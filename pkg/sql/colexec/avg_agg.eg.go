@@ -126,9 +126,15 @@ func (a *avgDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				var isNull bool
 				isNull = nulls.NullAt(i)
 				if !isNull {
-					if _, err := tree.ExactCtx.Add(&a.scratch.curSum, &a.scratch.curSum, &col[i]); err != nil {
-						colexecerror.ExpectedError(err)
+
+					{
+
+						_, err := tree.ExactCtx.Add(&a.scratch.curSum, &a.scratch.curSum, &col[i])
+						if err != nil {
+							colexecerror.ExpectedError(err)
+						}
 					}
+
 					a.scratch.curCount++
 					a.scratch.foundNonNullForCurrentGroup = true
 				}
@@ -161,9 +167,15 @@ func (a *avgDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				var isNull bool
 				isNull = nulls.NullAt(i)
 				if !isNull {
-					if _, err := tree.ExactCtx.Add(&a.scratch.curSum, &a.scratch.curSum, &col[i]); err != nil {
-						colexecerror.ExpectedError(err)
+
+					{
+
+						_, err := tree.ExactCtx.Add(&a.scratch.curSum, &a.scratch.curSum, &col[i])
+						if err != nil {
+							colexecerror.ExpectedError(err)
+						}
 					}
+
 					a.scratch.curCount++
 					a.scratch.foundNonNullForCurrentGroup = true
 				}
@@ -197,9 +209,15 @@ func (a *avgDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				var isNull bool
 				isNull = false
 				if !isNull {
-					if _, err := tree.ExactCtx.Add(&a.scratch.curSum, &a.scratch.curSum, &col[i]); err != nil {
-						colexecerror.ExpectedError(err)
+
+					{
+
+						_, err := tree.ExactCtx.Add(&a.scratch.curSum, &a.scratch.curSum, &col[i])
+						if err != nil {
+							colexecerror.ExpectedError(err)
+						}
 					}
+
 					a.scratch.curCount++
 					a.scratch.foundNonNullForCurrentGroup = true
 				}
@@ -231,9 +249,15 @@ func (a *avgDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				var isNull bool
 				isNull = false
 				if !isNull {
-					if _, err := tree.ExactCtx.Add(&a.scratch.curSum, &a.scratch.curSum, &col[i]); err != nil {
-						colexecerror.ExpectedError(err)
+
+					{
+
+						_, err := tree.ExactCtx.Add(&a.scratch.curSum, &a.scratch.curSum, &col[i])
+						if err != nil {
+							colexecerror.ExpectedError(err)
+						}
 					}
+
 					a.scratch.curCount++
 					a.scratch.foundNonNullForCurrentGroup = true
 				}
@@ -360,7 +384,12 @@ func (a *avgFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				var isNull bool
 				isNull = nulls.NullAt(i)
 				if !isNull {
-					a.scratch.curSum = float64(a.scratch.curSum) + float64(col[i])
+
+					{
+
+						a.scratch.curSum = float64(a.scratch.curSum) + float64(col[i])
+					}
+
 					a.scratch.curCount++
 					a.scratch.foundNonNullForCurrentGroup = true
 				}
@@ -389,7 +418,12 @@ func (a *avgFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				var isNull bool
 				isNull = nulls.NullAt(i)
 				if !isNull {
-					a.scratch.curSum = float64(a.scratch.curSum) + float64(col[i])
+
+					{
+
+						a.scratch.curSum = float64(a.scratch.curSum) + float64(col[i])
+					}
+
 					a.scratch.curCount++
 					a.scratch.foundNonNullForCurrentGroup = true
 				}
@@ -419,7 +453,12 @@ func (a *avgFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				var isNull bool
 				isNull = false
 				if !isNull {
-					a.scratch.curSum = float64(a.scratch.curSum) + float64(col[i])
+
+					{
+
+						a.scratch.curSum = float64(a.scratch.curSum) + float64(col[i])
+					}
+
 					a.scratch.curCount++
 					a.scratch.foundNonNullForCurrentGroup = true
 				}
@@ -447,7 +486,12 @@ func (a *avgFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				var isNull bool
 				isNull = false
 				if !isNull {
-					a.scratch.curSum = float64(a.scratch.curSum) + float64(col[i])
+
+					{
+
+						a.scratch.curSum = float64(a.scratch.curSum) + float64(col[i])
+					}
+
 					a.scratch.curCount++
 					a.scratch.foundNonNullForCurrentGroup = true
 				}

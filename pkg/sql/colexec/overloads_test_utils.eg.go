@@ -13,6 +13,384 @@ import (
 	"github.com/cockroachdb/cockroach/pkg/util/duration"
 )
 
+func performBitandInt16Int16(a int16, b int16) int16 {
+	var r int16
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	r = a & b
+
+	return r
+}
+
+func performBitandInt16Int32(a int16, b int32) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	r = int64(a) & int64(b)
+
+	return r
+}
+
+func performBitandInt16Int64(a int16, b int64) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	r = int64(a) & int64(b)
+
+	return r
+}
+
+func performBitandInt32Int16(a int32, b int16) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	r = int64(a) & int64(b)
+
+	return r
+}
+
+func performBitandInt32Int32(a int32, b int32) int32 {
+	var r int32
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	r = a & b
+
+	return r
+}
+
+func performBitandInt32Int64(a int32, b int64) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	r = int64(a) & int64(b)
+
+	return r
+}
+
+func performBitandInt64Int16(a int64, b int16) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	r = int64(a) & int64(b)
+
+	return r
+}
+
+func performBitandInt64Int32(a int64, b int32) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	r = int64(a) & int64(b)
+
+	return r
+}
+
+func performBitandInt64Int64(a int64, b int64) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	r = int64(a) & int64(b)
+
+	return r
+}
+
+func performBitorInt16Int16(a int16, b int16) int16 {
+	var r int16
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	r = a | b
+
+	return r
+}
+
+func performBitorInt16Int32(a int16, b int32) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	r = int64(a) | int64(b)
+
+	return r
+}
+
+func performBitorInt16Int64(a int16, b int64) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	r = int64(a) | int64(b)
+
+	return r
+}
+
+func performBitorInt32Int16(a int32, b int16) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	r = int64(a) | int64(b)
+
+	return r
+}
+
+func performBitorInt32Int32(a int32, b int32) int32 {
+	var r int32
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	r = a | b
+
+	return r
+}
+
+func performBitorInt32Int64(a int32, b int64) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	r = int64(a) | int64(b)
+
+	return r
+}
+
+func performBitorInt64Int16(a int64, b int16) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	r = int64(a) | int64(b)
+
+	return r
+}
+
+func performBitorInt64Int32(a int64, b int32) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	r = int64(a) | int64(b)
+
+	return r
+}
+
+func performBitorInt64Int64(a int64, b int64) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	r = int64(a) | int64(b)
+
+	return r
+}
+
+func performBitxorInt16Int16(a int16, b int16) int16 {
+	var r int16
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	r = a ^ b
+
+	return r
+}
+
+func performBitxorInt16Int32(a int16, b int32) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	r = int64(a) ^ int64(b)
+
+	return r
+}
+
+func performBitxorInt16Int64(a int16, b int64) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	r = int64(a) ^ int64(b)
+
+	return r
+}
+
+func performBitxorInt32Int16(a int32, b int16) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	r = int64(a) ^ int64(b)
+
+	return r
+}
+
+func performBitxorInt32Int32(a int32, b int32) int32 {
+	var r int32
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	r = a ^ b
+
+	return r
+}
+
+func performBitxorInt32Int64(a int32, b int64) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	r = int64(a) ^ int64(b)
+
+	return r
+}
+
+func performBitxorInt64Int16(a int64, b int16) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	r = int64(a) ^ int64(b)
+
+	return r
+}
+
+func performBitxorInt64Int32(a int64, b int32) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	r = int64(a) ^ int64(b)
+
+	return r
+}
+
+func performBitxorInt64Int64(a int64, b int64) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	r = int64(a) ^ int64(b)
+
+	return r
+}
+
 func performPlusDecimalInt16(a apd.Decimal, b int16) apd.Decimal {
 	var r apd.Decimal
 	// In order to inline the templated code of overloads, we need to have a
@@ -84,9 +462,15 @@ func performPlusDecimalDecimal(a apd.Decimal, b apd.Decimal) apd.Decimal {
 	// However, the scratch is not used in all of the functions, so we add this
 	// to go around "unused" error.
 	_ = _overloadHelper
-	if _, err := tree.ExactCtx.Add(&r, &a, &b); err != nil {
-		colexecerror.ExpectedError(err)
+
+	{
+
+		_, err := tree.ExactCtx.Add(&r, &a, &b)
+		if err != nil {
+			colexecerror.ExpectedError(err)
+		}
 	}
+
 	return r
 }
 
@@ -280,11 +664,10 @@ func performPlusInt16Decimal(a int16, b apd.Decimal) apd.Decimal {
 	_ = _overloadHelper
 
 	{
+
 		tmpDec := &_overloadHelper.tmpDec1
 		tmpDec.SetFinite(int64(a), 0)
-
 		_, err := tree.ExactCtx.Add(&r, tmpDec, &b)
-
 		if err != nil {
 			colexecerror.ExpectedError(err)
 		}
@@ -303,11 +686,10 @@ func performPlusInt32Decimal(a int32, b apd.Decimal) apd.Decimal {
 	_ = _overloadHelper
 
 	{
+
 		tmpDec := &_overloadHelper.tmpDec1
 		tmpDec.SetFinite(int64(a), 0)
-
 		_, err := tree.ExactCtx.Add(&r, tmpDec, &b)
-
 		if err != nil {
 			colexecerror.ExpectedError(err)
 		}
@@ -326,11 +708,10 @@ func performPlusInt64Decimal(a int64, b apd.Decimal) apd.Decimal {
 	_ = _overloadHelper
 
 	{
+
 		tmpDec := &_overloadHelper.tmpDec1
 		tmpDec.SetFinite(int64(a), 0)
-
 		_, err := tree.ExactCtx.Add(&r, tmpDec, &b)
-
 		if err != nil {
 			colexecerror.ExpectedError(err)
 		}
@@ -347,7 +728,12 @@ func performPlusFloat64Float64(a float64, b float64) float64 {
 	// However, the scratch is not used in all of the functions, so we add this
 	// to go around "unused" error.
 	_ = _overloadHelper
-	r = float64(a) + float64(b)
+
+	{
+
+		r = float64(a) + float64(b)
+	}
+
 	return r
 }
 
@@ -458,9 +844,15 @@ func performMinusDecimalDecimal(a apd.Decimal, b apd.Decimal) apd.Decimal {
 	// However, the scratch is not used in all of the functions, so we add this
 	// to go around "unused" error.
 	_ = _overloadHelper
-	if _, err := tree.ExactCtx.Sub(&r, &a, &b); err != nil {
-		colexecerror.ExpectedError(err)
+
+	{
+
+		_, err := tree.ExactCtx.Sub(&r, &a, &b)
+		if err != nil {
+			colexecerror.ExpectedError(err)
+		}
 	}
+
 	return r
 }
 
@@ -654,11 +1046,10 @@ func performMinusInt16Decimal(a int16, b apd.Decimal) apd.Decimal {
 	_ = _overloadHelper
 
 	{
+
 		tmpDec := &_overloadHelper.tmpDec1
 		tmpDec.SetFinite(int64(a), 0)
-
 		_, err := tree.ExactCtx.Sub(&r, tmpDec, &b)
-
 		if err != nil {
 			colexecerror.ExpectedError(err)
 		}
@@ -677,11 +1068,10 @@ func performMinusInt32Decimal(a int32, b apd.Decimal) apd.Decimal {
 	_ = _overloadHelper
 
 	{
+
 		tmpDec := &_overloadHelper.tmpDec1
 		tmpDec.SetFinite(int64(a), 0)
-
 		_, err := tree.ExactCtx.Sub(&r, tmpDec, &b)
-
 		if err != nil {
 			colexecerror.ExpectedError(err)
 		}
@@ -700,11 +1090,10 @@ func performMinusInt64Decimal(a int64, b apd.Decimal) apd.Decimal {
 	_ = _overloadHelper
 
 	{
+
 		tmpDec := &_overloadHelper.tmpDec1
 		tmpDec.SetFinite(int64(a), 0)
-
 		_, err := tree.ExactCtx.Sub(&r, tmpDec, &b)
-
 		if err != nil {
 			colexecerror.ExpectedError(err)
 		}
@@ -721,7 +1110,12 @@ func performMinusFloat64Float64(a float64, b float64) float64 {
 	// However, the scratch is not used in all of the functions, so we add this
 	// to go around "unused" error.
 	_ = _overloadHelper
-	r = float64(a) - float64(b)
+
+	{
+
+		r = float64(a) - float64(b)
+	}
+
 	return r
 }
 
@@ -835,9 +1229,15 @@ func performMultDecimalDecimal(a apd.Decimal, b apd.Decimal) apd.Decimal {
 	// However, the scratch is not used in all of the functions, so we add this
 	// to go around "unused" error.
 	_ = _overloadHelper
-	if _, err := tree.ExactCtx.Mul(&r, &a, &b); err != nil {
-		colexecerror.ExpectedError(err)
+
+	{
+
+		_, err := tree.ExactCtx.Mul(&r, &a, &b)
+		if err != nil {
+			colexecerror.ExpectedError(err)
+		}
 	}
+
 	return r
 }
 
@@ -1111,11 +1511,10 @@ func performMultInt16Decimal(a int16, b apd.Decimal) apd.Decimal {
 	_ = _overloadHelper
 
 	{
+
 		tmpDec := &_overloadHelper.tmpDec1
 		tmpDec.SetFinite(int64(a), 0)
-
 		_, err := tree.ExactCtx.Mul(&r, tmpDec, &b)
-
 		if err != nil {
 			colexecerror.ExpectedError(err)
 		}
@@ -1134,11 +1533,10 @@ func performMultInt32Decimal(a int32, b apd.Decimal) apd.Decimal {
 	_ = _overloadHelper
 
 	{
+
 		tmpDec := &_overloadHelper.tmpDec1
 		tmpDec.SetFinite(int64(a), 0)
-
 		_, err := tree.ExactCtx.Mul(&r, tmpDec, &b)
-
 		if err != nil {
 			colexecerror.ExpectedError(err)
 		}
@@ -1157,11 +1555,10 @@ func performMultInt64Decimal(a int64, b apd.Decimal) apd.Decimal {
 	_ = _overloadHelper
 
 	{
+
 		tmpDec := &_overloadHelper.tmpDec1
 		tmpDec.SetFinite(int64(a), 0)
-
 		_, err := tree.ExactCtx.Mul(&r, tmpDec, &b)
-
 		if err != nil {
 			colexecerror.ExpectedError(err)
 		}
@@ -1190,7 +1587,12 @@ func performMultFloat64Float64(a float64, b float64) float64 {
 	// However, the scratch is not used in all of the functions, so we add this
 	// to go around "unused" error.
 	_ = _overloadHelper
-	r = float64(a) * float64(b)
+
+	{
+
+		r = float64(a) * float64(b)
+	}
+
 	return r
 }
 
@@ -1332,10 +1734,12 @@ func performDivDecimalDecimal(a apd.Decimal, b apd.Decimal) apd.Decimal {
 	_ = _overloadHelper
 
 	{
-		cond, err := tree.DecimalCtx.Quo(&r, &a, &b)
-		if cond.DivisionByZero() {
+
+		if b.IsZero() {
 			colexecerror.ExpectedError(tree.ErrDivByZero)
 		}
+
+		_, err := tree.DecimalCtx.Quo(&r, &a, &b)
 		if err != nil {
 			colexecerror.ExpectedError(err)
 		}
@@ -1570,14 +1974,14 @@ func performDivInt16Decimal(a int16, b apd.Decimal) apd.Decimal {
 	_ = _overloadHelper
 
 	{
-		tmpDec := &_overloadHelper.tmpDec1
-		tmpDec.SetFinite(int64(a), 0)
 
-		cond, err := tree.DecimalCtx.Quo(&r, tmpDec, &b)
-		if cond.DivisionByZero() {
+		if b.IsZero() {
 			colexecerror.ExpectedError(tree.ErrDivByZero)
 		}
 
+		tmpDec := &_overloadHelper.tmpDec1
+		tmpDec.SetFinite(int64(a), 0)
+		_, err := tree.DecimalCtx.Quo(&r, tmpDec, &b)
 		if err != nil {
 			colexecerror.ExpectedError(err)
 		}
@@ -1596,14 +2000,14 @@ func performDivInt32Decimal(a int32, b apd.Decimal) apd.Decimal {
 	_ = _overloadHelper
 
 	{
-		tmpDec := &_overloadHelper.tmpDec1
-		tmpDec.SetFinite(int64(a), 0)
 
-		cond, err := tree.DecimalCtx.Quo(&r, tmpDec, &b)
-		if cond.DivisionByZero() {
+		if b.IsZero() {
 			colexecerror.ExpectedError(tree.ErrDivByZero)
 		}
 
+		tmpDec := &_overloadHelper.tmpDec1
+		tmpDec.SetFinite(int64(a), 0)
+		_, err := tree.DecimalCtx.Quo(&r, tmpDec, &b)
 		if err != nil {
 			colexecerror.ExpectedError(err)
 		}
@@ -1622,14 +2026,14 @@ func performDivInt64Decimal(a int64, b apd.Decimal) apd.Decimal {
 	_ = _overloadHelper
 
 	{
-		tmpDec := &_overloadHelper.tmpDec1
-		tmpDec.SetFinite(int64(a), 0)
 
-		cond, err := tree.DecimalCtx.Quo(&r, tmpDec, &b)
-		if cond.DivisionByZero() {
+		if b.IsZero() {
 			colexecerror.ExpectedError(tree.ErrDivByZero)
 		}
 
+		tmpDec := &_overloadHelper.tmpDec1
+		tmpDec.SetFinite(int64(a), 0)
+		_, err := tree.DecimalCtx.Quo(&r, tmpDec, &b)
 		if err != nil {
 			colexecerror.ExpectedError(err)
 		}
@@ -1646,7 +2050,16 @@ func performDivFloat64Float64(a float64, b float64) float64 {
 	// However, the scratch is not used in all of the functions, so we add this
 	// to go around "unused" error.
 	_ = _overloadHelper
-	r = float64(a) / float64(b)
+
+	{
+
+		if b == 0.0 {
+			colexecerror.ExpectedError(tree.ErrDivByZero)
+		}
+
+		r = float64(a) / float64(b)
+	}
+
 	return r
 }
 
@@ -1679,6 +2092,744 @@ func performDivIntervalFloat64(a duration.Duration, b float64) duration.Duration
 		colexecerror.ExpectedError(tree.ErrDivByZero)
 	}
 	r = a.DivFloat(float64(b))
+	return r
+}
+
+func performFloorDivDecimalInt16(a apd.Decimal, b int16) apd.Decimal {
+	var r apd.Decimal
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+
+		if b == 0 {
+			colexecerror.ExpectedError(tree.ErrDivByZero)
+		}
+
+		tmpDec := &_overloadHelper.tmpDec1
+		tmpDec.SetFinite(int64(b), 0)
+		if _, err := tree.HighPrecisionCtx.QuoInteger(&r, &a, tmpDec); err != nil {
+			colexecerror.ExpectedError(err)
+		}
+	}
+
+	return r
+}
+
+func performFloorDivDecimalInt32(a apd.Decimal, b int32) apd.Decimal {
+	var r apd.Decimal
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+
+		if b == 0 {
+			colexecerror.ExpectedError(tree.ErrDivByZero)
+		}
+
+		tmpDec := &_overloadHelper.tmpDec1
+		tmpDec.SetFinite(int64(b), 0)
+		if _, err := tree.HighPrecisionCtx.QuoInteger(&r, &a, tmpDec); err != nil {
+			colexecerror.ExpectedError(err)
+		}
+	}
+
+	return r
+}
+
+func performFloorDivDecimalInt64(a apd.Decimal, b int64) apd.Decimal {
+	var r apd.Decimal
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+
+		if b == 0 {
+			colexecerror.ExpectedError(tree.ErrDivByZero)
+		}
+
+		tmpDec := &_overloadHelper.tmpDec1
+		tmpDec.SetFinite(int64(b), 0)
+		if _, err := tree.HighPrecisionCtx.QuoInteger(&r, &a, tmpDec); err != nil {
+			colexecerror.ExpectedError(err)
+		}
+	}
+
+	return r
+}
+
+func performFloorDivDecimalDecimal(a apd.Decimal, b apd.Decimal) apd.Decimal {
+	var r apd.Decimal
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+
+		if b.IsZero() {
+			colexecerror.ExpectedError(tree.ErrDivByZero)
+		}
+
+		_, err := tree.HighPrecisionCtx.QuoInteger(&r, &a, &b)
+		if err != nil {
+			colexecerror.ExpectedError(err)
+		}
+	}
+
+	return r
+}
+
+func performFloorDivInt16Int16(a int16, b int16) int16 {
+	var r int16
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+		if b == 0 {
+			colexecerror.ExpectedError(tree.ErrDivByZero)
+		}
+		r = a // b
+	}
+
+	return r
+}
+
+func performFloorDivInt16Int32(a int16, b int32) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+		if int64(b) == 0 {
+			colexecerror.ExpectedError(tree.ErrDivByZero)
+		}
+		r = int64(a) // int64(b)
+	}
+
+	return r
+}
+
+func performFloorDivInt16Int64(a int16, b int64) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+		if int64(b) == 0 {
+			colexecerror.ExpectedError(tree.ErrDivByZero)
+		}
+		r = int64(a) // int64(b)
+	}
+
+	return r
+}
+
+func performFloorDivInt32Int16(a int32, b int16) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+		if int64(b) == 0 {
+			colexecerror.ExpectedError(tree.ErrDivByZero)
+		}
+		r = int64(a) // int64(b)
+	}
+
+	return r
+}
+
+func performFloorDivInt32Int32(a int32, b int32) int32 {
+	var r int32
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+		if b == 0 {
+			colexecerror.ExpectedError(tree.ErrDivByZero)
+		}
+		r = a // b
+	}
+
+	return r
+}
+
+func performFloorDivInt32Int64(a int32, b int64) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+		if int64(b) == 0 {
+			colexecerror.ExpectedError(tree.ErrDivByZero)
+		}
+		r = int64(a) // int64(b)
+	}
+
+	return r
+}
+
+func performFloorDivInt64Int16(a int64, b int16) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+		if int64(b) == 0 {
+			colexecerror.ExpectedError(tree.ErrDivByZero)
+		}
+		r = int64(a) // int64(b)
+	}
+
+	return r
+}
+
+func performFloorDivInt64Int32(a int64, b int32) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+		if int64(b) == 0 {
+			colexecerror.ExpectedError(tree.ErrDivByZero)
+		}
+		r = int64(a) // int64(b)
+	}
+
+	return r
+}
+
+func performFloorDivInt64Int64(a int64, b int64) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+		if int64(b) == 0 {
+			colexecerror.ExpectedError(tree.ErrDivByZero)
+		}
+		r = int64(a) // int64(b)
+	}
+
+	return r
+}
+
+func performFloorDivInt16Decimal(a int16, b apd.Decimal) apd.Decimal {
+	var r apd.Decimal
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+
+		if b.IsZero() {
+			colexecerror.ExpectedError(tree.ErrDivByZero)
+		}
+
+		tmpDec := &_overloadHelper.tmpDec1
+		tmpDec.SetFinite(int64(a), 0)
+		_, err := tree.HighPrecisionCtx.QuoInteger(&r, tmpDec, &b)
+		if err != nil {
+			colexecerror.ExpectedError(err)
+		}
+	}
+
+	return r
+}
+
+func performFloorDivInt32Decimal(a int32, b apd.Decimal) apd.Decimal {
+	var r apd.Decimal
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+
+		if b.IsZero() {
+			colexecerror.ExpectedError(tree.ErrDivByZero)
+		}
+
+		tmpDec := &_overloadHelper.tmpDec1
+		tmpDec.SetFinite(int64(a), 0)
+		_, err := tree.HighPrecisionCtx.QuoInteger(&r, tmpDec, &b)
+		if err != nil {
+			colexecerror.ExpectedError(err)
+		}
+	}
+
+	return r
+}
+
+func performFloorDivInt64Decimal(a int64, b apd.Decimal) apd.Decimal {
+	var r apd.Decimal
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+
+		if b.IsZero() {
+			colexecerror.ExpectedError(tree.ErrDivByZero)
+		}
+
+		tmpDec := &_overloadHelper.tmpDec1
+		tmpDec.SetFinite(int64(a), 0)
+		_, err := tree.HighPrecisionCtx.QuoInteger(&r, tmpDec, &b)
+		if err != nil {
+			colexecerror.ExpectedError(err)
+		}
+	}
+
+	return r
+}
+
+func performFloorDivFloat64Float64(a float64, b float64) float64 {
+	var r float64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+
+		if b == 0.0 {
+			colexecerror.ExpectedError(tree.ErrDivByZero)
+		}
+
+		r = math.Trunc(float64(a) / float64(b))
+	}
+
+	return r
+}
+
+func performModDecimalInt16(a apd.Decimal, b int16) apd.Decimal {
+	var r apd.Decimal
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+
+		if b == 0 {
+			colexecerror.ExpectedError(tree.ErrDivByZero)
+		}
+
+		tmpDec := &_overloadHelper.tmpDec1
+		tmpDec.SetFinite(int64(b), 0)
+		if _, err := tree.HighPrecisionCtx.Rem(&r, &a, tmpDec); err != nil {
+			colexecerror.ExpectedError(err)
+		}
+	}
+
+	return r
+}
+
+func performModDecimalInt32(a apd.Decimal, b int32) apd.Decimal {
+	var r apd.Decimal
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+
+		if b == 0 {
+			colexecerror.ExpectedError(tree.ErrDivByZero)
+		}
+
+		tmpDec := &_overloadHelper.tmpDec1
+		tmpDec.SetFinite(int64(b), 0)
+		if _, err := tree.HighPrecisionCtx.Rem(&r, &a, tmpDec); err != nil {
+			colexecerror.ExpectedError(err)
+		}
+	}
+
+	return r
+}
+
+func performModDecimalInt64(a apd.Decimal, b int64) apd.Decimal {
+	var r apd.Decimal
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+
+		if b == 0 {
+			colexecerror.ExpectedError(tree.ErrDivByZero)
+		}
+
+		tmpDec := &_overloadHelper.tmpDec1
+		tmpDec.SetFinite(int64(b), 0)
+		if _, err := tree.HighPrecisionCtx.Rem(&r, &a, tmpDec); err != nil {
+			colexecerror.ExpectedError(err)
+		}
+	}
+
+	return r
+}
+
+func performModDecimalDecimal(a apd.Decimal, b apd.Decimal) apd.Decimal {
+	var r apd.Decimal
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+
+		if b.IsZero() {
+			colexecerror.ExpectedError(tree.ErrDivByZero)
+		}
+
+		_, err := tree.HighPrecisionCtx.Rem(&r, &a, &b)
+		if err != nil {
+			colexecerror.ExpectedError(err)
+		}
+	}
+
+	return r
+}
+
+func performModInt16Int16(a int16, b int16) int16 {
+	var r int16
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+		if b == 0 {
+			colexecerror.ExpectedError(tree.ErrDivByZero)
+		}
+		r = a % b
+	}
+
+	return r
+}
+
+func performModInt16Int32(a int16, b int32) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+		if int64(b) == 0 {
+			colexecerror.ExpectedError(tree.ErrDivByZero)
+		}
+		r = int64(a) % int64(b)
+	}
+
+	return r
+}
+
+func performModInt16Int64(a int16, b int64) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+		if int64(b) == 0 {
+			colexecerror.ExpectedError(tree.ErrDivByZero)
+		}
+		r = int64(a) % int64(b)
+	}
+
+	return r
+}
+
+func performModInt32Int16(a int32, b int16) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+		if int64(b) == 0 {
+			colexecerror.ExpectedError(tree.ErrDivByZero)
+		}
+		r = int64(a) % int64(b)
+	}
+
+	return r
+}
+
+func performModInt32Int32(a int32, b int32) int32 {
+	var r int32
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+		if b == 0 {
+			colexecerror.ExpectedError(tree.ErrDivByZero)
+		}
+		r = a % b
+	}
+
+	return r
+}
+
+func performModInt32Int64(a int32, b int64) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+		if int64(b) == 0 {
+			colexecerror.ExpectedError(tree.ErrDivByZero)
+		}
+		r = int64(a) % int64(b)
+	}
+
+	return r
+}
+
+func performModInt64Int16(a int64, b int16) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+		if int64(b) == 0 {
+			colexecerror.ExpectedError(tree.ErrDivByZero)
+		}
+		r = int64(a) % int64(b)
+	}
+
+	return r
+}
+
+func performModInt64Int32(a int64, b int32) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+		if int64(b) == 0 {
+			colexecerror.ExpectedError(tree.ErrDivByZero)
+		}
+		r = int64(a) % int64(b)
+	}
+
+	return r
+}
+
+func performModInt64Int64(a int64, b int64) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+		if int64(b) == 0 {
+			colexecerror.ExpectedError(tree.ErrDivByZero)
+		}
+		r = int64(a) % int64(b)
+	}
+
+	return r
+}
+
+func performModInt16Decimal(a int16, b apd.Decimal) apd.Decimal {
+	var r apd.Decimal
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+
+		if b.IsZero() {
+			colexecerror.ExpectedError(tree.ErrDivByZero)
+		}
+
+		tmpDec := &_overloadHelper.tmpDec1
+		tmpDec.SetFinite(int64(a), 0)
+		_, err := tree.HighPrecisionCtx.Rem(&r, tmpDec, &b)
+		if err != nil {
+			colexecerror.ExpectedError(err)
+		}
+	}
+
+	return r
+}
+
+func performModInt32Decimal(a int32, b apd.Decimal) apd.Decimal {
+	var r apd.Decimal
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+
+		if b.IsZero() {
+			colexecerror.ExpectedError(tree.ErrDivByZero)
+		}
+
+		tmpDec := &_overloadHelper.tmpDec1
+		tmpDec.SetFinite(int64(a), 0)
+		_, err := tree.HighPrecisionCtx.Rem(&r, tmpDec, &b)
+		if err != nil {
+			colexecerror.ExpectedError(err)
+		}
+	}
+
+	return r
+}
+
+func performModInt64Decimal(a int64, b apd.Decimal) apd.Decimal {
+	var r apd.Decimal
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+
+		if b.IsZero() {
+			colexecerror.ExpectedError(tree.ErrDivByZero)
+		}
+
+		tmpDec := &_overloadHelper.tmpDec1
+		tmpDec.SetFinite(int64(a), 0)
+		_, err := tree.HighPrecisionCtx.Rem(&r, tmpDec, &b)
+		if err != nil {
+			colexecerror.ExpectedError(err)
+		}
+	}
+
+	return r
+}
+
+func performModFloat64Float64(a float64, b float64) float64 {
+	var r float64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+
+		if b == 0.0 {
+			colexecerror.ExpectedError(tree.ErrDivByZero)
+		}
+
+		r = math.Mod(float64(a), float64(b))
+	}
+
 	return r
 }
 

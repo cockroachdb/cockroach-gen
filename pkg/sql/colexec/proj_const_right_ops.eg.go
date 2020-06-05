@@ -32,6 +32,2604 @@ import (
 // Remove unused warning.
 var _ = execgen.UNSAFEGET
 
+type projBitandInt16Int16ConstOp struct {
+	projConstOpBase
+	constArg int16
+}
+
+func (p projBitandInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int16
+	col = vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int16()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = arg & p.constArg
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = arg & p.constArg
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				projCol[i] = arg & p.constArg
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				projCol[i] = arg & p.constArg
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projBitandInt16Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type projBitandInt16Int32ConstOp struct {
+	projConstOpBase
+	constArg int32
+}
+
+func (p projBitandInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int16
+	col = vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = int64(arg) & int64(p.constArg)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = int64(arg) & int64(p.constArg)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				projCol[i] = int64(arg) & int64(p.constArg)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				projCol[i] = int64(arg) & int64(p.constArg)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projBitandInt16Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projBitandInt16Int64ConstOp struct {
+	projConstOpBase
+	constArg int64
+}
+
+func (p projBitandInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int16
+	col = vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = int64(arg) & int64(p.constArg)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = int64(arg) & int64(p.constArg)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				projCol[i] = int64(arg) & int64(p.constArg)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				projCol[i] = int64(arg) & int64(p.constArg)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projBitandInt16Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projBitandInt32Int16ConstOp struct {
+	projConstOpBase
+	constArg int16
+}
+
+func (p projBitandInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int32
+	col = vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = int64(arg) & int64(p.constArg)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = int64(arg) & int64(p.constArg)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				projCol[i] = int64(arg) & int64(p.constArg)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				projCol[i] = int64(arg) & int64(p.constArg)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projBitandInt32Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type projBitandInt32Int32ConstOp struct {
+	projConstOpBase
+	constArg int32
+}
+
+func (p projBitandInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int32
+	col = vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int32()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = arg & p.constArg
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = arg & p.constArg
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				projCol[i] = arg & p.constArg
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				projCol[i] = arg & p.constArg
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projBitandInt32Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projBitandInt32Int64ConstOp struct {
+	projConstOpBase
+	constArg int64
+}
+
+func (p projBitandInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int32
+	col = vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = int64(arg) & int64(p.constArg)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = int64(arg) & int64(p.constArg)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				projCol[i] = int64(arg) & int64(p.constArg)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				projCol[i] = int64(arg) & int64(p.constArg)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projBitandInt32Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projBitandInt64Int16ConstOp struct {
+	projConstOpBase
+	constArg int16
+}
+
+func (p projBitandInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int64
+	col = vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = int64(arg) & int64(p.constArg)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = int64(arg) & int64(p.constArg)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				projCol[i] = int64(arg) & int64(p.constArg)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				projCol[i] = int64(arg) & int64(p.constArg)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projBitandInt64Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type projBitandInt64Int32ConstOp struct {
+	projConstOpBase
+	constArg int32
+}
+
+func (p projBitandInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int64
+	col = vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = int64(arg) & int64(p.constArg)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = int64(arg) & int64(p.constArg)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				projCol[i] = int64(arg) & int64(p.constArg)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				projCol[i] = int64(arg) & int64(p.constArg)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projBitandInt64Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projBitandInt64Int64ConstOp struct {
+	projConstOpBase
+	constArg int64
+}
+
+func (p projBitandInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int64
+	col = vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = int64(arg) & int64(p.constArg)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = int64(arg) & int64(p.constArg)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				projCol[i] = int64(arg) & int64(p.constArg)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				projCol[i] = int64(arg) & int64(p.constArg)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projBitandInt64Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projBitandDatumDatumConstOp struct {
+	projConstOpBase
+	constArg interface{}
+}
+
+func (p projBitandDatumDatumConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col coldata.DatumVec
+	col = vec.Datum()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_res, err := arg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, p.constArg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_res, err := arg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, p.constArg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col.Get(i)
+
+				_res, err := arg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, p.constArg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				arg := col.Get(i)
+
+				_res, err := arg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, p.constArg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projBitandDatumDatumConstOp) Init() {
+	p.input.Init()
+}
+
+type projBitorInt16Int16ConstOp struct {
+	projConstOpBase
+	constArg int16
+}
+
+func (p projBitorInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int16
+	col = vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int16()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = arg | p.constArg
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = arg | p.constArg
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				projCol[i] = arg | p.constArg
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				projCol[i] = arg | p.constArg
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projBitorInt16Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type projBitorInt16Int32ConstOp struct {
+	projConstOpBase
+	constArg int32
+}
+
+func (p projBitorInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int16
+	col = vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = int64(arg) | int64(p.constArg)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = int64(arg) | int64(p.constArg)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				projCol[i] = int64(arg) | int64(p.constArg)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				projCol[i] = int64(arg) | int64(p.constArg)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projBitorInt16Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projBitorInt16Int64ConstOp struct {
+	projConstOpBase
+	constArg int64
+}
+
+func (p projBitorInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int16
+	col = vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = int64(arg) | int64(p.constArg)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = int64(arg) | int64(p.constArg)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				projCol[i] = int64(arg) | int64(p.constArg)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				projCol[i] = int64(arg) | int64(p.constArg)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projBitorInt16Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projBitorInt32Int16ConstOp struct {
+	projConstOpBase
+	constArg int16
+}
+
+func (p projBitorInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int32
+	col = vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = int64(arg) | int64(p.constArg)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = int64(arg) | int64(p.constArg)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				projCol[i] = int64(arg) | int64(p.constArg)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				projCol[i] = int64(arg) | int64(p.constArg)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projBitorInt32Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type projBitorInt32Int32ConstOp struct {
+	projConstOpBase
+	constArg int32
+}
+
+func (p projBitorInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int32
+	col = vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int32()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = arg | p.constArg
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = arg | p.constArg
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				projCol[i] = arg | p.constArg
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				projCol[i] = arg | p.constArg
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projBitorInt32Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projBitorInt32Int64ConstOp struct {
+	projConstOpBase
+	constArg int64
+}
+
+func (p projBitorInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int32
+	col = vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = int64(arg) | int64(p.constArg)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = int64(arg) | int64(p.constArg)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				projCol[i] = int64(arg) | int64(p.constArg)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				projCol[i] = int64(arg) | int64(p.constArg)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projBitorInt32Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projBitorInt64Int16ConstOp struct {
+	projConstOpBase
+	constArg int16
+}
+
+func (p projBitorInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int64
+	col = vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = int64(arg) | int64(p.constArg)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = int64(arg) | int64(p.constArg)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				projCol[i] = int64(arg) | int64(p.constArg)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				projCol[i] = int64(arg) | int64(p.constArg)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projBitorInt64Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type projBitorInt64Int32ConstOp struct {
+	projConstOpBase
+	constArg int32
+}
+
+func (p projBitorInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int64
+	col = vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = int64(arg) | int64(p.constArg)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = int64(arg) | int64(p.constArg)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				projCol[i] = int64(arg) | int64(p.constArg)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				projCol[i] = int64(arg) | int64(p.constArg)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projBitorInt64Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projBitorInt64Int64ConstOp struct {
+	projConstOpBase
+	constArg int64
+}
+
+func (p projBitorInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int64
+	col = vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = int64(arg) | int64(p.constArg)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = int64(arg) | int64(p.constArg)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				projCol[i] = int64(arg) | int64(p.constArg)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				projCol[i] = int64(arg) | int64(p.constArg)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projBitorInt64Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projBitorDatumDatumConstOp struct {
+	projConstOpBase
+	constArg interface{}
+}
+
+func (p projBitorDatumDatumConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col coldata.DatumVec
+	col = vec.Datum()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_res, err := arg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, p.constArg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_res, err := arg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, p.constArg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col.Get(i)
+
+				_res, err := arg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, p.constArg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				arg := col.Get(i)
+
+				_res, err := arg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, p.constArg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projBitorDatumDatumConstOp) Init() {
+	p.input.Init()
+}
+
+type projBitxorInt16Int16ConstOp struct {
+	projConstOpBase
+	constArg int16
+}
+
+func (p projBitxorInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int16
+	col = vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int16()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = arg ^ p.constArg
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = arg ^ p.constArg
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				projCol[i] = arg ^ p.constArg
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				projCol[i] = arg ^ p.constArg
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projBitxorInt16Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type projBitxorInt16Int32ConstOp struct {
+	projConstOpBase
+	constArg int32
+}
+
+func (p projBitxorInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int16
+	col = vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = int64(arg) ^ int64(p.constArg)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = int64(arg) ^ int64(p.constArg)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				projCol[i] = int64(arg) ^ int64(p.constArg)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				projCol[i] = int64(arg) ^ int64(p.constArg)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projBitxorInt16Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projBitxorInt16Int64ConstOp struct {
+	projConstOpBase
+	constArg int64
+}
+
+func (p projBitxorInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int16
+	col = vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = int64(arg) ^ int64(p.constArg)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = int64(arg) ^ int64(p.constArg)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				projCol[i] = int64(arg) ^ int64(p.constArg)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				projCol[i] = int64(arg) ^ int64(p.constArg)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projBitxorInt16Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projBitxorInt32Int16ConstOp struct {
+	projConstOpBase
+	constArg int16
+}
+
+func (p projBitxorInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int32
+	col = vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = int64(arg) ^ int64(p.constArg)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = int64(arg) ^ int64(p.constArg)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				projCol[i] = int64(arg) ^ int64(p.constArg)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				projCol[i] = int64(arg) ^ int64(p.constArg)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projBitxorInt32Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type projBitxorInt32Int32ConstOp struct {
+	projConstOpBase
+	constArg int32
+}
+
+func (p projBitxorInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int32
+	col = vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int32()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = arg ^ p.constArg
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = arg ^ p.constArg
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				projCol[i] = arg ^ p.constArg
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				projCol[i] = arg ^ p.constArg
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projBitxorInt32Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projBitxorInt32Int64ConstOp struct {
+	projConstOpBase
+	constArg int64
+}
+
+func (p projBitxorInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int32
+	col = vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = int64(arg) ^ int64(p.constArg)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = int64(arg) ^ int64(p.constArg)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				projCol[i] = int64(arg) ^ int64(p.constArg)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				projCol[i] = int64(arg) ^ int64(p.constArg)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projBitxorInt32Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projBitxorInt64Int16ConstOp struct {
+	projConstOpBase
+	constArg int16
+}
+
+func (p projBitxorInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int64
+	col = vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = int64(arg) ^ int64(p.constArg)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = int64(arg) ^ int64(p.constArg)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				projCol[i] = int64(arg) ^ int64(p.constArg)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				projCol[i] = int64(arg) ^ int64(p.constArg)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projBitxorInt64Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type projBitxorInt64Int32ConstOp struct {
+	projConstOpBase
+	constArg int32
+}
+
+func (p projBitxorInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int64
+	col = vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = int64(arg) ^ int64(p.constArg)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = int64(arg) ^ int64(p.constArg)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				projCol[i] = int64(arg) ^ int64(p.constArg)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				projCol[i] = int64(arg) ^ int64(p.constArg)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projBitxorInt64Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projBitxorInt64Int64ConstOp struct {
+	projConstOpBase
+	constArg int64
+}
+
+func (p projBitxorInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int64
+	col = vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = int64(arg) ^ int64(p.constArg)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					projCol[i] = int64(arg) ^ int64(p.constArg)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				projCol[i] = int64(arg) ^ int64(p.constArg)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				projCol[i] = int64(arg) ^ int64(p.constArg)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projBitxorInt64Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projBitxorDatumDatumConstOp struct {
+	projConstOpBase
+	constArg interface{}
+}
+
+func (p projBitxorDatumDatumConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col coldata.DatumVec
+	col = vec.Datum()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_res, err := arg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, p.constArg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col.Get(i)
+
+					_res, err := arg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, p.constArg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col.Get(i)
+
+				_res, err := arg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, p.constArg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col.Slice(0, n)
+			_ = projCol.Get(n - 1)
+			for i := 0; i < n; i++ {
+				arg := col.Get(i)
+
+				_res, err := arg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, p.constArg)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projBitxorDatumDatumConstOp) Init() {
+	p.input.Init()
+}
+
 type projPlusBoolDatumConstOp struct {
 	projConstOpBase
 	constArg interface{}
@@ -531,9 +3129,15 @@ func (p projPlusDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				if !colNulls.NullAt(i) {
 					// We only want to perform the projection operation if the value is not null.
 					arg := col[i]
-					if _, err := tree.ExactCtx.Add(&projCol[i], &arg, &p.constArg); err != nil {
-						colexecerror.ExpectedError(err)
+
+					{
+
+						_, err := tree.ExactCtx.Add(&projCol[i], &arg, &p.constArg)
+						if err != nil {
+							colexecerror.ExpectedError(err)
+						}
 					}
+
 				}
 			}
 		} else {
@@ -543,9 +3147,15 @@ func (p projPlusDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				if !colNulls.NullAt(i) {
 					// We only want to perform the projection operation if the value is not null.
 					arg := col[i]
-					if _, err := tree.ExactCtx.Add(&projCol[i], &arg, &p.constArg); err != nil {
-						colexecerror.ExpectedError(err)
+
+					{
+
+						_, err := tree.ExactCtx.Add(&projCol[i], &arg, &p.constArg)
+						if err != nil {
+							colexecerror.ExpectedError(err)
+						}
 					}
+
 				}
 			}
 		}
@@ -556,18 +3166,30 @@ func (p projPlusDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			sel = sel[:n]
 			for _, i := range sel {
 				arg := col[i]
-				if _, err := tree.ExactCtx.Add(&projCol[i], &arg, &p.constArg); err != nil {
-					colexecerror.ExpectedError(err)
+
+				{
+
+					_, err := tree.ExactCtx.Add(&projCol[i], &arg, &p.constArg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
 				}
+
 			}
 		} else {
 			col = col[0:n]
 			_ = projCol[n-1]
 			for i := range col {
 				arg := col[i]
-				if _, err := tree.ExactCtx.Add(&projCol[i], &arg, &p.constArg); err != nil {
-					colexecerror.ExpectedError(err)
+
+				{
+
+					_, err := tree.ExactCtx.Add(&projCol[i], &arg, &p.constArg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
 				}
+
 			}
 		}
 	}
@@ -1070,11 +3692,10 @@ func (p projPlusInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
+
 						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
-
 						_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &p.constArg)
-
 						if err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -1091,11 +3712,10 @@ func (p projPlusInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
+
 						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
-
 						_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &p.constArg)
-
 						if err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -1113,11 +3733,10 @@ func (p projPlusInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
+
 					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(arg), 0)
-
 					_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &p.constArg)
-
 					if err != nil {
 						colexecerror.ExpectedError(err)
 					}
@@ -1131,11 +3750,10 @@ func (p projPlusInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
+
 					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(arg), 0)
-
 					_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &p.constArg)
-
 					if err != nil {
 						colexecerror.ExpectedError(err)
 					}
@@ -1643,11 +4261,10 @@ func (p projPlusInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
+
 						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
-
 						_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &p.constArg)
-
 						if err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -1664,11 +4281,10 @@ func (p projPlusInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
+
 						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
-
 						_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &p.constArg)
-
 						if err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -1686,11 +4302,10 @@ func (p projPlusInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
+
 					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(arg), 0)
-
 					_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &p.constArg)
-
 					if err != nil {
 						colexecerror.ExpectedError(err)
 					}
@@ -1704,11 +4319,10 @@ func (p projPlusInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
+
 					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(arg), 0)
-
 					_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &p.constArg)
-
 					if err != nil {
 						colexecerror.ExpectedError(err)
 					}
@@ -2216,11 +4830,10 @@ func (p projPlusInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
+
 						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
-
 						_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &p.constArg)
-
 						if err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -2237,11 +4850,10 @@ func (p projPlusInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
+
 						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
-
 						_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &p.constArg)
-
 						if err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -2259,11 +4871,10 @@ func (p projPlusInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
+
 					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(arg), 0)
-
 					_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &p.constArg)
-
 					if err != nil {
 						colexecerror.ExpectedError(err)
 					}
@@ -2277,11 +4888,10 @@ func (p projPlusInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
+
 					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(arg), 0)
-
 					_, err := tree.ExactCtx.Add(&projCol[i], tmpDec, &p.constArg)
-
 					if err != nil {
 						colexecerror.ExpectedError(err)
 					}
@@ -2460,7 +5070,12 @@ func (p projPlusFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				if !colNulls.NullAt(i) {
 					// We only want to perform the projection operation if the value is not null.
 					arg := col[i]
-					projCol[i] = float64(arg) + float64(p.constArg)
+
+					{
+
+						projCol[i] = float64(arg) + float64(p.constArg)
+					}
+
 				}
 			}
 		} else {
@@ -2470,7 +5085,12 @@ func (p projPlusFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				if !colNulls.NullAt(i) {
 					// We only want to perform the projection operation if the value is not null.
 					arg := col[i]
-					projCol[i] = float64(arg) + float64(p.constArg)
+
+					{
+
+						projCol[i] = float64(arg) + float64(p.constArg)
+					}
+
 				}
 			}
 		}
@@ -2481,14 +5101,24 @@ func (p projPlusFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			sel = sel[:n]
 			for _, i := range sel {
 				arg := col[i]
-				projCol[i] = float64(arg) + float64(p.constArg)
+
+				{
+
+					projCol[i] = float64(arg) + float64(p.constArg)
+				}
+
 			}
 		} else {
 			col = col[0:n]
 			_ = projCol[n-1]
 			for i := range col {
 				arg := col[i]
-				projCol[i] = float64(arg) + float64(p.constArg)
+
+				{
+
+					projCol[i] = float64(arg) + float64(p.constArg)
+				}
+
 			}
 		}
 	}
@@ -4519,9 +7149,15 @@ func (p projMinusDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch 
 				if !colNulls.NullAt(i) {
 					// We only want to perform the projection operation if the value is not null.
 					arg := col[i]
-					if _, err := tree.ExactCtx.Sub(&projCol[i], &arg, &p.constArg); err != nil {
-						colexecerror.ExpectedError(err)
+
+					{
+
+						_, err := tree.ExactCtx.Sub(&projCol[i], &arg, &p.constArg)
+						if err != nil {
+							colexecerror.ExpectedError(err)
+						}
 					}
+
 				}
 			}
 		} else {
@@ -4531,9 +7167,15 @@ func (p projMinusDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch 
 				if !colNulls.NullAt(i) {
 					// We only want to perform the projection operation if the value is not null.
 					arg := col[i]
-					if _, err := tree.ExactCtx.Sub(&projCol[i], &arg, &p.constArg); err != nil {
-						colexecerror.ExpectedError(err)
+
+					{
+
+						_, err := tree.ExactCtx.Sub(&projCol[i], &arg, &p.constArg)
+						if err != nil {
+							colexecerror.ExpectedError(err)
+						}
 					}
+
 				}
 			}
 		}
@@ -4544,18 +7186,30 @@ func (p projMinusDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch 
 			sel = sel[:n]
 			for _, i := range sel {
 				arg := col[i]
-				if _, err := tree.ExactCtx.Sub(&projCol[i], &arg, &p.constArg); err != nil {
-					colexecerror.ExpectedError(err)
+
+				{
+
+					_, err := tree.ExactCtx.Sub(&projCol[i], &arg, &p.constArg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
 				}
+
 			}
 		} else {
 			col = col[0:n]
 			_ = projCol[n-1]
 			for i := range col {
 				arg := col[i]
-				if _, err := tree.ExactCtx.Sub(&projCol[i], &arg, &p.constArg); err != nil {
-					colexecerror.ExpectedError(err)
+
+				{
+
+					_, err := tree.ExactCtx.Sub(&projCol[i], &arg, &p.constArg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
 				}
+
 			}
 		}
 	}
@@ -5058,11 +7712,10 @@ func (p projMinusInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
+
 						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
-
 						_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &p.constArg)
-
 						if err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -5079,11 +7732,10 @@ func (p projMinusInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
+
 						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
-
 						_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &p.constArg)
-
 						if err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -5101,11 +7753,10 @@ func (p projMinusInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
+
 					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(arg), 0)
-
 					_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &p.constArg)
-
 					if err != nil {
 						colexecerror.ExpectedError(err)
 					}
@@ -5119,11 +7770,10 @@ func (p projMinusInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
+
 					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(arg), 0)
-
 					_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &p.constArg)
-
 					if err != nil {
 						colexecerror.ExpectedError(err)
 					}
@@ -5631,11 +8281,10 @@ func (p projMinusInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
+
 						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
-
 						_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &p.constArg)
-
 						if err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -5652,11 +8301,10 @@ func (p projMinusInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
+
 						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
-
 						_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &p.constArg)
-
 						if err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -5674,11 +8322,10 @@ func (p projMinusInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
+
 					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(arg), 0)
-
 					_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &p.constArg)
-
 					if err != nil {
 						colexecerror.ExpectedError(err)
 					}
@@ -5692,11 +8339,10 @@ func (p projMinusInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
+
 					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(arg), 0)
-
 					_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &p.constArg)
-
 					if err != nil {
 						colexecerror.ExpectedError(err)
 					}
@@ -6204,11 +8850,10 @@ func (p projMinusInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
+
 						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
-
 						_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &p.constArg)
-
 						if err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -6225,11 +8870,10 @@ func (p projMinusInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
+
 						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
-
 						_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &p.constArg)
-
 						if err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -6247,11 +8891,10 @@ func (p projMinusInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
+
 					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(arg), 0)
-
 					_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &p.constArg)
-
 					if err != nil {
 						colexecerror.ExpectedError(err)
 					}
@@ -6265,11 +8908,10 @@ func (p projMinusInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
+
 					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(arg), 0)
-
 					_, err := tree.ExactCtx.Sub(&projCol[i], tmpDec, &p.constArg)
-
 					if err != nil {
 						colexecerror.ExpectedError(err)
 					}
@@ -6448,7 +9090,12 @@ func (p projMinusFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch 
 				if !colNulls.NullAt(i) {
 					// We only want to perform the projection operation if the value is not null.
 					arg := col[i]
-					projCol[i] = float64(arg) - float64(p.constArg)
+
+					{
+
+						projCol[i] = float64(arg) - float64(p.constArg)
+					}
+
 				}
 			}
 		} else {
@@ -6458,7 +9105,12 @@ func (p projMinusFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch 
 				if !colNulls.NullAt(i) {
 					// We only want to perform the projection operation if the value is not null.
 					arg := col[i]
-					projCol[i] = float64(arg) - float64(p.constArg)
+
+					{
+
+						projCol[i] = float64(arg) - float64(p.constArg)
+					}
+
 				}
 			}
 		}
@@ -6469,14 +9121,24 @@ func (p projMinusFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch 
 			sel = sel[:n]
 			for _, i := range sel {
 				arg := col[i]
-				projCol[i] = float64(arg) - float64(p.constArg)
+
+				{
+
+					projCol[i] = float64(arg) - float64(p.constArg)
+				}
+
 			}
 		} else {
 			col = col[0:n]
 			_ = projCol[n-1]
 			for i := range col {
 				arg := col[i]
-				projCol[i] = float64(arg) - float64(p.constArg)
+
+				{
+
+					projCol[i] = float64(arg) - float64(p.constArg)
+				}
+
 			}
 		}
 	}
@@ -8519,9 +11181,15 @@ func (p projMultDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				if !colNulls.NullAt(i) {
 					// We only want to perform the projection operation if the value is not null.
 					arg := col[i]
-					if _, err := tree.ExactCtx.Mul(&projCol[i], &arg, &p.constArg); err != nil {
-						colexecerror.ExpectedError(err)
+
+					{
+
+						_, err := tree.ExactCtx.Mul(&projCol[i], &arg, &p.constArg)
+						if err != nil {
+							colexecerror.ExpectedError(err)
+						}
 					}
+
 				}
 			}
 		} else {
@@ -8531,9 +11199,15 @@ func (p projMultDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				if !colNulls.NullAt(i) {
 					// We only want to perform the projection operation if the value is not null.
 					arg := col[i]
-					if _, err := tree.ExactCtx.Mul(&projCol[i], &arg, &p.constArg); err != nil {
-						colexecerror.ExpectedError(err)
+
+					{
+
+						_, err := tree.ExactCtx.Mul(&projCol[i], &arg, &p.constArg)
+						if err != nil {
+							colexecerror.ExpectedError(err)
+						}
 					}
+
 				}
 			}
 		}
@@ -8544,18 +11218,30 @@ func (p projMultDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			sel = sel[:n]
 			for _, i := range sel {
 				arg := col[i]
-				if _, err := tree.ExactCtx.Mul(&projCol[i], &arg, &p.constArg); err != nil {
-					colexecerror.ExpectedError(err)
+
+				{
+
+					_, err := tree.ExactCtx.Mul(&projCol[i], &arg, &p.constArg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
 				}
+
 			}
 		} else {
 			col = col[0:n]
 			_ = projCol[n-1]
 			for i := range col {
 				arg := col[i]
-				if _, err := tree.ExactCtx.Mul(&projCol[i], &arg, &p.constArg); err != nil {
-					colexecerror.ExpectedError(err)
+
+				{
+
+					_, err := tree.ExactCtx.Mul(&projCol[i], &arg, &p.constArg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
 				}
+
 			}
 		}
 	}
@@ -9239,11 +11925,10 @@ func (p projMultInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
+
 						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
-
 						_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &p.constArg)
-
 						if err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -9260,11 +11945,10 @@ func (p projMultInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
+
 						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
-
 						_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &p.constArg)
-
 						if err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -9282,11 +11966,10 @@ func (p projMultInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
+
 					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(arg), 0)
-
 					_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &p.constArg)
-
 					if err != nil {
 						colexecerror.ExpectedError(err)
 					}
@@ -9300,11 +11983,10 @@ func (p projMultInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
+
 					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(arg), 0)
-
 					_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &p.constArg)
-
 					if err != nil {
 						colexecerror.ExpectedError(err)
 					}
@@ -9896,11 +12578,10 @@ func (p projMultInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
+
 						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
-
 						_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &p.constArg)
-
 						if err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -9917,11 +12598,10 @@ func (p projMultInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
+
 						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
-
 						_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &p.constArg)
-
 						if err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -9939,11 +12619,10 @@ func (p projMultInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
+
 					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(arg), 0)
-
 					_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &p.constArg)
-
 					if err != nil {
 						colexecerror.ExpectedError(err)
 					}
@@ -9957,11 +12636,10 @@ func (p projMultInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
+
 					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(arg), 0)
-
 					_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &p.constArg)
-
 					if err != nil {
 						colexecerror.ExpectedError(err)
 					}
@@ -10553,11 +13231,10 @@ func (p projMultInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
+
 						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
-
 						_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &p.constArg)
-
 						if err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -10574,11 +13251,10 @@ func (p projMultInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
+
 						tmpDec := &_overloadHelper.tmpDec1
 						tmpDec.SetFinite(int64(arg), 0)
-
 						_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &p.constArg)
-
 						if err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -10596,11 +13272,10 @@ func (p projMultInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
+
 					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(arg), 0)
-
 					_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &p.constArg)
-
 					if err != nil {
 						colexecerror.ExpectedError(err)
 					}
@@ -10614,11 +13289,10 @@ func (p projMultInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
+
 					tmpDec := &_overloadHelper.tmpDec1
 					tmpDec.SetFinite(int64(arg), 0)
-
 					_, err := tree.ExactCtx.Mul(&projCol[i], tmpDec, &p.constArg)
-
 					if err != nil {
 						colexecerror.ExpectedError(err)
 					}
@@ -10874,7 +13548,12 @@ func (p projMultFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				if !colNulls.NullAt(i) {
 					// We only want to perform the projection operation if the value is not null.
 					arg := col[i]
-					projCol[i] = float64(arg) * float64(p.constArg)
+
+					{
+
+						projCol[i] = float64(arg) * float64(p.constArg)
+					}
+
 				}
 			}
 		} else {
@@ -10884,7 +13563,12 @@ func (p projMultFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				if !colNulls.NullAt(i) {
 					// We only want to perform the projection operation if the value is not null.
 					arg := col[i]
-					projCol[i] = float64(arg) * float64(p.constArg)
+
+					{
+
+						projCol[i] = float64(arg) * float64(p.constArg)
+					}
+
 				}
 			}
 		}
@@ -10895,14 +13579,24 @@ func (p projMultFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			sel = sel[:n]
 			for _, i := range sel {
 				arg := col[i]
-				projCol[i] = float64(arg) * float64(p.constArg)
+
+				{
+
+					projCol[i] = float64(arg) * float64(p.constArg)
+				}
+
 			}
 		} else {
 			col = col[0:n]
 			_ = projCol[n-1]
 			for i := range col {
 				arg := col[i]
-				projCol[i] = float64(arg) * float64(p.constArg)
+
+				{
+
+					projCol[i] = float64(arg) * float64(p.constArg)
+				}
+
 			}
 		}
 	}
@@ -13080,10 +15774,12 @@ func (p projDivDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						cond, err := tree.DecimalCtx.Quo(&projCol[i], &arg, &p.constArg)
-						if cond.DivisionByZero() {
+
+						if p.constArg.IsZero() {
 							colexecerror.ExpectedError(tree.ErrDivByZero)
 						}
+
+						_, err := tree.DecimalCtx.Quo(&projCol[i], &arg, &p.constArg)
 						if err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -13100,10 +15796,12 @@ func (p projDivDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						cond, err := tree.DecimalCtx.Quo(&projCol[i], &arg, &p.constArg)
-						if cond.DivisionByZero() {
+
+						if p.constArg.IsZero() {
 							colexecerror.ExpectedError(tree.ErrDivByZero)
 						}
+
+						_, err := tree.DecimalCtx.Quo(&projCol[i], &arg, &p.constArg)
 						if err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -13121,10 +15819,12 @@ func (p projDivDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					cond, err := tree.DecimalCtx.Quo(&projCol[i], &arg, &p.constArg)
-					if cond.DivisionByZero() {
+
+					if p.constArg.IsZero() {
 						colexecerror.ExpectedError(tree.ErrDivByZero)
 					}
+
+					_, err := tree.DecimalCtx.Quo(&projCol[i], &arg, &p.constArg)
 					if err != nil {
 						colexecerror.ExpectedError(err)
 					}
@@ -13138,10 +15838,12 @@ func (p projDivDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					cond, err := tree.DecimalCtx.Quo(&projCol[i], &arg, &p.constArg)
-					if cond.DivisionByZero() {
+
+					if p.constArg.IsZero() {
 						colexecerror.ExpectedError(tree.ErrDivByZero)
 					}
+
+					_, err := tree.DecimalCtx.Quo(&projCol[i], &arg, &p.constArg)
 					if err != nil {
 						colexecerror.ExpectedError(err)
 					}
@@ -13697,14 +16399,14 @@ func (p projDivInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						tmpDec := &_overloadHelper.tmpDec1
-						tmpDec.SetFinite(int64(arg), 0)
 
-						cond, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &p.constArg)
-						if cond.DivisionByZero() {
+						if p.constArg.IsZero() {
 							colexecerror.ExpectedError(tree.ErrDivByZero)
 						}
 
+						tmpDec := &_overloadHelper.tmpDec1
+						tmpDec.SetFinite(int64(arg), 0)
+						_, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &p.constArg)
 						if err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -13721,14 +16423,14 @@ func (p projDivInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						tmpDec := &_overloadHelper.tmpDec1
-						tmpDec.SetFinite(int64(arg), 0)
 
-						cond, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &p.constArg)
-						if cond.DivisionByZero() {
+						if p.constArg.IsZero() {
 							colexecerror.ExpectedError(tree.ErrDivByZero)
 						}
 
+						tmpDec := &_overloadHelper.tmpDec1
+						tmpDec.SetFinite(int64(arg), 0)
+						_, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &p.constArg)
 						if err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -13746,14 +16448,14 @@ func (p projDivInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					tmpDec := &_overloadHelper.tmpDec1
-					tmpDec.SetFinite(int64(arg), 0)
 
-					cond, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &p.constArg)
-					if cond.DivisionByZero() {
+					if p.constArg.IsZero() {
 						colexecerror.ExpectedError(tree.ErrDivByZero)
 					}
 
+					tmpDec := &_overloadHelper.tmpDec1
+					tmpDec.SetFinite(int64(arg), 0)
+					_, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &p.constArg)
 					if err != nil {
 						colexecerror.ExpectedError(err)
 					}
@@ -13767,14 +16469,14 @@ func (p projDivInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					tmpDec := &_overloadHelper.tmpDec1
-					tmpDec.SetFinite(int64(arg), 0)
 
-					cond, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &p.constArg)
-					if cond.DivisionByZero() {
+					if p.constArg.IsZero() {
 						colexecerror.ExpectedError(tree.ErrDivByZero)
 					}
 
+					tmpDec := &_overloadHelper.tmpDec1
+					tmpDec.SetFinite(int64(arg), 0)
+					_, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &p.constArg)
 					if err != nil {
 						colexecerror.ExpectedError(err)
 					}
@@ -14330,14 +17032,14 @@ func (p projDivInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						tmpDec := &_overloadHelper.tmpDec1
-						tmpDec.SetFinite(int64(arg), 0)
 
-						cond, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &p.constArg)
-						if cond.DivisionByZero() {
+						if p.constArg.IsZero() {
 							colexecerror.ExpectedError(tree.ErrDivByZero)
 						}
 
+						tmpDec := &_overloadHelper.tmpDec1
+						tmpDec.SetFinite(int64(arg), 0)
+						_, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &p.constArg)
 						if err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -14354,14 +17056,14 @@ func (p projDivInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						tmpDec := &_overloadHelper.tmpDec1
-						tmpDec.SetFinite(int64(arg), 0)
 
-						cond, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &p.constArg)
-						if cond.DivisionByZero() {
+						if p.constArg.IsZero() {
 							colexecerror.ExpectedError(tree.ErrDivByZero)
 						}
 
+						tmpDec := &_overloadHelper.tmpDec1
+						tmpDec.SetFinite(int64(arg), 0)
+						_, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &p.constArg)
 						if err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -14379,14 +17081,14 @@ func (p projDivInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					tmpDec := &_overloadHelper.tmpDec1
-					tmpDec.SetFinite(int64(arg), 0)
 
-					cond, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &p.constArg)
-					if cond.DivisionByZero() {
+					if p.constArg.IsZero() {
 						colexecerror.ExpectedError(tree.ErrDivByZero)
 					}
 
+					tmpDec := &_overloadHelper.tmpDec1
+					tmpDec.SetFinite(int64(arg), 0)
+					_, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &p.constArg)
 					if err != nil {
 						colexecerror.ExpectedError(err)
 					}
@@ -14400,14 +17102,14 @@ func (p projDivInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					tmpDec := &_overloadHelper.tmpDec1
-					tmpDec.SetFinite(int64(arg), 0)
 
-					cond, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &p.constArg)
-					if cond.DivisionByZero() {
+					if p.constArg.IsZero() {
 						colexecerror.ExpectedError(tree.ErrDivByZero)
 					}
 
+					tmpDec := &_overloadHelper.tmpDec1
+					tmpDec.SetFinite(int64(arg), 0)
+					_, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &p.constArg)
 					if err != nil {
 						colexecerror.ExpectedError(err)
 					}
@@ -14963,14 +17665,14 @@ func (p projDivInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						tmpDec := &_overloadHelper.tmpDec1
-						tmpDec.SetFinite(int64(arg), 0)
 
-						cond, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &p.constArg)
-						if cond.DivisionByZero() {
+						if p.constArg.IsZero() {
 							colexecerror.ExpectedError(tree.ErrDivByZero)
 						}
 
+						tmpDec := &_overloadHelper.tmpDec1
+						tmpDec.SetFinite(int64(arg), 0)
+						_, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &p.constArg)
 						if err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -14987,14 +17689,14 @@ func (p projDivInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						tmpDec := &_overloadHelper.tmpDec1
-						tmpDec.SetFinite(int64(arg), 0)
 
-						cond, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &p.constArg)
-						if cond.DivisionByZero() {
+						if p.constArg.IsZero() {
 							colexecerror.ExpectedError(tree.ErrDivByZero)
 						}
 
+						tmpDec := &_overloadHelper.tmpDec1
+						tmpDec.SetFinite(int64(arg), 0)
+						_, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &p.constArg)
 						if err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -15012,14 +17714,14 @@ func (p projDivInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					tmpDec := &_overloadHelper.tmpDec1
-					tmpDec.SetFinite(int64(arg), 0)
 
-					cond, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &p.constArg)
-					if cond.DivisionByZero() {
+					if p.constArg.IsZero() {
 						colexecerror.ExpectedError(tree.ErrDivByZero)
 					}
 
+					tmpDec := &_overloadHelper.tmpDec1
+					tmpDec.SetFinite(int64(arg), 0)
+					_, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &p.constArg)
 					if err != nil {
 						colexecerror.ExpectedError(err)
 					}
@@ -15033,14 +17735,14 @@ func (p projDivInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					tmpDec := &_overloadHelper.tmpDec1
-					tmpDec.SetFinite(int64(arg), 0)
 
-					cond, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &p.constArg)
-					if cond.DivisionByZero() {
+					if p.constArg.IsZero() {
 						colexecerror.ExpectedError(tree.ErrDivByZero)
 					}
 
+					tmpDec := &_overloadHelper.tmpDec1
+					tmpDec.SetFinite(int64(arg), 0)
+					_, err := tree.DecimalCtx.Quo(&projCol[i], tmpDec, &p.constArg)
 					if err != nil {
 						colexecerror.ExpectedError(err)
 					}
@@ -15219,7 +17921,16 @@ func (p projDivFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				if !colNulls.NullAt(i) {
 					// We only want to perform the projection operation if the value is not null.
 					arg := col[i]
-					projCol[i] = float64(arg) / float64(p.constArg)
+
+					{
+
+						if p.constArg == 0.0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+
+						projCol[i] = float64(arg) / float64(p.constArg)
+					}
+
 				}
 			}
 		} else {
@@ -15229,7 +17940,16 @@ func (p projDivFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 				if !colNulls.NullAt(i) {
 					// We only want to perform the projection operation if the value is not null.
 					arg := col[i]
-					projCol[i] = float64(arg) / float64(p.constArg)
+
+					{
+
+						if p.constArg == 0.0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+
+						projCol[i] = float64(arg) / float64(p.constArg)
+					}
+
 				}
 			}
 		}
@@ -15240,14 +17960,32 @@ func (p projDivFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			sel = sel[:n]
 			for _, i := range sel {
 				arg := col[i]
-				projCol[i] = float64(arg) / float64(p.constArg)
+
+				{
+
+					if p.constArg == 0.0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+
+					projCol[i] = float64(arg) / float64(p.constArg)
+				}
+
 			}
 		} else {
 			col = col[0:n]
 			_ = projCol[n-1]
 			for i := range col {
 				arg := col[i]
-				projCol[i] = float64(arg) / float64(p.constArg)
+
+				{
+
+					if p.constArg == 0.0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+
+					projCol[i] = float64(arg) / float64(p.constArg)
+				}
+
 			}
 		}
 	}
@@ -16731,6 +19469,3944 @@ func (p projDivDatumDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 }
 
 func (p projDivDatumDecimalConstOp) Init() {
+	p.input.Init()
+}
+
+type projFloorDivDecimalInt16ConstOp struct {
+	projConstOpBase
+	constArg int16
+}
+
+func (p projFloorDivDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []apd.Decimal
+	col = vec.Decimal()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Decimal()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+
+						if p.constArg == 0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+
+						tmpDec := &_overloadHelper.tmpDec1
+						tmpDec.SetFinite(int64(p.constArg), 0)
+						if _, err := tree.HighPrecisionCtx.QuoInteger(&projCol[i], &arg, tmpDec); err != nil {
+							colexecerror.ExpectedError(err)
+						}
+					}
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+
+						if p.constArg == 0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+
+						tmpDec := &_overloadHelper.tmpDec1
+						tmpDec.SetFinite(int64(p.constArg), 0)
+						if _, err := tree.HighPrecisionCtx.QuoInteger(&projCol[i], &arg, tmpDec); err != nil {
+							colexecerror.ExpectedError(err)
+						}
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				{
+
+					if p.constArg == 0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+
+					tmpDec := &_overloadHelper.tmpDec1
+					tmpDec.SetFinite(int64(p.constArg), 0)
+					if _, err := tree.HighPrecisionCtx.QuoInteger(&projCol[i], &arg, tmpDec); err != nil {
+						colexecerror.ExpectedError(err)
+					}
+				}
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				{
+
+					if p.constArg == 0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+
+					tmpDec := &_overloadHelper.tmpDec1
+					tmpDec.SetFinite(int64(p.constArg), 0)
+					if _, err := tree.HighPrecisionCtx.QuoInteger(&projCol[i], &arg, tmpDec); err != nil {
+						colexecerror.ExpectedError(err)
+					}
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projFloorDivDecimalInt16ConstOp) Init() {
+	p.input.Init()
+}
+
+type projFloorDivDecimalInt32ConstOp struct {
+	projConstOpBase
+	constArg int32
+}
+
+func (p projFloorDivDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []apd.Decimal
+	col = vec.Decimal()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Decimal()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+
+						if p.constArg == 0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+
+						tmpDec := &_overloadHelper.tmpDec1
+						tmpDec.SetFinite(int64(p.constArg), 0)
+						if _, err := tree.HighPrecisionCtx.QuoInteger(&projCol[i], &arg, tmpDec); err != nil {
+							colexecerror.ExpectedError(err)
+						}
+					}
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+
+						if p.constArg == 0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+
+						tmpDec := &_overloadHelper.tmpDec1
+						tmpDec.SetFinite(int64(p.constArg), 0)
+						if _, err := tree.HighPrecisionCtx.QuoInteger(&projCol[i], &arg, tmpDec); err != nil {
+							colexecerror.ExpectedError(err)
+						}
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				{
+
+					if p.constArg == 0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+
+					tmpDec := &_overloadHelper.tmpDec1
+					tmpDec.SetFinite(int64(p.constArg), 0)
+					if _, err := tree.HighPrecisionCtx.QuoInteger(&projCol[i], &arg, tmpDec); err != nil {
+						colexecerror.ExpectedError(err)
+					}
+				}
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				{
+
+					if p.constArg == 0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+
+					tmpDec := &_overloadHelper.tmpDec1
+					tmpDec.SetFinite(int64(p.constArg), 0)
+					if _, err := tree.HighPrecisionCtx.QuoInteger(&projCol[i], &arg, tmpDec); err != nil {
+						colexecerror.ExpectedError(err)
+					}
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projFloorDivDecimalInt32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projFloorDivDecimalInt64ConstOp struct {
+	projConstOpBase
+	constArg int64
+}
+
+func (p projFloorDivDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []apd.Decimal
+	col = vec.Decimal()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Decimal()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+
+						if p.constArg == 0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+
+						tmpDec := &_overloadHelper.tmpDec1
+						tmpDec.SetFinite(int64(p.constArg), 0)
+						if _, err := tree.HighPrecisionCtx.QuoInteger(&projCol[i], &arg, tmpDec); err != nil {
+							colexecerror.ExpectedError(err)
+						}
+					}
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+
+						if p.constArg == 0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+
+						tmpDec := &_overloadHelper.tmpDec1
+						tmpDec.SetFinite(int64(p.constArg), 0)
+						if _, err := tree.HighPrecisionCtx.QuoInteger(&projCol[i], &arg, tmpDec); err != nil {
+							colexecerror.ExpectedError(err)
+						}
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				{
+
+					if p.constArg == 0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+
+					tmpDec := &_overloadHelper.tmpDec1
+					tmpDec.SetFinite(int64(p.constArg), 0)
+					if _, err := tree.HighPrecisionCtx.QuoInteger(&projCol[i], &arg, tmpDec); err != nil {
+						colexecerror.ExpectedError(err)
+					}
+				}
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				{
+
+					if p.constArg == 0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+
+					tmpDec := &_overloadHelper.tmpDec1
+					tmpDec.SetFinite(int64(p.constArg), 0)
+					if _, err := tree.HighPrecisionCtx.QuoInteger(&projCol[i], &arg, tmpDec); err != nil {
+						colexecerror.ExpectedError(err)
+					}
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projFloorDivDecimalInt64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projFloorDivDecimalDecimalConstOp struct {
+	projConstOpBase
+	constArg apd.Decimal
+}
+
+func (p projFloorDivDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []apd.Decimal
+	col = vec.Decimal()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Decimal()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+
+						if p.constArg.IsZero() {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+
+						_, err := tree.HighPrecisionCtx.QuoInteger(&projCol[i], &arg, &p.constArg)
+						if err != nil {
+							colexecerror.ExpectedError(err)
+						}
+					}
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+
+						if p.constArg.IsZero() {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+
+						_, err := tree.HighPrecisionCtx.QuoInteger(&projCol[i], &arg, &p.constArg)
+						if err != nil {
+							colexecerror.ExpectedError(err)
+						}
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				{
+
+					if p.constArg.IsZero() {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+
+					_, err := tree.HighPrecisionCtx.QuoInteger(&projCol[i], &arg, &p.constArg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+				}
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				{
+
+					if p.constArg.IsZero() {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+
+					_, err := tree.HighPrecisionCtx.QuoInteger(&projCol[i], &arg, &p.constArg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projFloorDivDecimalDecimalConstOp) Init() {
+	p.input.Init()
+}
+
+type projFloorDivInt16Int16ConstOp struct {
+	projConstOpBase
+	constArg int16
+}
+
+func (p projFloorDivInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int16
+	col = vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int16()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if p.constArg == 0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+						projCol[i] = arg // p.constArg
+					}
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if p.constArg == 0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+						projCol[i] = arg // p.constArg
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				{
+					if p.constArg == 0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+					projCol[i] = arg // p.constArg
+				}
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				{
+					if p.constArg == 0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+					projCol[i] = arg // p.constArg
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projFloorDivInt16Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type projFloorDivInt16Int32ConstOp struct {
+	projConstOpBase
+	constArg int32
+}
+
+func (p projFloorDivInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int16
+	col = vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(p.constArg) == 0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+						projCol[i] = int64(arg) // int64(p.constArg)
+					}
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(p.constArg) == 0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+						projCol[i] = int64(arg) // int64(p.constArg)
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				{
+					if int64(p.constArg) == 0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+					projCol[i] = int64(arg) // int64(p.constArg)
+				}
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				{
+					if int64(p.constArg) == 0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+					projCol[i] = int64(arg) // int64(p.constArg)
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projFloorDivInt16Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projFloorDivInt16Int64ConstOp struct {
+	projConstOpBase
+	constArg int64
+}
+
+func (p projFloorDivInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int16
+	col = vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(p.constArg) == 0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+						projCol[i] = int64(arg) // int64(p.constArg)
+					}
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(p.constArg) == 0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+						projCol[i] = int64(arg) // int64(p.constArg)
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				{
+					if int64(p.constArg) == 0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+					projCol[i] = int64(arg) // int64(p.constArg)
+				}
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				{
+					if int64(p.constArg) == 0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+					projCol[i] = int64(arg) // int64(p.constArg)
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projFloorDivInt16Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projFloorDivInt16DecimalConstOp struct {
+	projConstOpBase
+	constArg apd.Decimal
+}
+
+func (p projFloorDivInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int16
+	col = vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Decimal()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+
+						if p.constArg.IsZero() {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+
+						tmpDec := &_overloadHelper.tmpDec1
+						tmpDec.SetFinite(int64(arg), 0)
+						_, err := tree.HighPrecisionCtx.QuoInteger(&projCol[i], tmpDec, &p.constArg)
+						if err != nil {
+							colexecerror.ExpectedError(err)
+						}
+					}
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+
+						if p.constArg.IsZero() {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+
+						tmpDec := &_overloadHelper.tmpDec1
+						tmpDec.SetFinite(int64(arg), 0)
+						_, err := tree.HighPrecisionCtx.QuoInteger(&projCol[i], tmpDec, &p.constArg)
+						if err != nil {
+							colexecerror.ExpectedError(err)
+						}
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				{
+
+					if p.constArg.IsZero() {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+
+					tmpDec := &_overloadHelper.tmpDec1
+					tmpDec.SetFinite(int64(arg), 0)
+					_, err := tree.HighPrecisionCtx.QuoInteger(&projCol[i], tmpDec, &p.constArg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+				}
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				{
+
+					if p.constArg.IsZero() {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+
+					tmpDec := &_overloadHelper.tmpDec1
+					tmpDec.SetFinite(int64(arg), 0)
+					_, err := tree.HighPrecisionCtx.QuoInteger(&projCol[i], tmpDec, &p.constArg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projFloorDivInt16DecimalConstOp) Init() {
+	p.input.Init()
+}
+
+type projFloorDivInt32Int16ConstOp struct {
+	projConstOpBase
+	constArg int16
+}
+
+func (p projFloorDivInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int32
+	col = vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(p.constArg) == 0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+						projCol[i] = int64(arg) // int64(p.constArg)
+					}
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(p.constArg) == 0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+						projCol[i] = int64(arg) // int64(p.constArg)
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				{
+					if int64(p.constArg) == 0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+					projCol[i] = int64(arg) // int64(p.constArg)
+				}
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				{
+					if int64(p.constArg) == 0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+					projCol[i] = int64(arg) // int64(p.constArg)
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projFloorDivInt32Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type projFloorDivInt32Int32ConstOp struct {
+	projConstOpBase
+	constArg int32
+}
+
+func (p projFloorDivInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int32
+	col = vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int32()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if p.constArg == 0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+						projCol[i] = arg // p.constArg
+					}
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if p.constArg == 0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+						projCol[i] = arg // p.constArg
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				{
+					if p.constArg == 0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+					projCol[i] = arg // p.constArg
+				}
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				{
+					if p.constArg == 0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+					projCol[i] = arg // p.constArg
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projFloorDivInt32Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projFloorDivInt32Int64ConstOp struct {
+	projConstOpBase
+	constArg int64
+}
+
+func (p projFloorDivInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int32
+	col = vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(p.constArg) == 0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+						projCol[i] = int64(arg) // int64(p.constArg)
+					}
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(p.constArg) == 0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+						projCol[i] = int64(arg) // int64(p.constArg)
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				{
+					if int64(p.constArg) == 0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+					projCol[i] = int64(arg) // int64(p.constArg)
+				}
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				{
+					if int64(p.constArg) == 0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+					projCol[i] = int64(arg) // int64(p.constArg)
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projFloorDivInt32Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projFloorDivInt32DecimalConstOp struct {
+	projConstOpBase
+	constArg apd.Decimal
+}
+
+func (p projFloorDivInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int32
+	col = vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Decimal()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+
+						if p.constArg.IsZero() {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+
+						tmpDec := &_overloadHelper.tmpDec1
+						tmpDec.SetFinite(int64(arg), 0)
+						_, err := tree.HighPrecisionCtx.QuoInteger(&projCol[i], tmpDec, &p.constArg)
+						if err != nil {
+							colexecerror.ExpectedError(err)
+						}
+					}
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+
+						if p.constArg.IsZero() {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+
+						tmpDec := &_overloadHelper.tmpDec1
+						tmpDec.SetFinite(int64(arg), 0)
+						_, err := tree.HighPrecisionCtx.QuoInteger(&projCol[i], tmpDec, &p.constArg)
+						if err != nil {
+							colexecerror.ExpectedError(err)
+						}
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				{
+
+					if p.constArg.IsZero() {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+
+					tmpDec := &_overloadHelper.tmpDec1
+					tmpDec.SetFinite(int64(arg), 0)
+					_, err := tree.HighPrecisionCtx.QuoInteger(&projCol[i], tmpDec, &p.constArg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+				}
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				{
+
+					if p.constArg.IsZero() {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+
+					tmpDec := &_overloadHelper.tmpDec1
+					tmpDec.SetFinite(int64(arg), 0)
+					_, err := tree.HighPrecisionCtx.QuoInteger(&projCol[i], tmpDec, &p.constArg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projFloorDivInt32DecimalConstOp) Init() {
+	p.input.Init()
+}
+
+type projFloorDivInt64Int16ConstOp struct {
+	projConstOpBase
+	constArg int16
+}
+
+func (p projFloorDivInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int64
+	col = vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(p.constArg) == 0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+						projCol[i] = int64(arg) // int64(p.constArg)
+					}
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(p.constArg) == 0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+						projCol[i] = int64(arg) // int64(p.constArg)
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				{
+					if int64(p.constArg) == 0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+					projCol[i] = int64(arg) // int64(p.constArg)
+				}
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				{
+					if int64(p.constArg) == 0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+					projCol[i] = int64(arg) // int64(p.constArg)
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projFloorDivInt64Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type projFloorDivInt64Int32ConstOp struct {
+	projConstOpBase
+	constArg int32
+}
+
+func (p projFloorDivInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int64
+	col = vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(p.constArg) == 0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+						projCol[i] = int64(arg) // int64(p.constArg)
+					}
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(p.constArg) == 0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+						projCol[i] = int64(arg) // int64(p.constArg)
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				{
+					if int64(p.constArg) == 0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+					projCol[i] = int64(arg) // int64(p.constArg)
+				}
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				{
+					if int64(p.constArg) == 0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+					projCol[i] = int64(arg) // int64(p.constArg)
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projFloorDivInt64Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projFloorDivInt64Int64ConstOp struct {
+	projConstOpBase
+	constArg int64
+}
+
+func (p projFloorDivInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int64
+	col = vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(p.constArg) == 0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+						projCol[i] = int64(arg) // int64(p.constArg)
+					}
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(p.constArg) == 0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+						projCol[i] = int64(arg) // int64(p.constArg)
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				{
+					if int64(p.constArg) == 0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+					projCol[i] = int64(arg) // int64(p.constArg)
+				}
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				{
+					if int64(p.constArg) == 0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+					projCol[i] = int64(arg) // int64(p.constArg)
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projFloorDivInt64Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projFloorDivInt64DecimalConstOp struct {
+	projConstOpBase
+	constArg apd.Decimal
+}
+
+func (p projFloorDivInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int64
+	col = vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Decimal()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+
+						if p.constArg.IsZero() {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+
+						tmpDec := &_overloadHelper.tmpDec1
+						tmpDec.SetFinite(int64(arg), 0)
+						_, err := tree.HighPrecisionCtx.QuoInteger(&projCol[i], tmpDec, &p.constArg)
+						if err != nil {
+							colexecerror.ExpectedError(err)
+						}
+					}
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+
+						if p.constArg.IsZero() {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+
+						tmpDec := &_overloadHelper.tmpDec1
+						tmpDec.SetFinite(int64(arg), 0)
+						_, err := tree.HighPrecisionCtx.QuoInteger(&projCol[i], tmpDec, &p.constArg)
+						if err != nil {
+							colexecerror.ExpectedError(err)
+						}
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				{
+
+					if p.constArg.IsZero() {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+
+					tmpDec := &_overloadHelper.tmpDec1
+					tmpDec.SetFinite(int64(arg), 0)
+					_, err := tree.HighPrecisionCtx.QuoInteger(&projCol[i], tmpDec, &p.constArg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+				}
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				{
+
+					if p.constArg.IsZero() {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+
+					tmpDec := &_overloadHelper.tmpDec1
+					tmpDec.SetFinite(int64(arg), 0)
+					_, err := tree.HighPrecisionCtx.QuoInteger(&projCol[i], tmpDec, &p.constArg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projFloorDivInt64DecimalConstOp) Init() {
+	p.input.Init()
+}
+
+type projFloorDivFloat64Float64ConstOp struct {
+	projConstOpBase
+	constArg float64
+}
+
+func (p projFloorDivFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []float64
+	col = vec.Float64()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Float64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+
+						if p.constArg == 0.0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+
+						projCol[i] = math.Trunc(float64(arg) / float64(p.constArg))
+					}
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+
+						if p.constArg == 0.0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+
+						projCol[i] = math.Trunc(float64(arg) / float64(p.constArg))
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				{
+
+					if p.constArg == 0.0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+
+					projCol[i] = math.Trunc(float64(arg) / float64(p.constArg))
+				}
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				{
+
+					if p.constArg == 0.0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+
+					projCol[i] = math.Trunc(float64(arg) / float64(p.constArg))
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projFloorDivFloat64Float64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projModDecimalInt16ConstOp struct {
+	projConstOpBase
+	constArg int16
+}
+
+func (p projModDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []apd.Decimal
+	col = vec.Decimal()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Decimal()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+
+						if p.constArg == 0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+
+						tmpDec := &_overloadHelper.tmpDec1
+						tmpDec.SetFinite(int64(p.constArg), 0)
+						if _, err := tree.HighPrecisionCtx.Rem(&projCol[i], &arg, tmpDec); err != nil {
+							colexecerror.ExpectedError(err)
+						}
+					}
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+
+						if p.constArg == 0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+
+						tmpDec := &_overloadHelper.tmpDec1
+						tmpDec.SetFinite(int64(p.constArg), 0)
+						if _, err := tree.HighPrecisionCtx.Rem(&projCol[i], &arg, tmpDec); err != nil {
+							colexecerror.ExpectedError(err)
+						}
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				{
+
+					if p.constArg == 0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+
+					tmpDec := &_overloadHelper.tmpDec1
+					tmpDec.SetFinite(int64(p.constArg), 0)
+					if _, err := tree.HighPrecisionCtx.Rem(&projCol[i], &arg, tmpDec); err != nil {
+						colexecerror.ExpectedError(err)
+					}
+				}
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				{
+
+					if p.constArg == 0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+
+					tmpDec := &_overloadHelper.tmpDec1
+					tmpDec.SetFinite(int64(p.constArg), 0)
+					if _, err := tree.HighPrecisionCtx.Rem(&projCol[i], &arg, tmpDec); err != nil {
+						colexecerror.ExpectedError(err)
+					}
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projModDecimalInt16ConstOp) Init() {
+	p.input.Init()
+}
+
+type projModDecimalInt32ConstOp struct {
+	projConstOpBase
+	constArg int32
+}
+
+func (p projModDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []apd.Decimal
+	col = vec.Decimal()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Decimal()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+
+						if p.constArg == 0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+
+						tmpDec := &_overloadHelper.tmpDec1
+						tmpDec.SetFinite(int64(p.constArg), 0)
+						if _, err := tree.HighPrecisionCtx.Rem(&projCol[i], &arg, tmpDec); err != nil {
+							colexecerror.ExpectedError(err)
+						}
+					}
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+
+						if p.constArg == 0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+
+						tmpDec := &_overloadHelper.tmpDec1
+						tmpDec.SetFinite(int64(p.constArg), 0)
+						if _, err := tree.HighPrecisionCtx.Rem(&projCol[i], &arg, tmpDec); err != nil {
+							colexecerror.ExpectedError(err)
+						}
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				{
+
+					if p.constArg == 0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+
+					tmpDec := &_overloadHelper.tmpDec1
+					tmpDec.SetFinite(int64(p.constArg), 0)
+					if _, err := tree.HighPrecisionCtx.Rem(&projCol[i], &arg, tmpDec); err != nil {
+						colexecerror.ExpectedError(err)
+					}
+				}
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				{
+
+					if p.constArg == 0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+
+					tmpDec := &_overloadHelper.tmpDec1
+					tmpDec.SetFinite(int64(p.constArg), 0)
+					if _, err := tree.HighPrecisionCtx.Rem(&projCol[i], &arg, tmpDec); err != nil {
+						colexecerror.ExpectedError(err)
+					}
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projModDecimalInt32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projModDecimalInt64ConstOp struct {
+	projConstOpBase
+	constArg int64
+}
+
+func (p projModDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []apd.Decimal
+	col = vec.Decimal()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Decimal()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+
+						if p.constArg == 0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+
+						tmpDec := &_overloadHelper.tmpDec1
+						tmpDec.SetFinite(int64(p.constArg), 0)
+						if _, err := tree.HighPrecisionCtx.Rem(&projCol[i], &arg, tmpDec); err != nil {
+							colexecerror.ExpectedError(err)
+						}
+					}
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+
+						if p.constArg == 0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+
+						tmpDec := &_overloadHelper.tmpDec1
+						tmpDec.SetFinite(int64(p.constArg), 0)
+						if _, err := tree.HighPrecisionCtx.Rem(&projCol[i], &arg, tmpDec); err != nil {
+							colexecerror.ExpectedError(err)
+						}
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				{
+
+					if p.constArg == 0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+
+					tmpDec := &_overloadHelper.tmpDec1
+					tmpDec.SetFinite(int64(p.constArg), 0)
+					if _, err := tree.HighPrecisionCtx.Rem(&projCol[i], &arg, tmpDec); err != nil {
+						colexecerror.ExpectedError(err)
+					}
+				}
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				{
+
+					if p.constArg == 0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+
+					tmpDec := &_overloadHelper.tmpDec1
+					tmpDec.SetFinite(int64(p.constArg), 0)
+					if _, err := tree.HighPrecisionCtx.Rem(&projCol[i], &arg, tmpDec); err != nil {
+						colexecerror.ExpectedError(err)
+					}
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projModDecimalInt64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projModDecimalDecimalConstOp struct {
+	projConstOpBase
+	constArg apd.Decimal
+}
+
+func (p projModDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []apd.Decimal
+	col = vec.Decimal()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Decimal()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+
+						if p.constArg.IsZero() {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+
+						_, err := tree.HighPrecisionCtx.Rem(&projCol[i], &arg, &p.constArg)
+						if err != nil {
+							colexecerror.ExpectedError(err)
+						}
+					}
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+
+						if p.constArg.IsZero() {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+
+						_, err := tree.HighPrecisionCtx.Rem(&projCol[i], &arg, &p.constArg)
+						if err != nil {
+							colexecerror.ExpectedError(err)
+						}
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				{
+
+					if p.constArg.IsZero() {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+
+					_, err := tree.HighPrecisionCtx.Rem(&projCol[i], &arg, &p.constArg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+				}
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				{
+
+					if p.constArg.IsZero() {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+
+					_, err := tree.HighPrecisionCtx.Rem(&projCol[i], &arg, &p.constArg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projModDecimalDecimalConstOp) Init() {
+	p.input.Init()
+}
+
+type projModInt16Int16ConstOp struct {
+	projConstOpBase
+	constArg int16
+}
+
+func (p projModInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int16
+	col = vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int16()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if p.constArg == 0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+						projCol[i] = arg % p.constArg
+					}
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if p.constArg == 0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+						projCol[i] = arg % p.constArg
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				{
+					if p.constArg == 0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+					projCol[i] = arg % p.constArg
+				}
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				{
+					if p.constArg == 0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+					projCol[i] = arg % p.constArg
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projModInt16Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type projModInt16Int32ConstOp struct {
+	projConstOpBase
+	constArg int32
+}
+
+func (p projModInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int16
+	col = vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(p.constArg) == 0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+						projCol[i] = int64(arg) % int64(p.constArg)
+					}
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(p.constArg) == 0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+						projCol[i] = int64(arg) % int64(p.constArg)
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				{
+					if int64(p.constArg) == 0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+					projCol[i] = int64(arg) % int64(p.constArg)
+				}
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				{
+					if int64(p.constArg) == 0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+					projCol[i] = int64(arg) % int64(p.constArg)
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projModInt16Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projModInt16Int64ConstOp struct {
+	projConstOpBase
+	constArg int64
+}
+
+func (p projModInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int16
+	col = vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(p.constArg) == 0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+						projCol[i] = int64(arg) % int64(p.constArg)
+					}
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(p.constArg) == 0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+						projCol[i] = int64(arg) % int64(p.constArg)
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				{
+					if int64(p.constArg) == 0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+					projCol[i] = int64(arg) % int64(p.constArg)
+				}
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				{
+					if int64(p.constArg) == 0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+					projCol[i] = int64(arg) % int64(p.constArg)
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projModInt16Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projModInt16DecimalConstOp struct {
+	projConstOpBase
+	constArg apd.Decimal
+}
+
+func (p projModInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int16
+	col = vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Decimal()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+
+						if p.constArg.IsZero() {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+
+						tmpDec := &_overloadHelper.tmpDec1
+						tmpDec.SetFinite(int64(arg), 0)
+						_, err := tree.HighPrecisionCtx.Rem(&projCol[i], tmpDec, &p.constArg)
+						if err != nil {
+							colexecerror.ExpectedError(err)
+						}
+					}
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+
+						if p.constArg.IsZero() {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+
+						tmpDec := &_overloadHelper.tmpDec1
+						tmpDec.SetFinite(int64(arg), 0)
+						_, err := tree.HighPrecisionCtx.Rem(&projCol[i], tmpDec, &p.constArg)
+						if err != nil {
+							colexecerror.ExpectedError(err)
+						}
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				{
+
+					if p.constArg.IsZero() {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+
+					tmpDec := &_overloadHelper.tmpDec1
+					tmpDec.SetFinite(int64(arg), 0)
+					_, err := tree.HighPrecisionCtx.Rem(&projCol[i], tmpDec, &p.constArg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+				}
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				{
+
+					if p.constArg.IsZero() {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+
+					tmpDec := &_overloadHelper.tmpDec1
+					tmpDec.SetFinite(int64(arg), 0)
+					_, err := tree.HighPrecisionCtx.Rem(&projCol[i], tmpDec, &p.constArg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projModInt16DecimalConstOp) Init() {
+	p.input.Init()
+}
+
+type projModInt32Int16ConstOp struct {
+	projConstOpBase
+	constArg int16
+}
+
+func (p projModInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int32
+	col = vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(p.constArg) == 0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+						projCol[i] = int64(arg) % int64(p.constArg)
+					}
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(p.constArg) == 0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+						projCol[i] = int64(arg) % int64(p.constArg)
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				{
+					if int64(p.constArg) == 0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+					projCol[i] = int64(arg) % int64(p.constArg)
+				}
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				{
+					if int64(p.constArg) == 0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+					projCol[i] = int64(arg) % int64(p.constArg)
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projModInt32Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type projModInt32Int32ConstOp struct {
+	projConstOpBase
+	constArg int32
+}
+
+func (p projModInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int32
+	col = vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int32()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if p.constArg == 0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+						projCol[i] = arg % p.constArg
+					}
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if p.constArg == 0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+						projCol[i] = arg % p.constArg
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				{
+					if p.constArg == 0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+					projCol[i] = arg % p.constArg
+				}
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				{
+					if p.constArg == 0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+					projCol[i] = arg % p.constArg
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projModInt32Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projModInt32Int64ConstOp struct {
+	projConstOpBase
+	constArg int64
+}
+
+func (p projModInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int32
+	col = vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(p.constArg) == 0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+						projCol[i] = int64(arg) % int64(p.constArg)
+					}
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(p.constArg) == 0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+						projCol[i] = int64(arg) % int64(p.constArg)
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				{
+					if int64(p.constArg) == 0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+					projCol[i] = int64(arg) % int64(p.constArg)
+				}
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				{
+					if int64(p.constArg) == 0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+					projCol[i] = int64(arg) % int64(p.constArg)
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projModInt32Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projModInt32DecimalConstOp struct {
+	projConstOpBase
+	constArg apd.Decimal
+}
+
+func (p projModInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int32
+	col = vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Decimal()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+
+						if p.constArg.IsZero() {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+
+						tmpDec := &_overloadHelper.tmpDec1
+						tmpDec.SetFinite(int64(arg), 0)
+						_, err := tree.HighPrecisionCtx.Rem(&projCol[i], tmpDec, &p.constArg)
+						if err != nil {
+							colexecerror.ExpectedError(err)
+						}
+					}
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+
+						if p.constArg.IsZero() {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+
+						tmpDec := &_overloadHelper.tmpDec1
+						tmpDec.SetFinite(int64(arg), 0)
+						_, err := tree.HighPrecisionCtx.Rem(&projCol[i], tmpDec, &p.constArg)
+						if err != nil {
+							colexecerror.ExpectedError(err)
+						}
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				{
+
+					if p.constArg.IsZero() {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+
+					tmpDec := &_overloadHelper.tmpDec1
+					tmpDec.SetFinite(int64(arg), 0)
+					_, err := tree.HighPrecisionCtx.Rem(&projCol[i], tmpDec, &p.constArg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+				}
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				{
+
+					if p.constArg.IsZero() {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+
+					tmpDec := &_overloadHelper.tmpDec1
+					tmpDec.SetFinite(int64(arg), 0)
+					_, err := tree.HighPrecisionCtx.Rem(&projCol[i], tmpDec, &p.constArg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projModInt32DecimalConstOp) Init() {
+	p.input.Init()
+}
+
+type projModInt64Int16ConstOp struct {
+	projConstOpBase
+	constArg int16
+}
+
+func (p projModInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int64
+	col = vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(p.constArg) == 0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+						projCol[i] = int64(arg) % int64(p.constArg)
+					}
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(p.constArg) == 0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+						projCol[i] = int64(arg) % int64(p.constArg)
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				{
+					if int64(p.constArg) == 0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+					projCol[i] = int64(arg) % int64(p.constArg)
+				}
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				{
+					if int64(p.constArg) == 0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+					projCol[i] = int64(arg) % int64(p.constArg)
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projModInt64Int16ConstOp) Init() {
+	p.input.Init()
+}
+
+type projModInt64Int32ConstOp struct {
+	projConstOpBase
+	constArg int32
+}
+
+func (p projModInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int64
+	col = vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(p.constArg) == 0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+						projCol[i] = int64(arg) % int64(p.constArg)
+					}
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(p.constArg) == 0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+						projCol[i] = int64(arg) % int64(p.constArg)
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				{
+					if int64(p.constArg) == 0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+					projCol[i] = int64(arg) % int64(p.constArg)
+				}
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				{
+					if int64(p.constArg) == 0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+					projCol[i] = int64(arg) % int64(p.constArg)
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projModInt64Int32ConstOp) Init() {
+	p.input.Init()
+}
+
+type projModInt64Int64ConstOp struct {
+	projConstOpBase
+	constArg int64
+}
+
+func (p projModInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int64
+	col = vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(p.constArg) == 0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+						projCol[i] = int64(arg) % int64(p.constArg)
+					}
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(p.constArg) == 0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+						projCol[i] = int64(arg) % int64(p.constArg)
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				{
+					if int64(p.constArg) == 0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+					projCol[i] = int64(arg) % int64(p.constArg)
+				}
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				{
+					if int64(p.constArg) == 0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+					projCol[i] = int64(arg) % int64(p.constArg)
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projModInt64Int64ConstOp) Init() {
+	p.input.Init()
+}
+
+type projModInt64DecimalConstOp struct {
+	projConstOpBase
+	constArg apd.Decimal
+}
+
+func (p projModInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int64
+	col = vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Decimal()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+
+						if p.constArg.IsZero() {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+
+						tmpDec := &_overloadHelper.tmpDec1
+						tmpDec.SetFinite(int64(arg), 0)
+						_, err := tree.HighPrecisionCtx.Rem(&projCol[i], tmpDec, &p.constArg)
+						if err != nil {
+							colexecerror.ExpectedError(err)
+						}
+					}
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+
+						if p.constArg.IsZero() {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+
+						tmpDec := &_overloadHelper.tmpDec1
+						tmpDec.SetFinite(int64(arg), 0)
+						_, err := tree.HighPrecisionCtx.Rem(&projCol[i], tmpDec, &p.constArg)
+						if err != nil {
+							colexecerror.ExpectedError(err)
+						}
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				{
+
+					if p.constArg.IsZero() {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+
+					tmpDec := &_overloadHelper.tmpDec1
+					tmpDec.SetFinite(int64(arg), 0)
+					_, err := tree.HighPrecisionCtx.Rem(&projCol[i], tmpDec, &p.constArg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+				}
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				{
+
+					if p.constArg.IsZero() {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+
+					tmpDec := &_overloadHelper.tmpDec1
+					tmpDec.SetFinite(int64(arg), 0)
+					_, err := tree.HighPrecisionCtx.Rem(&projCol[i], tmpDec, &p.constArg)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projModInt64DecimalConstOp) Init() {
+	p.input.Init()
+}
+
+type projModFloat64Float64ConstOp struct {
+	projConstOpBase
+	constArg float64
+}
+
+func (p projModFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []float64
+	col = vec.Float64()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Float64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+
+						if p.constArg == 0.0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+
+						projCol[i] = math.Mod(float64(arg), float64(p.constArg))
+					}
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+
+						if p.constArg == 0.0 {
+							colexecerror.ExpectedError(tree.ErrDivByZero)
+						}
+
+						projCol[i] = math.Mod(float64(arg), float64(p.constArg))
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				{
+
+					if p.constArg == 0.0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+
+					projCol[i] = math.Mod(float64(arg), float64(p.constArg))
+				}
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				{
+
+					if p.constArg == 0.0 {
+						colexecerror.ExpectedError(tree.ErrDivByZero)
+					}
+
+					projCol[i] = math.Mod(float64(arg), float64(p.constArg))
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projModFloat64Float64ConstOp) Init() {
 	p.input.Init()
 }
 
@@ -42873,6 +49549,273 @@ func GetProjectionRConstOperator(
 	switch op.(type) {
 	case tree.BinaryOperator:
 		switch op {
+		case tree.Bitand:
+			switch typeconv.TypeFamilyToCanonicalTypeFamily(leftType.Family()) {
+			case types.IntFamily:
+				switch leftType.Width() {
+				case 16:
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
+					case types.IntFamily:
+						switch rightType.Width() {
+						case 16:
+							return &projBitandInt16Int16ConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int16),
+							}, nil
+						case 32:
+							return &projBitandInt16Int32ConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int32),
+							}, nil
+						case -1:
+						default:
+							return &projBitandInt16Int64ConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int64),
+							}, nil
+						}
+					}
+				case 32:
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
+					case types.IntFamily:
+						switch rightType.Width() {
+						case 16:
+							return &projBitandInt32Int16ConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int16),
+							}, nil
+						case 32:
+							return &projBitandInt32Int32ConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int32),
+							}, nil
+						case -1:
+						default:
+							return &projBitandInt32Int64ConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int64),
+							}, nil
+						}
+					}
+				case -1:
+				default:
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
+					case types.IntFamily:
+						switch rightType.Width() {
+						case 16:
+							return &projBitandInt64Int16ConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int16),
+							}, nil
+						case 32:
+							return &projBitandInt64Int32ConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int32),
+							}, nil
+						case -1:
+						default:
+							return &projBitandInt64Int64ConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int64),
+							}, nil
+						}
+					}
+				}
+			case typeconv.DatumVecCanonicalTypeFamily:
+				switch leftType.Width() {
+				case -1:
+				default:
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
+					case typeconv.DatumVecCanonicalTypeFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projBitandDatumDatumConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(interface{}),
+							}, nil
+						}
+					}
+				}
+			}
+		case tree.Bitor:
+			switch typeconv.TypeFamilyToCanonicalTypeFamily(leftType.Family()) {
+			case types.IntFamily:
+				switch leftType.Width() {
+				case 16:
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
+					case types.IntFamily:
+						switch rightType.Width() {
+						case 16:
+							return &projBitorInt16Int16ConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int16),
+							}, nil
+						case 32:
+							return &projBitorInt16Int32ConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int32),
+							}, nil
+						case -1:
+						default:
+							return &projBitorInt16Int64ConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int64),
+							}, nil
+						}
+					}
+				case 32:
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
+					case types.IntFamily:
+						switch rightType.Width() {
+						case 16:
+							return &projBitorInt32Int16ConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int16),
+							}, nil
+						case 32:
+							return &projBitorInt32Int32ConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int32),
+							}, nil
+						case -1:
+						default:
+							return &projBitorInt32Int64ConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int64),
+							}, nil
+						}
+					}
+				case -1:
+				default:
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
+					case types.IntFamily:
+						switch rightType.Width() {
+						case 16:
+							return &projBitorInt64Int16ConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int16),
+							}, nil
+						case 32:
+							return &projBitorInt64Int32ConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int32),
+							}, nil
+						case -1:
+						default:
+							return &projBitorInt64Int64ConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int64),
+							}, nil
+						}
+					}
+				}
+			case typeconv.DatumVecCanonicalTypeFamily:
+				switch leftType.Width() {
+				case -1:
+				default:
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
+					case typeconv.DatumVecCanonicalTypeFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projBitorDatumDatumConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(interface{}),
+							}, nil
+						}
+					}
+				}
+			}
+		case tree.Bitxor:
+			switch typeconv.TypeFamilyToCanonicalTypeFamily(leftType.Family()) {
+			case types.IntFamily:
+				switch leftType.Width() {
+				case 16:
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
+					case types.IntFamily:
+						switch rightType.Width() {
+						case 16:
+							return &projBitxorInt16Int16ConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int16),
+							}, nil
+						case 32:
+							return &projBitxorInt16Int32ConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int32),
+							}, nil
+						case -1:
+						default:
+							return &projBitxorInt16Int64ConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int64),
+							}, nil
+						}
+					}
+				case 32:
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
+					case types.IntFamily:
+						switch rightType.Width() {
+						case 16:
+							return &projBitxorInt32Int16ConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int16),
+							}, nil
+						case 32:
+							return &projBitxorInt32Int32ConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int32),
+							}, nil
+						case -1:
+						default:
+							return &projBitxorInt32Int64ConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int64),
+							}, nil
+						}
+					}
+				case -1:
+				default:
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
+					case types.IntFamily:
+						switch rightType.Width() {
+						case 16:
+							return &projBitxorInt64Int16ConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int16),
+							}, nil
+						case 32:
+							return &projBitxorInt64Int32ConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int32),
+							}, nil
+						case -1:
+						default:
+							return &projBitxorInt64Int64ConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int64),
+							}, nil
+						}
+					}
+				}
+			case typeconv.DatumVecCanonicalTypeFamily:
+				switch leftType.Width() {
+				case -1:
+				default:
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
+					case typeconv.DatumVecCanonicalTypeFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projBitxorDatumDatumConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(interface{}),
+							}, nil
+						}
+					}
+				}
+			}
 		case tree.Plus:
 			switch typeconv.TypeFamilyToCanonicalTypeFamily(leftType.Family()) {
 			case types.BoolFamily:
@@ -44240,6 +51183,308 @@ func GetProjectionRConstOperator(
 							return &projDivDatumDecimalConstOp{
 								projConstOpBase: projConstOpBase,
 								constArg:        c.(apd.Decimal),
+							}, nil
+						}
+					}
+				}
+			}
+		case tree.FloorDiv:
+			switch typeconv.TypeFamilyToCanonicalTypeFamily(leftType.Family()) {
+			case types.DecimalFamily:
+				switch leftType.Width() {
+				case -1:
+				default:
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
+					case types.IntFamily:
+						switch rightType.Width() {
+						case 16:
+							return &projFloorDivDecimalInt16ConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int16),
+							}, nil
+						case 32:
+							return &projFloorDivDecimalInt32ConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int32),
+							}, nil
+						case -1:
+						default:
+							return &projFloorDivDecimalInt64ConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int64),
+							}, nil
+						}
+					case types.DecimalFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projFloorDivDecimalDecimalConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(apd.Decimal),
+							}, nil
+						}
+					}
+				}
+			case types.IntFamily:
+				switch leftType.Width() {
+				case 16:
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
+					case types.IntFamily:
+						switch rightType.Width() {
+						case 16:
+							return &projFloorDivInt16Int16ConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int16),
+							}, nil
+						case 32:
+							return &projFloorDivInt16Int32ConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int32),
+							}, nil
+						case -1:
+						default:
+							return &projFloorDivInt16Int64ConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int64),
+							}, nil
+						}
+					case types.DecimalFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projFloorDivInt16DecimalConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(apd.Decimal),
+							}, nil
+						}
+					}
+				case 32:
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
+					case types.IntFamily:
+						switch rightType.Width() {
+						case 16:
+							return &projFloorDivInt32Int16ConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int16),
+							}, nil
+						case 32:
+							return &projFloorDivInt32Int32ConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int32),
+							}, nil
+						case -1:
+						default:
+							return &projFloorDivInt32Int64ConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int64),
+							}, nil
+						}
+					case types.DecimalFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projFloorDivInt32DecimalConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(apd.Decimal),
+							}, nil
+						}
+					}
+				case -1:
+				default:
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
+					case types.IntFamily:
+						switch rightType.Width() {
+						case 16:
+							return &projFloorDivInt64Int16ConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int16),
+							}, nil
+						case 32:
+							return &projFloorDivInt64Int32ConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int32),
+							}, nil
+						case -1:
+						default:
+							return &projFloorDivInt64Int64ConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int64),
+							}, nil
+						}
+					case types.DecimalFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projFloorDivInt64DecimalConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(apd.Decimal),
+							}, nil
+						}
+					}
+				}
+			case types.FloatFamily:
+				switch leftType.Width() {
+				case -1:
+				default:
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
+					case types.FloatFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projFloorDivFloat64Float64ConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(float64),
+							}, nil
+						}
+					}
+				}
+			}
+		case tree.Mod:
+			switch typeconv.TypeFamilyToCanonicalTypeFamily(leftType.Family()) {
+			case types.DecimalFamily:
+				switch leftType.Width() {
+				case -1:
+				default:
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
+					case types.IntFamily:
+						switch rightType.Width() {
+						case 16:
+							return &projModDecimalInt16ConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int16),
+							}, nil
+						case 32:
+							return &projModDecimalInt32ConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int32),
+							}, nil
+						case -1:
+						default:
+							return &projModDecimalInt64ConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int64),
+							}, nil
+						}
+					case types.DecimalFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projModDecimalDecimalConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(apd.Decimal),
+							}, nil
+						}
+					}
+				}
+			case types.IntFamily:
+				switch leftType.Width() {
+				case 16:
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
+					case types.IntFamily:
+						switch rightType.Width() {
+						case 16:
+							return &projModInt16Int16ConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int16),
+							}, nil
+						case 32:
+							return &projModInt16Int32ConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int32),
+							}, nil
+						case -1:
+						default:
+							return &projModInt16Int64ConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int64),
+							}, nil
+						}
+					case types.DecimalFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projModInt16DecimalConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(apd.Decimal),
+							}, nil
+						}
+					}
+				case 32:
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
+					case types.IntFamily:
+						switch rightType.Width() {
+						case 16:
+							return &projModInt32Int16ConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int16),
+							}, nil
+						case 32:
+							return &projModInt32Int32ConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int32),
+							}, nil
+						case -1:
+						default:
+							return &projModInt32Int64ConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int64),
+							}, nil
+						}
+					case types.DecimalFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projModInt32DecimalConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(apd.Decimal),
+							}, nil
+						}
+					}
+				case -1:
+				default:
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
+					case types.IntFamily:
+						switch rightType.Width() {
+						case 16:
+							return &projModInt64Int16ConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int16),
+							}, nil
+						case 32:
+							return &projModInt64Int32ConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int32),
+							}, nil
+						case -1:
+						default:
+							return &projModInt64Int64ConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int64),
+							}, nil
+						}
+					case types.DecimalFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projModInt64DecimalConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(apd.Decimal),
+							}, nil
+						}
+					}
+				}
+			case types.FloatFamily:
+				switch leftType.Width() {
+				case -1:
+				default:
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
+					case types.FloatFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projModFloat64Float64ConstOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(float64),
 							}, nil
 						}
 					}
