@@ -1057,6 +1057,65 @@ func (_f *Factory) ConstructProject(
 		}
 	}
 
+	// [EliminateJoinUnderProjectLeft]
+	{
+		join := input
+		if join.Op() == opt.InnerJoinOp || join.Op() == opt.LeftJoinOp {
+			left := join.Child(0).(memo.RelExpr)
+			right := join.Child(1).(memo.RelExpr)
+			if _f.funcs.JoinDoesNotDuplicateLeftRows(join) {
+				if _f.funcs.JoinPreservesLeftRows(join) {
+					rightCols := _f.funcs.OutputCols(right)
+					if !_f.funcs.AreProjectionsCorrelated(projections, rightCols) {
+						if !_f.funcs.ColsIntersect(passthrough, rightCols) {
+							if _f.matchedRule == nil || _f.matchedRule(opt.EliminateJoinUnderProjectLeft) {
+								_expr := _f.ConstructProject(
+									left,
+									projections,
+									passthrough,
+								)
+								if _f.appliedRule != nil {
+									_f.appliedRule(opt.EliminateJoinUnderProjectLeft, nil, _expr)
+								}
+								return _expr
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [EliminateJoinUnderProjectRight]
+	{
+		join := input
+		_innerJoin, _ := join.(*memo.InnerJoinExpr)
+		if _innerJoin != nil {
+			left := _innerJoin.Left
+			right := _innerJoin.Right
+			if _f.funcs.JoinDoesNotDuplicateRightRows(join) {
+				if _f.funcs.JoinPreservesRightRows(join) {
+					leftCols := _f.funcs.OutputCols(left)
+					if !_f.funcs.AreProjectionsCorrelated(projections, leftCols) {
+						if !_f.funcs.ColsIntersect(passthrough, leftCols) {
+							if _f.matchedRule == nil || _f.matchedRule(opt.EliminateJoinUnderProjectRight) {
+								_expr := _f.ConstructProject(
+									right,
+									projections,
+									passthrough,
+								)
+								if _f.appliedRule != nil {
+									_f.appliedRule(opt.EliminateJoinUnderProjectRight, nil, _expr)
+								}
+								return _expr
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [EliminateProject]
 	{
 		if len(projections) == 0 {
@@ -4992,7 +5051,7 @@ func (_f *Factory) ConstructInnerJoinApply(
 
 	// [DecorrelateJoin]
 	{
-		if !_f.funcs.IsCorrelated(right, left) {
+		if !_f.funcs.IsCorrelated(right, _f.funcs.OutputCols(left)) {
 			private := joinPrivate
 			if _f.matchedRule == nil || _f.matchedRule(opt.DecorrelateJoin) {
 				_expr := _f.funcs.ConstructNonApplyJoin(opt.InnerJoinApplyOp, left, right, on, private).(memo.RelExpr)
@@ -5884,7 +5943,7 @@ func (_f *Factory) ConstructLeftJoinApply(
 
 	// [DecorrelateJoin]
 	{
-		if !_f.funcs.IsCorrelated(right, left) {
+		if !_f.funcs.IsCorrelated(right, _f.funcs.OutputCols(left)) {
 			private := joinPrivate
 			if _f.matchedRule == nil || _f.matchedRule(opt.DecorrelateJoin) {
 				_expr := _f.funcs.ConstructNonApplyJoin(opt.LeftJoinApplyOp, left, right, on, private).(memo.RelExpr)
@@ -6465,7 +6524,7 @@ func (_f *Factory) ConstructSemiJoinApply(
 
 	// [DecorrelateJoin]
 	{
-		if !_f.funcs.IsCorrelated(right, left) {
+		if !_f.funcs.IsCorrelated(right, _f.funcs.OutputCols(left)) {
 			private := joinPrivate
 			if _f.matchedRule == nil || _f.matchedRule(opt.DecorrelateJoin) {
 				_expr := _f.funcs.ConstructNonApplyJoin(opt.SemiJoinApplyOp, left, right, on, private).(memo.RelExpr)
@@ -7016,7 +7075,7 @@ func (_f *Factory) ConstructAntiJoinApply(
 
 	// [DecorrelateJoin]
 	{
-		if !_f.funcs.IsCorrelated(right, left) {
+		if !_f.funcs.IsCorrelated(right, _f.funcs.OutputCols(left)) {
 			private := joinPrivate
 			if _f.matchedRule == nil || _f.matchedRule(opt.DecorrelateJoin) {
 				_expr := _f.funcs.ConstructNonApplyJoin(opt.AntiJoinApplyOp, left, right, on, private).(memo.RelExpr)

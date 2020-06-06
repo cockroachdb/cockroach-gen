@@ -155,6 +155,8 @@ const (
 	SimplifyGroupByOrdering
 	SimplifyOrdinalityOrdering
 	SimplifyExplainOrdering
+	EliminateJoinUnderProjectLeft
+	EliminateJoinUnderProjectRight
 	EliminateProject
 	MergeProjects
 	MergeProjectWithValues
