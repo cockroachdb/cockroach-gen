@@ -8903,41 +8903,89 @@ func (_f *Factory) ConstructLimit(
 		}
 	}
 
-	// [PushLimitIntoLeftJoin]
+	// [PushLimitIntoJoinLeft]
 	{
-		_leftJoin, _ := input.(*memo.LeftJoinExpr)
-		if _leftJoin != nil {
-			left := _leftJoin.Left
-			right := _leftJoin.Right
-			on := _leftJoin.On
-			private := &_leftJoin.JoinPrivate
-			limitExpr := limit
-			_const, _ := limitExpr.(*memo.ConstExpr)
-			if _const != nil {
-				limit := _const.Value
-				if _f.funcs.IsPositiveInt(limit) {
-					if !_f.funcs.LimitGeMaxRows(limit, left) {
-						cols := _f.funcs.OutputCols(left)
-						if _f.funcs.OrderingCanProjectCols(ordering, cols) {
-							if _f.matchedRule == nil || _f.matchedRule(opt.PushLimitIntoLeftJoin) {
-								_expr := _f.ConstructLimit(
-									_f.ConstructLeftJoin(
-										_f.ConstructLimit(
-											left,
-											limitExpr,
-											_f.funcs.PruneOrdering(ordering, cols),
-										),
-										right,
-										on,
-										private,
-									),
-									limitExpr,
-									ordering,
-								)
-								if _f.appliedRule != nil {
-									_f.appliedRule(opt.PushLimitIntoLeftJoin, nil, _expr)
+		if input.Op() == opt.InnerJoinOp || input.Op() == opt.LeftJoinOp {
+			left := input.Child(0).(memo.RelExpr)
+			right := input.Child(1).(memo.RelExpr)
+			on := *input.Child(2).(*memo.FiltersExpr)
+			private := input.Private().(*memo.JoinPrivate)
+			if _f.funcs.JoinPreservesLeftRows(input) {
+				limitExpr := limit
+				_const, _ := limitExpr.(*memo.ConstExpr)
+				if _const != nil {
+					limit := _const.Value
+					if _f.funcs.IsPositiveInt(limit) {
+						if !_f.funcs.LimitGeMaxRows(limit, left) {
+							cols := _f.funcs.OutputCols(left)
+							if _f.funcs.OrderingCanProjectCols(ordering, cols) {
+								if _f.matchedRule == nil || _f.matchedRule(opt.PushLimitIntoJoinLeft) {
+									on := on
+									_expr := _f.ConstructLimit(
+										_f.DynamicConstruct(
+											input.Op(),
+											_f.ConstructLimit(
+												left,
+												limitExpr,
+												_f.funcs.PruneOrdering(ordering, cols),
+											),
+											right,
+											&on,
+											private,
+										).(memo.RelExpr),
+										limitExpr,
+										ordering,
+									)
+									if _f.appliedRule != nil {
+										_f.appliedRule(opt.PushLimitIntoJoinLeft, nil, _expr)
+									}
+									return _expr
 								}
-								return _expr
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [PushLimitIntoJoinRight]
+	{
+		_innerJoin, _ := input.(*memo.InnerJoinExpr)
+		if _innerJoin != nil {
+			left := _innerJoin.Left
+			right := _innerJoin.Right
+			on := _innerJoin.On
+			private := &_innerJoin.JoinPrivate
+			if _f.funcs.JoinPreservesRightRows(input) {
+				limitExpr := limit
+				_const, _ := limitExpr.(*memo.ConstExpr)
+				if _const != nil {
+					limit := _const.Value
+					if _f.funcs.IsPositiveInt(limit) {
+						if !_f.funcs.LimitGeMaxRows(limit, right) {
+							cols := _f.funcs.OutputCols(right)
+							if _f.funcs.OrderingCanProjectCols(ordering, cols) {
+								if _f.matchedRule == nil || _f.matchedRule(opt.PushLimitIntoJoinRight) {
+									_expr := _f.ConstructLimit(
+										_f.ConstructInnerJoin(
+											left,
+											_f.ConstructLimit(
+												right,
+												limitExpr,
+												_f.funcs.PruneOrdering(ordering, cols),
+											),
+											on,
+											private,
+										),
+										limitExpr,
+										ordering,
+									)
+									if _f.appliedRule != nil {
+										_f.appliedRule(opt.PushLimitIntoJoinRight, nil, _expr)
+									}
+									return _expr
+								}
 							}
 						}
 					}
