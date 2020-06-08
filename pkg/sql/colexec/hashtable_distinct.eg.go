@@ -16,14 +16,10 @@ import (
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
 	"github.com/cockroachdb/cockroach/pkg/col/coldataext"
 	"github.com/cockroachdb/cockroach/pkg/col/typeconv"
-	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execgen"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase/colexecerror"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 	"github.com/cockroachdb/cockroach/pkg/sql/types"
 )
-
-// Remove unused warning.
-var _ = execgen.UNSAFEGET
 
 // checkColAgainstItself is similar to checkCol, but it probes the vector
 // against itself.
@@ -1073,7 +1069,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 													{
 														tmpDec := &_overloadHelper.tmpDec1
-														tmpDec.SetFinite(int64(buildVal), 0)
+														tmpDec.SetInt64(int64(buildVal))
 														cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 													}
 
@@ -1120,7 +1116,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 													{
 														tmpDec := &_overloadHelper.tmpDec1
-														tmpDec.SetFinite(int64(buildVal), 0)
+														tmpDec.SetInt64(int64(buildVal))
 														cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 													}
 
@@ -1167,7 +1163,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 												{
 													tmpDec := &_overloadHelper.tmpDec1
-													tmpDec.SetFinite(int64(buildVal), 0)
+													tmpDec.SetInt64(int64(buildVal))
 													cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 												}
 
@@ -1215,7 +1211,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 												{
 													tmpDec := &_overloadHelper.tmpDec1
-													tmpDec.SetFinite(int64(buildVal), 0)
+													tmpDec.SetInt64(int64(buildVal))
 													cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 												}
 
@@ -1260,7 +1256,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 												{
 													tmpDec := &_overloadHelper.tmpDec1
-													tmpDec.SetFinite(int64(buildVal), 0)
+													tmpDec.SetInt64(int64(buildVal))
 													cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 												}
 
@@ -1323,7 +1319,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 													{
 														tmpDec := &_overloadHelper.tmpDec1
-														tmpDec.SetFinite(int64(buildVal), 0)
+														tmpDec.SetInt64(int64(buildVal))
 														cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 													}
 
@@ -1368,7 +1364,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 													{
 														tmpDec := &_overloadHelper.tmpDec1
-														tmpDec.SetFinite(int64(buildVal), 0)
+														tmpDec.SetInt64(int64(buildVal))
 														cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 													}
 
@@ -1413,7 +1409,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 												{
 													tmpDec := &_overloadHelper.tmpDec1
-													tmpDec.SetFinite(int64(buildVal), 0)
+													tmpDec.SetInt64(int64(buildVal))
 													cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 												}
 
@@ -1459,7 +1455,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 												{
 													tmpDec := &_overloadHelper.tmpDec1
-													tmpDec.SetFinite(int64(buildVal), 0)
+													tmpDec.SetInt64(int64(buildVal))
 													cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 												}
 
@@ -1502,7 +1498,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 												{
 													tmpDec := &_overloadHelper.tmpDec1
-													tmpDec.SetFinite(int64(buildVal), 0)
+													tmpDec.SetInt64(int64(buildVal))
 													cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 												}
 
@@ -1571,7 +1567,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 													{
 														tmpDec := &_overloadHelper.tmpDec1
-														tmpDec.SetFinite(int64(buildVal), 0)
+														tmpDec.SetInt64(int64(buildVal))
 														cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 													}
 
@@ -1618,7 +1614,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 													{
 														tmpDec := &_overloadHelper.tmpDec1
-														tmpDec.SetFinite(int64(buildVal), 0)
+														tmpDec.SetInt64(int64(buildVal))
 														cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 													}
 
@@ -1665,7 +1661,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 												{
 													tmpDec := &_overloadHelper.tmpDec1
-													tmpDec.SetFinite(int64(buildVal), 0)
+													tmpDec.SetInt64(int64(buildVal))
 													cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 												}
 
@@ -1713,7 +1709,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 												{
 													tmpDec := &_overloadHelper.tmpDec1
-													tmpDec.SetFinite(int64(buildVal), 0)
+													tmpDec.SetInt64(int64(buildVal))
 													cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 												}
 
@@ -1758,7 +1754,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 												{
 													tmpDec := &_overloadHelper.tmpDec1
-													tmpDec.SetFinite(int64(buildVal), 0)
+													tmpDec.SetInt64(int64(buildVal))
 													cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 												}
 
@@ -1821,7 +1817,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 													{
 														tmpDec := &_overloadHelper.tmpDec1
-														tmpDec.SetFinite(int64(buildVal), 0)
+														tmpDec.SetInt64(int64(buildVal))
 														cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 													}
 
@@ -1866,7 +1862,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 													{
 														tmpDec := &_overloadHelper.tmpDec1
-														tmpDec.SetFinite(int64(buildVal), 0)
+														tmpDec.SetInt64(int64(buildVal))
 														cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 													}
 
@@ -1911,7 +1907,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 												{
 													tmpDec := &_overloadHelper.tmpDec1
-													tmpDec.SetFinite(int64(buildVal), 0)
+													tmpDec.SetInt64(int64(buildVal))
 													cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 												}
 
@@ -1957,7 +1953,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 												{
 													tmpDec := &_overloadHelper.tmpDec1
-													tmpDec.SetFinite(int64(buildVal), 0)
+													tmpDec.SetInt64(int64(buildVal))
 													cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 												}
 
@@ -2000,7 +1996,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 												{
 													tmpDec := &_overloadHelper.tmpDec1
-													tmpDec.SetFinite(int64(buildVal), 0)
+													tmpDec.SetInt64(int64(buildVal))
 													cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 												}
 
@@ -2070,7 +2066,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 													{
 														tmpDec := &_overloadHelper.tmpDec1
-														tmpDec.SetFinite(int64(buildVal), 0)
+														tmpDec.SetInt64(int64(buildVal))
 														cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 													}
 
@@ -2117,7 +2113,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 													{
 														tmpDec := &_overloadHelper.tmpDec1
-														tmpDec.SetFinite(int64(buildVal), 0)
+														tmpDec.SetInt64(int64(buildVal))
 														cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 													}
 
@@ -2164,7 +2160,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 												{
 													tmpDec := &_overloadHelper.tmpDec1
-													tmpDec.SetFinite(int64(buildVal), 0)
+													tmpDec.SetInt64(int64(buildVal))
 													cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 												}
 
@@ -2212,7 +2208,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 												{
 													tmpDec := &_overloadHelper.tmpDec1
-													tmpDec.SetFinite(int64(buildVal), 0)
+													tmpDec.SetInt64(int64(buildVal))
 													cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 												}
 
@@ -2257,7 +2253,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 												{
 													tmpDec := &_overloadHelper.tmpDec1
-													tmpDec.SetFinite(int64(buildVal), 0)
+													tmpDec.SetInt64(int64(buildVal))
 													cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 												}
 
@@ -2320,7 +2316,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 													{
 														tmpDec := &_overloadHelper.tmpDec1
-														tmpDec.SetFinite(int64(buildVal), 0)
+														tmpDec.SetInt64(int64(buildVal))
 														cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 													}
 
@@ -2365,7 +2361,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 													{
 														tmpDec := &_overloadHelper.tmpDec1
-														tmpDec.SetFinite(int64(buildVal), 0)
+														tmpDec.SetInt64(int64(buildVal))
 														cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 													}
 
@@ -2410,7 +2406,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 												{
 													tmpDec := &_overloadHelper.tmpDec1
-													tmpDec.SetFinite(int64(buildVal), 0)
+													tmpDec.SetInt64(int64(buildVal))
 													cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 												}
 
@@ -2456,7 +2452,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 												{
 													tmpDec := &_overloadHelper.tmpDec1
-													tmpDec.SetFinite(int64(buildVal), 0)
+													tmpDec.SetInt64(int64(buildVal))
 													cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 												}
 
@@ -2499,7 +2495,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 												{
 													tmpDec := &_overloadHelper.tmpDec1
-													tmpDec.SetFinite(int64(buildVal), 0)
+													tmpDec.SetInt64(int64(buildVal))
 													cmpResult = tree.CompareDecimals(&probeVal, tmpDec)
 												}
 
@@ -5822,7 +5818,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 													{
 														tmpDec := &_overloadHelper.tmpDec1
-														tmpDec.SetFinite(int64(probeVal), 0)
+														tmpDec.SetInt64(int64(probeVal))
 														cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 													}
 
@@ -5869,7 +5865,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 													{
 														tmpDec := &_overloadHelper.tmpDec1
-														tmpDec.SetFinite(int64(probeVal), 0)
+														tmpDec.SetInt64(int64(probeVal))
 														cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 													}
 
@@ -5916,7 +5912,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 												{
 													tmpDec := &_overloadHelper.tmpDec1
-													tmpDec.SetFinite(int64(probeVal), 0)
+													tmpDec.SetInt64(int64(probeVal))
 													cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 												}
 
@@ -5964,7 +5960,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 												{
 													tmpDec := &_overloadHelper.tmpDec1
-													tmpDec.SetFinite(int64(probeVal), 0)
+													tmpDec.SetInt64(int64(probeVal))
 													cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 												}
 
@@ -6009,7 +6005,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 												{
 													tmpDec := &_overloadHelper.tmpDec1
-													tmpDec.SetFinite(int64(probeVal), 0)
+													tmpDec.SetInt64(int64(probeVal))
 													cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 												}
 
@@ -6072,7 +6068,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 													{
 														tmpDec := &_overloadHelper.tmpDec1
-														tmpDec.SetFinite(int64(probeVal), 0)
+														tmpDec.SetInt64(int64(probeVal))
 														cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 													}
 
@@ -6117,7 +6113,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 													{
 														tmpDec := &_overloadHelper.tmpDec1
-														tmpDec.SetFinite(int64(probeVal), 0)
+														tmpDec.SetInt64(int64(probeVal))
 														cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 													}
 
@@ -6162,7 +6158,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 												{
 													tmpDec := &_overloadHelper.tmpDec1
-													tmpDec.SetFinite(int64(probeVal), 0)
+													tmpDec.SetInt64(int64(probeVal))
 													cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 												}
 
@@ -6208,7 +6204,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 												{
 													tmpDec := &_overloadHelper.tmpDec1
-													tmpDec.SetFinite(int64(probeVal), 0)
+													tmpDec.SetInt64(int64(probeVal))
 													cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 												}
 
@@ -6251,7 +6247,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 												{
 													tmpDec := &_overloadHelper.tmpDec1
-													tmpDec.SetFinite(int64(probeVal), 0)
+													tmpDec.SetInt64(int64(probeVal))
 													cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 												}
 
@@ -8607,7 +8603,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 													{
 														tmpDec := &_overloadHelper.tmpDec1
-														tmpDec.SetFinite(int64(probeVal), 0)
+														tmpDec.SetInt64(int64(probeVal))
 														cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 													}
 
@@ -8654,7 +8650,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 													{
 														tmpDec := &_overloadHelper.tmpDec1
-														tmpDec.SetFinite(int64(probeVal), 0)
+														tmpDec.SetInt64(int64(probeVal))
 														cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 													}
 
@@ -8701,7 +8697,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 												{
 													tmpDec := &_overloadHelper.tmpDec1
-													tmpDec.SetFinite(int64(probeVal), 0)
+													tmpDec.SetInt64(int64(probeVal))
 													cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 												}
 
@@ -8749,7 +8745,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 												{
 													tmpDec := &_overloadHelper.tmpDec1
-													tmpDec.SetFinite(int64(probeVal), 0)
+													tmpDec.SetInt64(int64(probeVal))
 													cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 												}
 
@@ -8794,7 +8790,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 												{
 													tmpDec := &_overloadHelper.tmpDec1
-													tmpDec.SetFinite(int64(probeVal), 0)
+													tmpDec.SetInt64(int64(probeVal))
 													cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 												}
 
@@ -8857,7 +8853,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 													{
 														tmpDec := &_overloadHelper.tmpDec1
-														tmpDec.SetFinite(int64(probeVal), 0)
+														tmpDec.SetInt64(int64(probeVal))
 														cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 													}
 
@@ -8902,7 +8898,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 													{
 														tmpDec := &_overloadHelper.tmpDec1
-														tmpDec.SetFinite(int64(probeVal), 0)
+														tmpDec.SetInt64(int64(probeVal))
 														cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 													}
 
@@ -8947,7 +8943,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 												{
 													tmpDec := &_overloadHelper.tmpDec1
-													tmpDec.SetFinite(int64(probeVal), 0)
+													tmpDec.SetInt64(int64(probeVal))
 													cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 												}
 
@@ -8993,7 +8989,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 												{
 													tmpDec := &_overloadHelper.tmpDec1
-													tmpDec.SetFinite(int64(probeVal), 0)
+													tmpDec.SetInt64(int64(probeVal))
 													cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 												}
 
@@ -9036,7 +9032,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 												{
 													tmpDec := &_overloadHelper.tmpDec1
-													tmpDec.SetFinite(int64(probeVal), 0)
+													tmpDec.SetInt64(int64(probeVal))
 													cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 												}
 
@@ -11393,7 +11389,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 													{
 														tmpDec := &_overloadHelper.tmpDec1
-														tmpDec.SetFinite(int64(probeVal), 0)
+														tmpDec.SetInt64(int64(probeVal))
 														cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 													}
 
@@ -11440,7 +11436,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 													{
 														tmpDec := &_overloadHelper.tmpDec1
-														tmpDec.SetFinite(int64(probeVal), 0)
+														tmpDec.SetInt64(int64(probeVal))
 														cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 													}
 
@@ -11487,7 +11483,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 												{
 													tmpDec := &_overloadHelper.tmpDec1
-													tmpDec.SetFinite(int64(probeVal), 0)
+													tmpDec.SetInt64(int64(probeVal))
 													cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 												}
 
@@ -11535,7 +11531,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 												{
 													tmpDec := &_overloadHelper.tmpDec1
-													tmpDec.SetFinite(int64(probeVal), 0)
+													tmpDec.SetInt64(int64(probeVal))
 													cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 												}
 
@@ -11580,7 +11576,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 												{
 													tmpDec := &_overloadHelper.tmpDec1
-													tmpDec.SetFinite(int64(probeVal), 0)
+													tmpDec.SetInt64(int64(probeVal))
 													cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 												}
 
@@ -11643,7 +11639,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 													{
 														tmpDec := &_overloadHelper.tmpDec1
-														tmpDec.SetFinite(int64(probeVal), 0)
+														tmpDec.SetInt64(int64(probeVal))
 														cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 													}
 
@@ -11688,7 +11684,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 													{
 														tmpDec := &_overloadHelper.tmpDec1
-														tmpDec.SetFinite(int64(probeVal), 0)
+														tmpDec.SetInt64(int64(probeVal))
 														cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 													}
 
@@ -11733,7 +11729,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 												{
 													tmpDec := &_overloadHelper.tmpDec1
-													tmpDec.SetFinite(int64(probeVal), 0)
+													tmpDec.SetInt64(int64(probeVal))
 													cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 												}
 
@@ -11779,7 +11775,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 												{
 													tmpDec := &_overloadHelper.tmpDec1
-													tmpDec.SetFinite(int64(probeVal), 0)
+													tmpDec.SetInt64(int64(probeVal))
 													cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 												}
 
@@ -11822,7 +11818,7 @@ func (ht *hashTable) checkColAgainstItself(vec coldata.Vec, nToCheck uint64, sel
 
 												{
 													tmpDec := &_overloadHelper.tmpDec1
-													tmpDec.SetFinite(int64(probeVal), 0)
+													tmpDec.SetInt64(int64(probeVal))
 													cmpResult = tree.CompareDecimals(tmpDec, &buildVal)
 												}
 

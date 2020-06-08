@@ -403,7 +403,7 @@ func performPlusDecimalInt16(a apd.Decimal, b int16) apd.Decimal {
 	{
 
 		tmpDec := &_overloadHelper.tmpDec1
-		tmpDec.SetFinite(int64(b), 0)
+		tmpDec.SetInt64(int64(b))
 		if _, err := tree.ExactCtx.Add(&r, &a, tmpDec); err != nil {
 			colexecerror.ExpectedError(err)
 		}
@@ -424,7 +424,7 @@ func performPlusDecimalInt32(a apd.Decimal, b int32) apd.Decimal {
 	{
 
 		tmpDec := &_overloadHelper.tmpDec1
-		tmpDec.SetFinite(int64(b), 0)
+		tmpDec.SetInt64(int64(b))
 		if _, err := tree.ExactCtx.Add(&r, &a, tmpDec); err != nil {
 			colexecerror.ExpectedError(err)
 		}
@@ -445,7 +445,7 @@ func performPlusDecimalInt64(a apd.Decimal, b int64) apd.Decimal {
 	{
 
 		tmpDec := &_overloadHelper.tmpDec1
-		tmpDec.SetFinite(int64(b), 0)
+		tmpDec.SetInt64(int64(b))
 		if _, err := tree.ExactCtx.Add(&r, &a, tmpDec); err != nil {
 			colexecerror.ExpectedError(err)
 		}
@@ -666,7 +666,7 @@ func performPlusInt16Decimal(a int16, b apd.Decimal) apd.Decimal {
 	{
 
 		tmpDec := &_overloadHelper.tmpDec1
-		tmpDec.SetFinite(int64(a), 0)
+		tmpDec.SetInt64(int64(a))
 		_, err := tree.ExactCtx.Add(&r, tmpDec, &b)
 		if err != nil {
 			colexecerror.ExpectedError(err)
@@ -688,7 +688,7 @@ func performPlusInt32Decimal(a int32, b apd.Decimal) apd.Decimal {
 	{
 
 		tmpDec := &_overloadHelper.tmpDec1
-		tmpDec.SetFinite(int64(a), 0)
+		tmpDec.SetInt64(int64(a))
 		_, err := tree.ExactCtx.Add(&r, tmpDec, &b)
 		if err != nil {
 			colexecerror.ExpectedError(err)
@@ -710,7 +710,7 @@ func performPlusInt64Decimal(a int64, b apd.Decimal) apd.Decimal {
 	{
 
 		tmpDec := &_overloadHelper.tmpDec1
-		tmpDec.SetFinite(int64(a), 0)
+		tmpDec.SetInt64(int64(a))
 		_, err := tree.ExactCtx.Add(&r, tmpDec, &b)
 		if err != nil {
 			colexecerror.ExpectedError(err)
@@ -785,7 +785,7 @@ func performMinusDecimalInt16(a apd.Decimal, b int16) apd.Decimal {
 	{
 
 		tmpDec := &_overloadHelper.tmpDec1
-		tmpDec.SetFinite(int64(b), 0)
+		tmpDec.SetInt64(int64(b))
 		if _, err := tree.ExactCtx.Sub(&r, &a, tmpDec); err != nil {
 			colexecerror.ExpectedError(err)
 		}
@@ -806,7 +806,7 @@ func performMinusDecimalInt32(a apd.Decimal, b int32) apd.Decimal {
 	{
 
 		tmpDec := &_overloadHelper.tmpDec1
-		tmpDec.SetFinite(int64(b), 0)
+		tmpDec.SetInt64(int64(b))
 		if _, err := tree.ExactCtx.Sub(&r, &a, tmpDec); err != nil {
 			colexecerror.ExpectedError(err)
 		}
@@ -827,7 +827,7 @@ func performMinusDecimalInt64(a apd.Decimal, b int64) apd.Decimal {
 	{
 
 		tmpDec := &_overloadHelper.tmpDec1
-		tmpDec.SetFinite(int64(b), 0)
+		tmpDec.SetInt64(int64(b))
 		if _, err := tree.ExactCtx.Sub(&r, &a, tmpDec); err != nil {
 			colexecerror.ExpectedError(err)
 		}
@@ -1048,7 +1048,7 @@ func performMinusInt16Decimal(a int16, b apd.Decimal) apd.Decimal {
 	{
 
 		tmpDec := &_overloadHelper.tmpDec1
-		tmpDec.SetFinite(int64(a), 0)
+		tmpDec.SetInt64(int64(a))
 		_, err := tree.ExactCtx.Sub(&r, tmpDec, &b)
 		if err != nil {
 			colexecerror.ExpectedError(err)
@@ -1070,7 +1070,7 @@ func performMinusInt32Decimal(a int32, b apd.Decimal) apd.Decimal {
 	{
 
 		tmpDec := &_overloadHelper.tmpDec1
-		tmpDec.SetFinite(int64(a), 0)
+		tmpDec.SetInt64(int64(a))
 		_, err := tree.ExactCtx.Sub(&r, tmpDec, &b)
 		if err != nil {
 			colexecerror.ExpectedError(err)
@@ -1092,7 +1092,7 @@ func performMinusInt64Decimal(a int64, b apd.Decimal) apd.Decimal {
 	{
 
 		tmpDec := &_overloadHelper.tmpDec1
-		tmpDec.SetFinite(int64(a), 0)
+		tmpDec.SetInt64(int64(a))
 		_, err := tree.ExactCtx.Sub(&r, tmpDec, &b)
 		if err != nil {
 			colexecerror.ExpectedError(err)
@@ -1170,7 +1170,7 @@ func performMultDecimalInt16(a apd.Decimal, b int16) apd.Decimal {
 	{
 
 		tmpDec := &_overloadHelper.tmpDec1
-		tmpDec.SetFinite(int64(b), 0)
+		tmpDec.SetInt64(int64(b))
 		if _, err := tree.ExactCtx.Mul(&r, &a, tmpDec); err != nil {
 			colexecerror.ExpectedError(err)
 		}
@@ -1191,7 +1191,7 @@ func performMultDecimalInt32(a apd.Decimal, b int32) apd.Decimal {
 	{
 
 		tmpDec := &_overloadHelper.tmpDec1
-		tmpDec.SetFinite(int64(b), 0)
+		tmpDec.SetInt64(int64(b))
 		if _, err := tree.ExactCtx.Mul(&r, &a, tmpDec); err != nil {
 			colexecerror.ExpectedError(err)
 		}
@@ -1212,7 +1212,7 @@ func performMultDecimalInt64(a apd.Decimal, b int64) apd.Decimal {
 	{
 
 		tmpDec := &_overloadHelper.tmpDec1
-		tmpDec.SetFinite(int64(b), 0)
+		tmpDec.SetInt64(int64(b))
 		if _, err := tree.ExactCtx.Mul(&r, &a, tmpDec); err != nil {
 			colexecerror.ExpectedError(err)
 		}
@@ -1513,7 +1513,7 @@ func performMultInt16Decimal(a int16, b apd.Decimal) apd.Decimal {
 	{
 
 		tmpDec := &_overloadHelper.tmpDec1
-		tmpDec.SetFinite(int64(a), 0)
+		tmpDec.SetInt64(int64(a))
 		_, err := tree.ExactCtx.Mul(&r, tmpDec, &b)
 		if err != nil {
 			colexecerror.ExpectedError(err)
@@ -1535,7 +1535,7 @@ func performMultInt32Decimal(a int32, b apd.Decimal) apd.Decimal {
 	{
 
 		tmpDec := &_overloadHelper.tmpDec1
-		tmpDec.SetFinite(int64(a), 0)
+		tmpDec.SetInt64(int64(a))
 		_, err := tree.ExactCtx.Mul(&r, tmpDec, &b)
 		if err != nil {
 			colexecerror.ExpectedError(err)
@@ -1557,7 +1557,7 @@ func performMultInt64Decimal(a int64, b apd.Decimal) apd.Decimal {
 	{
 
 		tmpDec := &_overloadHelper.tmpDec1
-		tmpDec.SetFinite(int64(a), 0)
+		tmpDec.SetInt64(int64(a))
 		_, err := tree.ExactCtx.Mul(&r, tmpDec, &b)
 		if err != nil {
 			colexecerror.ExpectedError(err)
@@ -1665,7 +1665,7 @@ func performDivDecimalInt16(a apd.Decimal, b int16) apd.Decimal {
 		}
 
 		tmpDec := &_overloadHelper.tmpDec1
-		tmpDec.SetFinite(int64(b), 0)
+		tmpDec.SetInt64(int64(b))
 		if _, err := tree.DecimalCtx.Quo(&r, &a, tmpDec); err != nil {
 			colexecerror.ExpectedError(err)
 		}
@@ -1690,7 +1690,7 @@ func performDivDecimalInt32(a apd.Decimal, b int32) apd.Decimal {
 		}
 
 		tmpDec := &_overloadHelper.tmpDec1
-		tmpDec.SetFinite(int64(b), 0)
+		tmpDec.SetInt64(int64(b))
 		if _, err := tree.DecimalCtx.Quo(&r, &a, tmpDec); err != nil {
 			colexecerror.ExpectedError(err)
 		}
@@ -1715,7 +1715,7 @@ func performDivDecimalInt64(a apd.Decimal, b int64) apd.Decimal {
 		}
 
 		tmpDec := &_overloadHelper.tmpDec1
-		tmpDec.SetFinite(int64(b), 0)
+		tmpDec.SetInt64(int64(b))
 		if _, err := tree.DecimalCtx.Quo(&r, &a, tmpDec); err != nil {
 			colexecerror.ExpectedError(err)
 		}
@@ -1762,8 +1762,8 @@ func performDivInt16Int16(a int16, b int16) apd.Decimal {
 			colexecerror.ExpectedError(tree.ErrDivByZero)
 		}
 		leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
-		leftTmpDec.SetFinite(int64(a), 0)
-		rightTmpDec.SetFinite(int64(b), 0)
+		leftTmpDec.SetInt64(int64(a))
+		rightTmpDec.SetInt64(int64(b))
 		if _, err := tree.DecimalCtx.Quo(&r, leftTmpDec, rightTmpDec); err != nil {
 			colexecerror.ExpectedError(err)
 		}
@@ -1786,8 +1786,8 @@ func performDivInt16Int32(a int16, b int32) apd.Decimal {
 			colexecerror.ExpectedError(tree.ErrDivByZero)
 		}
 		leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
-		leftTmpDec.SetFinite(int64(int64(a)), 0)
-		rightTmpDec.SetFinite(int64(int64(b)), 0)
+		leftTmpDec.SetInt64(int64(int64(a)))
+		rightTmpDec.SetInt64(int64(int64(b)))
 		if _, err := tree.DecimalCtx.Quo(&r, leftTmpDec, rightTmpDec); err != nil {
 			colexecerror.ExpectedError(err)
 		}
@@ -1810,8 +1810,8 @@ func performDivInt16Int64(a int16, b int64) apd.Decimal {
 			colexecerror.ExpectedError(tree.ErrDivByZero)
 		}
 		leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
-		leftTmpDec.SetFinite(int64(int64(a)), 0)
-		rightTmpDec.SetFinite(int64(int64(b)), 0)
+		leftTmpDec.SetInt64(int64(int64(a)))
+		rightTmpDec.SetInt64(int64(int64(b)))
 		if _, err := tree.DecimalCtx.Quo(&r, leftTmpDec, rightTmpDec); err != nil {
 			colexecerror.ExpectedError(err)
 		}
@@ -1834,8 +1834,8 @@ func performDivInt32Int16(a int32, b int16) apd.Decimal {
 			colexecerror.ExpectedError(tree.ErrDivByZero)
 		}
 		leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
-		leftTmpDec.SetFinite(int64(int64(a)), 0)
-		rightTmpDec.SetFinite(int64(int64(b)), 0)
+		leftTmpDec.SetInt64(int64(int64(a)))
+		rightTmpDec.SetInt64(int64(int64(b)))
 		if _, err := tree.DecimalCtx.Quo(&r, leftTmpDec, rightTmpDec); err != nil {
 			colexecerror.ExpectedError(err)
 		}
@@ -1858,8 +1858,8 @@ func performDivInt32Int32(a int32, b int32) apd.Decimal {
 			colexecerror.ExpectedError(tree.ErrDivByZero)
 		}
 		leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
-		leftTmpDec.SetFinite(int64(a), 0)
-		rightTmpDec.SetFinite(int64(b), 0)
+		leftTmpDec.SetInt64(int64(a))
+		rightTmpDec.SetInt64(int64(b))
 		if _, err := tree.DecimalCtx.Quo(&r, leftTmpDec, rightTmpDec); err != nil {
 			colexecerror.ExpectedError(err)
 		}
@@ -1882,8 +1882,8 @@ func performDivInt32Int64(a int32, b int64) apd.Decimal {
 			colexecerror.ExpectedError(tree.ErrDivByZero)
 		}
 		leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
-		leftTmpDec.SetFinite(int64(int64(a)), 0)
-		rightTmpDec.SetFinite(int64(int64(b)), 0)
+		leftTmpDec.SetInt64(int64(int64(a)))
+		rightTmpDec.SetInt64(int64(int64(b)))
 		if _, err := tree.DecimalCtx.Quo(&r, leftTmpDec, rightTmpDec); err != nil {
 			colexecerror.ExpectedError(err)
 		}
@@ -1906,8 +1906,8 @@ func performDivInt64Int16(a int64, b int16) apd.Decimal {
 			colexecerror.ExpectedError(tree.ErrDivByZero)
 		}
 		leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
-		leftTmpDec.SetFinite(int64(int64(a)), 0)
-		rightTmpDec.SetFinite(int64(int64(b)), 0)
+		leftTmpDec.SetInt64(int64(int64(a)))
+		rightTmpDec.SetInt64(int64(int64(b)))
 		if _, err := tree.DecimalCtx.Quo(&r, leftTmpDec, rightTmpDec); err != nil {
 			colexecerror.ExpectedError(err)
 		}
@@ -1930,8 +1930,8 @@ func performDivInt64Int32(a int64, b int32) apd.Decimal {
 			colexecerror.ExpectedError(tree.ErrDivByZero)
 		}
 		leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
-		leftTmpDec.SetFinite(int64(int64(a)), 0)
-		rightTmpDec.SetFinite(int64(int64(b)), 0)
+		leftTmpDec.SetInt64(int64(int64(a)))
+		rightTmpDec.SetInt64(int64(int64(b)))
 		if _, err := tree.DecimalCtx.Quo(&r, leftTmpDec, rightTmpDec); err != nil {
 			colexecerror.ExpectedError(err)
 		}
@@ -1954,8 +1954,8 @@ func performDivInt64Int64(a int64, b int64) apd.Decimal {
 			colexecerror.ExpectedError(tree.ErrDivByZero)
 		}
 		leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
-		leftTmpDec.SetFinite(int64(int64(a)), 0)
-		rightTmpDec.SetFinite(int64(int64(b)), 0)
+		leftTmpDec.SetInt64(int64(int64(a)))
+		rightTmpDec.SetInt64(int64(int64(b)))
 		if _, err := tree.DecimalCtx.Quo(&r, leftTmpDec, rightTmpDec); err != nil {
 			colexecerror.ExpectedError(err)
 		}
@@ -1980,7 +1980,7 @@ func performDivInt16Decimal(a int16, b apd.Decimal) apd.Decimal {
 		}
 
 		tmpDec := &_overloadHelper.tmpDec1
-		tmpDec.SetFinite(int64(a), 0)
+		tmpDec.SetInt64(int64(a))
 		_, err := tree.DecimalCtx.Quo(&r, tmpDec, &b)
 		if err != nil {
 			colexecerror.ExpectedError(err)
@@ -2006,7 +2006,7 @@ func performDivInt32Decimal(a int32, b apd.Decimal) apd.Decimal {
 		}
 
 		tmpDec := &_overloadHelper.tmpDec1
-		tmpDec.SetFinite(int64(a), 0)
+		tmpDec.SetInt64(int64(a))
 		_, err := tree.DecimalCtx.Quo(&r, tmpDec, &b)
 		if err != nil {
 			colexecerror.ExpectedError(err)
@@ -2032,7 +2032,7 @@ func performDivInt64Decimal(a int64, b apd.Decimal) apd.Decimal {
 		}
 
 		tmpDec := &_overloadHelper.tmpDec1
-		tmpDec.SetFinite(int64(a), 0)
+		tmpDec.SetInt64(int64(a))
 		_, err := tree.DecimalCtx.Quo(&r, tmpDec, &b)
 		if err != nil {
 			colexecerror.ExpectedError(err)
@@ -2111,7 +2111,7 @@ func performFloorDivDecimalInt16(a apd.Decimal, b int16) apd.Decimal {
 		}
 
 		tmpDec := &_overloadHelper.tmpDec1
-		tmpDec.SetFinite(int64(b), 0)
+		tmpDec.SetInt64(int64(b))
 		if _, err := tree.HighPrecisionCtx.QuoInteger(&r, &a, tmpDec); err != nil {
 			colexecerror.ExpectedError(err)
 		}
@@ -2136,7 +2136,7 @@ func performFloorDivDecimalInt32(a apd.Decimal, b int32) apd.Decimal {
 		}
 
 		tmpDec := &_overloadHelper.tmpDec1
-		tmpDec.SetFinite(int64(b), 0)
+		tmpDec.SetInt64(int64(b))
 		if _, err := tree.HighPrecisionCtx.QuoInteger(&r, &a, tmpDec); err != nil {
 			colexecerror.ExpectedError(err)
 		}
@@ -2161,7 +2161,7 @@ func performFloorDivDecimalInt64(a apd.Decimal, b int64) apd.Decimal {
 		}
 
 		tmpDec := &_overloadHelper.tmpDec1
-		tmpDec.SetFinite(int64(b), 0)
+		tmpDec.SetInt64(int64(b))
 		if _, err := tree.HighPrecisionCtx.QuoInteger(&r, &a, tmpDec); err != nil {
 			colexecerror.ExpectedError(err)
 		}
@@ -2381,7 +2381,7 @@ func performFloorDivInt16Decimal(a int16, b apd.Decimal) apd.Decimal {
 		}
 
 		tmpDec := &_overloadHelper.tmpDec1
-		tmpDec.SetFinite(int64(a), 0)
+		tmpDec.SetInt64(int64(a))
 		_, err := tree.HighPrecisionCtx.QuoInteger(&r, tmpDec, &b)
 		if err != nil {
 			colexecerror.ExpectedError(err)
@@ -2407,7 +2407,7 @@ func performFloorDivInt32Decimal(a int32, b apd.Decimal) apd.Decimal {
 		}
 
 		tmpDec := &_overloadHelper.tmpDec1
-		tmpDec.SetFinite(int64(a), 0)
+		tmpDec.SetInt64(int64(a))
 		_, err := tree.HighPrecisionCtx.QuoInteger(&r, tmpDec, &b)
 		if err != nil {
 			colexecerror.ExpectedError(err)
@@ -2433,7 +2433,7 @@ func performFloorDivInt64Decimal(a int64, b apd.Decimal) apd.Decimal {
 		}
 
 		tmpDec := &_overloadHelper.tmpDec1
-		tmpDec.SetFinite(int64(a), 0)
+		tmpDec.SetInt64(int64(a))
 		_, err := tree.HighPrecisionCtx.QuoInteger(&r, tmpDec, &b)
 		if err != nil {
 			colexecerror.ExpectedError(err)
@@ -2480,7 +2480,7 @@ func performModDecimalInt16(a apd.Decimal, b int16) apd.Decimal {
 		}
 
 		tmpDec := &_overloadHelper.tmpDec1
-		tmpDec.SetFinite(int64(b), 0)
+		tmpDec.SetInt64(int64(b))
 		if _, err := tree.HighPrecisionCtx.Rem(&r, &a, tmpDec); err != nil {
 			colexecerror.ExpectedError(err)
 		}
@@ -2505,7 +2505,7 @@ func performModDecimalInt32(a apd.Decimal, b int32) apd.Decimal {
 		}
 
 		tmpDec := &_overloadHelper.tmpDec1
-		tmpDec.SetFinite(int64(b), 0)
+		tmpDec.SetInt64(int64(b))
 		if _, err := tree.HighPrecisionCtx.Rem(&r, &a, tmpDec); err != nil {
 			colexecerror.ExpectedError(err)
 		}
@@ -2530,7 +2530,7 @@ func performModDecimalInt64(a apd.Decimal, b int64) apd.Decimal {
 		}
 
 		tmpDec := &_overloadHelper.tmpDec1
-		tmpDec.SetFinite(int64(b), 0)
+		tmpDec.SetInt64(int64(b))
 		if _, err := tree.HighPrecisionCtx.Rem(&r, &a, tmpDec); err != nil {
 			colexecerror.ExpectedError(err)
 		}
@@ -2750,7 +2750,7 @@ func performModInt16Decimal(a int16, b apd.Decimal) apd.Decimal {
 		}
 
 		tmpDec := &_overloadHelper.tmpDec1
-		tmpDec.SetFinite(int64(a), 0)
+		tmpDec.SetInt64(int64(a))
 		_, err := tree.HighPrecisionCtx.Rem(&r, tmpDec, &b)
 		if err != nil {
 			colexecerror.ExpectedError(err)
@@ -2776,7 +2776,7 @@ func performModInt32Decimal(a int32, b apd.Decimal) apd.Decimal {
 		}
 
 		tmpDec := &_overloadHelper.tmpDec1
-		tmpDec.SetFinite(int64(a), 0)
+		tmpDec.SetInt64(int64(a))
 		_, err := tree.HighPrecisionCtx.Rem(&r, tmpDec, &b)
 		if err != nil {
 			colexecerror.ExpectedError(err)
@@ -2802,7 +2802,7 @@ func performModInt64Decimal(a int64, b apd.Decimal) apd.Decimal {
 		}
 
 		tmpDec := &_overloadHelper.tmpDec1
-		tmpDec.SetFinite(int64(a), 0)
+		tmpDec.SetInt64(int64(a))
 		_, err := tree.HighPrecisionCtx.Rem(&r, tmpDec, &b)
 		if err != nil {
 			colexecerror.ExpectedError(err)
@@ -2903,7 +2903,7 @@ func performEQDecimalInt16(a apd.Decimal, b int16) bool {
 
 		{
 			tmpDec := &_overloadHelper.tmpDec1
-			tmpDec.SetFinite(int64(b), 0)
+			tmpDec.SetInt64(int64(b))
 			cmpResult = tree.CompareDecimals(&a, tmpDec)
 		}
 
@@ -2927,7 +2927,7 @@ func performEQDecimalInt32(a apd.Decimal, b int32) bool {
 
 		{
 			tmpDec := &_overloadHelper.tmpDec1
-			tmpDec.SetFinite(int64(b), 0)
+			tmpDec.SetInt64(int64(b))
 			cmpResult = tree.CompareDecimals(&a, tmpDec)
 		}
 
@@ -2951,7 +2951,7 @@ func performEQDecimalInt64(a apd.Decimal, b int64) bool {
 
 		{
 			tmpDec := &_overloadHelper.tmpDec1
-			tmpDec.SetFinite(int64(b), 0)
+			tmpDec.SetInt64(int64(b))
 			cmpResult = tree.CompareDecimals(&a, tmpDec)
 		}
 
@@ -3391,7 +3391,7 @@ func performEQInt16Decimal(a int16, b apd.Decimal) bool {
 
 		{
 			tmpDec := &_overloadHelper.tmpDec1
-			tmpDec.SetFinite(int64(a), 0)
+			tmpDec.SetInt64(int64(a))
 			cmpResult = tree.CompareDecimals(tmpDec, &b)
 		}
 
@@ -3415,7 +3415,7 @@ func performEQInt32Decimal(a int32, b apd.Decimal) bool {
 
 		{
 			tmpDec := &_overloadHelper.tmpDec1
-			tmpDec.SetFinite(int64(a), 0)
+			tmpDec.SetInt64(int64(a))
 			cmpResult = tree.CompareDecimals(tmpDec, &b)
 		}
 
@@ -3439,7 +3439,7 @@ func performEQInt64Decimal(a int64, b apd.Decimal) bool {
 
 		{
 			tmpDec := &_overloadHelper.tmpDec1
-			tmpDec.SetFinite(int64(a), 0)
+			tmpDec.SetInt64(int64(a))
 			cmpResult = tree.CompareDecimals(tmpDec, &b)
 		}
 
@@ -3724,7 +3724,7 @@ func performNEDecimalInt16(a apd.Decimal, b int16) bool {
 
 		{
 			tmpDec := &_overloadHelper.tmpDec1
-			tmpDec.SetFinite(int64(b), 0)
+			tmpDec.SetInt64(int64(b))
 			cmpResult = tree.CompareDecimals(&a, tmpDec)
 		}
 
@@ -3748,7 +3748,7 @@ func performNEDecimalInt32(a apd.Decimal, b int32) bool {
 
 		{
 			tmpDec := &_overloadHelper.tmpDec1
-			tmpDec.SetFinite(int64(b), 0)
+			tmpDec.SetInt64(int64(b))
 			cmpResult = tree.CompareDecimals(&a, tmpDec)
 		}
 
@@ -3772,7 +3772,7 @@ func performNEDecimalInt64(a apd.Decimal, b int64) bool {
 
 		{
 			tmpDec := &_overloadHelper.tmpDec1
-			tmpDec.SetFinite(int64(b), 0)
+			tmpDec.SetInt64(int64(b))
 			cmpResult = tree.CompareDecimals(&a, tmpDec)
 		}
 
@@ -4212,7 +4212,7 @@ func performNEInt16Decimal(a int16, b apd.Decimal) bool {
 
 		{
 			tmpDec := &_overloadHelper.tmpDec1
-			tmpDec.SetFinite(int64(a), 0)
+			tmpDec.SetInt64(int64(a))
 			cmpResult = tree.CompareDecimals(tmpDec, &b)
 		}
 
@@ -4236,7 +4236,7 @@ func performNEInt32Decimal(a int32, b apd.Decimal) bool {
 
 		{
 			tmpDec := &_overloadHelper.tmpDec1
-			tmpDec.SetFinite(int64(a), 0)
+			tmpDec.SetInt64(int64(a))
 			cmpResult = tree.CompareDecimals(tmpDec, &b)
 		}
 
@@ -4260,7 +4260,7 @@ func performNEInt64Decimal(a int64, b apd.Decimal) bool {
 
 		{
 			tmpDec := &_overloadHelper.tmpDec1
-			tmpDec.SetFinite(int64(a), 0)
+			tmpDec.SetInt64(int64(a))
 			cmpResult = tree.CompareDecimals(tmpDec, &b)
 		}
 
@@ -4545,7 +4545,7 @@ func performLTDecimalInt16(a apd.Decimal, b int16) bool {
 
 		{
 			tmpDec := &_overloadHelper.tmpDec1
-			tmpDec.SetFinite(int64(b), 0)
+			tmpDec.SetInt64(int64(b))
 			cmpResult = tree.CompareDecimals(&a, tmpDec)
 		}
 
@@ -4569,7 +4569,7 @@ func performLTDecimalInt32(a apd.Decimal, b int32) bool {
 
 		{
 			tmpDec := &_overloadHelper.tmpDec1
-			tmpDec.SetFinite(int64(b), 0)
+			tmpDec.SetInt64(int64(b))
 			cmpResult = tree.CompareDecimals(&a, tmpDec)
 		}
 
@@ -4593,7 +4593,7 @@ func performLTDecimalInt64(a apd.Decimal, b int64) bool {
 
 		{
 			tmpDec := &_overloadHelper.tmpDec1
-			tmpDec.SetFinite(int64(b), 0)
+			tmpDec.SetInt64(int64(b))
 			cmpResult = tree.CompareDecimals(&a, tmpDec)
 		}
 
@@ -5033,7 +5033,7 @@ func performLTInt16Decimal(a int16, b apd.Decimal) bool {
 
 		{
 			tmpDec := &_overloadHelper.tmpDec1
-			tmpDec.SetFinite(int64(a), 0)
+			tmpDec.SetInt64(int64(a))
 			cmpResult = tree.CompareDecimals(tmpDec, &b)
 		}
 
@@ -5057,7 +5057,7 @@ func performLTInt32Decimal(a int32, b apd.Decimal) bool {
 
 		{
 			tmpDec := &_overloadHelper.tmpDec1
-			tmpDec.SetFinite(int64(a), 0)
+			tmpDec.SetInt64(int64(a))
 			cmpResult = tree.CompareDecimals(tmpDec, &b)
 		}
 
@@ -5081,7 +5081,7 @@ func performLTInt64Decimal(a int64, b apd.Decimal) bool {
 
 		{
 			tmpDec := &_overloadHelper.tmpDec1
-			tmpDec.SetFinite(int64(a), 0)
+			tmpDec.SetInt64(int64(a))
 			cmpResult = tree.CompareDecimals(tmpDec, &b)
 		}
 
@@ -5366,7 +5366,7 @@ func performLEDecimalInt16(a apd.Decimal, b int16) bool {
 
 		{
 			tmpDec := &_overloadHelper.tmpDec1
-			tmpDec.SetFinite(int64(b), 0)
+			tmpDec.SetInt64(int64(b))
 			cmpResult = tree.CompareDecimals(&a, tmpDec)
 		}
 
@@ -5390,7 +5390,7 @@ func performLEDecimalInt32(a apd.Decimal, b int32) bool {
 
 		{
 			tmpDec := &_overloadHelper.tmpDec1
-			tmpDec.SetFinite(int64(b), 0)
+			tmpDec.SetInt64(int64(b))
 			cmpResult = tree.CompareDecimals(&a, tmpDec)
 		}
 
@@ -5414,7 +5414,7 @@ func performLEDecimalInt64(a apd.Decimal, b int64) bool {
 
 		{
 			tmpDec := &_overloadHelper.tmpDec1
-			tmpDec.SetFinite(int64(b), 0)
+			tmpDec.SetInt64(int64(b))
 			cmpResult = tree.CompareDecimals(&a, tmpDec)
 		}
 
@@ -5854,7 +5854,7 @@ func performLEInt16Decimal(a int16, b apd.Decimal) bool {
 
 		{
 			tmpDec := &_overloadHelper.tmpDec1
-			tmpDec.SetFinite(int64(a), 0)
+			tmpDec.SetInt64(int64(a))
 			cmpResult = tree.CompareDecimals(tmpDec, &b)
 		}
 
@@ -5878,7 +5878,7 @@ func performLEInt32Decimal(a int32, b apd.Decimal) bool {
 
 		{
 			tmpDec := &_overloadHelper.tmpDec1
-			tmpDec.SetFinite(int64(a), 0)
+			tmpDec.SetInt64(int64(a))
 			cmpResult = tree.CompareDecimals(tmpDec, &b)
 		}
 
@@ -5902,7 +5902,7 @@ func performLEInt64Decimal(a int64, b apd.Decimal) bool {
 
 		{
 			tmpDec := &_overloadHelper.tmpDec1
-			tmpDec.SetFinite(int64(a), 0)
+			tmpDec.SetInt64(int64(a))
 			cmpResult = tree.CompareDecimals(tmpDec, &b)
 		}
 
@@ -6187,7 +6187,7 @@ func performGTDecimalInt16(a apd.Decimal, b int16) bool {
 
 		{
 			tmpDec := &_overloadHelper.tmpDec1
-			tmpDec.SetFinite(int64(b), 0)
+			tmpDec.SetInt64(int64(b))
 			cmpResult = tree.CompareDecimals(&a, tmpDec)
 		}
 
@@ -6211,7 +6211,7 @@ func performGTDecimalInt32(a apd.Decimal, b int32) bool {
 
 		{
 			tmpDec := &_overloadHelper.tmpDec1
-			tmpDec.SetFinite(int64(b), 0)
+			tmpDec.SetInt64(int64(b))
 			cmpResult = tree.CompareDecimals(&a, tmpDec)
 		}
 
@@ -6235,7 +6235,7 @@ func performGTDecimalInt64(a apd.Decimal, b int64) bool {
 
 		{
 			tmpDec := &_overloadHelper.tmpDec1
-			tmpDec.SetFinite(int64(b), 0)
+			tmpDec.SetInt64(int64(b))
 			cmpResult = tree.CompareDecimals(&a, tmpDec)
 		}
 
@@ -6675,7 +6675,7 @@ func performGTInt16Decimal(a int16, b apd.Decimal) bool {
 
 		{
 			tmpDec := &_overloadHelper.tmpDec1
-			tmpDec.SetFinite(int64(a), 0)
+			tmpDec.SetInt64(int64(a))
 			cmpResult = tree.CompareDecimals(tmpDec, &b)
 		}
 
@@ -6699,7 +6699,7 @@ func performGTInt32Decimal(a int32, b apd.Decimal) bool {
 
 		{
 			tmpDec := &_overloadHelper.tmpDec1
-			tmpDec.SetFinite(int64(a), 0)
+			tmpDec.SetInt64(int64(a))
 			cmpResult = tree.CompareDecimals(tmpDec, &b)
 		}
 
@@ -6723,7 +6723,7 @@ func performGTInt64Decimal(a int64, b apd.Decimal) bool {
 
 		{
 			tmpDec := &_overloadHelper.tmpDec1
-			tmpDec.SetFinite(int64(a), 0)
+			tmpDec.SetInt64(int64(a))
 			cmpResult = tree.CompareDecimals(tmpDec, &b)
 		}
 
@@ -7008,7 +7008,7 @@ func performGEDecimalInt16(a apd.Decimal, b int16) bool {
 
 		{
 			tmpDec := &_overloadHelper.tmpDec1
-			tmpDec.SetFinite(int64(b), 0)
+			tmpDec.SetInt64(int64(b))
 			cmpResult = tree.CompareDecimals(&a, tmpDec)
 		}
 
@@ -7032,7 +7032,7 @@ func performGEDecimalInt32(a apd.Decimal, b int32) bool {
 
 		{
 			tmpDec := &_overloadHelper.tmpDec1
-			tmpDec.SetFinite(int64(b), 0)
+			tmpDec.SetInt64(int64(b))
 			cmpResult = tree.CompareDecimals(&a, tmpDec)
 		}
 
@@ -7056,7 +7056,7 @@ func performGEDecimalInt64(a apd.Decimal, b int64) bool {
 
 		{
 			tmpDec := &_overloadHelper.tmpDec1
-			tmpDec.SetFinite(int64(b), 0)
+			tmpDec.SetInt64(int64(b))
 			cmpResult = tree.CompareDecimals(&a, tmpDec)
 		}
 
@@ -7496,7 +7496,7 @@ func performGEInt16Decimal(a int16, b apd.Decimal) bool {
 
 		{
 			tmpDec := &_overloadHelper.tmpDec1
-			tmpDec.SetFinite(int64(a), 0)
+			tmpDec.SetInt64(int64(a))
 			cmpResult = tree.CompareDecimals(tmpDec, &b)
 		}
 
@@ -7520,7 +7520,7 @@ func performGEInt32Decimal(a int32, b apd.Decimal) bool {
 
 		{
 			tmpDec := &_overloadHelper.tmpDec1
-			tmpDec.SetFinite(int64(a), 0)
+			tmpDec.SetInt64(int64(a))
 			cmpResult = tree.CompareDecimals(tmpDec, &b)
 		}
 
@@ -7544,7 +7544,7 @@ func performGEInt64Decimal(a int64, b apd.Decimal) bool {
 
 		{
 			tmpDec := &_overloadHelper.tmpDec1
-			tmpDec.SetFinite(int64(a), 0)
+			tmpDec.SetInt64(int64(a))
 			cmpResult = tree.CompareDecimals(tmpDec, &b)
 		}
 

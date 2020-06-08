@@ -19,7 +19,6 @@ import (
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
 	"github.com/cockroachdb/cockroach/pkg/col/coldataext"
 	"github.com/cockroachdb/cockroach/pkg/col/typeconv"
-	"github.com/cockroachdb/cockroach/pkg/sql/colexec/execgen"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase/colexecerror"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
@@ -80,9 +79,6 @@ func NewOrderedDistinct(
 		outputCol:    outputCol,
 	}, nil
 }
-
-// Remove unused warning.
-var _ = execgen.UNSAFEGET
 
 func newSingleDistinct(
 	input colexecbase.Operator, distinctColIdx int, outputCol []bool, t *types.T,
@@ -333,21 +329,68 @@ func (p *distinctBoolOp) Next(ctx context.Context) coldata.Batch {
 		// Bounds check elimination.
 		sel = sel[:n]
 		if nulls != nil {
-			for _, checkIdx := range sel {
-				outputIdx := checkIdx
-				null := nulls.NullAt(checkIdx)
-				if null {
-					if !lastValNull {
-						// The current value is null while the previous was not.
-						outputCol[outputIdx] = true
+			for _, idx := range sel {
+				{
+					var (
+						__retval_lastVal     bool
+						__retval_lastValNull bool
+					)
+					{
+						var (
+							checkIdx  int = idx
+							outputIdx int = idx
+						)
+						null := nulls.NullAt(checkIdx)
+						if null {
+							if !lastValNull {
+								// The current value is null while the previous was not.
+								outputCol[outputIdx] = true
+							}
+						} else {
+							v := col[checkIdx]
+							if lastValNull {
+								// The previous value was null while the current is not.
+								outputCol[outputIdx] = true
+							} else {
+								// Neither value is null, so we must compare.
+								var unique bool
+
+								{
+									var cmpResult int
+
+									if !v && lastVal {
+										cmpResult = -1
+									} else if v && !lastVal {
+										cmpResult = 1
+									} else {
+										cmpResult = 0
+									}
+
+									unique = cmpResult != 0
+								}
+
+								outputCol[outputIdx] = outputCol[outputIdx] || unique
+							}
+							lastVal = v
+						}
+						{
+							__retval_lastVal = lastVal
+							__retval_lastValNull = null
+						}
 					}
-				} else {
-					v := col[checkIdx]
-					if lastValNull {
-						// The previous value was null while the current is not.
-						outputCol[outputIdx] = true
-					} else {
-						// Neither value is null, so we must compare.
+					lastVal, lastValNull = __retval_lastVal, __retval_lastValNull
+				}
+			}
+		} else {
+			for _, idx := range sel {
+				{
+					var __retval_0 bool
+					{
+						var (
+							checkIdx  int = idx
+							outputIdx int = idx
+						)
+						v := col[checkIdx]
 						var unique bool
 
 						{
@@ -365,56 +408,82 @@ func (p *distinctBoolOp) Next(ctx context.Context) coldata.Batch {
 						}
 
 						outputCol[outputIdx] = outputCol[outputIdx] || unique
+						lastVal = v
+						{
+							__retval_0 = lastVal
+						}
 					}
-					lastVal = v
+					lastVal = __retval_0
 				}
-				lastValNull = null
-			}
-		} else {
-			for _, checkIdx := range sel {
-				outputIdx := checkIdx
-				v := col[checkIdx]
-				var unique bool
-
-				{
-					var cmpResult int
-
-					if !v && lastVal {
-						cmpResult = -1
-					} else if v && !lastVal {
-						cmpResult = 1
-					} else {
-						cmpResult = 0
-					}
-
-					unique = cmpResult != 0
-				}
-
-				outputCol[outputIdx] = outputCol[outputIdx] || unique
-				lastVal = v
 			}
 		}
 	} else {
-		// Bounds check elimination.
 		col = col[0:n]
 		outputCol = outputCol[:n]
 		_ = outputCol[n-1]
 		if nulls != nil {
-			for checkIdx := range col {
-				outputIdx := checkIdx
-				null := nulls.NullAt(checkIdx)
-				if null {
-					if !lastValNull {
-						// The current value is null while the previous was not.
-						outputCol[outputIdx] = true
+			for idx := range col {
+				{
+					var (
+						__retval_lastVal     bool
+						__retval_lastValNull bool
+					)
+					{
+						var (
+							checkIdx  int = idx
+							outputIdx int = idx
+						)
+						null := nulls.NullAt(checkIdx)
+						if null {
+							if !lastValNull {
+								// The current value is null while the previous was not.
+								outputCol[outputIdx] = true
+							}
+						} else {
+							v := col[checkIdx]
+							if lastValNull {
+								// The previous value was null while the current is not.
+								outputCol[outputIdx] = true
+							} else {
+								// Neither value is null, so we must compare.
+								var unique bool
+
+								{
+									var cmpResult int
+
+									if !v && lastVal {
+										cmpResult = -1
+									} else if v && !lastVal {
+										cmpResult = 1
+									} else {
+										cmpResult = 0
+									}
+
+									unique = cmpResult != 0
+								}
+
+								outputCol[outputIdx] = outputCol[outputIdx] || unique
+							}
+							lastVal = v
+						}
+						{
+							__retval_lastVal = lastVal
+							__retval_lastValNull = null
+						}
 					}
-				} else {
-					v := col[checkIdx]
-					if lastValNull {
-						// The previous value was null while the current is not.
-						outputCol[outputIdx] = true
-					} else {
-						// Neither value is null, so we must compare.
+					lastVal, lastValNull = __retval_lastVal, __retval_lastValNull
+				}
+			}
+		} else {
+			for idx := range col {
+				{
+					var __retval_0 bool
+					{
+						var (
+							checkIdx  int = idx
+							outputIdx int = idx
+						)
+						v := col[checkIdx]
 						var unique bool
 
 						{
@@ -432,33 +501,13 @@ func (p *distinctBoolOp) Next(ctx context.Context) coldata.Batch {
 						}
 
 						outputCol[outputIdx] = outputCol[outputIdx] || unique
+						lastVal = v
+						{
+							__retval_0 = lastVal
+						}
 					}
-					lastVal = v
+					lastVal = __retval_0
 				}
-				lastValNull = null
-			}
-		} else {
-			for checkIdx := range col {
-				outputIdx := checkIdx
-				v := col[checkIdx]
-				var unique bool
-
-				{
-					var cmpResult int
-
-					if !v && lastVal {
-						cmpResult = -1
-					} else if v && !lastVal {
-						cmpResult = 1
-					} else {
-						cmpResult = 0
-					}
-
-					unique = cmpResult != 0
-				}
-
-				outputCol[outputIdx] = outputCol[outputIdx] || unique
-				lastVal = v
 			}
 		}
 	}
@@ -491,19 +540,59 @@ func (p partitionerBool) partitionWithOrder(
 	outputCol[0] = true
 	if nulls != nil {
 		for outputIdx, checkIdx := range order {
-			null := nulls.NullAt(checkIdx)
-			if null {
-				if !lastValNull {
-					// The current value is null while the previous was not.
-					outputCol[outputIdx] = true
+			{
+				var (
+					__retval_lastVal     bool
+					__retval_lastValNull bool
+				)
+				{
+					null := nulls.NullAt(checkIdx)
+					if null {
+						if !lastValNull {
+							// The current value is null while the previous was not.
+							outputCol[outputIdx] = true
+						}
+					} else {
+						v := col[checkIdx]
+						if lastValNull {
+							// The previous value was null while the current is not.
+							outputCol[outputIdx] = true
+						} else {
+							// Neither value is null, so we must compare.
+							var unique bool
+
+							{
+								var cmpResult int
+
+								if !v && lastVal {
+									cmpResult = -1
+								} else if v && !lastVal {
+									cmpResult = 1
+								} else {
+									cmpResult = 0
+								}
+
+								unique = cmpResult != 0
+							}
+
+							outputCol[outputIdx] = outputCol[outputIdx] || unique
+						}
+						lastVal = v
+					}
+					{
+						__retval_lastVal = lastVal
+						__retval_lastValNull = null
+					}
 				}
-			} else {
-				v := col[checkIdx]
-				if lastValNull {
-					// The previous value was null while the current is not.
-					outputCol[outputIdx] = true
-				} else {
-					// Neither value is null, so we must compare.
+				lastVal, lastValNull = __retval_lastVal, __retval_lastValNull
+			}
+		}
+	} else {
+		for outputIdx, checkIdx := range order {
+			{
+				var __retval_0 bool
+				{
+					v := col[checkIdx]
 					var unique bool
 
 					{
@@ -521,32 +610,13 @@ func (p partitionerBool) partitionWithOrder(
 					}
 
 					outputCol[outputIdx] = outputCol[outputIdx] || unique
+					lastVal = v
+					{
+						__retval_0 = lastVal
+					}
 				}
-				lastVal = v
+				lastVal = __retval_0
 			}
-			lastValNull = null
-		}
-	} else {
-		for outputIdx, checkIdx := range order {
-			v := col[checkIdx]
-			var unique bool
-
-			{
-				var cmpResult int
-
-				if !v && lastVal {
-					cmpResult = -1
-				} else if v && !lastVal {
-					cmpResult = 1
-				} else {
-					cmpResult = 0
-				}
-
-				unique = cmpResult != 0
-			}
-
-			outputCol[outputIdx] = outputCol[outputIdx] || unique
-			lastVal = v
 		}
 	}
 }
@@ -566,21 +636,68 @@ func (p partitionerBool) partition(colVec coldata.Vec, outputCol []bool, n int) 
 	outputCol = outputCol[:n]
 	outputCol[0] = true
 	if nulls != nil {
-		for checkIdx := range col {
-			outputIdx := checkIdx
-			null := nulls.NullAt(checkIdx)
-			if null {
-				if !lastValNull {
-					// The current value is null while the previous was not.
-					outputCol[outputIdx] = true
+		for idx := range col {
+			{
+				var (
+					__retval_lastVal     bool
+					__retval_lastValNull bool
+				)
+				{
+					var (
+						checkIdx  int = idx
+						outputIdx int = idx
+					)
+					null := nulls.NullAt(checkIdx)
+					if null {
+						if !lastValNull {
+							// The current value is null while the previous was not.
+							outputCol[outputIdx] = true
+						}
+					} else {
+						v := col[checkIdx]
+						if lastValNull {
+							// The previous value was null while the current is not.
+							outputCol[outputIdx] = true
+						} else {
+							// Neither value is null, so we must compare.
+							var unique bool
+
+							{
+								var cmpResult int
+
+								if !v && lastVal {
+									cmpResult = -1
+								} else if v && !lastVal {
+									cmpResult = 1
+								} else {
+									cmpResult = 0
+								}
+
+								unique = cmpResult != 0
+							}
+
+							outputCol[outputIdx] = outputCol[outputIdx] || unique
+						}
+						lastVal = v
+					}
+					{
+						__retval_lastVal = lastVal
+						__retval_lastValNull = null
+					}
 				}
-			} else {
-				v := col[checkIdx]
-				if lastValNull {
-					// The previous value was null while the current is not.
-					outputCol[outputIdx] = true
-				} else {
-					// Neither value is null, so we must compare.
+				lastVal, lastValNull = __retval_lastVal, __retval_lastValNull
+			}
+		}
+	} else {
+		for idx := range col {
+			{
+				var __retval_0 bool
+				{
+					var (
+						checkIdx  int = idx
+						outputIdx int = idx
+					)
+					v := col[checkIdx]
 					var unique bool
 
 					{
@@ -598,33 +715,13 @@ func (p partitionerBool) partition(colVec coldata.Vec, outputCol []bool, n int) 
 					}
 
 					outputCol[outputIdx] = outputCol[outputIdx] || unique
+					lastVal = v
+					{
+						__retval_0 = lastVal
+					}
 				}
-				lastVal = v
+				lastVal = __retval_0
 			}
-			lastValNull = null
-		}
-	} else {
-		for checkIdx := range col {
-			outputIdx := checkIdx
-			v := col[checkIdx]
-			var unique bool
-
-			{
-				var cmpResult int
-
-				if !v && lastVal {
-					cmpResult = -1
-				} else if v && !lastVal {
-					cmpResult = 1
-				} else {
-					cmpResult = 0
-				}
-
-				unique = cmpResult != 0
-			}
-
-			outputCol[outputIdx] = outputCol[outputIdx] || unique
-			lastVal = v
 		}
 	}
 }
@@ -702,21 +799,60 @@ func (p *distinctBytesOp) Next(ctx context.Context) coldata.Batch {
 		// Bounds check elimination.
 		sel = sel[:n]
 		if nulls != nil {
-			for _, checkIdx := range sel {
-				outputIdx := checkIdx
-				null := nulls.NullAt(checkIdx)
-				if null {
-					if !lastValNull {
-						// The current value is null while the previous was not.
-						outputCol[outputIdx] = true
+			for _, idx := range sel {
+				{
+					var (
+						__retval_lastVal     []byte
+						__retval_lastValNull bool
+					)
+					{
+						var (
+							checkIdx  int = idx
+							outputIdx int = idx
+						)
+						null := nulls.NullAt(checkIdx)
+						if null {
+							if !lastValNull {
+								// The current value is null while the previous was not.
+								outputCol[outputIdx] = true
+							}
+						} else {
+							v := col.Get(checkIdx)
+							if lastValNull {
+								// The previous value was null while the current is not.
+								outputCol[outputIdx] = true
+							} else {
+								// Neither value is null, so we must compare.
+								var unique bool
+
+								{
+									var cmpResult int
+									cmpResult = bytes.Compare(v, lastVal)
+									unique = cmpResult != 0
+								}
+
+								outputCol[outputIdx] = outputCol[outputIdx] || unique
+							}
+							lastVal = append(lastVal[:0], v...)
+						}
+						{
+							__retval_lastVal = lastVal
+							__retval_lastValNull = null
+						}
 					}
-				} else {
-					v := col.Get(checkIdx)
-					if lastValNull {
-						// The previous value was null while the current is not.
-						outputCol[outputIdx] = true
-					} else {
-						// Neither value is null, so we must compare.
+					lastVal, lastValNull = __retval_lastVal, __retval_lastValNull
+				}
+			}
+		} else {
+			for _, idx := range sel {
+				{
+					var __retval_0 []byte
+					{
+						var (
+							checkIdx  int = idx
+							outputIdx int = idx
+						)
+						v := col.Get(checkIdx)
 						var unique bool
 
 						{
@@ -726,50 +862,76 @@ func (p *distinctBytesOp) Next(ctx context.Context) coldata.Batch {
 						}
 
 						outputCol[outputIdx] = outputCol[outputIdx] || unique
+						lastVal = append(lastVal[:0], v...)
+						{
+							__retval_0 = lastVal
+						}
 					}
-					lastVal = append(lastVal[:0], v...)
+					lastVal = __retval_0
 				}
-				lastValNull = null
-			}
-		} else {
-			for _, checkIdx := range sel {
-				outputIdx := checkIdx
-				v := col.Get(checkIdx)
-				var unique bool
-
-				{
-					var cmpResult int
-					cmpResult = bytes.Compare(v, lastVal)
-					unique = cmpResult != 0
-				}
-
-				outputCol[outputIdx] = outputCol[outputIdx] || unique
-				lastVal = append(lastVal[:0], v...)
 			}
 		}
 	} else {
-		// Bounds check elimination.
 		col = col
 		_ = 0
 		_ = n
 		outputCol = outputCol[:n]
 		_ = outputCol[n-1]
 		if nulls != nil {
-			for checkIdx := 0; checkIdx < n; checkIdx++ {
-				outputIdx := checkIdx
-				null := nulls.NullAt(checkIdx)
-				if null {
-					if !lastValNull {
-						// The current value is null while the previous was not.
-						outputCol[outputIdx] = true
+			for idx := 0; idx < n; idx++ {
+				{
+					var (
+						__retval_lastVal     []byte
+						__retval_lastValNull bool
+					)
+					{
+						var (
+							checkIdx  int = idx
+							outputIdx int = idx
+						)
+						null := nulls.NullAt(checkIdx)
+						if null {
+							if !lastValNull {
+								// The current value is null while the previous was not.
+								outputCol[outputIdx] = true
+							}
+						} else {
+							v := col.Get(checkIdx)
+							if lastValNull {
+								// The previous value was null while the current is not.
+								outputCol[outputIdx] = true
+							} else {
+								// Neither value is null, so we must compare.
+								var unique bool
+
+								{
+									var cmpResult int
+									cmpResult = bytes.Compare(v, lastVal)
+									unique = cmpResult != 0
+								}
+
+								outputCol[outputIdx] = outputCol[outputIdx] || unique
+							}
+							lastVal = append(lastVal[:0], v...)
+						}
+						{
+							__retval_lastVal = lastVal
+							__retval_lastValNull = null
+						}
 					}
-				} else {
-					v := col.Get(checkIdx)
-					if lastValNull {
-						// The previous value was null while the current is not.
-						outputCol[outputIdx] = true
-					} else {
-						// Neither value is null, so we must compare.
+					lastVal, lastValNull = __retval_lastVal, __retval_lastValNull
+				}
+			}
+		} else {
+			for idx := 0; idx < n; idx++ {
+				{
+					var __retval_0 []byte
+					{
+						var (
+							checkIdx  int = idx
+							outputIdx int = idx
+						)
+						v := col.Get(checkIdx)
 						var unique bool
 
 						{
@@ -779,25 +941,13 @@ func (p *distinctBytesOp) Next(ctx context.Context) coldata.Batch {
 						}
 
 						outputCol[outputIdx] = outputCol[outputIdx] || unique
+						lastVal = append(lastVal[:0], v...)
+						{
+							__retval_0 = lastVal
+						}
 					}
-					lastVal = append(lastVal[:0], v...)
+					lastVal = __retval_0
 				}
-				lastValNull = null
-			}
-		} else {
-			for checkIdx := 0; checkIdx < n; checkIdx++ {
-				outputIdx := checkIdx
-				v := col.Get(checkIdx)
-				var unique bool
-
-				{
-					var cmpResult int
-					cmpResult = bytes.Compare(v, lastVal)
-					unique = cmpResult != 0
-				}
-
-				outputCol[outputIdx] = outputCol[outputIdx] || unique
-				lastVal = append(lastVal[:0], v...)
 			}
 		}
 	}
@@ -832,19 +982,51 @@ func (p partitionerBytes) partitionWithOrder(
 	outputCol[0] = true
 	if nulls != nil {
 		for outputIdx, checkIdx := range order {
-			null := nulls.NullAt(checkIdx)
-			if null {
-				if !lastValNull {
-					// The current value is null while the previous was not.
-					outputCol[outputIdx] = true
+			{
+				var (
+					__retval_lastVal     []byte
+					__retval_lastValNull bool
+				)
+				{
+					null := nulls.NullAt(checkIdx)
+					if null {
+						if !lastValNull {
+							// The current value is null while the previous was not.
+							outputCol[outputIdx] = true
+						}
+					} else {
+						v := col.Get(checkIdx)
+						if lastValNull {
+							// The previous value was null while the current is not.
+							outputCol[outputIdx] = true
+						} else {
+							// Neither value is null, so we must compare.
+							var unique bool
+
+							{
+								var cmpResult int
+								cmpResult = bytes.Compare(v, lastVal)
+								unique = cmpResult != 0
+							}
+
+							outputCol[outputIdx] = outputCol[outputIdx] || unique
+						}
+						lastVal = append(lastVal[:0], v...)
+					}
+					{
+						__retval_lastVal = lastVal
+						__retval_lastValNull = null
+					}
 				}
-			} else {
-				v := col.Get(checkIdx)
-				if lastValNull {
-					// The previous value was null while the current is not.
-					outputCol[outputIdx] = true
-				} else {
-					// Neither value is null, so we must compare.
+				lastVal, lastValNull = __retval_lastVal, __retval_lastValNull
+			}
+		}
+	} else {
+		for outputIdx, checkIdx := range order {
+			{
+				var __retval_0 []byte
+				{
+					v := col.Get(checkIdx)
 					var unique bool
 
 					{
@@ -854,24 +1036,13 @@ func (p partitionerBytes) partitionWithOrder(
 					}
 
 					outputCol[outputIdx] = outputCol[outputIdx] || unique
+					lastVal = append(lastVal[:0], v...)
+					{
+						__retval_0 = lastVal
+					}
 				}
-				lastVal = append(lastVal[:0], v...)
+				lastVal = __retval_0
 			}
-			lastValNull = null
-		}
-	} else {
-		for outputIdx, checkIdx := range order {
-			v := col.Get(checkIdx)
-			var unique bool
-
-			{
-				var cmpResult int
-				cmpResult = bytes.Compare(v, lastVal)
-				unique = cmpResult != 0
-			}
-
-			outputCol[outputIdx] = outputCol[outputIdx] || unique
-			lastVal = append(lastVal[:0], v...)
 		}
 	}
 }
@@ -893,21 +1064,60 @@ func (p partitionerBytes) partition(colVec coldata.Vec, outputCol []bool, n int)
 	outputCol = outputCol[:n]
 	outputCol[0] = true
 	if nulls != nil {
-		for checkIdx := 0; checkIdx < n; checkIdx++ {
-			outputIdx := checkIdx
-			null := nulls.NullAt(checkIdx)
-			if null {
-				if !lastValNull {
-					// The current value is null while the previous was not.
-					outputCol[outputIdx] = true
+		for idx := 0; idx < n; idx++ {
+			{
+				var (
+					__retval_lastVal     []byte
+					__retval_lastValNull bool
+				)
+				{
+					var (
+						checkIdx  int = idx
+						outputIdx int = idx
+					)
+					null := nulls.NullAt(checkIdx)
+					if null {
+						if !lastValNull {
+							// The current value is null while the previous was not.
+							outputCol[outputIdx] = true
+						}
+					} else {
+						v := col.Get(checkIdx)
+						if lastValNull {
+							// The previous value was null while the current is not.
+							outputCol[outputIdx] = true
+						} else {
+							// Neither value is null, so we must compare.
+							var unique bool
+
+							{
+								var cmpResult int
+								cmpResult = bytes.Compare(v, lastVal)
+								unique = cmpResult != 0
+							}
+
+							outputCol[outputIdx] = outputCol[outputIdx] || unique
+						}
+						lastVal = append(lastVal[:0], v...)
+					}
+					{
+						__retval_lastVal = lastVal
+						__retval_lastValNull = null
+					}
 				}
-			} else {
-				v := col.Get(checkIdx)
-				if lastValNull {
-					// The previous value was null while the current is not.
-					outputCol[outputIdx] = true
-				} else {
-					// Neither value is null, so we must compare.
+				lastVal, lastValNull = __retval_lastVal, __retval_lastValNull
+			}
+		}
+	} else {
+		for idx := 0; idx < n; idx++ {
+			{
+				var __retval_0 []byte
+				{
+					var (
+						checkIdx  int = idx
+						outputIdx int = idx
+					)
+					v := col.Get(checkIdx)
 					var unique bool
 
 					{
@@ -917,25 +1127,13 @@ func (p partitionerBytes) partition(colVec coldata.Vec, outputCol []bool, n int)
 					}
 
 					outputCol[outputIdx] = outputCol[outputIdx] || unique
+					lastVal = append(lastVal[:0], v...)
+					{
+						__retval_0 = lastVal
+					}
 				}
-				lastVal = append(lastVal[:0], v...)
+				lastVal = __retval_0
 			}
-			lastValNull = null
-		}
-	} else {
-		for checkIdx := 0; checkIdx < n; checkIdx++ {
-			outputIdx := checkIdx
-			v := col.Get(checkIdx)
-			var unique bool
-
-			{
-				var cmpResult int
-				cmpResult = bytes.Compare(v, lastVal)
-				unique = cmpResult != 0
-			}
-
-			outputCol[outputIdx] = outputCol[outputIdx] || unique
-			lastVal = append(lastVal[:0], v...)
 		}
 	}
 }
@@ -1013,21 +1211,60 @@ func (p *distinctDecimalOp) Next(ctx context.Context) coldata.Batch {
 		// Bounds check elimination.
 		sel = sel[:n]
 		if nulls != nil {
-			for _, checkIdx := range sel {
-				outputIdx := checkIdx
-				null := nulls.NullAt(checkIdx)
-				if null {
-					if !lastValNull {
-						// The current value is null while the previous was not.
-						outputCol[outputIdx] = true
+			for _, idx := range sel {
+				{
+					var (
+						__retval_lastVal     apd.Decimal
+						__retval_lastValNull bool
+					)
+					{
+						var (
+							checkIdx  int = idx
+							outputIdx int = idx
+						)
+						null := nulls.NullAt(checkIdx)
+						if null {
+							if !lastValNull {
+								// The current value is null while the previous was not.
+								outputCol[outputIdx] = true
+							}
+						} else {
+							v := col[checkIdx]
+							if lastValNull {
+								// The previous value was null while the current is not.
+								outputCol[outputIdx] = true
+							} else {
+								// Neither value is null, so we must compare.
+								var unique bool
+
+								{
+									var cmpResult int
+									cmpResult = tree.CompareDecimals(&v, &lastVal)
+									unique = cmpResult != 0
+								}
+
+								outputCol[outputIdx] = outputCol[outputIdx] || unique
+							}
+							lastVal.Set(&v)
+						}
+						{
+							__retval_lastVal = lastVal
+							__retval_lastValNull = null
+						}
 					}
-				} else {
-					v := col[checkIdx]
-					if lastValNull {
-						// The previous value was null while the current is not.
-						outputCol[outputIdx] = true
-					} else {
-						// Neither value is null, so we must compare.
+					lastVal, lastValNull = __retval_lastVal, __retval_lastValNull
+				}
+			}
+		} else {
+			for _, idx := range sel {
+				{
+					var __retval_0 apd.Decimal
+					{
+						var (
+							checkIdx  int = idx
+							outputIdx int = idx
+						)
+						v := col[checkIdx]
 						var unique bool
 
 						{
@@ -1037,48 +1274,74 @@ func (p *distinctDecimalOp) Next(ctx context.Context) coldata.Batch {
 						}
 
 						outputCol[outputIdx] = outputCol[outputIdx] || unique
+						lastVal.Set(&v)
+						{
+							__retval_0 = lastVal
+						}
 					}
-					lastVal.Set(&v)
+					lastVal = __retval_0
 				}
-				lastValNull = null
-			}
-		} else {
-			for _, checkIdx := range sel {
-				outputIdx := checkIdx
-				v := col[checkIdx]
-				var unique bool
-
-				{
-					var cmpResult int
-					cmpResult = tree.CompareDecimals(&v, &lastVal)
-					unique = cmpResult != 0
-				}
-
-				outputCol[outputIdx] = outputCol[outputIdx] || unique
-				lastVal.Set(&v)
 			}
 		}
 	} else {
-		// Bounds check elimination.
 		col = col[0:n]
 		outputCol = outputCol[:n]
 		_ = outputCol[n-1]
 		if nulls != nil {
-			for checkIdx := range col {
-				outputIdx := checkIdx
-				null := nulls.NullAt(checkIdx)
-				if null {
-					if !lastValNull {
-						// The current value is null while the previous was not.
-						outputCol[outputIdx] = true
+			for idx := range col {
+				{
+					var (
+						__retval_lastVal     apd.Decimal
+						__retval_lastValNull bool
+					)
+					{
+						var (
+							checkIdx  int = idx
+							outputIdx int = idx
+						)
+						null := nulls.NullAt(checkIdx)
+						if null {
+							if !lastValNull {
+								// The current value is null while the previous was not.
+								outputCol[outputIdx] = true
+							}
+						} else {
+							v := col[checkIdx]
+							if lastValNull {
+								// The previous value was null while the current is not.
+								outputCol[outputIdx] = true
+							} else {
+								// Neither value is null, so we must compare.
+								var unique bool
+
+								{
+									var cmpResult int
+									cmpResult = tree.CompareDecimals(&v, &lastVal)
+									unique = cmpResult != 0
+								}
+
+								outputCol[outputIdx] = outputCol[outputIdx] || unique
+							}
+							lastVal.Set(&v)
+						}
+						{
+							__retval_lastVal = lastVal
+							__retval_lastValNull = null
+						}
 					}
-				} else {
-					v := col[checkIdx]
-					if lastValNull {
-						// The previous value was null while the current is not.
-						outputCol[outputIdx] = true
-					} else {
-						// Neither value is null, so we must compare.
+					lastVal, lastValNull = __retval_lastVal, __retval_lastValNull
+				}
+			}
+		} else {
+			for idx := range col {
+				{
+					var __retval_0 apd.Decimal
+					{
+						var (
+							checkIdx  int = idx
+							outputIdx int = idx
+						)
+						v := col[checkIdx]
 						var unique bool
 
 						{
@@ -1088,25 +1351,13 @@ func (p *distinctDecimalOp) Next(ctx context.Context) coldata.Batch {
 						}
 
 						outputCol[outputIdx] = outputCol[outputIdx] || unique
+						lastVal.Set(&v)
+						{
+							__retval_0 = lastVal
+						}
 					}
-					lastVal.Set(&v)
+					lastVal = __retval_0
 				}
-				lastValNull = null
-			}
-		} else {
-			for checkIdx := range col {
-				outputIdx := checkIdx
-				v := col[checkIdx]
-				var unique bool
-
-				{
-					var cmpResult int
-					cmpResult = tree.CompareDecimals(&v, &lastVal)
-					unique = cmpResult != 0
-				}
-
-				outputCol[outputIdx] = outputCol[outputIdx] || unique
-				lastVal.Set(&v)
 			}
 		}
 	}
@@ -1139,19 +1390,51 @@ func (p partitionerDecimal) partitionWithOrder(
 	outputCol[0] = true
 	if nulls != nil {
 		for outputIdx, checkIdx := range order {
-			null := nulls.NullAt(checkIdx)
-			if null {
-				if !lastValNull {
-					// The current value is null while the previous was not.
-					outputCol[outputIdx] = true
+			{
+				var (
+					__retval_lastVal     apd.Decimal
+					__retval_lastValNull bool
+				)
+				{
+					null := nulls.NullAt(checkIdx)
+					if null {
+						if !lastValNull {
+							// The current value is null while the previous was not.
+							outputCol[outputIdx] = true
+						}
+					} else {
+						v := col[checkIdx]
+						if lastValNull {
+							// The previous value was null while the current is not.
+							outputCol[outputIdx] = true
+						} else {
+							// Neither value is null, so we must compare.
+							var unique bool
+
+							{
+								var cmpResult int
+								cmpResult = tree.CompareDecimals(&v, &lastVal)
+								unique = cmpResult != 0
+							}
+
+							outputCol[outputIdx] = outputCol[outputIdx] || unique
+						}
+						lastVal.Set(&v)
+					}
+					{
+						__retval_lastVal = lastVal
+						__retval_lastValNull = null
+					}
 				}
-			} else {
-				v := col[checkIdx]
-				if lastValNull {
-					// The previous value was null while the current is not.
-					outputCol[outputIdx] = true
-				} else {
-					// Neither value is null, so we must compare.
+				lastVal, lastValNull = __retval_lastVal, __retval_lastValNull
+			}
+		}
+	} else {
+		for outputIdx, checkIdx := range order {
+			{
+				var __retval_0 apd.Decimal
+				{
+					v := col[checkIdx]
 					var unique bool
 
 					{
@@ -1161,24 +1444,13 @@ func (p partitionerDecimal) partitionWithOrder(
 					}
 
 					outputCol[outputIdx] = outputCol[outputIdx] || unique
+					lastVal.Set(&v)
+					{
+						__retval_0 = lastVal
+					}
 				}
-				lastVal.Set(&v)
+				lastVal = __retval_0
 			}
-			lastValNull = null
-		}
-	} else {
-		for outputIdx, checkIdx := range order {
-			v := col[checkIdx]
-			var unique bool
-
-			{
-				var cmpResult int
-				cmpResult = tree.CompareDecimals(&v, &lastVal)
-				unique = cmpResult != 0
-			}
-
-			outputCol[outputIdx] = outputCol[outputIdx] || unique
-			lastVal.Set(&v)
 		}
 	}
 }
@@ -1198,21 +1470,60 @@ func (p partitionerDecimal) partition(colVec coldata.Vec, outputCol []bool, n in
 	outputCol = outputCol[:n]
 	outputCol[0] = true
 	if nulls != nil {
-		for checkIdx := range col {
-			outputIdx := checkIdx
-			null := nulls.NullAt(checkIdx)
-			if null {
-				if !lastValNull {
-					// The current value is null while the previous was not.
-					outputCol[outputIdx] = true
+		for idx := range col {
+			{
+				var (
+					__retval_lastVal     apd.Decimal
+					__retval_lastValNull bool
+				)
+				{
+					var (
+						checkIdx  int = idx
+						outputIdx int = idx
+					)
+					null := nulls.NullAt(checkIdx)
+					if null {
+						if !lastValNull {
+							// The current value is null while the previous was not.
+							outputCol[outputIdx] = true
+						}
+					} else {
+						v := col[checkIdx]
+						if lastValNull {
+							// The previous value was null while the current is not.
+							outputCol[outputIdx] = true
+						} else {
+							// Neither value is null, so we must compare.
+							var unique bool
+
+							{
+								var cmpResult int
+								cmpResult = tree.CompareDecimals(&v, &lastVal)
+								unique = cmpResult != 0
+							}
+
+							outputCol[outputIdx] = outputCol[outputIdx] || unique
+						}
+						lastVal.Set(&v)
+					}
+					{
+						__retval_lastVal = lastVal
+						__retval_lastValNull = null
+					}
 				}
-			} else {
-				v := col[checkIdx]
-				if lastValNull {
-					// The previous value was null while the current is not.
-					outputCol[outputIdx] = true
-				} else {
-					// Neither value is null, so we must compare.
+				lastVal, lastValNull = __retval_lastVal, __retval_lastValNull
+			}
+		}
+	} else {
+		for idx := range col {
+			{
+				var __retval_0 apd.Decimal
+				{
+					var (
+						checkIdx  int = idx
+						outputIdx int = idx
+					)
+					v := col[checkIdx]
 					var unique bool
 
 					{
@@ -1222,25 +1533,13 @@ func (p partitionerDecimal) partition(colVec coldata.Vec, outputCol []bool, n in
 					}
 
 					outputCol[outputIdx] = outputCol[outputIdx] || unique
+					lastVal.Set(&v)
+					{
+						__retval_0 = lastVal
+					}
 				}
-				lastVal.Set(&v)
+				lastVal = __retval_0
 			}
-			lastValNull = null
-		}
-	} else {
-		for checkIdx := range col {
-			outputIdx := checkIdx
-			v := col[checkIdx]
-			var unique bool
-
-			{
-				var cmpResult int
-				cmpResult = tree.CompareDecimals(&v, &lastVal)
-				unique = cmpResult != 0
-			}
-
-			outputCol[outputIdx] = outputCol[outputIdx] || unique
-			lastVal.Set(&v)
 		}
 	}
 }
@@ -1318,21 +1617,71 @@ func (p *distinctInt16Op) Next(ctx context.Context) coldata.Batch {
 		// Bounds check elimination.
 		sel = sel[:n]
 		if nulls != nil {
-			for _, checkIdx := range sel {
-				outputIdx := checkIdx
-				null := nulls.NullAt(checkIdx)
-				if null {
-					if !lastValNull {
-						// The current value is null while the previous was not.
-						outputCol[outputIdx] = true
+			for _, idx := range sel {
+				{
+					var (
+						__retval_lastVal     int16
+						__retval_lastValNull bool
+					)
+					{
+						var (
+							checkIdx  int = idx
+							outputIdx int = idx
+						)
+						null := nulls.NullAt(checkIdx)
+						if null {
+							if !lastValNull {
+								// The current value is null while the previous was not.
+								outputCol[outputIdx] = true
+							}
+						} else {
+							v := col[checkIdx]
+							if lastValNull {
+								// The previous value was null while the current is not.
+								outputCol[outputIdx] = true
+							} else {
+								// Neither value is null, so we must compare.
+								var unique bool
+
+								{
+									var cmpResult int
+
+									{
+										a, b := int64(v), int64(lastVal)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									unique = cmpResult != 0
+								}
+
+								outputCol[outputIdx] = outputCol[outputIdx] || unique
+							}
+							lastVal = v
+						}
+						{
+							__retval_lastVal = lastVal
+							__retval_lastValNull = null
+						}
 					}
-				} else {
-					v := col[checkIdx]
-					if lastValNull {
-						// The previous value was null while the current is not.
-						outputCol[outputIdx] = true
-					} else {
-						// Neither value is null, so we must compare.
+					lastVal, lastValNull = __retval_lastVal, __retval_lastValNull
+				}
+			}
+		} else {
+			for _, idx := range sel {
+				{
+					var __retval_0 int16
+					{
+						var (
+							checkIdx  int = idx
+							outputIdx int = idx
+						)
+						v := col[checkIdx]
 						var unique bool
 
 						{
@@ -1353,59 +1702,85 @@ func (p *distinctInt16Op) Next(ctx context.Context) coldata.Batch {
 						}
 
 						outputCol[outputIdx] = outputCol[outputIdx] || unique
-					}
-					lastVal = v
-				}
-				lastValNull = null
-			}
-		} else {
-			for _, checkIdx := range sel {
-				outputIdx := checkIdx
-				v := col[checkIdx]
-				var unique bool
-
-				{
-					var cmpResult int
-
-					{
-						a, b := int64(v), int64(lastVal)
-						if a < b {
-							cmpResult = -1
-						} else if a > b {
-							cmpResult = 1
-						} else {
-							cmpResult = 0
+						lastVal = v
+						{
+							__retval_0 = lastVal
 						}
 					}
-
-					unique = cmpResult != 0
+					lastVal = __retval_0
 				}
-
-				outputCol[outputIdx] = outputCol[outputIdx] || unique
-				lastVal = v
 			}
 		}
 	} else {
-		// Bounds check elimination.
 		col = col[0:n]
 		outputCol = outputCol[:n]
 		_ = outputCol[n-1]
 		if nulls != nil {
-			for checkIdx := range col {
-				outputIdx := checkIdx
-				null := nulls.NullAt(checkIdx)
-				if null {
-					if !lastValNull {
-						// The current value is null while the previous was not.
-						outputCol[outputIdx] = true
+			for idx := range col {
+				{
+					var (
+						__retval_lastVal     int16
+						__retval_lastValNull bool
+					)
+					{
+						var (
+							checkIdx  int = idx
+							outputIdx int = idx
+						)
+						null := nulls.NullAt(checkIdx)
+						if null {
+							if !lastValNull {
+								// The current value is null while the previous was not.
+								outputCol[outputIdx] = true
+							}
+						} else {
+							v := col[checkIdx]
+							if lastValNull {
+								// The previous value was null while the current is not.
+								outputCol[outputIdx] = true
+							} else {
+								// Neither value is null, so we must compare.
+								var unique bool
+
+								{
+									var cmpResult int
+
+									{
+										a, b := int64(v), int64(lastVal)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									unique = cmpResult != 0
+								}
+
+								outputCol[outputIdx] = outputCol[outputIdx] || unique
+							}
+							lastVal = v
+						}
+						{
+							__retval_lastVal = lastVal
+							__retval_lastValNull = null
+						}
 					}
-				} else {
-					v := col[checkIdx]
-					if lastValNull {
-						// The previous value was null while the current is not.
-						outputCol[outputIdx] = true
-					} else {
-						// Neither value is null, so we must compare.
+					lastVal, lastValNull = __retval_lastVal, __retval_lastValNull
+				}
+			}
+		} else {
+			for idx := range col {
+				{
+					var __retval_0 int16
+					{
+						var (
+							checkIdx  int = idx
+							outputIdx int = idx
+						)
+						v := col[checkIdx]
 						var unique bool
 
 						{
@@ -1426,36 +1801,13 @@ func (p *distinctInt16Op) Next(ctx context.Context) coldata.Batch {
 						}
 
 						outputCol[outputIdx] = outputCol[outputIdx] || unique
-					}
-					lastVal = v
-				}
-				lastValNull = null
-			}
-		} else {
-			for checkIdx := range col {
-				outputIdx := checkIdx
-				v := col[checkIdx]
-				var unique bool
-
-				{
-					var cmpResult int
-
-					{
-						a, b := int64(v), int64(lastVal)
-						if a < b {
-							cmpResult = -1
-						} else if a > b {
-							cmpResult = 1
-						} else {
-							cmpResult = 0
+						lastVal = v
+						{
+							__retval_0 = lastVal
 						}
 					}
-
-					unique = cmpResult != 0
+					lastVal = __retval_0
 				}
-
-				outputCol[outputIdx] = outputCol[outputIdx] || unique
-				lastVal = v
 			}
 		}
 	}
@@ -1488,19 +1840,62 @@ func (p partitionerInt16) partitionWithOrder(
 	outputCol[0] = true
 	if nulls != nil {
 		for outputIdx, checkIdx := range order {
-			null := nulls.NullAt(checkIdx)
-			if null {
-				if !lastValNull {
-					// The current value is null while the previous was not.
-					outputCol[outputIdx] = true
+			{
+				var (
+					__retval_lastVal     int16
+					__retval_lastValNull bool
+				)
+				{
+					null := nulls.NullAt(checkIdx)
+					if null {
+						if !lastValNull {
+							// The current value is null while the previous was not.
+							outputCol[outputIdx] = true
+						}
+					} else {
+						v := col[checkIdx]
+						if lastValNull {
+							// The previous value was null while the current is not.
+							outputCol[outputIdx] = true
+						} else {
+							// Neither value is null, so we must compare.
+							var unique bool
+
+							{
+								var cmpResult int
+
+								{
+									a, b := int64(v), int64(lastVal)
+									if a < b {
+										cmpResult = -1
+									} else if a > b {
+										cmpResult = 1
+									} else {
+										cmpResult = 0
+									}
+								}
+
+								unique = cmpResult != 0
+							}
+
+							outputCol[outputIdx] = outputCol[outputIdx] || unique
+						}
+						lastVal = v
+					}
+					{
+						__retval_lastVal = lastVal
+						__retval_lastValNull = null
+					}
 				}
-			} else {
-				v := col[checkIdx]
-				if lastValNull {
-					// The previous value was null while the current is not.
-					outputCol[outputIdx] = true
-				} else {
-					// Neither value is null, so we must compare.
+				lastVal, lastValNull = __retval_lastVal, __retval_lastValNull
+			}
+		}
+	} else {
+		for outputIdx, checkIdx := range order {
+			{
+				var __retval_0 int16
+				{
+					v := col[checkIdx]
 					var unique bool
 
 					{
@@ -1521,35 +1916,13 @@ func (p partitionerInt16) partitionWithOrder(
 					}
 
 					outputCol[outputIdx] = outputCol[outputIdx] || unique
-				}
-				lastVal = v
-			}
-			lastValNull = null
-		}
-	} else {
-		for outputIdx, checkIdx := range order {
-			v := col[checkIdx]
-			var unique bool
-
-			{
-				var cmpResult int
-
-				{
-					a, b := int64(v), int64(lastVal)
-					if a < b {
-						cmpResult = -1
-					} else if a > b {
-						cmpResult = 1
-					} else {
-						cmpResult = 0
+					lastVal = v
+					{
+						__retval_0 = lastVal
 					}
 				}
-
-				unique = cmpResult != 0
+				lastVal = __retval_0
 			}
-
-			outputCol[outputIdx] = outputCol[outputIdx] || unique
-			lastVal = v
 		}
 	}
 }
@@ -1569,21 +1942,71 @@ func (p partitionerInt16) partition(colVec coldata.Vec, outputCol []bool, n int)
 	outputCol = outputCol[:n]
 	outputCol[0] = true
 	if nulls != nil {
-		for checkIdx := range col {
-			outputIdx := checkIdx
-			null := nulls.NullAt(checkIdx)
-			if null {
-				if !lastValNull {
-					// The current value is null while the previous was not.
-					outputCol[outputIdx] = true
+		for idx := range col {
+			{
+				var (
+					__retval_lastVal     int16
+					__retval_lastValNull bool
+				)
+				{
+					var (
+						checkIdx  int = idx
+						outputIdx int = idx
+					)
+					null := nulls.NullAt(checkIdx)
+					if null {
+						if !lastValNull {
+							// The current value is null while the previous was not.
+							outputCol[outputIdx] = true
+						}
+					} else {
+						v := col[checkIdx]
+						if lastValNull {
+							// The previous value was null while the current is not.
+							outputCol[outputIdx] = true
+						} else {
+							// Neither value is null, so we must compare.
+							var unique bool
+
+							{
+								var cmpResult int
+
+								{
+									a, b := int64(v), int64(lastVal)
+									if a < b {
+										cmpResult = -1
+									} else if a > b {
+										cmpResult = 1
+									} else {
+										cmpResult = 0
+									}
+								}
+
+								unique = cmpResult != 0
+							}
+
+							outputCol[outputIdx] = outputCol[outputIdx] || unique
+						}
+						lastVal = v
+					}
+					{
+						__retval_lastVal = lastVal
+						__retval_lastValNull = null
+					}
 				}
-			} else {
-				v := col[checkIdx]
-				if lastValNull {
-					// The previous value was null while the current is not.
-					outputCol[outputIdx] = true
-				} else {
-					// Neither value is null, so we must compare.
+				lastVal, lastValNull = __retval_lastVal, __retval_lastValNull
+			}
+		}
+	} else {
+		for idx := range col {
+			{
+				var __retval_0 int16
+				{
+					var (
+						checkIdx  int = idx
+						outputIdx int = idx
+					)
+					v := col[checkIdx]
 					var unique bool
 
 					{
@@ -1604,36 +2027,13 @@ func (p partitionerInt16) partition(colVec coldata.Vec, outputCol []bool, n int)
 					}
 
 					outputCol[outputIdx] = outputCol[outputIdx] || unique
-				}
-				lastVal = v
-			}
-			lastValNull = null
-		}
-	} else {
-		for checkIdx := range col {
-			outputIdx := checkIdx
-			v := col[checkIdx]
-			var unique bool
-
-			{
-				var cmpResult int
-
-				{
-					a, b := int64(v), int64(lastVal)
-					if a < b {
-						cmpResult = -1
-					} else if a > b {
-						cmpResult = 1
-					} else {
-						cmpResult = 0
+					lastVal = v
+					{
+						__retval_0 = lastVal
 					}
 				}
-
-				unique = cmpResult != 0
+				lastVal = __retval_0
 			}
-
-			outputCol[outputIdx] = outputCol[outputIdx] || unique
-			lastVal = v
 		}
 	}
 }
@@ -1711,21 +2111,71 @@ func (p *distinctInt32Op) Next(ctx context.Context) coldata.Batch {
 		// Bounds check elimination.
 		sel = sel[:n]
 		if nulls != nil {
-			for _, checkIdx := range sel {
-				outputIdx := checkIdx
-				null := nulls.NullAt(checkIdx)
-				if null {
-					if !lastValNull {
-						// The current value is null while the previous was not.
-						outputCol[outputIdx] = true
+			for _, idx := range sel {
+				{
+					var (
+						__retval_lastVal     int32
+						__retval_lastValNull bool
+					)
+					{
+						var (
+							checkIdx  int = idx
+							outputIdx int = idx
+						)
+						null := nulls.NullAt(checkIdx)
+						if null {
+							if !lastValNull {
+								// The current value is null while the previous was not.
+								outputCol[outputIdx] = true
+							}
+						} else {
+							v := col[checkIdx]
+							if lastValNull {
+								// The previous value was null while the current is not.
+								outputCol[outputIdx] = true
+							} else {
+								// Neither value is null, so we must compare.
+								var unique bool
+
+								{
+									var cmpResult int
+
+									{
+										a, b := int64(v), int64(lastVal)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									unique = cmpResult != 0
+								}
+
+								outputCol[outputIdx] = outputCol[outputIdx] || unique
+							}
+							lastVal = v
+						}
+						{
+							__retval_lastVal = lastVal
+							__retval_lastValNull = null
+						}
 					}
-				} else {
-					v := col[checkIdx]
-					if lastValNull {
-						// The previous value was null while the current is not.
-						outputCol[outputIdx] = true
-					} else {
-						// Neither value is null, so we must compare.
+					lastVal, lastValNull = __retval_lastVal, __retval_lastValNull
+				}
+			}
+		} else {
+			for _, idx := range sel {
+				{
+					var __retval_0 int32
+					{
+						var (
+							checkIdx  int = idx
+							outputIdx int = idx
+						)
+						v := col[checkIdx]
 						var unique bool
 
 						{
@@ -1746,59 +2196,85 @@ func (p *distinctInt32Op) Next(ctx context.Context) coldata.Batch {
 						}
 
 						outputCol[outputIdx] = outputCol[outputIdx] || unique
-					}
-					lastVal = v
-				}
-				lastValNull = null
-			}
-		} else {
-			for _, checkIdx := range sel {
-				outputIdx := checkIdx
-				v := col[checkIdx]
-				var unique bool
-
-				{
-					var cmpResult int
-
-					{
-						a, b := int64(v), int64(lastVal)
-						if a < b {
-							cmpResult = -1
-						} else if a > b {
-							cmpResult = 1
-						} else {
-							cmpResult = 0
+						lastVal = v
+						{
+							__retval_0 = lastVal
 						}
 					}
-
-					unique = cmpResult != 0
+					lastVal = __retval_0
 				}
-
-				outputCol[outputIdx] = outputCol[outputIdx] || unique
-				lastVal = v
 			}
 		}
 	} else {
-		// Bounds check elimination.
 		col = col[0:n]
 		outputCol = outputCol[:n]
 		_ = outputCol[n-1]
 		if nulls != nil {
-			for checkIdx := range col {
-				outputIdx := checkIdx
-				null := nulls.NullAt(checkIdx)
-				if null {
-					if !lastValNull {
-						// The current value is null while the previous was not.
-						outputCol[outputIdx] = true
+			for idx := range col {
+				{
+					var (
+						__retval_lastVal     int32
+						__retval_lastValNull bool
+					)
+					{
+						var (
+							checkIdx  int = idx
+							outputIdx int = idx
+						)
+						null := nulls.NullAt(checkIdx)
+						if null {
+							if !lastValNull {
+								// The current value is null while the previous was not.
+								outputCol[outputIdx] = true
+							}
+						} else {
+							v := col[checkIdx]
+							if lastValNull {
+								// The previous value was null while the current is not.
+								outputCol[outputIdx] = true
+							} else {
+								// Neither value is null, so we must compare.
+								var unique bool
+
+								{
+									var cmpResult int
+
+									{
+										a, b := int64(v), int64(lastVal)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									unique = cmpResult != 0
+								}
+
+								outputCol[outputIdx] = outputCol[outputIdx] || unique
+							}
+							lastVal = v
+						}
+						{
+							__retval_lastVal = lastVal
+							__retval_lastValNull = null
+						}
 					}
-				} else {
-					v := col[checkIdx]
-					if lastValNull {
-						// The previous value was null while the current is not.
-						outputCol[outputIdx] = true
-					} else {
-						// Neither value is null, so we must compare.
+					lastVal, lastValNull = __retval_lastVal, __retval_lastValNull
+				}
+			}
+		} else {
+			for idx := range col {
+				{
+					var __retval_0 int32
+					{
+						var (
+							checkIdx  int = idx
+							outputIdx int = idx
+						)
+						v := col[checkIdx]
 						var unique bool
 
 						{
@@ -1819,36 +2295,13 @@ func (p *distinctInt32Op) Next(ctx context.Context) coldata.Batch {
 						}
 
 						outputCol[outputIdx] = outputCol[outputIdx] || unique
-					}
-					lastVal = v
-				}
-				lastValNull = null
-			}
-		} else {
-			for checkIdx := range col {
-				outputIdx := checkIdx
-				v := col[checkIdx]
-				var unique bool
-
-				{
-					var cmpResult int
-
-					{
-						a, b := int64(v), int64(lastVal)
-						if a < b {
-							cmpResult = -1
-						} else if a > b {
-							cmpResult = 1
-						} else {
-							cmpResult = 0
+						lastVal = v
+						{
+							__retval_0 = lastVal
 						}
 					}
-
-					unique = cmpResult != 0
+					lastVal = __retval_0
 				}
-
-				outputCol[outputIdx] = outputCol[outputIdx] || unique
-				lastVal = v
 			}
 		}
 	}
@@ -1881,19 +2334,62 @@ func (p partitionerInt32) partitionWithOrder(
 	outputCol[0] = true
 	if nulls != nil {
 		for outputIdx, checkIdx := range order {
-			null := nulls.NullAt(checkIdx)
-			if null {
-				if !lastValNull {
-					// The current value is null while the previous was not.
-					outputCol[outputIdx] = true
+			{
+				var (
+					__retval_lastVal     int32
+					__retval_lastValNull bool
+				)
+				{
+					null := nulls.NullAt(checkIdx)
+					if null {
+						if !lastValNull {
+							// The current value is null while the previous was not.
+							outputCol[outputIdx] = true
+						}
+					} else {
+						v := col[checkIdx]
+						if lastValNull {
+							// The previous value was null while the current is not.
+							outputCol[outputIdx] = true
+						} else {
+							// Neither value is null, so we must compare.
+							var unique bool
+
+							{
+								var cmpResult int
+
+								{
+									a, b := int64(v), int64(lastVal)
+									if a < b {
+										cmpResult = -1
+									} else if a > b {
+										cmpResult = 1
+									} else {
+										cmpResult = 0
+									}
+								}
+
+								unique = cmpResult != 0
+							}
+
+							outputCol[outputIdx] = outputCol[outputIdx] || unique
+						}
+						lastVal = v
+					}
+					{
+						__retval_lastVal = lastVal
+						__retval_lastValNull = null
+					}
 				}
-			} else {
-				v := col[checkIdx]
-				if lastValNull {
-					// The previous value was null while the current is not.
-					outputCol[outputIdx] = true
-				} else {
-					// Neither value is null, so we must compare.
+				lastVal, lastValNull = __retval_lastVal, __retval_lastValNull
+			}
+		}
+	} else {
+		for outputIdx, checkIdx := range order {
+			{
+				var __retval_0 int32
+				{
+					v := col[checkIdx]
 					var unique bool
 
 					{
@@ -1914,35 +2410,13 @@ func (p partitionerInt32) partitionWithOrder(
 					}
 
 					outputCol[outputIdx] = outputCol[outputIdx] || unique
-				}
-				lastVal = v
-			}
-			lastValNull = null
-		}
-	} else {
-		for outputIdx, checkIdx := range order {
-			v := col[checkIdx]
-			var unique bool
-
-			{
-				var cmpResult int
-
-				{
-					a, b := int64(v), int64(lastVal)
-					if a < b {
-						cmpResult = -1
-					} else if a > b {
-						cmpResult = 1
-					} else {
-						cmpResult = 0
+					lastVal = v
+					{
+						__retval_0 = lastVal
 					}
 				}
-
-				unique = cmpResult != 0
+				lastVal = __retval_0
 			}
-
-			outputCol[outputIdx] = outputCol[outputIdx] || unique
-			lastVal = v
 		}
 	}
 }
@@ -1962,21 +2436,71 @@ func (p partitionerInt32) partition(colVec coldata.Vec, outputCol []bool, n int)
 	outputCol = outputCol[:n]
 	outputCol[0] = true
 	if nulls != nil {
-		for checkIdx := range col {
-			outputIdx := checkIdx
-			null := nulls.NullAt(checkIdx)
-			if null {
-				if !lastValNull {
-					// The current value is null while the previous was not.
-					outputCol[outputIdx] = true
+		for idx := range col {
+			{
+				var (
+					__retval_lastVal     int32
+					__retval_lastValNull bool
+				)
+				{
+					var (
+						checkIdx  int = idx
+						outputIdx int = idx
+					)
+					null := nulls.NullAt(checkIdx)
+					if null {
+						if !lastValNull {
+							// The current value is null while the previous was not.
+							outputCol[outputIdx] = true
+						}
+					} else {
+						v := col[checkIdx]
+						if lastValNull {
+							// The previous value was null while the current is not.
+							outputCol[outputIdx] = true
+						} else {
+							// Neither value is null, so we must compare.
+							var unique bool
+
+							{
+								var cmpResult int
+
+								{
+									a, b := int64(v), int64(lastVal)
+									if a < b {
+										cmpResult = -1
+									} else if a > b {
+										cmpResult = 1
+									} else {
+										cmpResult = 0
+									}
+								}
+
+								unique = cmpResult != 0
+							}
+
+							outputCol[outputIdx] = outputCol[outputIdx] || unique
+						}
+						lastVal = v
+					}
+					{
+						__retval_lastVal = lastVal
+						__retval_lastValNull = null
+					}
 				}
-			} else {
-				v := col[checkIdx]
-				if lastValNull {
-					// The previous value was null while the current is not.
-					outputCol[outputIdx] = true
-				} else {
-					// Neither value is null, so we must compare.
+				lastVal, lastValNull = __retval_lastVal, __retval_lastValNull
+			}
+		}
+	} else {
+		for idx := range col {
+			{
+				var __retval_0 int32
+				{
+					var (
+						checkIdx  int = idx
+						outputIdx int = idx
+					)
+					v := col[checkIdx]
 					var unique bool
 
 					{
@@ -1997,36 +2521,13 @@ func (p partitionerInt32) partition(colVec coldata.Vec, outputCol []bool, n int)
 					}
 
 					outputCol[outputIdx] = outputCol[outputIdx] || unique
-				}
-				lastVal = v
-			}
-			lastValNull = null
-		}
-	} else {
-		for checkIdx := range col {
-			outputIdx := checkIdx
-			v := col[checkIdx]
-			var unique bool
-
-			{
-				var cmpResult int
-
-				{
-					a, b := int64(v), int64(lastVal)
-					if a < b {
-						cmpResult = -1
-					} else if a > b {
-						cmpResult = 1
-					} else {
-						cmpResult = 0
+					lastVal = v
+					{
+						__retval_0 = lastVal
 					}
 				}
-
-				unique = cmpResult != 0
+				lastVal = __retval_0
 			}
-
-			outputCol[outputIdx] = outputCol[outputIdx] || unique
-			lastVal = v
 		}
 	}
 }
@@ -2104,21 +2605,71 @@ func (p *distinctInt64Op) Next(ctx context.Context) coldata.Batch {
 		// Bounds check elimination.
 		sel = sel[:n]
 		if nulls != nil {
-			for _, checkIdx := range sel {
-				outputIdx := checkIdx
-				null := nulls.NullAt(checkIdx)
-				if null {
-					if !lastValNull {
-						// The current value is null while the previous was not.
-						outputCol[outputIdx] = true
+			for _, idx := range sel {
+				{
+					var (
+						__retval_lastVal     int64
+						__retval_lastValNull bool
+					)
+					{
+						var (
+							checkIdx  int = idx
+							outputIdx int = idx
+						)
+						null := nulls.NullAt(checkIdx)
+						if null {
+							if !lastValNull {
+								// The current value is null while the previous was not.
+								outputCol[outputIdx] = true
+							}
+						} else {
+							v := col[checkIdx]
+							if lastValNull {
+								// The previous value was null while the current is not.
+								outputCol[outputIdx] = true
+							} else {
+								// Neither value is null, so we must compare.
+								var unique bool
+
+								{
+									var cmpResult int
+
+									{
+										a, b := int64(v), int64(lastVal)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									unique = cmpResult != 0
+								}
+
+								outputCol[outputIdx] = outputCol[outputIdx] || unique
+							}
+							lastVal = v
+						}
+						{
+							__retval_lastVal = lastVal
+							__retval_lastValNull = null
+						}
 					}
-				} else {
-					v := col[checkIdx]
-					if lastValNull {
-						// The previous value was null while the current is not.
-						outputCol[outputIdx] = true
-					} else {
-						// Neither value is null, so we must compare.
+					lastVal, lastValNull = __retval_lastVal, __retval_lastValNull
+				}
+			}
+		} else {
+			for _, idx := range sel {
+				{
+					var __retval_0 int64
+					{
+						var (
+							checkIdx  int = idx
+							outputIdx int = idx
+						)
+						v := col[checkIdx]
 						var unique bool
 
 						{
@@ -2139,59 +2690,85 @@ func (p *distinctInt64Op) Next(ctx context.Context) coldata.Batch {
 						}
 
 						outputCol[outputIdx] = outputCol[outputIdx] || unique
-					}
-					lastVal = v
-				}
-				lastValNull = null
-			}
-		} else {
-			for _, checkIdx := range sel {
-				outputIdx := checkIdx
-				v := col[checkIdx]
-				var unique bool
-
-				{
-					var cmpResult int
-
-					{
-						a, b := int64(v), int64(lastVal)
-						if a < b {
-							cmpResult = -1
-						} else if a > b {
-							cmpResult = 1
-						} else {
-							cmpResult = 0
+						lastVal = v
+						{
+							__retval_0 = lastVal
 						}
 					}
-
-					unique = cmpResult != 0
+					lastVal = __retval_0
 				}
-
-				outputCol[outputIdx] = outputCol[outputIdx] || unique
-				lastVal = v
 			}
 		}
 	} else {
-		// Bounds check elimination.
 		col = col[0:n]
 		outputCol = outputCol[:n]
 		_ = outputCol[n-1]
 		if nulls != nil {
-			for checkIdx := range col {
-				outputIdx := checkIdx
-				null := nulls.NullAt(checkIdx)
-				if null {
-					if !lastValNull {
-						// The current value is null while the previous was not.
-						outputCol[outputIdx] = true
+			for idx := range col {
+				{
+					var (
+						__retval_lastVal     int64
+						__retval_lastValNull bool
+					)
+					{
+						var (
+							checkIdx  int = idx
+							outputIdx int = idx
+						)
+						null := nulls.NullAt(checkIdx)
+						if null {
+							if !lastValNull {
+								// The current value is null while the previous was not.
+								outputCol[outputIdx] = true
+							}
+						} else {
+							v := col[checkIdx]
+							if lastValNull {
+								// The previous value was null while the current is not.
+								outputCol[outputIdx] = true
+							} else {
+								// Neither value is null, so we must compare.
+								var unique bool
+
+								{
+									var cmpResult int
+
+									{
+										a, b := int64(v), int64(lastVal)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else {
+											cmpResult = 0
+										}
+									}
+
+									unique = cmpResult != 0
+								}
+
+								outputCol[outputIdx] = outputCol[outputIdx] || unique
+							}
+							lastVal = v
+						}
+						{
+							__retval_lastVal = lastVal
+							__retval_lastValNull = null
+						}
 					}
-				} else {
-					v := col[checkIdx]
-					if lastValNull {
-						// The previous value was null while the current is not.
-						outputCol[outputIdx] = true
-					} else {
-						// Neither value is null, so we must compare.
+					lastVal, lastValNull = __retval_lastVal, __retval_lastValNull
+				}
+			}
+		} else {
+			for idx := range col {
+				{
+					var __retval_0 int64
+					{
+						var (
+							checkIdx  int = idx
+							outputIdx int = idx
+						)
+						v := col[checkIdx]
 						var unique bool
 
 						{
@@ -2212,36 +2789,13 @@ func (p *distinctInt64Op) Next(ctx context.Context) coldata.Batch {
 						}
 
 						outputCol[outputIdx] = outputCol[outputIdx] || unique
-					}
-					lastVal = v
-				}
-				lastValNull = null
-			}
-		} else {
-			for checkIdx := range col {
-				outputIdx := checkIdx
-				v := col[checkIdx]
-				var unique bool
-
-				{
-					var cmpResult int
-
-					{
-						a, b := int64(v), int64(lastVal)
-						if a < b {
-							cmpResult = -1
-						} else if a > b {
-							cmpResult = 1
-						} else {
-							cmpResult = 0
+						lastVal = v
+						{
+							__retval_0 = lastVal
 						}
 					}
-
-					unique = cmpResult != 0
+					lastVal = __retval_0
 				}
-
-				outputCol[outputIdx] = outputCol[outputIdx] || unique
-				lastVal = v
 			}
 		}
 	}
@@ -2274,19 +2828,62 @@ func (p partitionerInt64) partitionWithOrder(
 	outputCol[0] = true
 	if nulls != nil {
 		for outputIdx, checkIdx := range order {
-			null := nulls.NullAt(checkIdx)
-			if null {
-				if !lastValNull {
-					// The current value is null while the previous was not.
-					outputCol[outputIdx] = true
+			{
+				var (
+					__retval_lastVal     int64
+					__retval_lastValNull bool
+				)
+				{
+					null := nulls.NullAt(checkIdx)
+					if null {
+						if !lastValNull {
+							// The current value is null while the previous was not.
+							outputCol[outputIdx] = true
+						}
+					} else {
+						v := col[checkIdx]
+						if lastValNull {
+							// The previous value was null while the current is not.
+							outputCol[outputIdx] = true
+						} else {
+							// Neither value is null, so we must compare.
+							var unique bool
+
+							{
+								var cmpResult int
+
+								{
+									a, b := int64(v), int64(lastVal)
+									if a < b {
+										cmpResult = -1
+									} else if a > b {
+										cmpResult = 1
+									} else {
+										cmpResult = 0
+									}
+								}
+
+								unique = cmpResult != 0
+							}
+
+							outputCol[outputIdx] = outputCol[outputIdx] || unique
+						}
+						lastVal = v
+					}
+					{
+						__retval_lastVal = lastVal
+						__retval_lastValNull = null
+					}
 				}
-			} else {
-				v := col[checkIdx]
-				if lastValNull {
-					// The previous value was null while the current is not.
-					outputCol[outputIdx] = true
-				} else {
-					// Neither value is null, so we must compare.
+				lastVal, lastValNull = __retval_lastVal, __retval_lastValNull
+			}
+		}
+	} else {
+		for outputIdx, checkIdx := range order {
+			{
+				var __retval_0 int64
+				{
+					v := col[checkIdx]
 					var unique bool
 
 					{
@@ -2307,35 +2904,13 @@ func (p partitionerInt64) partitionWithOrder(
 					}
 
 					outputCol[outputIdx] = outputCol[outputIdx] || unique
-				}
-				lastVal = v
-			}
-			lastValNull = null
-		}
-	} else {
-		for outputIdx, checkIdx := range order {
-			v := col[checkIdx]
-			var unique bool
-
-			{
-				var cmpResult int
-
-				{
-					a, b := int64(v), int64(lastVal)
-					if a < b {
-						cmpResult = -1
-					} else if a > b {
-						cmpResult = 1
-					} else {
-						cmpResult = 0
+					lastVal = v
+					{
+						__retval_0 = lastVal
 					}
 				}
-
-				unique = cmpResult != 0
+				lastVal = __retval_0
 			}
-
-			outputCol[outputIdx] = outputCol[outputIdx] || unique
-			lastVal = v
 		}
 	}
 }
@@ -2355,21 +2930,71 @@ func (p partitionerInt64) partition(colVec coldata.Vec, outputCol []bool, n int)
 	outputCol = outputCol[:n]
 	outputCol[0] = true
 	if nulls != nil {
-		for checkIdx := range col {
-			outputIdx := checkIdx
-			null := nulls.NullAt(checkIdx)
-			if null {
-				if !lastValNull {
-					// The current value is null while the previous was not.
-					outputCol[outputIdx] = true
+		for idx := range col {
+			{
+				var (
+					__retval_lastVal     int64
+					__retval_lastValNull bool
+				)
+				{
+					var (
+						checkIdx  int = idx
+						outputIdx int = idx
+					)
+					null := nulls.NullAt(checkIdx)
+					if null {
+						if !lastValNull {
+							// The current value is null while the previous was not.
+							outputCol[outputIdx] = true
+						}
+					} else {
+						v := col[checkIdx]
+						if lastValNull {
+							// The previous value was null while the current is not.
+							outputCol[outputIdx] = true
+						} else {
+							// Neither value is null, so we must compare.
+							var unique bool
+
+							{
+								var cmpResult int
+
+								{
+									a, b := int64(v), int64(lastVal)
+									if a < b {
+										cmpResult = -1
+									} else if a > b {
+										cmpResult = 1
+									} else {
+										cmpResult = 0
+									}
+								}
+
+								unique = cmpResult != 0
+							}
+
+							outputCol[outputIdx] = outputCol[outputIdx] || unique
+						}
+						lastVal = v
+					}
+					{
+						__retval_lastVal = lastVal
+						__retval_lastValNull = null
+					}
 				}
-			} else {
-				v := col[checkIdx]
-				if lastValNull {
-					// The previous value was null while the current is not.
-					outputCol[outputIdx] = true
-				} else {
-					// Neither value is null, so we must compare.
+				lastVal, lastValNull = __retval_lastVal, __retval_lastValNull
+			}
+		}
+	} else {
+		for idx := range col {
+			{
+				var __retval_0 int64
+				{
+					var (
+						checkIdx  int = idx
+						outputIdx int = idx
+					)
+					v := col[checkIdx]
 					var unique bool
 
 					{
@@ -2390,36 +3015,13 @@ func (p partitionerInt64) partition(colVec coldata.Vec, outputCol []bool, n int)
 					}
 
 					outputCol[outputIdx] = outputCol[outputIdx] || unique
-				}
-				lastVal = v
-			}
-			lastValNull = null
-		}
-	} else {
-		for checkIdx := range col {
-			outputIdx := checkIdx
-			v := col[checkIdx]
-			var unique bool
-
-			{
-				var cmpResult int
-
-				{
-					a, b := int64(v), int64(lastVal)
-					if a < b {
-						cmpResult = -1
-					} else if a > b {
-						cmpResult = 1
-					} else {
-						cmpResult = 0
+					lastVal = v
+					{
+						__retval_0 = lastVal
 					}
 				}
-
-				unique = cmpResult != 0
+				lastVal = __retval_0
 			}
-
-			outputCol[outputIdx] = outputCol[outputIdx] || unique
-			lastVal = v
 		}
 	}
 }
@@ -2497,21 +3099,79 @@ func (p *distinctFloat64Op) Next(ctx context.Context) coldata.Batch {
 		// Bounds check elimination.
 		sel = sel[:n]
 		if nulls != nil {
-			for _, checkIdx := range sel {
-				outputIdx := checkIdx
-				null := nulls.NullAt(checkIdx)
-				if null {
-					if !lastValNull {
-						// The current value is null while the previous was not.
-						outputCol[outputIdx] = true
+			for _, idx := range sel {
+				{
+					var (
+						__retval_lastVal     float64
+						__retval_lastValNull bool
+					)
+					{
+						var (
+							checkIdx  int = idx
+							outputIdx int = idx
+						)
+						null := nulls.NullAt(checkIdx)
+						if null {
+							if !lastValNull {
+								// The current value is null while the previous was not.
+								outputCol[outputIdx] = true
+							}
+						} else {
+							v := col[checkIdx]
+							if lastValNull {
+								// The previous value was null while the current is not.
+								outputCol[outputIdx] = true
+							} else {
+								// Neither value is null, so we must compare.
+								var unique bool
+
+								{
+									var cmpResult int
+
+									{
+										a, b := float64(v), float64(lastVal)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else if a == b {
+											cmpResult = 0
+										} else if math.IsNaN(a) {
+											if math.IsNaN(b) {
+												cmpResult = 0
+											} else {
+												cmpResult = -1
+											}
+										} else {
+											cmpResult = 1
+										}
+									}
+
+									unique = cmpResult != 0
+								}
+
+								outputCol[outputIdx] = outputCol[outputIdx] || unique
+							}
+							lastVal = v
+						}
+						{
+							__retval_lastVal = lastVal
+							__retval_lastValNull = null
+						}
 					}
-				} else {
-					v := col[checkIdx]
-					if lastValNull {
-						// The previous value was null while the current is not.
-						outputCol[outputIdx] = true
-					} else {
-						// Neither value is null, so we must compare.
+					lastVal, lastValNull = __retval_lastVal, __retval_lastValNull
+				}
+			}
+		} else {
+			for _, idx := range sel {
+				{
+					var __retval_0 float64
+					{
+						var (
+							checkIdx  int = idx
+							outputIdx int = idx
+						)
+						v := col[checkIdx]
 						var unique bool
 
 						{
@@ -2540,67 +3200,93 @@ func (p *distinctFloat64Op) Next(ctx context.Context) coldata.Batch {
 						}
 
 						outputCol[outputIdx] = outputCol[outputIdx] || unique
-					}
-					lastVal = v
-				}
-				lastValNull = null
-			}
-		} else {
-			for _, checkIdx := range sel {
-				outputIdx := checkIdx
-				v := col[checkIdx]
-				var unique bool
-
-				{
-					var cmpResult int
-
-					{
-						a, b := float64(v), float64(lastVal)
-						if a < b {
-							cmpResult = -1
-						} else if a > b {
-							cmpResult = 1
-						} else if a == b {
-							cmpResult = 0
-						} else if math.IsNaN(a) {
-							if math.IsNaN(b) {
-								cmpResult = 0
-							} else {
-								cmpResult = -1
-							}
-						} else {
-							cmpResult = 1
+						lastVal = v
+						{
+							__retval_0 = lastVal
 						}
 					}
-
-					unique = cmpResult != 0
+					lastVal = __retval_0
 				}
-
-				outputCol[outputIdx] = outputCol[outputIdx] || unique
-				lastVal = v
 			}
 		}
 	} else {
-		// Bounds check elimination.
 		col = col[0:n]
 		outputCol = outputCol[:n]
 		_ = outputCol[n-1]
 		if nulls != nil {
-			for checkIdx := range col {
-				outputIdx := checkIdx
-				null := nulls.NullAt(checkIdx)
-				if null {
-					if !lastValNull {
-						// The current value is null while the previous was not.
-						outputCol[outputIdx] = true
+			for idx := range col {
+				{
+					var (
+						__retval_lastVal     float64
+						__retval_lastValNull bool
+					)
+					{
+						var (
+							checkIdx  int = idx
+							outputIdx int = idx
+						)
+						null := nulls.NullAt(checkIdx)
+						if null {
+							if !lastValNull {
+								// The current value is null while the previous was not.
+								outputCol[outputIdx] = true
+							}
+						} else {
+							v := col[checkIdx]
+							if lastValNull {
+								// The previous value was null while the current is not.
+								outputCol[outputIdx] = true
+							} else {
+								// Neither value is null, so we must compare.
+								var unique bool
+
+								{
+									var cmpResult int
+
+									{
+										a, b := float64(v), float64(lastVal)
+										if a < b {
+											cmpResult = -1
+										} else if a > b {
+											cmpResult = 1
+										} else if a == b {
+											cmpResult = 0
+										} else if math.IsNaN(a) {
+											if math.IsNaN(b) {
+												cmpResult = 0
+											} else {
+												cmpResult = -1
+											}
+										} else {
+											cmpResult = 1
+										}
+									}
+
+									unique = cmpResult != 0
+								}
+
+								outputCol[outputIdx] = outputCol[outputIdx] || unique
+							}
+							lastVal = v
+						}
+						{
+							__retval_lastVal = lastVal
+							__retval_lastValNull = null
+						}
 					}
-				} else {
-					v := col[checkIdx]
-					if lastValNull {
-						// The previous value was null while the current is not.
-						outputCol[outputIdx] = true
-					} else {
-						// Neither value is null, so we must compare.
+					lastVal, lastValNull = __retval_lastVal, __retval_lastValNull
+				}
+			}
+		} else {
+			for idx := range col {
+				{
+					var __retval_0 float64
+					{
+						var (
+							checkIdx  int = idx
+							outputIdx int = idx
+						)
+						v := col[checkIdx]
 						var unique bool
 
 						{
@@ -2629,44 +3315,13 @@ func (p *distinctFloat64Op) Next(ctx context.Context) coldata.Batch {
 						}
 
 						outputCol[outputIdx] = outputCol[outputIdx] || unique
-					}
-					lastVal = v
-				}
-				lastValNull = null
-			}
-		} else {
-			for checkIdx := range col {
-				outputIdx := checkIdx
-				v := col[checkIdx]
-				var unique bool
-
-				{
-					var cmpResult int
-
-					{
-						a, b := float64(v), float64(lastVal)
-						if a < b {
-							cmpResult = -1
-						} else if a > b {
-							cmpResult = 1
-						} else if a == b {
-							cmpResult = 0
-						} else if math.IsNaN(a) {
-							if math.IsNaN(b) {
-								cmpResult = 0
-							} else {
-								cmpResult = -1
-							}
-						} else {
-							cmpResult = 1
+						lastVal = v
+						{
+							__retval_0 = lastVal
 						}
 					}
-
-					unique = cmpResult != 0
+					lastVal = __retval_0
 				}
-
-				outputCol[outputIdx] = outputCol[outputIdx] || unique
-				lastVal = v
 			}
 		}
 	}
@@ -2699,19 +3354,70 @@ func (p partitionerFloat64) partitionWithOrder(
 	outputCol[0] = true
 	if nulls != nil {
 		for outputIdx, checkIdx := range order {
-			null := nulls.NullAt(checkIdx)
-			if null {
-				if !lastValNull {
-					// The current value is null while the previous was not.
-					outputCol[outputIdx] = true
+			{
+				var (
+					__retval_lastVal     float64
+					__retval_lastValNull bool
+				)
+				{
+					null := nulls.NullAt(checkIdx)
+					if null {
+						if !lastValNull {
+							// The current value is null while the previous was not.
+							outputCol[outputIdx] = true
+						}
+					} else {
+						v := col[checkIdx]
+						if lastValNull {
+							// The previous value was null while the current is not.
+							outputCol[outputIdx] = true
+						} else {
+							// Neither value is null, so we must compare.
+							var unique bool
+
+							{
+								var cmpResult int
+
+								{
+									a, b := float64(v), float64(lastVal)
+									if a < b {
+										cmpResult = -1
+									} else if a > b {
+										cmpResult = 1
+									} else if a == b {
+										cmpResult = 0
+									} else if math.IsNaN(a) {
+										if math.IsNaN(b) {
+											cmpResult = 0
+										} else {
+											cmpResult = -1
+										}
+									} else {
+										cmpResult = 1
+									}
+								}
+
+								unique = cmpResult != 0
+							}
+
+							outputCol[outputIdx] = outputCol[outputIdx] || unique
+						}
+						lastVal = v
+					}
+					{
+						__retval_lastVal = lastVal
+						__retval_lastValNull = null
+					}
 				}
-			} else {
-				v := col[checkIdx]
-				if lastValNull {
-					// The previous value was null while the current is not.
-					outputCol[outputIdx] = true
-				} else {
-					// Neither value is null, so we must compare.
+				lastVal, lastValNull = __retval_lastVal, __retval_lastValNull
+			}
+		}
+	} else {
+		for outputIdx, checkIdx := range order {
+			{
+				var __retval_0 float64
+				{
+					v := col[checkIdx]
 					var unique bool
 
 					{
@@ -2740,43 +3446,13 @@ func (p partitionerFloat64) partitionWithOrder(
 					}
 
 					outputCol[outputIdx] = outputCol[outputIdx] || unique
-				}
-				lastVal = v
-			}
-			lastValNull = null
-		}
-	} else {
-		for outputIdx, checkIdx := range order {
-			v := col[checkIdx]
-			var unique bool
-
-			{
-				var cmpResult int
-
-				{
-					a, b := float64(v), float64(lastVal)
-					if a < b {
-						cmpResult = -1
-					} else if a > b {
-						cmpResult = 1
-					} else if a == b {
-						cmpResult = 0
-					} else if math.IsNaN(a) {
-						if math.IsNaN(b) {
-							cmpResult = 0
-						} else {
-							cmpResult = -1
-						}
-					} else {
-						cmpResult = 1
+					lastVal = v
+					{
+						__retval_0 = lastVal
 					}
 				}
-
-				unique = cmpResult != 0
+				lastVal = __retval_0
 			}
-
-			outputCol[outputIdx] = outputCol[outputIdx] || unique
-			lastVal = v
 		}
 	}
 }
@@ -2796,21 +3472,79 @@ func (p partitionerFloat64) partition(colVec coldata.Vec, outputCol []bool, n in
 	outputCol = outputCol[:n]
 	outputCol[0] = true
 	if nulls != nil {
-		for checkIdx := range col {
-			outputIdx := checkIdx
-			null := nulls.NullAt(checkIdx)
-			if null {
-				if !lastValNull {
-					// The current value is null while the previous was not.
-					outputCol[outputIdx] = true
+		for idx := range col {
+			{
+				var (
+					__retval_lastVal     float64
+					__retval_lastValNull bool
+				)
+				{
+					var (
+						checkIdx  int = idx
+						outputIdx int = idx
+					)
+					null := nulls.NullAt(checkIdx)
+					if null {
+						if !lastValNull {
+							// The current value is null while the previous was not.
+							outputCol[outputIdx] = true
+						}
+					} else {
+						v := col[checkIdx]
+						if lastValNull {
+							// The previous value was null while the current is not.
+							outputCol[outputIdx] = true
+						} else {
+							// Neither value is null, so we must compare.
+							var unique bool
+
+							{
+								var cmpResult int
+
+								{
+									a, b := float64(v), float64(lastVal)
+									if a < b {
+										cmpResult = -1
+									} else if a > b {
+										cmpResult = 1
+									} else if a == b {
+										cmpResult = 0
+									} else if math.IsNaN(a) {
+										if math.IsNaN(b) {
+											cmpResult = 0
+										} else {
+											cmpResult = -1
+										}
+									} else {
+										cmpResult = 1
+									}
+								}
+
+								unique = cmpResult != 0
+							}
+
+							outputCol[outputIdx] = outputCol[outputIdx] || unique
+						}
+						lastVal = v
+					}
+					{
+						__retval_lastVal = lastVal
+						__retval_lastValNull = null
+					}
 				}
-			} else {
-				v := col[checkIdx]
-				if lastValNull {
-					// The previous value was null while the current is not.
-					outputCol[outputIdx] = true
-				} else {
-					// Neither value is null, so we must compare.
+				lastVal, lastValNull = __retval_lastVal, __retval_lastValNull
+			}
+		}
+	} else {
+		for idx := range col {
+			{
+				var __retval_0 float64
+				{
+					var (
+						checkIdx  int = idx
+						outputIdx int = idx
+					)
+					v := col[checkIdx]
 					var unique bool
 
 					{
@@ -2839,44 +3573,13 @@ func (p partitionerFloat64) partition(colVec coldata.Vec, outputCol []bool, n in
 					}
 
 					outputCol[outputIdx] = outputCol[outputIdx] || unique
-				}
-				lastVal = v
-			}
-			lastValNull = null
-		}
-	} else {
-		for checkIdx := range col {
-			outputIdx := checkIdx
-			v := col[checkIdx]
-			var unique bool
-
-			{
-				var cmpResult int
-
-				{
-					a, b := float64(v), float64(lastVal)
-					if a < b {
-						cmpResult = -1
-					} else if a > b {
-						cmpResult = 1
-					} else if a == b {
-						cmpResult = 0
-					} else if math.IsNaN(a) {
-						if math.IsNaN(b) {
-							cmpResult = 0
-						} else {
-							cmpResult = -1
-						}
-					} else {
-						cmpResult = 1
+					lastVal = v
+					{
+						__retval_0 = lastVal
 					}
 				}
-
-				unique = cmpResult != 0
+				lastVal = __retval_0
 			}
-
-			outputCol[outputIdx] = outputCol[outputIdx] || unique
-			lastVal = v
 		}
 	}
 }
@@ -2954,21 +3657,67 @@ func (p *distinctTimestampOp) Next(ctx context.Context) coldata.Batch {
 		// Bounds check elimination.
 		sel = sel[:n]
 		if nulls != nil {
-			for _, checkIdx := range sel {
-				outputIdx := checkIdx
-				null := nulls.NullAt(checkIdx)
-				if null {
-					if !lastValNull {
-						// The current value is null while the previous was not.
-						outputCol[outputIdx] = true
+			for _, idx := range sel {
+				{
+					var (
+						__retval_lastVal     time.Time
+						__retval_lastValNull bool
+					)
+					{
+						var (
+							checkIdx  int = idx
+							outputIdx int = idx
+						)
+						null := nulls.NullAt(checkIdx)
+						if null {
+							if !lastValNull {
+								// The current value is null while the previous was not.
+								outputCol[outputIdx] = true
+							}
+						} else {
+							v := col[checkIdx]
+							if lastValNull {
+								// The previous value was null while the current is not.
+								outputCol[outputIdx] = true
+							} else {
+								// Neither value is null, so we must compare.
+								var unique bool
+
+								{
+									var cmpResult int
+
+									if v.Before(lastVal) {
+										cmpResult = -1
+									} else if lastVal.Before(v) {
+										cmpResult = 1
+									} else {
+										cmpResult = 0
+									}
+									unique = cmpResult != 0
+								}
+
+								outputCol[outputIdx] = outputCol[outputIdx] || unique
+							}
+							lastVal = v
+						}
+						{
+							__retval_lastVal = lastVal
+							__retval_lastValNull = null
+						}
 					}
-				} else {
-					v := col[checkIdx]
-					if lastValNull {
-						// The previous value was null while the current is not.
-						outputCol[outputIdx] = true
-					} else {
-						// Neither value is null, so we must compare.
+					lastVal, lastValNull = __retval_lastVal, __retval_lastValNull
+				}
+			}
+		} else {
+			for _, idx := range sel {
+				{
+					var __retval_0 time.Time
+					{
+						var (
+							checkIdx  int = idx
+							outputIdx int = idx
+						)
+						v := col[checkIdx]
 						var unique bool
 
 						{
@@ -2985,55 +3734,81 @@ func (p *distinctTimestampOp) Next(ctx context.Context) coldata.Batch {
 						}
 
 						outputCol[outputIdx] = outputCol[outputIdx] || unique
+						lastVal = v
+						{
+							__retval_0 = lastVal
+						}
 					}
-					lastVal = v
+					lastVal = __retval_0
 				}
-				lastValNull = null
-			}
-		} else {
-			for _, checkIdx := range sel {
-				outputIdx := checkIdx
-				v := col[checkIdx]
-				var unique bool
-
-				{
-					var cmpResult int
-
-					if v.Before(lastVal) {
-						cmpResult = -1
-					} else if lastVal.Before(v) {
-						cmpResult = 1
-					} else {
-						cmpResult = 0
-					}
-					unique = cmpResult != 0
-				}
-
-				outputCol[outputIdx] = outputCol[outputIdx] || unique
-				lastVal = v
 			}
 		}
 	} else {
-		// Bounds check elimination.
 		col = col[0:n]
 		outputCol = outputCol[:n]
 		_ = outputCol[n-1]
 		if nulls != nil {
-			for checkIdx := range col {
-				outputIdx := checkIdx
-				null := nulls.NullAt(checkIdx)
-				if null {
-					if !lastValNull {
-						// The current value is null while the previous was not.
-						outputCol[outputIdx] = true
+			for idx := range col {
+				{
+					var (
+						__retval_lastVal     time.Time
+						__retval_lastValNull bool
+					)
+					{
+						var (
+							checkIdx  int = idx
+							outputIdx int = idx
+						)
+						null := nulls.NullAt(checkIdx)
+						if null {
+							if !lastValNull {
+								// The current value is null while the previous was not.
+								outputCol[outputIdx] = true
+							}
+						} else {
+							v := col[checkIdx]
+							if lastValNull {
+								// The previous value was null while the current is not.
+								outputCol[outputIdx] = true
+							} else {
+								// Neither value is null, so we must compare.
+								var unique bool
+
+								{
+									var cmpResult int
+
+									if v.Before(lastVal) {
+										cmpResult = -1
+									} else if lastVal.Before(v) {
+										cmpResult = 1
+									} else {
+										cmpResult = 0
+									}
+									unique = cmpResult != 0
+								}
+
+								outputCol[outputIdx] = outputCol[outputIdx] || unique
+							}
+							lastVal = v
+						}
+						{
+							__retval_lastVal = lastVal
+							__retval_lastValNull = null
+						}
 					}
-				} else {
-					v := col[checkIdx]
-					if lastValNull {
-						// The previous value was null while the current is not.
-						outputCol[outputIdx] = true
-					} else {
-						// Neither value is null, so we must compare.
+					lastVal, lastValNull = __retval_lastVal, __retval_lastValNull
+				}
+			}
+		} else {
+			for idx := range col {
+				{
+					var __retval_0 time.Time
+					{
+						var (
+							checkIdx  int = idx
+							outputIdx int = idx
+						)
+						v := col[checkIdx]
 						var unique bool
 
 						{
@@ -3050,32 +3825,13 @@ func (p *distinctTimestampOp) Next(ctx context.Context) coldata.Batch {
 						}
 
 						outputCol[outputIdx] = outputCol[outputIdx] || unique
+						lastVal = v
+						{
+							__retval_0 = lastVal
+						}
 					}
-					lastVal = v
+					lastVal = __retval_0
 				}
-				lastValNull = null
-			}
-		} else {
-			for checkIdx := range col {
-				outputIdx := checkIdx
-				v := col[checkIdx]
-				var unique bool
-
-				{
-					var cmpResult int
-
-					if v.Before(lastVal) {
-						cmpResult = -1
-					} else if lastVal.Before(v) {
-						cmpResult = 1
-					} else {
-						cmpResult = 0
-					}
-					unique = cmpResult != 0
-				}
-
-				outputCol[outputIdx] = outputCol[outputIdx] || unique
-				lastVal = v
 			}
 		}
 	}
@@ -3108,19 +3864,58 @@ func (p partitionerTimestamp) partitionWithOrder(
 	outputCol[0] = true
 	if nulls != nil {
 		for outputIdx, checkIdx := range order {
-			null := nulls.NullAt(checkIdx)
-			if null {
-				if !lastValNull {
-					// The current value is null while the previous was not.
-					outputCol[outputIdx] = true
+			{
+				var (
+					__retval_lastVal     time.Time
+					__retval_lastValNull bool
+				)
+				{
+					null := nulls.NullAt(checkIdx)
+					if null {
+						if !lastValNull {
+							// The current value is null while the previous was not.
+							outputCol[outputIdx] = true
+						}
+					} else {
+						v := col[checkIdx]
+						if lastValNull {
+							// The previous value was null while the current is not.
+							outputCol[outputIdx] = true
+						} else {
+							// Neither value is null, so we must compare.
+							var unique bool
+
+							{
+								var cmpResult int
+
+								if v.Before(lastVal) {
+									cmpResult = -1
+								} else if lastVal.Before(v) {
+									cmpResult = 1
+								} else {
+									cmpResult = 0
+								}
+								unique = cmpResult != 0
+							}
+
+							outputCol[outputIdx] = outputCol[outputIdx] || unique
+						}
+						lastVal = v
+					}
+					{
+						__retval_lastVal = lastVal
+						__retval_lastValNull = null
+					}
 				}
-			} else {
-				v := col[checkIdx]
-				if lastValNull {
-					// The previous value was null while the current is not.
-					outputCol[outputIdx] = true
-				} else {
-					// Neither value is null, so we must compare.
+				lastVal, lastValNull = __retval_lastVal, __retval_lastValNull
+			}
+		}
+	} else {
+		for outputIdx, checkIdx := range order {
+			{
+				var __retval_0 time.Time
+				{
+					v := col[checkIdx]
 					var unique bool
 
 					{
@@ -3137,31 +3932,13 @@ func (p partitionerTimestamp) partitionWithOrder(
 					}
 
 					outputCol[outputIdx] = outputCol[outputIdx] || unique
+					lastVal = v
+					{
+						__retval_0 = lastVal
+					}
 				}
-				lastVal = v
+				lastVal = __retval_0
 			}
-			lastValNull = null
-		}
-	} else {
-		for outputIdx, checkIdx := range order {
-			v := col[checkIdx]
-			var unique bool
-
-			{
-				var cmpResult int
-
-				if v.Before(lastVal) {
-					cmpResult = -1
-				} else if lastVal.Before(v) {
-					cmpResult = 1
-				} else {
-					cmpResult = 0
-				}
-				unique = cmpResult != 0
-			}
-
-			outputCol[outputIdx] = outputCol[outputIdx] || unique
-			lastVal = v
 		}
 	}
 }
@@ -3181,21 +3958,67 @@ func (p partitionerTimestamp) partition(colVec coldata.Vec, outputCol []bool, n 
 	outputCol = outputCol[:n]
 	outputCol[0] = true
 	if nulls != nil {
-		for checkIdx := range col {
-			outputIdx := checkIdx
-			null := nulls.NullAt(checkIdx)
-			if null {
-				if !lastValNull {
-					// The current value is null while the previous was not.
-					outputCol[outputIdx] = true
+		for idx := range col {
+			{
+				var (
+					__retval_lastVal     time.Time
+					__retval_lastValNull bool
+				)
+				{
+					var (
+						checkIdx  int = idx
+						outputIdx int = idx
+					)
+					null := nulls.NullAt(checkIdx)
+					if null {
+						if !lastValNull {
+							// The current value is null while the previous was not.
+							outputCol[outputIdx] = true
+						}
+					} else {
+						v := col[checkIdx]
+						if lastValNull {
+							// The previous value was null while the current is not.
+							outputCol[outputIdx] = true
+						} else {
+							// Neither value is null, so we must compare.
+							var unique bool
+
+							{
+								var cmpResult int
+
+								if v.Before(lastVal) {
+									cmpResult = -1
+								} else if lastVal.Before(v) {
+									cmpResult = 1
+								} else {
+									cmpResult = 0
+								}
+								unique = cmpResult != 0
+							}
+
+							outputCol[outputIdx] = outputCol[outputIdx] || unique
+						}
+						lastVal = v
+					}
+					{
+						__retval_lastVal = lastVal
+						__retval_lastValNull = null
+					}
 				}
-			} else {
-				v := col[checkIdx]
-				if lastValNull {
-					// The previous value was null while the current is not.
-					outputCol[outputIdx] = true
-				} else {
-					// Neither value is null, so we must compare.
+				lastVal, lastValNull = __retval_lastVal, __retval_lastValNull
+			}
+		}
+	} else {
+		for idx := range col {
+			{
+				var __retval_0 time.Time
+				{
+					var (
+						checkIdx  int = idx
+						outputIdx int = idx
+					)
+					v := col[checkIdx]
 					var unique bool
 
 					{
@@ -3212,32 +4035,13 @@ func (p partitionerTimestamp) partition(colVec coldata.Vec, outputCol []bool, n 
 					}
 
 					outputCol[outputIdx] = outputCol[outputIdx] || unique
+					lastVal = v
+					{
+						__retval_0 = lastVal
+					}
 				}
-				lastVal = v
+				lastVal = __retval_0
 			}
-			lastValNull = null
-		}
-	} else {
-		for checkIdx := range col {
-			outputIdx := checkIdx
-			v := col[checkIdx]
-			var unique bool
-
-			{
-				var cmpResult int
-
-				if v.Before(lastVal) {
-					cmpResult = -1
-				} else if lastVal.Before(v) {
-					cmpResult = 1
-				} else {
-					cmpResult = 0
-				}
-				unique = cmpResult != 0
-			}
-
-			outputCol[outputIdx] = outputCol[outputIdx] || unique
-			lastVal = v
 		}
 	}
 }
@@ -3315,21 +4119,60 @@ func (p *distinctIntervalOp) Next(ctx context.Context) coldata.Batch {
 		// Bounds check elimination.
 		sel = sel[:n]
 		if nulls != nil {
-			for _, checkIdx := range sel {
-				outputIdx := checkIdx
-				null := nulls.NullAt(checkIdx)
-				if null {
-					if !lastValNull {
-						// The current value is null while the previous was not.
-						outputCol[outputIdx] = true
+			for _, idx := range sel {
+				{
+					var (
+						__retval_lastVal     duration.Duration
+						__retval_lastValNull bool
+					)
+					{
+						var (
+							checkIdx  int = idx
+							outputIdx int = idx
+						)
+						null := nulls.NullAt(checkIdx)
+						if null {
+							if !lastValNull {
+								// The current value is null while the previous was not.
+								outputCol[outputIdx] = true
+							}
+						} else {
+							v := col[checkIdx]
+							if lastValNull {
+								// The previous value was null while the current is not.
+								outputCol[outputIdx] = true
+							} else {
+								// Neither value is null, so we must compare.
+								var unique bool
+
+								{
+									var cmpResult int
+									cmpResult = v.Compare(lastVal)
+									unique = cmpResult != 0
+								}
+
+								outputCol[outputIdx] = outputCol[outputIdx] || unique
+							}
+							lastVal = v
+						}
+						{
+							__retval_lastVal = lastVal
+							__retval_lastValNull = null
+						}
 					}
-				} else {
-					v := col[checkIdx]
-					if lastValNull {
-						// The previous value was null while the current is not.
-						outputCol[outputIdx] = true
-					} else {
-						// Neither value is null, so we must compare.
+					lastVal, lastValNull = __retval_lastVal, __retval_lastValNull
+				}
+			}
+		} else {
+			for _, idx := range sel {
+				{
+					var __retval_0 duration.Duration
+					{
+						var (
+							checkIdx  int = idx
+							outputIdx int = idx
+						)
+						v := col[checkIdx]
 						var unique bool
 
 						{
@@ -3339,48 +4182,74 @@ func (p *distinctIntervalOp) Next(ctx context.Context) coldata.Batch {
 						}
 
 						outputCol[outputIdx] = outputCol[outputIdx] || unique
+						lastVal = v
+						{
+							__retval_0 = lastVal
+						}
 					}
-					lastVal = v
+					lastVal = __retval_0
 				}
-				lastValNull = null
-			}
-		} else {
-			for _, checkIdx := range sel {
-				outputIdx := checkIdx
-				v := col[checkIdx]
-				var unique bool
-
-				{
-					var cmpResult int
-					cmpResult = v.Compare(lastVal)
-					unique = cmpResult != 0
-				}
-
-				outputCol[outputIdx] = outputCol[outputIdx] || unique
-				lastVal = v
 			}
 		}
 	} else {
-		// Bounds check elimination.
 		col = col[0:n]
 		outputCol = outputCol[:n]
 		_ = outputCol[n-1]
 		if nulls != nil {
-			for checkIdx := range col {
-				outputIdx := checkIdx
-				null := nulls.NullAt(checkIdx)
-				if null {
-					if !lastValNull {
-						// The current value is null while the previous was not.
-						outputCol[outputIdx] = true
+			for idx := range col {
+				{
+					var (
+						__retval_lastVal     duration.Duration
+						__retval_lastValNull bool
+					)
+					{
+						var (
+							checkIdx  int = idx
+							outputIdx int = idx
+						)
+						null := nulls.NullAt(checkIdx)
+						if null {
+							if !lastValNull {
+								// The current value is null while the previous was not.
+								outputCol[outputIdx] = true
+							}
+						} else {
+							v := col[checkIdx]
+							if lastValNull {
+								// The previous value was null while the current is not.
+								outputCol[outputIdx] = true
+							} else {
+								// Neither value is null, so we must compare.
+								var unique bool
+
+								{
+									var cmpResult int
+									cmpResult = v.Compare(lastVal)
+									unique = cmpResult != 0
+								}
+
+								outputCol[outputIdx] = outputCol[outputIdx] || unique
+							}
+							lastVal = v
+						}
+						{
+							__retval_lastVal = lastVal
+							__retval_lastValNull = null
+						}
 					}
-				} else {
-					v := col[checkIdx]
-					if lastValNull {
-						// The previous value was null while the current is not.
-						outputCol[outputIdx] = true
-					} else {
-						// Neither value is null, so we must compare.
+					lastVal, lastValNull = __retval_lastVal, __retval_lastValNull
+				}
+			}
+		} else {
+			for idx := range col {
+				{
+					var __retval_0 duration.Duration
+					{
+						var (
+							checkIdx  int = idx
+							outputIdx int = idx
+						)
+						v := col[checkIdx]
 						var unique bool
 
 						{
@@ -3390,25 +4259,13 @@ func (p *distinctIntervalOp) Next(ctx context.Context) coldata.Batch {
 						}
 
 						outputCol[outputIdx] = outputCol[outputIdx] || unique
+						lastVal = v
+						{
+							__retval_0 = lastVal
+						}
 					}
-					lastVal = v
+					lastVal = __retval_0
 				}
-				lastValNull = null
-			}
-		} else {
-			for checkIdx := range col {
-				outputIdx := checkIdx
-				v := col[checkIdx]
-				var unique bool
-
-				{
-					var cmpResult int
-					cmpResult = v.Compare(lastVal)
-					unique = cmpResult != 0
-				}
-
-				outputCol[outputIdx] = outputCol[outputIdx] || unique
-				lastVal = v
 			}
 		}
 	}
@@ -3441,19 +4298,51 @@ func (p partitionerInterval) partitionWithOrder(
 	outputCol[0] = true
 	if nulls != nil {
 		for outputIdx, checkIdx := range order {
-			null := nulls.NullAt(checkIdx)
-			if null {
-				if !lastValNull {
-					// The current value is null while the previous was not.
-					outputCol[outputIdx] = true
+			{
+				var (
+					__retval_lastVal     duration.Duration
+					__retval_lastValNull bool
+				)
+				{
+					null := nulls.NullAt(checkIdx)
+					if null {
+						if !lastValNull {
+							// The current value is null while the previous was not.
+							outputCol[outputIdx] = true
+						}
+					} else {
+						v := col[checkIdx]
+						if lastValNull {
+							// The previous value was null while the current is not.
+							outputCol[outputIdx] = true
+						} else {
+							// Neither value is null, so we must compare.
+							var unique bool
+
+							{
+								var cmpResult int
+								cmpResult = v.Compare(lastVal)
+								unique = cmpResult != 0
+							}
+
+							outputCol[outputIdx] = outputCol[outputIdx] || unique
+						}
+						lastVal = v
+					}
+					{
+						__retval_lastVal = lastVal
+						__retval_lastValNull = null
+					}
 				}
-			} else {
-				v := col[checkIdx]
-				if lastValNull {
-					// The previous value was null while the current is not.
-					outputCol[outputIdx] = true
-				} else {
-					// Neither value is null, so we must compare.
+				lastVal, lastValNull = __retval_lastVal, __retval_lastValNull
+			}
+		}
+	} else {
+		for outputIdx, checkIdx := range order {
+			{
+				var __retval_0 duration.Duration
+				{
+					v := col[checkIdx]
 					var unique bool
 
 					{
@@ -3463,24 +4352,13 @@ func (p partitionerInterval) partitionWithOrder(
 					}
 
 					outputCol[outputIdx] = outputCol[outputIdx] || unique
+					lastVal = v
+					{
+						__retval_0 = lastVal
+					}
 				}
-				lastVal = v
+				lastVal = __retval_0
 			}
-			lastValNull = null
-		}
-	} else {
-		for outputIdx, checkIdx := range order {
-			v := col[checkIdx]
-			var unique bool
-
-			{
-				var cmpResult int
-				cmpResult = v.Compare(lastVal)
-				unique = cmpResult != 0
-			}
-
-			outputCol[outputIdx] = outputCol[outputIdx] || unique
-			lastVal = v
 		}
 	}
 }
@@ -3500,21 +4378,60 @@ func (p partitionerInterval) partition(colVec coldata.Vec, outputCol []bool, n i
 	outputCol = outputCol[:n]
 	outputCol[0] = true
 	if nulls != nil {
-		for checkIdx := range col {
-			outputIdx := checkIdx
-			null := nulls.NullAt(checkIdx)
-			if null {
-				if !lastValNull {
-					// The current value is null while the previous was not.
-					outputCol[outputIdx] = true
+		for idx := range col {
+			{
+				var (
+					__retval_lastVal     duration.Duration
+					__retval_lastValNull bool
+				)
+				{
+					var (
+						checkIdx  int = idx
+						outputIdx int = idx
+					)
+					null := nulls.NullAt(checkIdx)
+					if null {
+						if !lastValNull {
+							// The current value is null while the previous was not.
+							outputCol[outputIdx] = true
+						}
+					} else {
+						v := col[checkIdx]
+						if lastValNull {
+							// The previous value was null while the current is not.
+							outputCol[outputIdx] = true
+						} else {
+							// Neither value is null, so we must compare.
+							var unique bool
+
+							{
+								var cmpResult int
+								cmpResult = v.Compare(lastVal)
+								unique = cmpResult != 0
+							}
+
+							outputCol[outputIdx] = outputCol[outputIdx] || unique
+						}
+						lastVal = v
+					}
+					{
+						__retval_lastVal = lastVal
+						__retval_lastValNull = null
+					}
 				}
-			} else {
-				v := col[checkIdx]
-				if lastValNull {
-					// The previous value was null while the current is not.
-					outputCol[outputIdx] = true
-				} else {
-					// Neither value is null, so we must compare.
+				lastVal, lastValNull = __retval_lastVal, __retval_lastValNull
+			}
+		}
+	} else {
+		for idx := range col {
+			{
+				var __retval_0 duration.Duration
+				{
+					var (
+						checkIdx  int = idx
+						outputIdx int = idx
+					)
+					v := col[checkIdx]
 					var unique bool
 
 					{
@@ -3524,25 +4441,13 @@ func (p partitionerInterval) partition(colVec coldata.Vec, outputCol []bool, n i
 					}
 
 					outputCol[outputIdx] = outputCol[outputIdx] || unique
+					lastVal = v
+					{
+						__retval_0 = lastVal
+					}
 				}
-				lastVal = v
+				lastVal = __retval_0
 			}
-			lastValNull = null
-		}
-	} else {
-		for checkIdx := range col {
-			outputIdx := checkIdx
-			v := col[checkIdx]
-			var unique bool
-
-			{
-				var cmpResult int
-				cmpResult = v.Compare(lastVal)
-				unique = cmpResult != 0
-			}
-
-			outputCol[outputIdx] = outputCol[outputIdx] || unique
-			lastVal = v
 		}
 	}
 }
@@ -3620,21 +4525,62 @@ func (p *distinctDatumOp) Next(ctx context.Context) coldata.Batch {
 		// Bounds check elimination.
 		sel = sel[:n]
 		if nulls != nil {
-			for _, checkIdx := range sel {
-				outputIdx := checkIdx
-				null := nulls.NullAt(checkIdx)
-				if null {
-					if !lastValNull {
-						// The current value is null while the previous was not.
-						outputCol[outputIdx] = true
+			for _, idx := range sel {
+				{
+					var (
+						__retval_lastVal     interface{}
+						__retval_lastValNull bool
+					)
+					{
+						var (
+							checkIdx  int = idx
+							outputIdx int = idx
+						)
+						null := nulls.NullAt(checkIdx)
+						if null {
+							if !lastValNull {
+								// The current value is null while the previous was not.
+								outputCol[outputIdx] = true
+							}
+						} else {
+							v := col.Get(checkIdx)
+							if lastValNull {
+								// The previous value was null while the current is not.
+								outputCol[outputIdx] = true
+							} else {
+								// Neither value is null, so we must compare.
+								var unique bool
+
+								{
+									var cmpResult int
+
+									cmpResult = v.(*coldataext.Datum).CompareDatum(col, lastVal)
+
+									unique = cmpResult != 0
+								}
+
+								outputCol[outputIdx] = outputCol[outputIdx] || unique
+							}
+							lastVal = v
+						}
+						{
+							__retval_lastVal = lastVal
+							__retval_lastValNull = null
+						}
 					}
-				} else {
-					v := col.Get(checkIdx)
-					if lastValNull {
-						// The previous value was null while the current is not.
-						outputCol[outputIdx] = true
-					} else {
-						// Neither value is null, so we must compare.
+					lastVal, lastValNull = __retval_lastVal, __retval_lastValNull
+				}
+			}
+		} else {
+			for _, idx := range sel {
+				{
+					var __retval_0 interface{}
+					{
+						var (
+							checkIdx  int = idx
+							outputIdx int = idx
+						)
+						v := col.Get(checkIdx)
 						var unique bool
 
 						{
@@ -3646,50 +4592,76 @@ func (p *distinctDatumOp) Next(ctx context.Context) coldata.Batch {
 						}
 
 						outputCol[outputIdx] = outputCol[outputIdx] || unique
+						lastVal = v
+						{
+							__retval_0 = lastVal
+						}
 					}
-					lastVal = v
+					lastVal = __retval_0
 				}
-				lastValNull = null
-			}
-		} else {
-			for _, checkIdx := range sel {
-				outputIdx := checkIdx
-				v := col.Get(checkIdx)
-				var unique bool
-
-				{
-					var cmpResult int
-
-					cmpResult = v.(*coldataext.Datum).CompareDatum(col, lastVal)
-
-					unique = cmpResult != 0
-				}
-
-				outputCol[outputIdx] = outputCol[outputIdx] || unique
-				lastVal = v
 			}
 		}
 	} else {
-		// Bounds check elimination.
 		col = col.Slice(0, n)
 		outputCol = outputCol[:n]
 		_ = outputCol[n-1]
 		if nulls != nil {
-			for checkIdx := 0; checkIdx < n; checkIdx++ {
-				outputIdx := checkIdx
-				null := nulls.NullAt(checkIdx)
-				if null {
-					if !lastValNull {
-						// The current value is null while the previous was not.
-						outputCol[outputIdx] = true
+			for idx := 0; idx < n; idx++ {
+				{
+					var (
+						__retval_lastVal     interface{}
+						__retval_lastValNull bool
+					)
+					{
+						var (
+							checkIdx  int = idx
+							outputIdx int = idx
+						)
+						null := nulls.NullAt(checkIdx)
+						if null {
+							if !lastValNull {
+								// The current value is null while the previous was not.
+								outputCol[outputIdx] = true
+							}
+						} else {
+							v := col.Get(checkIdx)
+							if lastValNull {
+								// The previous value was null while the current is not.
+								outputCol[outputIdx] = true
+							} else {
+								// Neither value is null, so we must compare.
+								var unique bool
+
+								{
+									var cmpResult int
+
+									cmpResult = v.(*coldataext.Datum).CompareDatum(col, lastVal)
+
+									unique = cmpResult != 0
+								}
+
+								outputCol[outputIdx] = outputCol[outputIdx] || unique
+							}
+							lastVal = v
+						}
+						{
+							__retval_lastVal = lastVal
+							__retval_lastValNull = null
+						}
 					}
-				} else {
-					v := col.Get(checkIdx)
-					if lastValNull {
-						// The previous value was null while the current is not.
-						outputCol[outputIdx] = true
-					} else {
-						// Neither value is null, so we must compare.
+					lastVal, lastValNull = __retval_lastVal, __retval_lastValNull
+				}
+			}
+		} else {
+			for idx := 0; idx < n; idx++ {
+				{
+					var __retval_0 interface{}
+					{
+						var (
+							checkIdx  int = idx
+							outputIdx int = idx
+						)
+						v := col.Get(checkIdx)
 						var unique bool
 
 						{
@@ -3701,27 +4673,13 @@ func (p *distinctDatumOp) Next(ctx context.Context) coldata.Batch {
 						}
 
 						outputCol[outputIdx] = outputCol[outputIdx] || unique
+						lastVal = v
+						{
+							__retval_0 = lastVal
+						}
 					}
-					lastVal = v
+					lastVal = __retval_0
 				}
-				lastValNull = null
-			}
-		} else {
-			for checkIdx := 0; checkIdx < n; checkIdx++ {
-				outputIdx := checkIdx
-				v := col.Get(checkIdx)
-				var unique bool
-
-				{
-					var cmpResult int
-
-					cmpResult = v.(*coldataext.Datum).CompareDatum(col, lastVal)
-
-					unique = cmpResult != 0
-				}
-
-				outputCol[outputIdx] = outputCol[outputIdx] || unique
-				lastVal = v
 			}
 		}
 	}
@@ -3754,19 +4712,53 @@ func (p partitionerDatum) partitionWithOrder(
 	outputCol[0] = true
 	if nulls != nil {
 		for outputIdx, checkIdx := range order {
-			null := nulls.NullAt(checkIdx)
-			if null {
-				if !lastValNull {
-					// The current value is null while the previous was not.
-					outputCol[outputIdx] = true
+			{
+				var (
+					__retval_lastVal     interface{}
+					__retval_lastValNull bool
+				)
+				{
+					null := nulls.NullAt(checkIdx)
+					if null {
+						if !lastValNull {
+							// The current value is null while the previous was not.
+							outputCol[outputIdx] = true
+						}
+					} else {
+						v := col.Get(checkIdx)
+						if lastValNull {
+							// The previous value was null while the current is not.
+							outputCol[outputIdx] = true
+						} else {
+							// Neither value is null, so we must compare.
+							var unique bool
+
+							{
+								var cmpResult int
+
+								cmpResult = v.(*coldataext.Datum).CompareDatum(col, lastVal)
+
+								unique = cmpResult != 0
+							}
+
+							outputCol[outputIdx] = outputCol[outputIdx] || unique
+						}
+						lastVal = v
+					}
+					{
+						__retval_lastVal = lastVal
+						__retval_lastValNull = null
+					}
 				}
-			} else {
-				v := col.Get(checkIdx)
-				if lastValNull {
-					// The previous value was null while the current is not.
-					outputCol[outputIdx] = true
-				} else {
-					// Neither value is null, so we must compare.
+				lastVal, lastValNull = __retval_lastVal, __retval_lastValNull
+			}
+		}
+	} else {
+		for outputIdx, checkIdx := range order {
+			{
+				var __retval_0 interface{}
+				{
+					v := col.Get(checkIdx)
 					var unique bool
 
 					{
@@ -3778,26 +4770,13 @@ func (p partitionerDatum) partitionWithOrder(
 					}
 
 					outputCol[outputIdx] = outputCol[outputIdx] || unique
+					lastVal = v
+					{
+						__retval_0 = lastVal
+					}
 				}
-				lastVal = v
+				lastVal = __retval_0
 			}
-			lastValNull = null
-		}
-	} else {
-		for outputIdx, checkIdx := range order {
-			v := col.Get(checkIdx)
-			var unique bool
-
-			{
-				var cmpResult int
-
-				cmpResult = v.(*coldataext.Datum).CompareDatum(col, lastVal)
-
-				unique = cmpResult != 0
-			}
-
-			outputCol[outputIdx] = outputCol[outputIdx] || unique
-			lastVal = v
 		}
 	}
 }
@@ -3817,21 +4796,62 @@ func (p partitionerDatum) partition(colVec coldata.Vec, outputCol []bool, n int)
 	outputCol = outputCol[:n]
 	outputCol[0] = true
 	if nulls != nil {
-		for checkIdx := 0; checkIdx < n; checkIdx++ {
-			outputIdx := checkIdx
-			null := nulls.NullAt(checkIdx)
-			if null {
-				if !lastValNull {
-					// The current value is null while the previous was not.
-					outputCol[outputIdx] = true
+		for idx := 0; idx < n; idx++ {
+			{
+				var (
+					__retval_lastVal     interface{}
+					__retval_lastValNull bool
+				)
+				{
+					var (
+						checkIdx  int = idx
+						outputIdx int = idx
+					)
+					null := nulls.NullAt(checkIdx)
+					if null {
+						if !lastValNull {
+							// The current value is null while the previous was not.
+							outputCol[outputIdx] = true
+						}
+					} else {
+						v := col.Get(checkIdx)
+						if lastValNull {
+							// The previous value was null while the current is not.
+							outputCol[outputIdx] = true
+						} else {
+							// Neither value is null, so we must compare.
+							var unique bool
+
+							{
+								var cmpResult int
+
+								cmpResult = v.(*coldataext.Datum).CompareDatum(col, lastVal)
+
+								unique = cmpResult != 0
+							}
+
+							outputCol[outputIdx] = outputCol[outputIdx] || unique
+						}
+						lastVal = v
+					}
+					{
+						__retval_lastVal = lastVal
+						__retval_lastValNull = null
+					}
 				}
-			} else {
-				v := col.Get(checkIdx)
-				if lastValNull {
-					// The previous value was null while the current is not.
-					outputCol[outputIdx] = true
-				} else {
-					// Neither value is null, so we must compare.
+				lastVal, lastValNull = __retval_lastVal, __retval_lastValNull
+			}
+		}
+	} else {
+		for idx := 0; idx < n; idx++ {
+			{
+				var __retval_0 interface{}
+				{
+					var (
+						checkIdx  int = idx
+						outputIdx int = idx
+					)
+					v := col.Get(checkIdx)
 					var unique bool
 
 					{
@@ -3843,27 +4863,26 @@ func (p partitionerDatum) partition(colVec coldata.Vec, outputCol []bool, n int)
 					}
 
 					outputCol[outputIdx] = outputCol[outputIdx] || unique
+					lastVal = v
+					{
+						__retval_0 = lastVal
+					}
 				}
-				lastVal = v
+				lastVal = __retval_0
 			}
-			lastValNull = null
-		}
-	} else {
-		for checkIdx := 0; checkIdx < n; checkIdx++ {
-			outputIdx := checkIdx
-			v := col.Get(checkIdx)
-			var unique bool
-
-			{
-				var cmpResult int
-
-				cmpResult = v.(*coldataext.Datum).CompareDatum(col, lastVal)
-
-				unique = cmpResult != 0
-			}
-
-			outputCol[outputIdx] = outputCol[outputIdx] || unique
-			lastVal = v
 		}
 	}
 }
+
+// checkDistinct retrieves the value at the ith index of col, compares it
+// to the passed in lastVal, and sets the ith value of outputCol to true if the
+// compared values were distinct. It presumes that the current batch has no null
+// values.
+// execgen:inline
+const _ = "inlined_checkDistinct"
+
+// checkDistinctWithNulls behaves the same as checkDistinct, but it also
+// considers whether the previous and current values are null. It assumes that
+// `nulls` is non-nil.
+// execgen:inline
+const _ = "inlined_checkDistinctWithNulls"
