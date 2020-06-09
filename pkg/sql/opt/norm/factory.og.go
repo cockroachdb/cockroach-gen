@@ -8994,6 +8994,41 @@ func (_f *Factory) ConstructLimit(
 		}
 	}
 
+	// [FoldLimits]
+	{
+		_limit, _ := input.(*memo.LimitExpr)
+		if _limit != nil {
+			innerInput := _limit.Input
+			innerLimitExpr := _limit.Limit
+			_const, _ := innerLimitExpr.(*memo.ConstExpr)
+			if _const != nil {
+				innerLimit := _const.Value
+				innerOrdering := _limit.Ordering
+				outerLimitExpr := limit
+				_const2, _ := outerLimitExpr.(*memo.ConstExpr)
+				if _const2 != nil {
+					outerLimit := _const2.Value
+					if !_f.funcs.IsGreaterThan(outerLimit, innerLimit) {
+						outerOrdering := ordering
+						if _f.funcs.OrderingImplies(innerOrdering, outerOrdering) {
+							if _f.matchedRule == nil || _f.matchedRule(opt.FoldLimits) {
+								_expr := _f.ConstructLimit(
+									innerInput,
+									outerLimitExpr,
+									innerOrdering,
+								)
+								if _f.appliedRule != nil {
+									_f.appliedRule(opt.FoldLimits, nil, _expr)
+								}
+								return _expr
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [SimplifyLimitOrdering]
 	{
 		if _f.funcs.CanSimplifyLimitOffsetOrdering(input, ordering) {

@@ -142,6 +142,7 @@ const (
 	PushLimitIntoOrdinality
 	PushLimitIntoJoinLeft
 	PushLimitIntoJoinRight
+	FoldLimits
 	EliminateMax1Row
 	FoldPlusZero
 	FoldZeroPlus
