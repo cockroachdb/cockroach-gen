@@ -9244,6 +9244,106 @@ func (_f *Factory) ConstructLimit(
 		}
 	}
 
+	// [AssociateLimitJoinsLeft]
+	{
+		limitInput := input
+		_innerJoin, _ := limitInput.(*memo.InnerJoinExpr)
+		if _innerJoin != nil {
+			outsideLeft := _innerJoin.Left
+			_leftJoin, _ := outsideLeft.(*memo.LeftJoinExpr)
+			if _leftJoin != nil {
+				insideLeft := _leftJoin.Left
+				insideRight := _leftJoin.Right
+				insideOn := _leftJoin.On
+				insidePrivate := &_leftJoin.JoinPrivate
+				if _f.funcs.NoJoinHints(insidePrivate) {
+					outsideRight := _innerJoin.Right
+					outsideOn := _innerJoin.On
+					if !_f.funcs.ColsIntersect(_f.funcs.FilterOuterCols(outsideOn), _f.funcs.OutputCols(insideRight)) {
+						outsidePrivate := &_innerJoin.JoinPrivate
+						if _f.funcs.NoJoinHints(outsidePrivate) {
+							if !_f.funcs.JoinPreservesLeftRows(limitInput) {
+								limitValue := limit
+								limitOrdering := ordering
+								if _f.matchedRule == nil || _f.matchedRule(opt.AssociateLimitJoinsLeft) {
+									_expr := _f.ConstructLimit(
+										_f.ConstructLeftJoin(
+											_f.ConstructInnerJoin(
+												insideLeft,
+												outsideRight,
+												outsideOn,
+												_f.funcs.EmptyJoinPrivate(),
+											),
+											insideRight,
+											insideOn,
+											_f.funcs.EmptyJoinPrivate(),
+										),
+										limitValue,
+										limitOrdering,
+									)
+									if _f.appliedRule != nil {
+										_f.appliedRule(opt.AssociateLimitJoinsLeft, nil, _expr)
+									}
+									return _expr
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [AssociateLimitJoinsRight]
+	{
+		limitInput := input
+		_innerJoin, _ := limitInput.(*memo.InnerJoinExpr)
+		if _innerJoin != nil {
+			outsideLeft := _innerJoin.Left
+			outsideRight := _innerJoin.Right
+			_leftJoin, _ := outsideRight.(*memo.LeftJoinExpr)
+			if _leftJoin != nil {
+				insideLeft := _leftJoin.Left
+				insideRight := _leftJoin.Right
+				insideOn := _leftJoin.On
+				insidePrivate := &_leftJoin.JoinPrivate
+				if _f.funcs.NoJoinHints(insidePrivate) {
+					outsideOn := _innerJoin.On
+					if !_f.funcs.ColsIntersect(_f.funcs.FilterOuterCols(outsideOn), _f.funcs.OutputCols(insideRight)) {
+						outsidePrivate := &_innerJoin.JoinPrivate
+						if _f.funcs.NoJoinHints(outsidePrivate) {
+							if !_f.funcs.JoinPreservesRightRows(limitInput) {
+								limitValue := limit
+								limitOrdering := ordering
+								if _f.matchedRule == nil || _f.matchedRule(opt.AssociateLimitJoinsRight) {
+									_expr := _f.ConstructLimit(
+										_f.ConstructLeftJoin(
+											_f.ConstructInnerJoin(
+												insideLeft,
+												outsideLeft,
+												outsideOn,
+												_f.funcs.EmptyJoinPrivate(),
+											),
+											insideRight,
+											insideOn,
+											_f.funcs.EmptyJoinPrivate(),
+										),
+										limitValue,
+										limitOrdering,
+									)
+									if _f.appliedRule != nil {
+										_f.appliedRule(opt.AssociateLimitJoinsRight, nil, _expr)
+									}
+									return _expr
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	e := _f.mem.MemoizeLimit(input, limit, ordering)
 	return _f.onConstructRelational(e)
 }

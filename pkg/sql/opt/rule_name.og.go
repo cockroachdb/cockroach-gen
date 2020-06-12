@@ -147,6 +147,8 @@ const (
 	PushLimitIntoJoinLeft
 	PushLimitIntoJoinRight
 	FoldLimits
+	AssociateLimitJoinsLeft
+	AssociateLimitJoinsRight
 	EliminateMax1Row
 	FoldPlusZero
 	FoldZeroPlus
