@@ -35,17 +35,13 @@ func (p *selPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
-			//
-			//
 			if sel := batch.Selection(); sel != nil {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
 					arg := col.Get(i)
 					cmp = bytes.HasPrefix(arg, p.constArg)
-					//
 					isNull = nulls.NullAt(i)
-					//
 					if cmp && !isNull {
 						sel[idx] = i
 						idx++
@@ -61,29 +57,21 @@ func (p *selPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg := col.Get(i)
 					cmp = bytes.HasPrefix(arg, p.constArg)
-					//
 					isNull = nulls.NullAt(i)
-					//
 					if cmp && !isNull {
 						sel[idx] = i
 						idx++
 					}
 				}
 			}
-			//
-			//
 		} else {
-			//
-			//
 			if sel := batch.Selection(); sel != nil {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
 					arg := col.Get(i)
 					cmp = bytes.HasPrefix(arg, p.constArg)
-					//
 					isNull = false
-					//
 					if cmp && !isNull {
 						sel[idx] = i
 						idx++
@@ -99,17 +87,13 @@ func (p *selPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg := col.Get(i)
 					cmp = bytes.HasPrefix(arg, p.constArg)
-					//
 					isNull = false
-					//
 					if cmp && !isNull {
 						sel[idx] = i
 						idx++
 					}
 				}
 			}
-			//
-			//
 		}
 		if idx > 0 {
 			batch.SetLength(idx)
@@ -122,13 +106,9 @@ func (p *selPrefixBytesBytesConstOp) Init() {
 	p.input.Init()
 }
 
-//
-
 type projPrefixBytesBytesConstOp struct {
 	projConstOpBase
-	//
 	constArg []byte
-	//
 }
 
 func (p projPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
@@ -145,9 +125,7 @@ func (p projPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	}
 	vec := batch.ColVec(p.colIdx)
 	var col *coldata.Bytes
-	//
 	col = vec.Bytes()
-	//
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -156,29 +134,15 @@ func (p projPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	}
 	projCol := projVec.Bool()
 	if vec.Nulls().MaybeHasNulls() {
-		//
-		//
-		//
 		colNulls := vec.Nulls()
-		//
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				//
-				//
-				//
 				if !colNulls.NullAt(i) {
 					// We only want to perform the projection operation if the value is not null.
-					//
 					arg := col.Get(i)
-					//
 					projCol[i] = bytes.HasPrefix(arg, p.constArg)
-					//
-					//
 				}
-				//
-				//
-				//
 			}
 		} else {
 			col = col
@@ -186,46 +150,21 @@ func (p projPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 			_ = n
 			_ = projCol[n-1]
 			for i := 0; i < n; i++ {
-				//
-				//
-				//
 				if !colNulls.NullAt(i) {
 					// We only want to perform the projection operation if the value is not null.
-					//
 					arg := col.Get(i)
-					//
 					projCol[i] = bytes.HasPrefix(arg, p.constArg)
-					//
-					//
 				}
-				//
-				//
-				//
 			}
 		}
-		//
 		colNullsCopy := colNulls.Copy()
 		projVec.SetNulls(&colNullsCopy)
-		//
-		//
-		//
 	} else {
-		//
-		//
-		//
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				//
-				//
-				//
 				arg := col.Get(i)
-				//
 				projCol[i] = bytes.HasPrefix(arg, p.constArg)
-				//
-				//
-				//
-				//
 			}
 		} else {
 			col = col
@@ -233,21 +172,10 @@ func (p projPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 			_ = n
 			_ = projCol[n-1]
 			for i := 0; i < n; i++ {
-				//
-				//
-				//
 				arg := col.Get(i)
-				//
 				projCol[i] = bytes.HasPrefix(arg, p.constArg)
-				//
-				//
-				//
-				//
 			}
 		}
-		//
-		//
-		//
 	}
 	// Although we didn't change the length of the batch, it is necessary to set
 	// the length anyway (this helps maintaining the invariant of flat bytes).
@@ -258,8 +186,6 @@ func (p projPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 func (p projPrefixBytesBytesConstOp) Init() {
 	p.input.Init()
 }
-
-//
 
 type selSuffixBytesBytesConstOp struct {
 	selConstOpBase
@@ -286,17 +212,13 @@ func (p *selSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
-			//
-			//
 			if sel := batch.Selection(); sel != nil {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
 					arg := col.Get(i)
 					cmp = bytes.HasSuffix(arg, p.constArg)
-					//
 					isNull = nulls.NullAt(i)
-					//
 					if cmp && !isNull {
 						sel[idx] = i
 						idx++
@@ -312,29 +234,21 @@ func (p *selSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg := col.Get(i)
 					cmp = bytes.HasSuffix(arg, p.constArg)
-					//
 					isNull = nulls.NullAt(i)
-					//
 					if cmp && !isNull {
 						sel[idx] = i
 						idx++
 					}
 				}
 			}
-			//
-			//
 		} else {
-			//
-			//
 			if sel := batch.Selection(); sel != nil {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
 					arg := col.Get(i)
 					cmp = bytes.HasSuffix(arg, p.constArg)
-					//
 					isNull = false
-					//
 					if cmp && !isNull {
 						sel[idx] = i
 						idx++
@@ -350,17 +264,13 @@ func (p *selSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg := col.Get(i)
 					cmp = bytes.HasSuffix(arg, p.constArg)
-					//
 					isNull = false
-					//
 					if cmp && !isNull {
 						sel[idx] = i
 						idx++
 					}
 				}
 			}
-			//
-			//
 		}
 		if idx > 0 {
 			batch.SetLength(idx)
@@ -373,13 +283,9 @@ func (p *selSuffixBytesBytesConstOp) Init() {
 	p.input.Init()
 }
 
-//
-
 type projSuffixBytesBytesConstOp struct {
 	projConstOpBase
-	//
 	constArg []byte
-	//
 }
 
 func (p projSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
@@ -396,9 +302,7 @@ func (p projSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	}
 	vec := batch.ColVec(p.colIdx)
 	var col *coldata.Bytes
-	//
 	col = vec.Bytes()
-	//
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -407,29 +311,15 @@ func (p projSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	}
 	projCol := projVec.Bool()
 	if vec.Nulls().MaybeHasNulls() {
-		//
-		//
-		//
 		colNulls := vec.Nulls()
-		//
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				//
-				//
-				//
 				if !colNulls.NullAt(i) {
 					// We only want to perform the projection operation if the value is not null.
-					//
 					arg := col.Get(i)
-					//
 					projCol[i] = bytes.HasSuffix(arg, p.constArg)
-					//
-					//
 				}
-				//
-				//
-				//
 			}
 		} else {
 			col = col
@@ -437,46 +327,21 @@ func (p projSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 			_ = n
 			_ = projCol[n-1]
 			for i := 0; i < n; i++ {
-				//
-				//
-				//
 				if !colNulls.NullAt(i) {
 					// We only want to perform the projection operation if the value is not null.
-					//
 					arg := col.Get(i)
-					//
 					projCol[i] = bytes.HasSuffix(arg, p.constArg)
-					//
-					//
 				}
-				//
-				//
-				//
 			}
 		}
-		//
 		colNullsCopy := colNulls.Copy()
 		projVec.SetNulls(&colNullsCopy)
-		//
-		//
-		//
 	} else {
-		//
-		//
-		//
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				//
-				//
-				//
 				arg := col.Get(i)
-				//
 				projCol[i] = bytes.HasSuffix(arg, p.constArg)
-				//
-				//
-				//
-				//
 			}
 		} else {
 			col = col
@@ -484,21 +349,10 @@ func (p projSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 			_ = n
 			_ = projCol[n-1]
 			for i := 0; i < n; i++ {
-				//
-				//
-				//
 				arg := col.Get(i)
-				//
 				projCol[i] = bytes.HasSuffix(arg, p.constArg)
-				//
-				//
-				//
-				//
 			}
 		}
-		//
-		//
-		//
 	}
 	// Although we didn't change the length of the batch, it is necessary to set
 	// the length anyway (this helps maintaining the invariant of flat bytes).
@@ -509,8 +363,6 @@ func (p projSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 func (p projSuffixBytesBytesConstOp) Init() {
 	p.input.Init()
 }
-
-//
 
 type selRegexpBytesBytesConstOp struct {
 	selConstOpBase
@@ -537,17 +389,13 @@ func (p *selRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
-			//
-			//
 			if sel := batch.Selection(); sel != nil {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
 					arg := col.Get(i)
 					cmp = p.constArg.Match(arg)
-					//
 					isNull = nulls.NullAt(i)
-					//
 					if cmp && !isNull {
 						sel[idx] = i
 						idx++
@@ -563,29 +411,21 @@ func (p *selRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg := col.Get(i)
 					cmp = p.constArg.Match(arg)
-					//
 					isNull = nulls.NullAt(i)
-					//
 					if cmp && !isNull {
 						sel[idx] = i
 						idx++
 					}
 				}
 			}
-			//
-			//
 		} else {
-			//
-			//
 			if sel := batch.Selection(); sel != nil {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
 					arg := col.Get(i)
 					cmp = p.constArg.Match(arg)
-					//
 					isNull = false
-					//
 					if cmp && !isNull {
 						sel[idx] = i
 						idx++
@@ -601,17 +441,13 @@ func (p *selRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 					var cmp bool
 					arg := col.Get(i)
 					cmp = p.constArg.Match(arg)
-					//
 					isNull = false
-					//
 					if cmp && !isNull {
 						sel[idx] = i
 						idx++
 					}
 				}
 			}
-			//
-			//
 		}
 		if idx > 0 {
 			batch.SetLength(idx)
@@ -624,13 +460,9 @@ func (p *selRegexpBytesBytesConstOp) Init() {
 	p.input.Init()
 }
 
-//
-
 type projRegexpBytesBytesConstOp struct {
 	projConstOpBase
-	//
 	constArg *regexp.Regexp
-	//
 }
 
 func (p projRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
@@ -647,9 +479,7 @@ func (p projRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	}
 	vec := batch.ColVec(p.colIdx)
 	var col *coldata.Bytes
-	//
 	col = vec.Bytes()
-	//
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -658,29 +488,15 @@ func (p projRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 	}
 	projCol := projVec.Bool()
 	if vec.Nulls().MaybeHasNulls() {
-		//
-		//
-		//
 		colNulls := vec.Nulls()
-		//
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				//
-				//
-				//
 				if !colNulls.NullAt(i) {
 					// We only want to perform the projection operation if the value is not null.
-					//
 					arg := col.Get(i)
-					//
 					projCol[i] = p.constArg.Match(arg)
-					//
-					//
 				}
-				//
-				//
-				//
 			}
 		} else {
 			col = col
@@ -688,46 +504,21 @@ func (p projRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 			_ = n
 			_ = projCol[n-1]
 			for i := 0; i < n; i++ {
-				//
-				//
-				//
 				if !colNulls.NullAt(i) {
 					// We only want to perform the projection operation if the value is not null.
-					//
 					arg := col.Get(i)
-					//
 					projCol[i] = p.constArg.Match(arg)
-					//
-					//
 				}
-				//
-				//
-				//
 			}
 		}
-		//
 		colNullsCopy := colNulls.Copy()
 		projVec.SetNulls(&colNullsCopy)
-		//
-		//
-		//
 	} else {
-		//
-		//
-		//
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				//
-				//
-				//
 				arg := col.Get(i)
-				//
 				projCol[i] = p.constArg.Match(arg)
-				//
-				//
-				//
-				//
 			}
 		} else {
 			col = col
@@ -735,21 +526,10 @@ func (p projRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 			_ = n
 			_ = projCol[n-1]
 			for i := 0; i < n; i++ {
-				//
-				//
-				//
 				arg := col.Get(i)
-				//
 				projCol[i] = p.constArg.Match(arg)
-				//
-				//
-				//
-				//
 			}
 		}
-		//
-		//
-		//
 	}
 	// Although we didn't change the length of the batch, it is necessary to set
 	// the length anyway (this helps maintaining the invariant of flat bytes).
@@ -760,8 +540,6 @@ func (p projRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 func (p projRegexpBytesBytesConstOp) Init() {
 	p.input.Init()
 }
-
-//
 
 type selNotPrefixBytesBytesConstOp struct {
 	selConstOpBase
@@ -788,17 +566,13 @@ func (p *selNotPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
-			//
-			//
 			if sel := batch.Selection(); sel != nil {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
 					arg := col.Get(i)
 					cmp = !bytes.HasPrefix(arg, p.constArg)
-					//
 					isNull = nulls.NullAt(i)
-					//
 					if cmp && !isNull {
 						sel[idx] = i
 						idx++
@@ -814,29 +588,21 @@ func (p *selNotPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 					var cmp bool
 					arg := col.Get(i)
 					cmp = !bytes.HasPrefix(arg, p.constArg)
-					//
 					isNull = nulls.NullAt(i)
-					//
 					if cmp && !isNull {
 						sel[idx] = i
 						idx++
 					}
 				}
 			}
-			//
-			//
 		} else {
-			//
-			//
 			if sel := batch.Selection(); sel != nil {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
 					arg := col.Get(i)
 					cmp = !bytes.HasPrefix(arg, p.constArg)
-					//
 					isNull = false
-					//
 					if cmp && !isNull {
 						sel[idx] = i
 						idx++
@@ -852,17 +618,13 @@ func (p *selNotPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 					var cmp bool
 					arg := col.Get(i)
 					cmp = !bytes.HasPrefix(arg, p.constArg)
-					//
 					isNull = false
-					//
 					if cmp && !isNull {
 						sel[idx] = i
 						idx++
 					}
 				}
 			}
-			//
-			//
 		}
 		if idx > 0 {
 			batch.SetLength(idx)
@@ -875,13 +637,9 @@ func (p *selNotPrefixBytesBytesConstOp) Init() {
 	p.input.Init()
 }
 
-//
-
 type projNotPrefixBytesBytesConstOp struct {
 	projConstOpBase
-	//
 	constArg []byte
-	//
 }
 
 func (p projNotPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
@@ -898,9 +656,7 @@ func (p projNotPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 	}
 	vec := batch.ColVec(p.colIdx)
 	var col *coldata.Bytes
-	//
 	col = vec.Bytes()
-	//
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -909,29 +665,15 @@ func (p projNotPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 	}
 	projCol := projVec.Bool()
 	if vec.Nulls().MaybeHasNulls() {
-		//
-		//
-		//
 		colNulls := vec.Nulls()
-		//
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				//
-				//
-				//
 				if !colNulls.NullAt(i) {
 					// We only want to perform the projection operation if the value is not null.
-					//
 					arg := col.Get(i)
-					//
 					projCol[i] = !bytes.HasPrefix(arg, p.constArg)
-					//
-					//
 				}
-				//
-				//
-				//
 			}
 		} else {
 			col = col
@@ -939,46 +681,21 @@ func (p projNotPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 			_ = n
 			_ = projCol[n-1]
 			for i := 0; i < n; i++ {
-				//
-				//
-				//
 				if !colNulls.NullAt(i) {
 					// We only want to perform the projection operation if the value is not null.
-					//
 					arg := col.Get(i)
-					//
 					projCol[i] = !bytes.HasPrefix(arg, p.constArg)
-					//
-					//
 				}
-				//
-				//
-				//
 			}
 		}
-		//
 		colNullsCopy := colNulls.Copy()
 		projVec.SetNulls(&colNullsCopy)
-		//
-		//
-		//
 	} else {
-		//
-		//
-		//
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				//
-				//
-				//
 				arg := col.Get(i)
-				//
 				projCol[i] = !bytes.HasPrefix(arg, p.constArg)
-				//
-				//
-				//
-				//
 			}
 		} else {
 			col = col
@@ -986,21 +703,10 @@ func (p projNotPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 			_ = n
 			_ = projCol[n-1]
 			for i := 0; i < n; i++ {
-				//
-				//
-				//
 				arg := col.Get(i)
-				//
 				projCol[i] = !bytes.HasPrefix(arg, p.constArg)
-				//
-				//
-				//
-				//
 			}
 		}
-		//
-		//
-		//
 	}
 	// Although we didn't change the length of the batch, it is necessary to set
 	// the length anyway (this helps maintaining the invariant of flat bytes).
@@ -1011,8 +717,6 @@ func (p projNotPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 func (p projNotPrefixBytesBytesConstOp) Init() {
 	p.input.Init()
 }
-
-//
 
 type selNotSuffixBytesBytesConstOp struct {
 	selConstOpBase
@@ -1039,17 +743,13 @@ func (p *selNotSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
-			//
-			//
 			if sel := batch.Selection(); sel != nil {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
 					arg := col.Get(i)
 					cmp = !bytes.HasSuffix(arg, p.constArg)
-					//
 					isNull = nulls.NullAt(i)
-					//
 					if cmp && !isNull {
 						sel[idx] = i
 						idx++
@@ -1065,29 +765,21 @@ func (p *selNotSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 					var cmp bool
 					arg := col.Get(i)
 					cmp = !bytes.HasSuffix(arg, p.constArg)
-					//
 					isNull = nulls.NullAt(i)
-					//
 					if cmp && !isNull {
 						sel[idx] = i
 						idx++
 					}
 				}
 			}
-			//
-			//
 		} else {
-			//
-			//
 			if sel := batch.Selection(); sel != nil {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
 					arg := col.Get(i)
 					cmp = !bytes.HasSuffix(arg, p.constArg)
-					//
 					isNull = false
-					//
 					if cmp && !isNull {
 						sel[idx] = i
 						idx++
@@ -1103,17 +795,13 @@ func (p *selNotSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 					var cmp bool
 					arg := col.Get(i)
 					cmp = !bytes.HasSuffix(arg, p.constArg)
-					//
 					isNull = false
-					//
 					if cmp && !isNull {
 						sel[idx] = i
 						idx++
 					}
 				}
 			}
-			//
-			//
 		}
 		if idx > 0 {
 			batch.SetLength(idx)
@@ -1126,13 +814,9 @@ func (p *selNotSuffixBytesBytesConstOp) Init() {
 	p.input.Init()
 }
 
-//
-
 type projNotSuffixBytesBytesConstOp struct {
 	projConstOpBase
-	//
 	constArg []byte
-	//
 }
 
 func (p projNotSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
@@ -1149,9 +833,7 @@ func (p projNotSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 	}
 	vec := batch.ColVec(p.colIdx)
 	var col *coldata.Bytes
-	//
 	col = vec.Bytes()
-	//
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -1160,29 +842,15 @@ func (p projNotSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 	}
 	projCol := projVec.Bool()
 	if vec.Nulls().MaybeHasNulls() {
-		//
-		//
-		//
 		colNulls := vec.Nulls()
-		//
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				//
-				//
-				//
 				if !colNulls.NullAt(i) {
 					// We only want to perform the projection operation if the value is not null.
-					//
 					arg := col.Get(i)
-					//
 					projCol[i] = !bytes.HasSuffix(arg, p.constArg)
-					//
-					//
 				}
-				//
-				//
-				//
 			}
 		} else {
 			col = col
@@ -1190,46 +858,21 @@ func (p projNotSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 			_ = n
 			_ = projCol[n-1]
 			for i := 0; i < n; i++ {
-				//
-				//
-				//
 				if !colNulls.NullAt(i) {
 					// We only want to perform the projection operation if the value is not null.
-					//
 					arg := col.Get(i)
-					//
 					projCol[i] = !bytes.HasSuffix(arg, p.constArg)
-					//
-					//
 				}
-				//
-				//
-				//
 			}
 		}
-		//
 		colNullsCopy := colNulls.Copy()
 		projVec.SetNulls(&colNullsCopy)
-		//
-		//
-		//
 	} else {
-		//
-		//
-		//
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				//
-				//
-				//
 				arg := col.Get(i)
-				//
 				projCol[i] = !bytes.HasSuffix(arg, p.constArg)
-				//
-				//
-				//
-				//
 			}
 		} else {
 			col = col
@@ -1237,21 +880,10 @@ func (p projNotSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 			_ = n
 			_ = projCol[n-1]
 			for i := 0; i < n; i++ {
-				//
-				//
-				//
 				arg := col.Get(i)
-				//
 				projCol[i] = !bytes.HasSuffix(arg, p.constArg)
-				//
-				//
-				//
-				//
 			}
 		}
-		//
-		//
-		//
 	}
 	// Although we didn't change the length of the batch, it is necessary to set
 	// the length anyway (this helps maintaining the invariant of flat bytes).
@@ -1262,8 +894,6 @@ func (p projNotSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 func (p projNotSuffixBytesBytesConstOp) Init() {
 	p.input.Init()
 }
-
-//
 
 type selNotRegexpBytesBytesConstOp struct {
 	selConstOpBase
@@ -1290,17 +920,13 @@ func (p *selNotRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 		n := batch.Length()
 		if vec.MaybeHasNulls() {
 			nulls := vec.Nulls()
-			//
-			//
 			if sel := batch.Selection(); sel != nil {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
 					arg := col.Get(i)
 					cmp = !p.constArg.Match(arg)
-					//
 					isNull = nulls.NullAt(i)
-					//
 					if cmp && !isNull {
 						sel[idx] = i
 						idx++
@@ -1316,29 +942,21 @@ func (p *selNotRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 					var cmp bool
 					arg := col.Get(i)
 					cmp = !p.constArg.Match(arg)
-					//
 					isNull = nulls.NullAt(i)
-					//
 					if cmp && !isNull {
 						sel[idx] = i
 						idx++
 					}
 				}
 			}
-			//
-			//
 		} else {
-			//
-			//
 			if sel := batch.Selection(); sel != nil {
 				sel = sel[:n]
 				for _, i := range sel {
 					var cmp bool
 					arg := col.Get(i)
 					cmp = !p.constArg.Match(arg)
-					//
 					isNull = false
-					//
 					if cmp && !isNull {
 						sel[idx] = i
 						idx++
@@ -1354,17 +972,13 @@ func (p *selNotRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 					var cmp bool
 					arg := col.Get(i)
 					cmp = !p.constArg.Match(arg)
-					//
 					isNull = false
-					//
 					if cmp && !isNull {
 						sel[idx] = i
 						idx++
 					}
 				}
 			}
-			//
-			//
 		}
 		if idx > 0 {
 			batch.SetLength(idx)
@@ -1377,13 +991,9 @@ func (p *selNotRegexpBytesBytesConstOp) Init() {
 	p.input.Init()
 }
 
-//
-
 type projNotRegexpBytesBytesConstOp struct {
 	projConstOpBase
-	//
 	constArg *regexp.Regexp
-	//
 }
 
 func (p projNotRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
@@ -1400,9 +1010,7 @@ func (p projNotRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 	}
 	vec := batch.ColVec(p.colIdx)
 	var col *coldata.Bytes
-	//
 	col = vec.Bytes()
-	//
 	projVec := batch.ColVec(p.outputIdx)
 	if projVec.MaybeHasNulls() {
 		// We need to make sure that there are no left over null values in the
@@ -1411,29 +1019,15 @@ func (p projNotRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 	}
 	projCol := projVec.Bool()
 	if vec.Nulls().MaybeHasNulls() {
-		//
-		//
-		//
 		colNulls := vec.Nulls()
-		//
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				//
-				//
-				//
 				if !colNulls.NullAt(i) {
 					// We only want to perform the projection operation if the value is not null.
-					//
 					arg := col.Get(i)
-					//
 					projCol[i] = !p.constArg.Match(arg)
-					//
-					//
 				}
-				//
-				//
-				//
 			}
 		} else {
 			col = col
@@ -1441,46 +1035,21 @@ func (p projNotRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 			_ = n
 			_ = projCol[n-1]
 			for i := 0; i < n; i++ {
-				//
-				//
-				//
 				if !colNulls.NullAt(i) {
 					// We only want to perform the projection operation if the value is not null.
-					//
 					arg := col.Get(i)
-					//
 					projCol[i] = !p.constArg.Match(arg)
-					//
-					//
 				}
-				//
-				//
-				//
 			}
 		}
-		//
 		colNullsCopy := colNulls.Copy()
 		projVec.SetNulls(&colNullsCopy)
-		//
-		//
-		//
 	} else {
-		//
-		//
-		//
 		if sel := batch.Selection(); sel != nil {
 			sel = sel[:n]
 			for _, i := range sel {
-				//
-				//
-				//
 				arg := col.Get(i)
-				//
 				projCol[i] = !p.constArg.Match(arg)
-				//
-				//
-				//
-				//
 			}
 		} else {
 			col = col
@@ -1488,21 +1057,10 @@ func (p projNotRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 			_ = n
 			_ = projCol[n-1]
 			for i := 0; i < n; i++ {
-				//
-				//
-				//
 				arg := col.Get(i)
-				//
 				projCol[i] = !p.constArg.Match(arg)
-				//
-				//
-				//
-				//
 			}
 		}
-		//
-		//
-		//
 	}
 	// Although we didn't change the length of the batch, it is necessary to set
 	// the length anyway (this helps maintaining the invariant of flat bytes).
@@ -1513,5 +1071,3 @@ func (p projNotRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 func (p projNotRegexpBytesBytesConstOp) Init() {
 	p.input.Init()
 }
-
-//

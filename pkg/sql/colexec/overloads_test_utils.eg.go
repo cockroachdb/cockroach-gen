@@ -13,8 +13,6 @@ import (
 	"github.com/cockroachdb/cockroach/pkg/util/duration"
 )
 
-//
-
 func performBitandInt16Int16(a int16, b int16) int16 {
 	var r int16
 	// In order to inline the templated code of overloads, we need to have a
@@ -28,8 +26,6 @@ func performBitandInt16Int16(a int16, b int16) int16 {
 
 	return r
 }
-
-//
 
 func performBitandInt16Int32(a int16, b int32) int64 {
 	var r int64
@@ -45,8 +41,6 @@ func performBitandInt16Int32(a int16, b int32) int64 {
 	return r
 }
 
-//
-
 func performBitandInt16Int64(a int16, b int64) int64 {
 	var r int64
 	// In order to inline the templated code of overloads, we need to have a
@@ -60,8 +54,6 @@ func performBitandInt16Int64(a int16, b int64) int64 {
 
 	return r
 }
-
-//
 
 func performBitandInt32Int16(a int32, b int16) int64 {
 	var r int64
@@ -77,8 +69,6 @@ func performBitandInt32Int16(a int32, b int16) int64 {
 	return r
 }
 
-//
-
 func performBitandInt32Int32(a int32, b int32) int32 {
 	var r int32
 	// In order to inline the templated code of overloads, we need to have a
@@ -92,8 +82,6 @@ func performBitandInt32Int32(a int32, b int32) int32 {
 
 	return r
 }
-
-//
 
 func performBitandInt32Int64(a int32, b int64) int64 {
 	var r int64
@@ -109,8 +97,6 @@ func performBitandInt32Int64(a int32, b int64) int64 {
 	return r
 }
 
-//
-
 func performBitandInt64Int16(a int64, b int16) int64 {
 	var r int64
 	// In order to inline the templated code of overloads, we need to have a
@@ -124,8 +110,6 @@ func performBitandInt64Int16(a int64, b int16) int64 {
 
 	return r
 }
-
-//
 
 func performBitandInt64Int32(a int64, b int32) int64 {
 	var r int64
@@ -141,8 +125,6 @@ func performBitandInt64Int32(a int64, b int32) int64 {
 	return r
 }
 
-//
-
 func performBitandInt64Int64(a int64, b int64) int64 {
 	var r int64
 	// In order to inline the templated code of overloads, we need to have a
@@ -156,10 +138,6 @@ func performBitandInt64Int64(a int64, b int64) int64 {
 
 	return r
 }
-
-//
-
-//
 
 func performBitorInt16Int16(a int16, b int16) int16 {
 	var r int16
@@ -175,8 +153,6 @@ func performBitorInt16Int16(a int16, b int16) int16 {
 	return r
 }
 
-//
-
 func performBitorInt16Int32(a int16, b int32) int64 {
 	var r int64
 	// In order to inline the templated code of overloads, we need to have a
@@ -190,8 +166,6 @@ func performBitorInt16Int32(a int16, b int32) int64 {
 
 	return r
 }
-
-//
 
 func performBitorInt16Int64(a int16, b int64) int64 {
 	var r int64
@@ -207,8 +181,6 @@ func performBitorInt16Int64(a int16, b int64) int64 {
 	return r
 }
 
-//
-
 func performBitorInt32Int16(a int32, b int16) int64 {
 	var r int64
 	// In order to inline the templated code of overloads, we need to have a
@@ -222,8 +194,6 @@ func performBitorInt32Int16(a int32, b int16) int64 {
 
 	return r
 }
-
-//
 
 func performBitorInt32Int32(a int32, b int32) int32 {
 	var r int32
@@ -239,8 +209,6 @@ func performBitorInt32Int32(a int32, b int32) int32 {
 	return r
 }
 
-//
-
 func performBitorInt32Int64(a int32, b int64) int64 {
 	var r int64
 	// In order to inline the templated code of overloads, we need to have a
@@ -254,8 +222,6 @@ func performBitorInt32Int64(a int32, b int64) int64 {
 
 	return r
 }
-
-//
 
 func performBitorInt64Int16(a int64, b int16) int64 {
 	var r int64
@@ -271,8 +237,6 @@ func performBitorInt64Int16(a int64, b int16) int64 {
 	return r
 }
 
-//
-
 func performBitorInt64Int32(a int64, b int32) int64 {
 	var r int64
 	// In order to inline the templated code of overloads, we need to have a
@@ -286,8 +250,6 @@ func performBitorInt64Int32(a int64, b int32) int64 {
 
 	return r
 }
-
-//
 
 func performBitorInt64Int64(a int64, b int64) int64 {
 	var r int64
@@ -303,10 +265,6 @@ func performBitorInt64Int64(a int64, b int64) int64 {
 	return r
 }
 
-//
-
-//
-
 func performBitxorInt16Int16(a int16, b int16) int16 {
 	var r int16
 	// In order to inline the templated code of overloads, we need to have a
@@ -320,8 +278,6 @@ func performBitxorInt16Int16(a int16, b int16) int16 {
 
 	return r
 }
-
-//
 
 func performBitxorInt16Int32(a int16, b int32) int64 {
 	var r int64
@@ -337,8 +293,6 @@ func performBitxorInt16Int32(a int16, b int32) int64 {
 	return r
 }
 
-//
-
 func performBitxorInt16Int64(a int16, b int64) int64 {
 	var r int64
 	// In order to inline the templated code of overloads, we need to have a
@@ -352,8 +306,6 @@ func performBitxorInt16Int64(a int16, b int64) int64 {
 
 	return r
 }
-
-//
 
 func performBitxorInt32Int16(a int32, b int16) int64 {
 	var r int64
@@ -369,8 +321,6 @@ func performBitxorInt32Int16(a int32, b int16) int64 {
 	return r
 }
 
-//
-
 func performBitxorInt32Int32(a int32, b int32) int32 {
 	var r int32
 	// In order to inline the templated code of overloads, we need to have a
@@ -384,8 +334,6 @@ func performBitxorInt32Int32(a int32, b int32) int32 {
 
 	return r
 }
-
-//
 
 func performBitxorInt32Int64(a int32, b int64) int64 {
 	var r int64
@@ -401,8 +349,6 @@ func performBitxorInt32Int64(a int32, b int64) int64 {
 	return r
 }
 
-//
-
 func performBitxorInt64Int16(a int64, b int16) int64 {
 	var r int64
 	// In order to inline the templated code of overloads, we need to have a
@@ -416,8 +362,6 @@ func performBitxorInt64Int16(a int64, b int16) int64 {
 
 	return r
 }
-
-//
 
 func performBitxorInt64Int32(a int64, b int32) int64 {
 	var r int64
@@ -433,8 +377,6 @@ func performBitxorInt64Int32(a int64, b int32) int64 {
 	return r
 }
 
-//
-
 func performBitxorInt64Int64(a int64, b int64) int64 {
 	var r int64
 	// In order to inline the templated code of overloads, we need to have a
@@ -448,12 +390,6 @@ func performBitxorInt64Int64(a int64, b int64) int64 {
 
 	return r
 }
-
-//
-
-//
-
-//
 
 func performPlusDecimalInt16(a apd.Decimal, b int16) apd.Decimal {
 	var r apd.Decimal
@@ -476,8 +412,6 @@ func performPlusDecimalInt16(a apd.Decimal, b int16) apd.Decimal {
 	return r
 }
 
-//
-
 func performPlusDecimalInt32(a apd.Decimal, b int32) apd.Decimal {
 	var r apd.Decimal
 	// In order to inline the templated code of overloads, we need to have a
@@ -498,8 +432,6 @@ func performPlusDecimalInt32(a apd.Decimal, b int32) apd.Decimal {
 
 	return r
 }
-
-//
 
 func performPlusDecimalInt64(a apd.Decimal, b int64) apd.Decimal {
 	var r apd.Decimal
@@ -522,8 +454,6 @@ func performPlusDecimalInt64(a apd.Decimal, b int64) apd.Decimal {
 	return r
 }
 
-//
-
 func performPlusDecimalDecimal(a apd.Decimal, b apd.Decimal) apd.Decimal {
 	var r apd.Decimal
 	// In order to inline the templated code of overloads, we need to have a
@@ -543,10 +473,6 @@ func performPlusDecimalDecimal(a apd.Decimal, b apd.Decimal) apd.Decimal {
 
 	return r
 }
-
-//
-
-//
 
 func performPlusInt16Int16(a int16, b int16) int16 {
 	var r int16
@@ -568,8 +494,6 @@ func performPlusInt16Int16(a int16, b int16) int16 {
 	return r
 }
 
-//
-
 func performPlusInt16Int32(a int16, b int32) int64 {
 	var r int64
 	// In order to inline the templated code of overloads, we need to have a
@@ -589,8 +513,6 @@ func performPlusInt16Int32(a int16, b int32) int64 {
 
 	return r
 }
-
-//
 
 func performPlusInt16Int64(a int16, b int64) int64 {
 	var r int64
@@ -612,8 +534,6 @@ func performPlusInt16Int64(a int16, b int64) int64 {
 	return r
 }
 
-//
-
 func performPlusInt32Int16(a int32, b int16) int64 {
 	var r int64
 	// In order to inline the templated code of overloads, we need to have a
@@ -633,8 +553,6 @@ func performPlusInt32Int16(a int32, b int16) int64 {
 
 	return r
 }
-
-//
 
 func performPlusInt32Int32(a int32, b int32) int32 {
 	var r int32
@@ -656,8 +574,6 @@ func performPlusInt32Int32(a int32, b int32) int32 {
 	return r
 }
 
-//
-
 func performPlusInt32Int64(a int32, b int64) int64 {
 	var r int64
 	// In order to inline the templated code of overloads, we need to have a
@@ -677,8 +593,6 @@ func performPlusInt32Int64(a int32, b int64) int64 {
 
 	return r
 }
-
-//
 
 func performPlusInt64Int16(a int64, b int16) int64 {
 	var r int64
@@ -700,8 +614,6 @@ func performPlusInt64Int16(a int64, b int16) int64 {
 	return r
 }
 
-//
-
 func performPlusInt64Int32(a int64, b int32) int64 {
 	var r int64
 	// In order to inline the templated code of overloads, we need to have a
@@ -722,8 +634,6 @@ func performPlusInt64Int32(a int64, b int32) int64 {
 	return r
 }
 
-//
-
 func performPlusInt64Int64(a int64, b int64) int64 {
 	var r int64
 	// In order to inline the templated code of overloads, we need to have a
@@ -743,8 +653,6 @@ func performPlusInt64Int64(a int64, b int64) int64 {
 
 	return r
 }
-
-//
 
 func performPlusInt16Decimal(a int16, b apd.Decimal) apd.Decimal {
 	var r apd.Decimal
@@ -768,8 +676,6 @@ func performPlusInt16Decimal(a int16, b apd.Decimal) apd.Decimal {
 	return r
 }
 
-//
-
 func performPlusInt32Decimal(a int32, b apd.Decimal) apd.Decimal {
 	var r apd.Decimal
 	// In order to inline the templated code of overloads, we need to have a
@@ -791,8 +697,6 @@ func performPlusInt32Decimal(a int32, b apd.Decimal) apd.Decimal {
 
 	return r
 }
-
-//
 
 func performPlusInt64Decimal(a int64, b apd.Decimal) apd.Decimal {
 	var r apd.Decimal
@@ -816,14 +720,6 @@ func performPlusInt64Decimal(a int64, b apd.Decimal) apd.Decimal {
 	return r
 }
 
-//
-
-//
-
-//
-
-//
-
 func performPlusFloat64Float64(a float64, b float64) float64 {
 	var r float64
 	// In order to inline the templated code of overloads, we need to have a
@@ -841,10 +737,6 @@ func performPlusFloat64Float64(a float64, b float64) float64 {
 	return r
 }
 
-//
-
-//
-
 func performPlusTimestampInterval(a time.Time, b duration.Duration) time.Time {
 	var r time.Time
 	// In order to inline the templated code of overloads, we need to have a
@@ -856,8 +748,6 @@ func performPlusTimestampInterval(a time.Time, b duration.Duration) time.Time {
 	r = duration.Add(a, b)
 	return r
 }
-
-//
 
 func performPlusIntervalTimestamp(a duration.Duration, b time.Time) time.Time {
 	var r time.Time
@@ -871,8 +761,6 @@ func performPlusIntervalTimestamp(a duration.Duration, b time.Time) time.Time {
 	return r
 }
 
-//
-
 func performPlusIntervalInterval(a duration.Duration, b duration.Duration) duration.Duration {
 	var r duration.Duration
 	// In order to inline the templated code of overloads, we need to have a
@@ -884,30 +772,6 @@ func performPlusIntervalInterval(a duration.Duration, b duration.Duration) durat
 	r = a.Add(b)
 	return r
 }
-
-//
-
-//
-
-//
-
-//
-
-//
-
-//
-
-//
-
-//
-
-//
-
-//
-
-//
-
-//
 
 func performMinusDecimalInt16(a apd.Decimal, b int16) apd.Decimal {
 	var r apd.Decimal
@@ -930,8 +794,6 @@ func performMinusDecimalInt16(a apd.Decimal, b int16) apd.Decimal {
 	return r
 }
 
-//
-
 func performMinusDecimalInt32(a apd.Decimal, b int32) apd.Decimal {
 	var r apd.Decimal
 	// In order to inline the templated code of overloads, we need to have a
@@ -952,8 +814,6 @@ func performMinusDecimalInt32(a apd.Decimal, b int32) apd.Decimal {
 
 	return r
 }
-
-//
 
 func performMinusDecimalInt64(a apd.Decimal, b int64) apd.Decimal {
 	var r apd.Decimal
@@ -976,8 +836,6 @@ func performMinusDecimalInt64(a apd.Decimal, b int64) apd.Decimal {
 	return r
 }
 
-//
-
 func performMinusDecimalDecimal(a apd.Decimal, b apd.Decimal) apd.Decimal {
 	var r apd.Decimal
 	// In order to inline the templated code of overloads, we need to have a
@@ -997,10 +855,6 @@ func performMinusDecimalDecimal(a apd.Decimal, b apd.Decimal) apd.Decimal {
 
 	return r
 }
-
-//
-
-//
 
 func performMinusInt16Int16(a int16, b int16) int16 {
 	var r int16
@@ -1022,8 +876,6 @@ func performMinusInt16Int16(a int16, b int16) int16 {
 	return r
 }
 
-//
-
 func performMinusInt16Int32(a int16, b int32) int64 {
 	var r int64
 	// In order to inline the templated code of overloads, we need to have a
@@ -1043,8 +895,6 @@ func performMinusInt16Int32(a int16, b int32) int64 {
 
 	return r
 }
-
-//
 
 func performMinusInt16Int64(a int16, b int64) int64 {
 	var r int64
@@ -1066,8 +916,6 @@ func performMinusInt16Int64(a int16, b int64) int64 {
 	return r
 }
 
-//
-
 func performMinusInt32Int16(a int32, b int16) int64 {
 	var r int64
 	// In order to inline the templated code of overloads, we need to have a
@@ -1087,8 +935,6 @@ func performMinusInt32Int16(a int32, b int16) int64 {
 
 	return r
 }
-
-//
 
 func performMinusInt32Int32(a int32, b int32) int32 {
 	var r int32
@@ -1110,8 +956,6 @@ func performMinusInt32Int32(a int32, b int32) int32 {
 	return r
 }
 
-//
-
 func performMinusInt32Int64(a int32, b int64) int64 {
 	var r int64
 	// In order to inline the templated code of overloads, we need to have a
@@ -1131,8 +975,6 @@ func performMinusInt32Int64(a int32, b int64) int64 {
 
 	return r
 }
-
-//
 
 func performMinusInt64Int16(a int64, b int16) int64 {
 	var r int64
@@ -1154,8 +996,6 @@ func performMinusInt64Int16(a int64, b int16) int64 {
 	return r
 }
 
-//
-
 func performMinusInt64Int32(a int64, b int32) int64 {
 	var r int64
 	// In order to inline the templated code of overloads, we need to have a
@@ -1176,8 +1016,6 @@ func performMinusInt64Int32(a int64, b int32) int64 {
 	return r
 }
 
-//
-
 func performMinusInt64Int64(a int64, b int64) int64 {
 	var r int64
 	// In order to inline the templated code of overloads, we need to have a
@@ -1197,8 +1035,6 @@ func performMinusInt64Int64(a int64, b int64) int64 {
 
 	return r
 }
-
-//
 
 func performMinusInt16Decimal(a int16, b apd.Decimal) apd.Decimal {
 	var r apd.Decimal
@@ -1222,8 +1058,6 @@ func performMinusInt16Decimal(a int16, b apd.Decimal) apd.Decimal {
 	return r
 }
 
-//
-
 func performMinusInt32Decimal(a int32, b apd.Decimal) apd.Decimal {
 	var r apd.Decimal
 	// In order to inline the templated code of overloads, we need to have a
@@ -1245,8 +1079,6 @@ func performMinusInt32Decimal(a int32, b apd.Decimal) apd.Decimal {
 
 	return r
 }
-
-//
 
 func performMinusInt64Decimal(a int64, b apd.Decimal) apd.Decimal {
 	var r apd.Decimal
@@ -1270,14 +1102,6 @@ func performMinusInt64Decimal(a int64, b apd.Decimal) apd.Decimal {
 	return r
 }
 
-//
-
-//
-
-//
-
-//
-
 func performMinusFloat64Float64(a float64, b float64) float64 {
 	var r float64
 	// In order to inline the templated code of overloads, we need to have a
@@ -1295,10 +1119,6 @@ func performMinusFloat64Float64(a float64, b float64) float64 {
 	return r
 }
 
-//
-
-//
-
 func performMinusTimestampTimestamp(a time.Time, b time.Time) duration.Duration {
 	var r duration.Duration
 	// In order to inline the templated code of overloads, we need to have a
@@ -1314,8 +1134,6 @@ func performMinusTimestampTimestamp(a time.Time, b time.Time) duration.Duration 
 	return r
 }
 
-//
-
 func performMinusTimestampInterval(a time.Time, b duration.Duration) time.Time {
 	var r time.Time
 	// In order to inline the templated code of overloads, we need to have a
@@ -1328,8 +1146,6 @@ func performMinusTimestampInterval(a time.Time, b duration.Duration) time.Time {
 	return r
 }
 
-//
-
 func performMinusIntervalInterval(a duration.Duration, b duration.Duration) duration.Duration {
 	var r duration.Duration
 	// In order to inline the templated code of overloads, we need to have a
@@ -1341,30 +1157,6 @@ func performMinusIntervalInterval(a duration.Duration, b duration.Duration) dura
 	r = a.Sub(b)
 	return r
 }
-
-//
-
-//
-
-//
-
-//
-
-//
-
-//
-
-//
-
-//
-
-//
-
-//
-
-//
-
-//
 
 func performMultDecimalInt16(a apd.Decimal, b int16) apd.Decimal {
 	var r apd.Decimal
@@ -1387,8 +1179,6 @@ func performMultDecimalInt16(a apd.Decimal, b int16) apd.Decimal {
 	return r
 }
 
-//
-
 func performMultDecimalInt32(a apd.Decimal, b int32) apd.Decimal {
 	var r apd.Decimal
 	// In order to inline the templated code of overloads, we need to have a
@@ -1409,8 +1199,6 @@ func performMultDecimalInt32(a apd.Decimal, b int32) apd.Decimal {
 
 	return r
 }
-
-//
 
 func performMultDecimalInt64(a apd.Decimal, b int64) apd.Decimal {
 	var r apd.Decimal
@@ -1433,8 +1221,6 @@ func performMultDecimalInt64(a apd.Decimal, b int64) apd.Decimal {
 	return r
 }
 
-//
-
 func performMultDecimalDecimal(a apd.Decimal, b apd.Decimal) apd.Decimal {
 	var r apd.Decimal
 	// In order to inline the templated code of overloads, we need to have a
@@ -1455,8 +1241,6 @@ func performMultDecimalDecimal(a apd.Decimal, b apd.Decimal) apd.Decimal {
 	return r
 }
 
-//
-
 func performMultDecimalInterval(a apd.Decimal, b duration.Duration) duration.Duration {
 	var r duration.Duration
 	// In order to inline the templated code of overloads, we need to have a
@@ -1473,10 +1257,6 @@ func performMultDecimalInterval(a apd.Decimal, b duration.Duration) duration.Dur
 	r = b.MulFloat(f)
 	return r
 }
-
-//
-
-//
 
 func performMultInt16Int16(a int16, b int16) int16 {
 	var r int16
@@ -1505,8 +1285,6 @@ func performMultInt16Int16(a int16, b int16) int16 {
 	return r
 }
 
-//
-
 func performMultInt16Int32(a int16, b int32) int64 {
 	var r int64
 	// In order to inline the templated code of overloads, we need to have a
@@ -1533,8 +1311,6 @@ func performMultInt16Int32(a int16, b int32) int64 {
 
 	return r
 }
-
-//
 
 func performMultInt16Int64(a int16, b int64) int64 {
 	var r int64
@@ -1563,8 +1339,6 @@ func performMultInt16Int64(a int16, b int64) int64 {
 	return r
 }
 
-//
-
 func performMultInt32Int16(a int32, b int16) int64 {
 	var r int64
 	// In order to inline the templated code of overloads, we need to have a
@@ -1591,8 +1365,6 @@ func performMultInt32Int16(a int32, b int16) int64 {
 
 	return r
 }
-
-//
 
 func performMultInt32Int32(a int32, b int32) int32 {
 	var r int32
@@ -1621,8 +1393,6 @@ func performMultInt32Int32(a int32, b int32) int32 {
 	return r
 }
 
-//
-
 func performMultInt32Int64(a int32, b int64) int64 {
 	var r int64
 	// In order to inline the templated code of overloads, we need to have a
@@ -1649,8 +1419,6 @@ func performMultInt32Int64(a int32, b int64) int64 {
 
 	return r
 }
-
-//
 
 func performMultInt64Int16(a int64, b int16) int64 {
 	var r int64
@@ -1679,8 +1447,6 @@ func performMultInt64Int16(a int64, b int16) int64 {
 	return r
 }
 
-//
-
 func performMultInt64Int32(a int64, b int32) int64 {
 	var r int64
 	// In order to inline the templated code of overloads, we need to have a
@@ -1707,8 +1473,6 @@ func performMultInt64Int32(a int64, b int32) int64 {
 
 	return r
 }
-
-//
 
 func performMultInt64Int64(a int64, b int64) int64 {
 	var r int64
@@ -1737,8 +1501,6 @@ func performMultInt64Int64(a int64, b int64) int64 {
 	return r
 }
 
-//
-
 func performMultInt16Decimal(a int16, b apd.Decimal) apd.Decimal {
 	var r apd.Decimal
 	// In order to inline the templated code of overloads, we need to have a
@@ -1760,8 +1522,6 @@ func performMultInt16Decimal(a int16, b apd.Decimal) apd.Decimal {
 
 	return r
 }
-
-//
 
 func performMultInt32Decimal(a int32, b apd.Decimal) apd.Decimal {
 	var r apd.Decimal
@@ -1785,8 +1545,6 @@ func performMultInt32Decimal(a int32, b apd.Decimal) apd.Decimal {
 	return r
 }
 
-//
-
 func performMultInt64Decimal(a int64, b apd.Decimal) apd.Decimal {
 	var r apd.Decimal
 	// In order to inline the templated code of overloads, we need to have a
@@ -1809,8 +1567,6 @@ func performMultInt64Decimal(a int64, b apd.Decimal) apd.Decimal {
 	return r
 }
 
-//
-
 func performMultInt64Interval(a int64, b duration.Duration) duration.Duration {
 	var r duration.Duration
 	// In order to inline the templated code of overloads, we need to have a
@@ -1822,14 +1578,6 @@ func performMultInt64Interval(a int64, b duration.Duration) duration.Duration {
 	r = b.Mul(int64(a))
 	return r
 }
-
-//
-
-//
-
-//
-
-//
 
 func performMultFloat64Float64(a float64, b float64) float64 {
 	var r float64
@@ -1848,8 +1596,6 @@ func performMultFloat64Float64(a float64, b float64) float64 {
 	return r
 }
 
-//
-
 func performMultFloat64Interval(a float64, b duration.Duration) duration.Duration {
 	var r duration.Duration
 	// In order to inline the templated code of overloads, we need to have a
@@ -1861,10 +1607,6 @@ func performMultFloat64Interval(a float64, b duration.Duration) duration.Duratio
 	r = b.MulFloat(float64(a))
 	return r
 }
-
-//
-
-//
 
 func performMultIntervalInt64(a duration.Duration, b int64) duration.Duration {
 	var r duration.Duration
@@ -1878,8 +1620,6 @@ func performMultIntervalInt64(a duration.Duration, b int64) duration.Duration {
 	return r
 }
 
-//
-
 func performMultIntervalFloat64(a duration.Duration, b float64) duration.Duration {
 	var r duration.Duration
 	// In order to inline the templated code of overloads, we need to have a
@@ -1891,8 +1631,6 @@ func performMultIntervalFloat64(a duration.Duration, b float64) duration.Duratio
 	r = a.MulFloat(float64(b))
 	return r
 }
-
-//
 
 func performMultIntervalDecimal(a duration.Duration, b apd.Decimal) duration.Duration {
 	var r duration.Duration
@@ -1910,30 +1648,6 @@ func performMultIntervalDecimal(a duration.Duration, b apd.Decimal) duration.Dur
 	r = a.MulFloat(f)
 	return r
 }
-
-//
-
-//
-
-//
-
-//
-
-//
-
-//
-
-//
-
-//
-
-//
-
-//
-
-//
-
-//
 
 func performDivDecimalInt16(a apd.Decimal, b int16) apd.Decimal {
 	var r apd.Decimal
@@ -1960,8 +1674,6 @@ func performDivDecimalInt16(a apd.Decimal, b int16) apd.Decimal {
 	return r
 }
 
-//
-
 func performDivDecimalInt32(a apd.Decimal, b int32) apd.Decimal {
 	var r apd.Decimal
 	// In order to inline the templated code of overloads, we need to have a
@@ -1986,8 +1698,6 @@ func performDivDecimalInt32(a apd.Decimal, b int32) apd.Decimal {
 
 	return r
 }
-
-//
 
 func performDivDecimalInt64(a apd.Decimal, b int64) apd.Decimal {
 	var r apd.Decimal
@@ -2014,8 +1724,6 @@ func performDivDecimalInt64(a apd.Decimal, b int64) apd.Decimal {
 	return r
 }
 
-//
-
 func performDivDecimalDecimal(a apd.Decimal, b apd.Decimal) apd.Decimal {
 	var r apd.Decimal
 	// In order to inline the templated code of overloads, we need to have a
@@ -2039,10 +1747,6 @@ func performDivDecimalDecimal(a apd.Decimal, b apd.Decimal) apd.Decimal {
 
 	return r
 }
-
-//
-
-//
 
 func performDivInt16Int16(a int16, b int16) apd.Decimal {
 	var r apd.Decimal
@@ -2068,8 +1772,6 @@ func performDivInt16Int16(a int16, b int16) apd.Decimal {
 	return r
 }
 
-//
-
 func performDivInt16Int32(a int16, b int32) apd.Decimal {
 	var r apd.Decimal
 	// In order to inline the templated code of overloads, we need to have a
@@ -2093,8 +1795,6 @@ func performDivInt16Int32(a int16, b int32) apd.Decimal {
 
 	return r
 }
-
-//
 
 func performDivInt16Int64(a int16, b int64) apd.Decimal {
 	var r apd.Decimal
@@ -2120,8 +1820,6 @@ func performDivInt16Int64(a int16, b int64) apd.Decimal {
 	return r
 }
 
-//
-
 func performDivInt32Int16(a int32, b int16) apd.Decimal {
 	var r apd.Decimal
 	// In order to inline the templated code of overloads, we need to have a
@@ -2145,8 +1843,6 @@ func performDivInt32Int16(a int32, b int16) apd.Decimal {
 
 	return r
 }
-
-//
 
 func performDivInt32Int32(a int32, b int32) apd.Decimal {
 	var r apd.Decimal
@@ -2172,8 +1868,6 @@ func performDivInt32Int32(a int32, b int32) apd.Decimal {
 	return r
 }
 
-//
-
 func performDivInt32Int64(a int32, b int64) apd.Decimal {
 	var r apd.Decimal
 	// In order to inline the templated code of overloads, we need to have a
@@ -2197,8 +1891,6 @@ func performDivInt32Int64(a int32, b int64) apd.Decimal {
 
 	return r
 }
-
-//
 
 func performDivInt64Int16(a int64, b int16) apd.Decimal {
 	var r apd.Decimal
@@ -2224,8 +1916,6 @@ func performDivInt64Int16(a int64, b int16) apd.Decimal {
 	return r
 }
 
-//
-
 func performDivInt64Int32(a int64, b int32) apd.Decimal {
 	var r apd.Decimal
 	// In order to inline the templated code of overloads, we need to have a
@@ -2250,8 +1940,6 @@ func performDivInt64Int32(a int64, b int32) apd.Decimal {
 	return r
 }
 
-//
-
 func performDivInt64Int64(a int64, b int64) apd.Decimal {
 	var r apd.Decimal
 	// In order to inline the templated code of overloads, we need to have a
@@ -2275,8 +1963,6 @@ func performDivInt64Int64(a int64, b int64) apd.Decimal {
 
 	return r
 }
-
-//
 
 func performDivInt16Decimal(a int16, b apd.Decimal) apd.Decimal {
 	var r apd.Decimal
@@ -2304,8 +1990,6 @@ func performDivInt16Decimal(a int16, b apd.Decimal) apd.Decimal {
 	return r
 }
 
-//
-
 func performDivInt32Decimal(a int32, b apd.Decimal) apd.Decimal {
 	var r apd.Decimal
 	// In order to inline the templated code of overloads, we need to have a
@@ -2331,8 +2015,6 @@ func performDivInt32Decimal(a int32, b apd.Decimal) apd.Decimal {
 
 	return r
 }
-
-//
 
 func performDivInt64Decimal(a int64, b apd.Decimal) apd.Decimal {
 	var r apd.Decimal
@@ -2360,14 +2042,6 @@ func performDivInt64Decimal(a int64, b apd.Decimal) apd.Decimal {
 	return r
 }
 
-//
-
-//
-
-//
-
-//
-
 func performDivFloat64Float64(a float64, b float64) float64 {
 	var r float64
 	// In order to inline the templated code of overloads, we need to have a
@@ -2389,10 +2063,6 @@ func performDivFloat64Float64(a float64, b float64) float64 {
 	return r
 }
 
-//
-
-//
-
 func performDivIntervalInt64(a duration.Duration, b int64) duration.Duration {
 	var r duration.Duration
 	// In order to inline the templated code of overloads, we need to have a
@@ -2409,8 +2079,6 @@ func performDivIntervalInt64(a duration.Duration, b int64) duration.Duration {
 	return r
 }
 
-//
-
 func performDivIntervalFloat64(a duration.Duration, b float64) duration.Duration {
 	var r duration.Duration
 	// In order to inline the templated code of overloads, we need to have a
@@ -2426,28 +2094,6 @@ func performDivIntervalFloat64(a duration.Duration, b float64) duration.Duration
 	r = a.DivFloat(float64(b))
 	return r
 }
-
-//
-
-//
-
-//
-
-//
-
-//
-
-//
-
-//
-
-//
-
-//
-
-//
-
-//
 
 func performFloorDivDecimalInt16(a apd.Decimal, b int16) apd.Decimal {
 	var r apd.Decimal
@@ -2474,8 +2120,6 @@ func performFloorDivDecimalInt16(a apd.Decimal, b int16) apd.Decimal {
 	return r
 }
 
-//
-
 func performFloorDivDecimalInt32(a apd.Decimal, b int32) apd.Decimal {
 	var r apd.Decimal
 	// In order to inline the templated code of overloads, we need to have a
@@ -2500,8 +2144,6 @@ func performFloorDivDecimalInt32(a apd.Decimal, b int32) apd.Decimal {
 
 	return r
 }
-
-//
 
 func performFloorDivDecimalInt64(a apd.Decimal, b int64) apd.Decimal {
 	var r apd.Decimal
@@ -2528,8 +2170,6 @@ func performFloorDivDecimalInt64(a apd.Decimal, b int64) apd.Decimal {
 	return r
 }
 
-//
-
 func performFloorDivDecimalDecimal(a apd.Decimal, b apd.Decimal) apd.Decimal {
 	var r apd.Decimal
 	// In order to inline the templated code of overloads, we need to have a
@@ -2554,8 +2194,6 @@ func performFloorDivDecimalDecimal(a apd.Decimal, b apd.Decimal) apd.Decimal {
 	return r
 }
 
-//
-
 func performFloorDivInt16Int16(a int16, b int16) int16 {
 	var r int16
 	// In order to inline the templated code of overloads, we need to have a
@@ -2574,8 +2212,6 @@ func performFloorDivInt16Int16(a int16, b int16) int16 {
 
 	return r
 }
-
-//
 
 func performFloorDivInt16Int32(a int16, b int32) int64 {
 	var r int64
@@ -2596,8 +2232,6 @@ func performFloorDivInt16Int32(a int16, b int32) int64 {
 	return r
 }
 
-//
-
 func performFloorDivInt16Int64(a int16, b int64) int64 {
 	var r int64
 	// In order to inline the templated code of overloads, we need to have a
@@ -2616,8 +2250,6 @@ func performFloorDivInt16Int64(a int16, b int64) int64 {
 
 	return r
 }
-
-//
 
 func performFloorDivInt32Int16(a int32, b int16) int64 {
 	var r int64
@@ -2638,8 +2270,6 @@ func performFloorDivInt32Int16(a int32, b int16) int64 {
 	return r
 }
 
-//
-
 func performFloorDivInt32Int32(a int32, b int32) int32 {
 	var r int32
 	// In order to inline the templated code of overloads, we need to have a
@@ -2658,8 +2288,6 @@ func performFloorDivInt32Int32(a int32, b int32) int32 {
 
 	return r
 }
-
-//
 
 func performFloorDivInt32Int64(a int32, b int64) int64 {
 	var r int64
@@ -2680,8 +2308,6 @@ func performFloorDivInt32Int64(a int32, b int64) int64 {
 	return r
 }
 
-//
-
 func performFloorDivInt64Int16(a int64, b int16) int64 {
 	var r int64
 	// In order to inline the templated code of overloads, we need to have a
@@ -2700,8 +2326,6 @@ func performFloorDivInt64Int16(a int64, b int16) int64 {
 
 	return r
 }
-
-//
 
 func performFloorDivInt64Int32(a int64, b int32) int64 {
 	var r int64
@@ -2722,8 +2346,6 @@ func performFloorDivInt64Int32(a int64, b int32) int64 {
 	return r
 }
 
-//
-
 func performFloorDivInt64Int64(a int64, b int64) int64 {
 	var r int64
 	// In order to inline the templated code of overloads, we need to have a
@@ -2742,8 +2364,6 @@ func performFloorDivInt64Int64(a int64, b int64) int64 {
 
 	return r
 }
-
-//
 
 func performFloorDivInt16Decimal(a int16, b apd.Decimal) apd.Decimal {
 	var r apd.Decimal
@@ -2771,8 +2391,6 @@ func performFloorDivInt16Decimal(a int16, b apd.Decimal) apd.Decimal {
 	return r
 }
 
-//
-
 func performFloorDivInt32Decimal(a int32, b apd.Decimal) apd.Decimal {
 	var r apd.Decimal
 	// In order to inline the templated code of overloads, we need to have a
@@ -2798,8 +2416,6 @@ func performFloorDivInt32Decimal(a int32, b apd.Decimal) apd.Decimal {
 
 	return r
 }
-
-//
 
 func performFloorDivInt64Decimal(a int64, b apd.Decimal) apd.Decimal {
 	var r apd.Decimal
@@ -2827,8 +2443,6 @@ func performFloorDivInt64Decimal(a int64, b apd.Decimal) apd.Decimal {
 	return r
 }
 
-//
-
 func performFloorDivFloat64Float64(a float64, b float64) float64 {
 	var r float64
 	// In order to inline the templated code of overloads, we need to have a
@@ -2849,8 +2463,6 @@ func performFloorDivFloat64Float64(a float64, b float64) float64 {
 
 	return r
 }
-
-//
 
 func performModDecimalInt16(a apd.Decimal, b int16) apd.Decimal {
 	var r apd.Decimal
@@ -2877,8 +2489,6 @@ func performModDecimalInt16(a apd.Decimal, b int16) apd.Decimal {
 	return r
 }
 
-//
-
 func performModDecimalInt32(a apd.Decimal, b int32) apd.Decimal {
 	var r apd.Decimal
 	// In order to inline the templated code of overloads, we need to have a
@@ -2903,8 +2513,6 @@ func performModDecimalInt32(a apd.Decimal, b int32) apd.Decimal {
 
 	return r
 }
-
-//
 
 func performModDecimalInt64(a apd.Decimal, b int64) apd.Decimal {
 	var r apd.Decimal
@@ -2931,8 +2539,6 @@ func performModDecimalInt64(a apd.Decimal, b int64) apd.Decimal {
 	return r
 }
 
-//
-
 func performModDecimalDecimal(a apd.Decimal, b apd.Decimal) apd.Decimal {
 	var r apd.Decimal
 	// In order to inline the templated code of overloads, we need to have a
@@ -2957,8 +2563,6 @@ func performModDecimalDecimal(a apd.Decimal, b apd.Decimal) apd.Decimal {
 	return r
 }
 
-//
-
 func performModInt16Int16(a int16, b int16) int16 {
 	var r int16
 	// In order to inline the templated code of overloads, we need to have a
@@ -2977,8 +2581,6 @@ func performModInt16Int16(a int16, b int16) int16 {
 
 	return r
 }
-
-//
 
 func performModInt16Int32(a int16, b int32) int64 {
 	var r int64
@@ -2999,8 +2601,6 @@ func performModInt16Int32(a int16, b int32) int64 {
 	return r
 }
 
-//
-
 func performModInt16Int64(a int16, b int64) int64 {
 	var r int64
 	// In order to inline the templated code of overloads, we need to have a
@@ -3019,8 +2619,6 @@ func performModInt16Int64(a int16, b int64) int64 {
 
 	return r
 }
-
-//
 
 func performModInt32Int16(a int32, b int16) int64 {
 	var r int64
@@ -3041,8 +2639,6 @@ func performModInt32Int16(a int32, b int16) int64 {
 	return r
 }
 
-//
-
 func performModInt32Int32(a int32, b int32) int32 {
 	var r int32
 	// In order to inline the templated code of overloads, we need to have a
@@ -3061,8 +2657,6 @@ func performModInt32Int32(a int32, b int32) int32 {
 
 	return r
 }
-
-//
 
 func performModInt32Int64(a int32, b int64) int64 {
 	var r int64
@@ -3083,8 +2677,6 @@ func performModInt32Int64(a int32, b int64) int64 {
 	return r
 }
 
-//
-
 func performModInt64Int16(a int64, b int16) int64 {
 	var r int64
 	// In order to inline the templated code of overloads, we need to have a
@@ -3103,8 +2695,6 @@ func performModInt64Int16(a int64, b int16) int64 {
 
 	return r
 }
-
-//
 
 func performModInt64Int32(a int64, b int32) int64 {
 	var r int64
@@ -3125,8 +2715,6 @@ func performModInt64Int32(a int64, b int32) int64 {
 	return r
 }
 
-//
-
 func performModInt64Int64(a int64, b int64) int64 {
 	var r int64
 	// In order to inline the templated code of overloads, we need to have a
@@ -3145,8 +2733,6 @@ func performModInt64Int64(a int64, b int64) int64 {
 
 	return r
 }
-
-//
 
 func performModInt16Decimal(a int16, b apd.Decimal) apd.Decimal {
 	var r apd.Decimal
@@ -3174,8 +2760,6 @@ func performModInt16Decimal(a int16, b apd.Decimal) apd.Decimal {
 	return r
 }
 
-//
-
 func performModInt32Decimal(a int32, b apd.Decimal) apd.Decimal {
 	var r apd.Decimal
 	// In order to inline the templated code of overloads, we need to have a
@@ -3201,8 +2785,6 @@ func performModInt32Decimal(a int32, b apd.Decimal) apd.Decimal {
 
 	return r
 }
-
-//
 
 func performModInt64Decimal(a int64, b apd.Decimal) apd.Decimal {
 	var r apd.Decimal
@@ -3230,8 +2812,6 @@ func performModInt64Decimal(a int64, b apd.Decimal) apd.Decimal {
 	return r
 }
 
-//
-
 func performModFloat64Float64(a float64, b float64) float64 {
 	var r float64
 	// In order to inline the templated code of overloads, we need to have a
@@ -3253,8 +2833,6 @@ func performModFloat64Float64(a float64, b float64) float64 {
 	return r
 }
 
-//
-
 func performConcatBytesBytes(a []byte, b []byte) []byte {
 	var r []byte
 	// In order to inline the templated code of overloads, we need to have a
@@ -3266,18 +2844,6 @@ func performConcatBytesBytes(a []byte, b []byte) []byte {
 	colexecerror.InternalError("couldn't translate indexing on target element: r")
 	return r
 }
-
-//
-
-//
-
-//
-
-//
-
-//
-
-//
 
 func performEQBoolBool(a bool, b bool) bool {
 	var r bool
@@ -3305,8 +2871,6 @@ func performEQBoolBool(a bool, b bool) bool {
 	return r
 }
 
-//
-
 func performEQBytesBytes(a []byte, b []byte) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -3324,8 +2888,6 @@ func performEQBytesBytes(a []byte, b []byte) bool {
 
 	return r
 }
-
-//
 
 func performEQDecimalInt16(a apd.Decimal, b int16) bool {
 	var r bool
@@ -3351,8 +2913,6 @@ func performEQDecimalInt16(a apd.Decimal, b int16) bool {
 	return r
 }
 
-//
-
 func performEQDecimalInt32(a apd.Decimal, b int32) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -3377,8 +2937,6 @@ func performEQDecimalInt32(a apd.Decimal, b int32) bool {
 	return r
 }
 
-//
-
 func performEQDecimalInt64(a apd.Decimal, b int64) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -3402,8 +2960,6 @@ func performEQDecimalInt64(a apd.Decimal, b int64) bool {
 
 	return r
 }
-
-//
 
 func performEQDecimalFloat64(a apd.Decimal, b float64) bool {
 	var r bool
@@ -3431,8 +2987,6 @@ func performEQDecimalFloat64(a apd.Decimal, b float64) bool {
 	return r
 }
 
-//
-
 func performEQDecimalDecimal(a apd.Decimal, b apd.Decimal) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -3450,8 +3004,6 @@ func performEQDecimalDecimal(a apd.Decimal, b apd.Decimal) bool {
 
 	return r
 }
-
-//
 
 func performEQInt16Int16(a int16, b int16) bool {
 	var r bool
@@ -3482,8 +3034,6 @@ func performEQInt16Int16(a int16, b int16) bool {
 	return r
 }
 
-//
-
 func performEQInt16Int32(a int16, b int32) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -3512,8 +3062,6 @@ func performEQInt16Int32(a int16, b int32) bool {
 
 	return r
 }
-
-//
 
 func performEQInt16Int64(a int16, b int64) bool {
 	var r bool
@@ -3544,8 +3092,6 @@ func performEQInt16Int64(a int16, b int64) bool {
 	return r
 }
 
-//
-
 func performEQInt32Int16(a int32, b int16) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -3574,8 +3120,6 @@ func performEQInt32Int16(a int32, b int16) bool {
 
 	return r
 }
-
-//
 
 func performEQInt32Int32(a int32, b int32) bool {
 	var r bool
@@ -3606,8 +3150,6 @@ func performEQInt32Int32(a int32, b int32) bool {
 	return r
 }
 
-//
-
 func performEQInt32Int64(a int32, b int64) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -3636,8 +3178,6 @@ func performEQInt32Int64(a int32, b int64) bool {
 
 	return r
 }
-
-//
 
 func performEQInt64Int16(a int64, b int16) bool {
 	var r bool
@@ -3668,8 +3208,6 @@ func performEQInt64Int16(a int64, b int16) bool {
 	return r
 }
 
-//
-
 func performEQInt64Int32(a int64, b int32) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -3699,8 +3237,6 @@ func performEQInt64Int32(a int64, b int32) bool {
 	return r
 }
 
-//
-
 func performEQInt64Int64(a int64, b int64) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -3729,8 +3265,6 @@ func performEQInt64Int64(a int64, b int64) bool {
 
 	return r
 }
-
-//
 
 func performEQInt16Float64(a int16, b float64) bool {
 	var r bool
@@ -3769,8 +3303,6 @@ func performEQInt16Float64(a int16, b float64) bool {
 	return r
 }
 
-//
-
 func performEQInt32Float64(a int32, b float64) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -3807,8 +3339,6 @@ func performEQInt32Float64(a int32, b float64) bool {
 
 	return r
 }
-
-//
 
 func performEQInt64Float64(a int64, b float64) bool {
 	var r bool
@@ -3847,8 +3377,6 @@ func performEQInt64Float64(a int64, b float64) bool {
 	return r
 }
 
-//
-
 func performEQInt16Decimal(a int16, b apd.Decimal) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -3872,8 +3400,6 @@ func performEQInt16Decimal(a int16, b apd.Decimal) bool {
 
 	return r
 }
-
-//
 
 func performEQInt32Decimal(a int32, b apd.Decimal) bool {
 	var r bool
@@ -3899,8 +3425,6 @@ func performEQInt32Decimal(a int32, b apd.Decimal) bool {
 	return r
 }
 
-//
-
 func performEQInt64Decimal(a int64, b apd.Decimal) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -3924,8 +3448,6 @@ func performEQInt64Decimal(a int64, b apd.Decimal) bool {
 
 	return r
 }
-
-//
 
 func performEQFloat64Int16(a float64, b int16) bool {
 	var r bool
@@ -3964,8 +3486,6 @@ func performEQFloat64Int16(a float64, b int16) bool {
 	return r
 }
 
-//
-
 func performEQFloat64Int32(a float64, b int32) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -4002,8 +3522,6 @@ func performEQFloat64Int32(a float64, b int32) bool {
 
 	return r
 }
-
-//
 
 func performEQFloat64Int64(a float64, b int64) bool {
 	var r bool
@@ -4042,8 +3560,6 @@ func performEQFloat64Int64(a float64, b int64) bool {
 	return r
 }
 
-//
-
 func performEQFloat64Float64(a float64, b float64) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -4081,8 +3597,6 @@ func performEQFloat64Float64(a float64, b float64) bool {
 	return r
 }
 
-//
-
 func performEQFloat64Decimal(a float64, b apd.Decimal) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -4109,8 +3623,6 @@ func performEQFloat64Decimal(a float64, b apd.Decimal) bool {
 	return r
 }
 
-//
-
 func performEQTimestampTimestamp(a time.Time, b time.Time) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -4136,8 +3648,6 @@ func performEQTimestampTimestamp(a time.Time, b time.Time) bool {
 	return r
 }
 
-//
-
 func performEQIntervalInterval(a duration.Duration, b duration.Duration) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -4155,10 +3665,6 @@ func performEQIntervalInterval(a duration.Duration, b duration.Duration) bool {
 
 	return r
 }
-
-//
-
-//
 
 func performNEBoolBool(a bool, b bool) bool {
 	var r bool
@@ -4186,8 +3692,6 @@ func performNEBoolBool(a bool, b bool) bool {
 	return r
 }
 
-//
-
 func performNEBytesBytes(a []byte, b []byte) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -4205,8 +3709,6 @@ func performNEBytesBytes(a []byte, b []byte) bool {
 
 	return r
 }
-
-//
 
 func performNEDecimalInt16(a apd.Decimal, b int16) bool {
 	var r bool
@@ -4232,8 +3734,6 @@ func performNEDecimalInt16(a apd.Decimal, b int16) bool {
 	return r
 }
 
-//
-
 func performNEDecimalInt32(a apd.Decimal, b int32) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -4258,8 +3758,6 @@ func performNEDecimalInt32(a apd.Decimal, b int32) bool {
 	return r
 }
 
-//
-
 func performNEDecimalInt64(a apd.Decimal, b int64) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -4283,8 +3781,6 @@ func performNEDecimalInt64(a apd.Decimal, b int64) bool {
 
 	return r
 }
-
-//
 
 func performNEDecimalFloat64(a apd.Decimal, b float64) bool {
 	var r bool
@@ -4312,8 +3808,6 @@ func performNEDecimalFloat64(a apd.Decimal, b float64) bool {
 	return r
 }
 
-//
-
 func performNEDecimalDecimal(a apd.Decimal, b apd.Decimal) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -4331,8 +3825,6 @@ func performNEDecimalDecimal(a apd.Decimal, b apd.Decimal) bool {
 
 	return r
 }
-
-//
 
 func performNEInt16Int16(a int16, b int16) bool {
 	var r bool
@@ -4363,8 +3855,6 @@ func performNEInt16Int16(a int16, b int16) bool {
 	return r
 }
 
-//
-
 func performNEInt16Int32(a int16, b int32) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -4393,8 +3883,6 @@ func performNEInt16Int32(a int16, b int32) bool {
 
 	return r
 }
-
-//
 
 func performNEInt16Int64(a int16, b int64) bool {
 	var r bool
@@ -4425,8 +3913,6 @@ func performNEInt16Int64(a int16, b int64) bool {
 	return r
 }
 
-//
-
 func performNEInt32Int16(a int32, b int16) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -4455,8 +3941,6 @@ func performNEInt32Int16(a int32, b int16) bool {
 
 	return r
 }
-
-//
 
 func performNEInt32Int32(a int32, b int32) bool {
 	var r bool
@@ -4487,8 +3971,6 @@ func performNEInt32Int32(a int32, b int32) bool {
 	return r
 }
 
-//
-
 func performNEInt32Int64(a int32, b int64) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -4517,8 +3999,6 @@ func performNEInt32Int64(a int32, b int64) bool {
 
 	return r
 }
-
-//
 
 func performNEInt64Int16(a int64, b int16) bool {
 	var r bool
@@ -4549,8 +4029,6 @@ func performNEInt64Int16(a int64, b int16) bool {
 	return r
 }
 
-//
-
 func performNEInt64Int32(a int64, b int32) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -4580,8 +4058,6 @@ func performNEInt64Int32(a int64, b int32) bool {
 	return r
 }
 
-//
-
 func performNEInt64Int64(a int64, b int64) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -4610,8 +4086,6 @@ func performNEInt64Int64(a int64, b int64) bool {
 
 	return r
 }
-
-//
 
 func performNEInt16Float64(a int16, b float64) bool {
 	var r bool
@@ -4650,8 +4124,6 @@ func performNEInt16Float64(a int16, b float64) bool {
 	return r
 }
 
-//
-
 func performNEInt32Float64(a int32, b float64) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -4688,8 +4160,6 @@ func performNEInt32Float64(a int32, b float64) bool {
 
 	return r
 }
-
-//
 
 func performNEInt64Float64(a int64, b float64) bool {
 	var r bool
@@ -4728,8 +4198,6 @@ func performNEInt64Float64(a int64, b float64) bool {
 	return r
 }
 
-//
-
 func performNEInt16Decimal(a int16, b apd.Decimal) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -4753,8 +4221,6 @@ func performNEInt16Decimal(a int16, b apd.Decimal) bool {
 
 	return r
 }
-
-//
 
 func performNEInt32Decimal(a int32, b apd.Decimal) bool {
 	var r bool
@@ -4780,8 +4246,6 @@ func performNEInt32Decimal(a int32, b apd.Decimal) bool {
 	return r
 }
 
-//
-
 func performNEInt64Decimal(a int64, b apd.Decimal) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -4805,8 +4269,6 @@ func performNEInt64Decimal(a int64, b apd.Decimal) bool {
 
 	return r
 }
-
-//
 
 func performNEFloat64Int16(a float64, b int16) bool {
 	var r bool
@@ -4845,8 +4307,6 @@ func performNEFloat64Int16(a float64, b int16) bool {
 	return r
 }
 
-//
-
 func performNEFloat64Int32(a float64, b int32) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -4883,8 +4343,6 @@ func performNEFloat64Int32(a float64, b int32) bool {
 
 	return r
 }
-
-//
 
 func performNEFloat64Int64(a float64, b int64) bool {
 	var r bool
@@ -4923,8 +4381,6 @@ func performNEFloat64Int64(a float64, b int64) bool {
 	return r
 }
 
-//
-
 func performNEFloat64Float64(a float64, b float64) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -4962,8 +4418,6 @@ func performNEFloat64Float64(a float64, b float64) bool {
 	return r
 }
 
-//
-
 func performNEFloat64Decimal(a float64, b apd.Decimal) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -4990,8 +4444,6 @@ func performNEFloat64Decimal(a float64, b apd.Decimal) bool {
 	return r
 }
 
-//
-
 func performNETimestampTimestamp(a time.Time, b time.Time) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -5017,8 +4469,6 @@ func performNETimestampTimestamp(a time.Time, b time.Time) bool {
 	return r
 }
 
-//
-
 func performNEIntervalInterval(a duration.Duration, b duration.Duration) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -5036,10 +4486,6 @@ func performNEIntervalInterval(a duration.Duration, b duration.Duration) bool {
 
 	return r
 }
-
-//
-
-//
 
 func performLTBoolBool(a bool, b bool) bool {
 	var r bool
@@ -5067,8 +4513,6 @@ func performLTBoolBool(a bool, b bool) bool {
 	return r
 }
 
-//
-
 func performLTBytesBytes(a []byte, b []byte) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -5086,8 +4530,6 @@ func performLTBytesBytes(a []byte, b []byte) bool {
 
 	return r
 }
-
-//
 
 func performLTDecimalInt16(a apd.Decimal, b int16) bool {
 	var r bool
@@ -5113,8 +4555,6 @@ func performLTDecimalInt16(a apd.Decimal, b int16) bool {
 	return r
 }
 
-//
-
 func performLTDecimalInt32(a apd.Decimal, b int32) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -5139,8 +4579,6 @@ func performLTDecimalInt32(a apd.Decimal, b int32) bool {
 	return r
 }
 
-//
-
 func performLTDecimalInt64(a apd.Decimal, b int64) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -5164,8 +4602,6 @@ func performLTDecimalInt64(a apd.Decimal, b int64) bool {
 
 	return r
 }
-
-//
 
 func performLTDecimalFloat64(a apd.Decimal, b float64) bool {
 	var r bool
@@ -5193,8 +4629,6 @@ func performLTDecimalFloat64(a apd.Decimal, b float64) bool {
 	return r
 }
 
-//
-
 func performLTDecimalDecimal(a apd.Decimal, b apd.Decimal) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -5212,8 +4646,6 @@ func performLTDecimalDecimal(a apd.Decimal, b apd.Decimal) bool {
 
 	return r
 }
-
-//
 
 func performLTInt16Int16(a int16, b int16) bool {
 	var r bool
@@ -5244,8 +4676,6 @@ func performLTInt16Int16(a int16, b int16) bool {
 	return r
 }
 
-//
-
 func performLTInt16Int32(a int16, b int32) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -5274,8 +4704,6 @@ func performLTInt16Int32(a int16, b int32) bool {
 
 	return r
 }
-
-//
 
 func performLTInt16Int64(a int16, b int64) bool {
 	var r bool
@@ -5306,8 +4734,6 @@ func performLTInt16Int64(a int16, b int64) bool {
 	return r
 }
 
-//
-
 func performLTInt32Int16(a int32, b int16) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -5336,8 +4762,6 @@ func performLTInt32Int16(a int32, b int16) bool {
 
 	return r
 }
-
-//
 
 func performLTInt32Int32(a int32, b int32) bool {
 	var r bool
@@ -5368,8 +4792,6 @@ func performLTInt32Int32(a int32, b int32) bool {
 	return r
 }
 
-//
-
 func performLTInt32Int64(a int32, b int64) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -5398,8 +4820,6 @@ func performLTInt32Int64(a int32, b int64) bool {
 
 	return r
 }
-
-//
 
 func performLTInt64Int16(a int64, b int16) bool {
 	var r bool
@@ -5430,8 +4850,6 @@ func performLTInt64Int16(a int64, b int16) bool {
 	return r
 }
 
-//
-
 func performLTInt64Int32(a int64, b int32) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -5461,8 +4879,6 @@ func performLTInt64Int32(a int64, b int32) bool {
 	return r
 }
 
-//
-
 func performLTInt64Int64(a int64, b int64) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -5491,8 +4907,6 @@ func performLTInt64Int64(a int64, b int64) bool {
 
 	return r
 }
-
-//
 
 func performLTInt16Float64(a int16, b float64) bool {
 	var r bool
@@ -5531,8 +4945,6 @@ func performLTInt16Float64(a int16, b float64) bool {
 	return r
 }
 
-//
-
 func performLTInt32Float64(a int32, b float64) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -5569,8 +4981,6 @@ func performLTInt32Float64(a int32, b float64) bool {
 
 	return r
 }
-
-//
 
 func performLTInt64Float64(a int64, b float64) bool {
 	var r bool
@@ -5609,8 +5019,6 @@ func performLTInt64Float64(a int64, b float64) bool {
 	return r
 }
 
-//
-
 func performLTInt16Decimal(a int16, b apd.Decimal) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -5634,8 +5042,6 @@ func performLTInt16Decimal(a int16, b apd.Decimal) bool {
 
 	return r
 }
-
-//
 
 func performLTInt32Decimal(a int32, b apd.Decimal) bool {
 	var r bool
@@ -5661,8 +5067,6 @@ func performLTInt32Decimal(a int32, b apd.Decimal) bool {
 	return r
 }
 
-//
-
 func performLTInt64Decimal(a int64, b apd.Decimal) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -5686,8 +5090,6 @@ func performLTInt64Decimal(a int64, b apd.Decimal) bool {
 
 	return r
 }
-
-//
 
 func performLTFloat64Int16(a float64, b int16) bool {
 	var r bool
@@ -5726,8 +5128,6 @@ func performLTFloat64Int16(a float64, b int16) bool {
 	return r
 }
 
-//
-
 func performLTFloat64Int32(a float64, b int32) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -5764,8 +5164,6 @@ func performLTFloat64Int32(a float64, b int32) bool {
 
 	return r
 }
-
-//
 
 func performLTFloat64Int64(a float64, b int64) bool {
 	var r bool
@@ -5804,8 +5202,6 @@ func performLTFloat64Int64(a float64, b int64) bool {
 	return r
 }
 
-//
-
 func performLTFloat64Float64(a float64, b float64) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -5843,8 +5239,6 @@ func performLTFloat64Float64(a float64, b float64) bool {
 	return r
 }
 
-//
-
 func performLTFloat64Decimal(a float64, b apd.Decimal) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -5871,8 +5265,6 @@ func performLTFloat64Decimal(a float64, b apd.Decimal) bool {
 	return r
 }
 
-//
-
 func performLTTimestampTimestamp(a time.Time, b time.Time) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -5898,8 +5290,6 @@ func performLTTimestampTimestamp(a time.Time, b time.Time) bool {
 	return r
 }
 
-//
-
 func performLTIntervalInterval(a duration.Duration, b duration.Duration) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -5917,10 +5307,6 @@ func performLTIntervalInterval(a duration.Duration, b duration.Duration) bool {
 
 	return r
 }
-
-//
-
-//
 
 func performLEBoolBool(a bool, b bool) bool {
 	var r bool
@@ -5948,8 +5334,6 @@ func performLEBoolBool(a bool, b bool) bool {
 	return r
 }
 
-//
-
 func performLEBytesBytes(a []byte, b []byte) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -5967,8 +5351,6 @@ func performLEBytesBytes(a []byte, b []byte) bool {
 
 	return r
 }
-
-//
 
 func performLEDecimalInt16(a apd.Decimal, b int16) bool {
 	var r bool
@@ -5994,8 +5376,6 @@ func performLEDecimalInt16(a apd.Decimal, b int16) bool {
 	return r
 }
 
-//
-
 func performLEDecimalInt32(a apd.Decimal, b int32) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -6020,8 +5400,6 @@ func performLEDecimalInt32(a apd.Decimal, b int32) bool {
 	return r
 }
 
-//
-
 func performLEDecimalInt64(a apd.Decimal, b int64) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -6045,8 +5423,6 @@ func performLEDecimalInt64(a apd.Decimal, b int64) bool {
 
 	return r
 }
-
-//
 
 func performLEDecimalFloat64(a apd.Decimal, b float64) bool {
 	var r bool
@@ -6074,8 +5450,6 @@ func performLEDecimalFloat64(a apd.Decimal, b float64) bool {
 	return r
 }
 
-//
-
 func performLEDecimalDecimal(a apd.Decimal, b apd.Decimal) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -6093,8 +5467,6 @@ func performLEDecimalDecimal(a apd.Decimal, b apd.Decimal) bool {
 
 	return r
 }
-
-//
 
 func performLEInt16Int16(a int16, b int16) bool {
 	var r bool
@@ -6125,8 +5497,6 @@ func performLEInt16Int16(a int16, b int16) bool {
 	return r
 }
 
-//
-
 func performLEInt16Int32(a int16, b int32) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -6155,8 +5525,6 @@ func performLEInt16Int32(a int16, b int32) bool {
 
 	return r
 }
-
-//
 
 func performLEInt16Int64(a int16, b int64) bool {
 	var r bool
@@ -6187,8 +5555,6 @@ func performLEInt16Int64(a int16, b int64) bool {
 	return r
 }
 
-//
-
 func performLEInt32Int16(a int32, b int16) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -6217,8 +5583,6 @@ func performLEInt32Int16(a int32, b int16) bool {
 
 	return r
 }
-
-//
 
 func performLEInt32Int32(a int32, b int32) bool {
 	var r bool
@@ -6249,8 +5613,6 @@ func performLEInt32Int32(a int32, b int32) bool {
 	return r
 }
 
-//
-
 func performLEInt32Int64(a int32, b int64) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -6279,8 +5641,6 @@ func performLEInt32Int64(a int32, b int64) bool {
 
 	return r
 }
-
-//
 
 func performLEInt64Int16(a int64, b int16) bool {
 	var r bool
@@ -6311,8 +5671,6 @@ func performLEInt64Int16(a int64, b int16) bool {
 	return r
 }
 
-//
-
 func performLEInt64Int32(a int64, b int32) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -6342,8 +5700,6 @@ func performLEInt64Int32(a int64, b int32) bool {
 	return r
 }
 
-//
-
 func performLEInt64Int64(a int64, b int64) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -6372,8 +5728,6 @@ func performLEInt64Int64(a int64, b int64) bool {
 
 	return r
 }
-
-//
 
 func performLEInt16Float64(a int16, b float64) bool {
 	var r bool
@@ -6412,8 +5766,6 @@ func performLEInt16Float64(a int16, b float64) bool {
 	return r
 }
 
-//
-
 func performLEInt32Float64(a int32, b float64) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -6450,8 +5802,6 @@ func performLEInt32Float64(a int32, b float64) bool {
 
 	return r
 }
-
-//
 
 func performLEInt64Float64(a int64, b float64) bool {
 	var r bool
@@ -6490,8 +5840,6 @@ func performLEInt64Float64(a int64, b float64) bool {
 	return r
 }
 
-//
-
 func performLEInt16Decimal(a int16, b apd.Decimal) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -6515,8 +5863,6 @@ func performLEInt16Decimal(a int16, b apd.Decimal) bool {
 
 	return r
 }
-
-//
 
 func performLEInt32Decimal(a int32, b apd.Decimal) bool {
 	var r bool
@@ -6542,8 +5888,6 @@ func performLEInt32Decimal(a int32, b apd.Decimal) bool {
 	return r
 }
 
-//
-
 func performLEInt64Decimal(a int64, b apd.Decimal) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -6567,8 +5911,6 @@ func performLEInt64Decimal(a int64, b apd.Decimal) bool {
 
 	return r
 }
-
-//
 
 func performLEFloat64Int16(a float64, b int16) bool {
 	var r bool
@@ -6607,8 +5949,6 @@ func performLEFloat64Int16(a float64, b int16) bool {
 	return r
 }
 
-//
-
 func performLEFloat64Int32(a float64, b int32) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -6645,8 +5985,6 @@ func performLEFloat64Int32(a float64, b int32) bool {
 
 	return r
 }
-
-//
 
 func performLEFloat64Int64(a float64, b int64) bool {
 	var r bool
@@ -6685,8 +6023,6 @@ func performLEFloat64Int64(a float64, b int64) bool {
 	return r
 }
 
-//
-
 func performLEFloat64Float64(a float64, b float64) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -6724,8 +6060,6 @@ func performLEFloat64Float64(a float64, b float64) bool {
 	return r
 }
 
-//
-
 func performLEFloat64Decimal(a float64, b apd.Decimal) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -6752,8 +6086,6 @@ func performLEFloat64Decimal(a float64, b apd.Decimal) bool {
 	return r
 }
 
-//
-
 func performLETimestampTimestamp(a time.Time, b time.Time) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -6779,8 +6111,6 @@ func performLETimestampTimestamp(a time.Time, b time.Time) bool {
 	return r
 }
 
-//
-
 func performLEIntervalInterval(a duration.Duration, b duration.Duration) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -6798,10 +6128,6 @@ func performLEIntervalInterval(a duration.Duration, b duration.Duration) bool {
 
 	return r
 }
-
-//
-
-//
 
 func performGTBoolBool(a bool, b bool) bool {
 	var r bool
@@ -6829,8 +6155,6 @@ func performGTBoolBool(a bool, b bool) bool {
 	return r
 }
 
-//
-
 func performGTBytesBytes(a []byte, b []byte) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -6848,8 +6172,6 @@ func performGTBytesBytes(a []byte, b []byte) bool {
 
 	return r
 }
-
-//
 
 func performGTDecimalInt16(a apd.Decimal, b int16) bool {
 	var r bool
@@ -6875,8 +6197,6 @@ func performGTDecimalInt16(a apd.Decimal, b int16) bool {
 	return r
 }
 
-//
-
 func performGTDecimalInt32(a apd.Decimal, b int32) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -6901,8 +6221,6 @@ func performGTDecimalInt32(a apd.Decimal, b int32) bool {
 	return r
 }
 
-//
-
 func performGTDecimalInt64(a apd.Decimal, b int64) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -6926,8 +6244,6 @@ func performGTDecimalInt64(a apd.Decimal, b int64) bool {
 
 	return r
 }
-
-//
 
 func performGTDecimalFloat64(a apd.Decimal, b float64) bool {
 	var r bool
@@ -6955,8 +6271,6 @@ func performGTDecimalFloat64(a apd.Decimal, b float64) bool {
 	return r
 }
 
-//
-
 func performGTDecimalDecimal(a apd.Decimal, b apd.Decimal) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -6974,8 +6288,6 @@ func performGTDecimalDecimal(a apd.Decimal, b apd.Decimal) bool {
 
 	return r
 }
-
-//
 
 func performGTInt16Int16(a int16, b int16) bool {
 	var r bool
@@ -7006,8 +6318,6 @@ func performGTInt16Int16(a int16, b int16) bool {
 	return r
 }
 
-//
-
 func performGTInt16Int32(a int16, b int32) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -7036,8 +6346,6 @@ func performGTInt16Int32(a int16, b int32) bool {
 
 	return r
 }
-
-//
 
 func performGTInt16Int64(a int16, b int64) bool {
 	var r bool
@@ -7068,8 +6376,6 @@ func performGTInt16Int64(a int16, b int64) bool {
 	return r
 }
 
-//
-
 func performGTInt32Int16(a int32, b int16) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -7098,8 +6404,6 @@ func performGTInt32Int16(a int32, b int16) bool {
 
 	return r
 }
-
-//
 
 func performGTInt32Int32(a int32, b int32) bool {
 	var r bool
@@ -7130,8 +6434,6 @@ func performGTInt32Int32(a int32, b int32) bool {
 	return r
 }
 
-//
-
 func performGTInt32Int64(a int32, b int64) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -7160,8 +6462,6 @@ func performGTInt32Int64(a int32, b int64) bool {
 
 	return r
 }
-
-//
 
 func performGTInt64Int16(a int64, b int16) bool {
 	var r bool
@@ -7192,8 +6492,6 @@ func performGTInt64Int16(a int64, b int16) bool {
 	return r
 }
 
-//
-
 func performGTInt64Int32(a int64, b int32) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -7223,8 +6521,6 @@ func performGTInt64Int32(a int64, b int32) bool {
 	return r
 }
 
-//
-
 func performGTInt64Int64(a int64, b int64) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -7253,8 +6549,6 @@ func performGTInt64Int64(a int64, b int64) bool {
 
 	return r
 }
-
-//
 
 func performGTInt16Float64(a int16, b float64) bool {
 	var r bool
@@ -7293,8 +6587,6 @@ func performGTInt16Float64(a int16, b float64) bool {
 	return r
 }
 
-//
-
 func performGTInt32Float64(a int32, b float64) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -7331,8 +6623,6 @@ func performGTInt32Float64(a int32, b float64) bool {
 
 	return r
 }
-
-//
 
 func performGTInt64Float64(a int64, b float64) bool {
 	var r bool
@@ -7371,8 +6661,6 @@ func performGTInt64Float64(a int64, b float64) bool {
 	return r
 }
 
-//
-
 func performGTInt16Decimal(a int16, b apd.Decimal) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -7396,8 +6684,6 @@ func performGTInt16Decimal(a int16, b apd.Decimal) bool {
 
 	return r
 }
-
-//
 
 func performGTInt32Decimal(a int32, b apd.Decimal) bool {
 	var r bool
@@ -7423,8 +6709,6 @@ func performGTInt32Decimal(a int32, b apd.Decimal) bool {
 	return r
 }
 
-//
-
 func performGTInt64Decimal(a int64, b apd.Decimal) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -7448,8 +6732,6 @@ func performGTInt64Decimal(a int64, b apd.Decimal) bool {
 
 	return r
 }
-
-//
 
 func performGTFloat64Int16(a float64, b int16) bool {
 	var r bool
@@ -7488,8 +6770,6 @@ func performGTFloat64Int16(a float64, b int16) bool {
 	return r
 }
 
-//
-
 func performGTFloat64Int32(a float64, b int32) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -7526,8 +6806,6 @@ func performGTFloat64Int32(a float64, b int32) bool {
 
 	return r
 }
-
-//
 
 func performGTFloat64Int64(a float64, b int64) bool {
 	var r bool
@@ -7566,8 +6844,6 @@ func performGTFloat64Int64(a float64, b int64) bool {
 	return r
 }
 
-//
-
 func performGTFloat64Float64(a float64, b float64) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -7605,8 +6881,6 @@ func performGTFloat64Float64(a float64, b float64) bool {
 	return r
 }
 
-//
-
 func performGTFloat64Decimal(a float64, b apd.Decimal) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -7633,8 +6907,6 @@ func performGTFloat64Decimal(a float64, b apd.Decimal) bool {
 	return r
 }
 
-//
-
 func performGTTimestampTimestamp(a time.Time, b time.Time) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -7660,8 +6932,6 @@ func performGTTimestampTimestamp(a time.Time, b time.Time) bool {
 	return r
 }
 
-//
-
 func performGTIntervalInterval(a duration.Duration, b duration.Duration) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -7679,10 +6949,6 @@ func performGTIntervalInterval(a duration.Duration, b duration.Duration) bool {
 
 	return r
 }
-
-//
-
-//
 
 func performGEBoolBool(a bool, b bool) bool {
 	var r bool
@@ -7710,8 +6976,6 @@ func performGEBoolBool(a bool, b bool) bool {
 	return r
 }
 
-//
-
 func performGEBytesBytes(a []byte, b []byte) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -7729,8 +6993,6 @@ func performGEBytesBytes(a []byte, b []byte) bool {
 
 	return r
 }
-
-//
 
 func performGEDecimalInt16(a apd.Decimal, b int16) bool {
 	var r bool
@@ -7756,8 +7018,6 @@ func performGEDecimalInt16(a apd.Decimal, b int16) bool {
 	return r
 }
 
-//
-
 func performGEDecimalInt32(a apd.Decimal, b int32) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -7782,8 +7042,6 @@ func performGEDecimalInt32(a apd.Decimal, b int32) bool {
 	return r
 }
 
-//
-
 func performGEDecimalInt64(a apd.Decimal, b int64) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -7807,8 +7065,6 @@ func performGEDecimalInt64(a apd.Decimal, b int64) bool {
 
 	return r
 }
-
-//
 
 func performGEDecimalFloat64(a apd.Decimal, b float64) bool {
 	var r bool
@@ -7836,8 +7092,6 @@ func performGEDecimalFloat64(a apd.Decimal, b float64) bool {
 	return r
 }
 
-//
-
 func performGEDecimalDecimal(a apd.Decimal, b apd.Decimal) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -7855,8 +7109,6 @@ func performGEDecimalDecimal(a apd.Decimal, b apd.Decimal) bool {
 
 	return r
 }
-
-//
 
 func performGEInt16Int16(a int16, b int16) bool {
 	var r bool
@@ -7887,8 +7139,6 @@ func performGEInt16Int16(a int16, b int16) bool {
 	return r
 }
 
-//
-
 func performGEInt16Int32(a int16, b int32) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -7917,8 +7167,6 @@ func performGEInt16Int32(a int16, b int32) bool {
 
 	return r
 }
-
-//
 
 func performGEInt16Int64(a int16, b int64) bool {
 	var r bool
@@ -7949,8 +7197,6 @@ func performGEInt16Int64(a int16, b int64) bool {
 	return r
 }
 
-//
-
 func performGEInt32Int16(a int32, b int16) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -7979,8 +7225,6 @@ func performGEInt32Int16(a int32, b int16) bool {
 
 	return r
 }
-
-//
 
 func performGEInt32Int32(a int32, b int32) bool {
 	var r bool
@@ -8011,8 +7255,6 @@ func performGEInt32Int32(a int32, b int32) bool {
 	return r
 }
 
-//
-
 func performGEInt32Int64(a int32, b int64) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -8041,8 +7283,6 @@ func performGEInt32Int64(a int32, b int64) bool {
 
 	return r
 }
-
-//
 
 func performGEInt64Int16(a int64, b int16) bool {
 	var r bool
@@ -8073,8 +7313,6 @@ func performGEInt64Int16(a int64, b int16) bool {
 	return r
 }
 
-//
-
 func performGEInt64Int32(a int64, b int32) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -8104,8 +7342,6 @@ func performGEInt64Int32(a int64, b int32) bool {
 	return r
 }
 
-//
-
 func performGEInt64Int64(a int64, b int64) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -8134,8 +7370,6 @@ func performGEInt64Int64(a int64, b int64) bool {
 
 	return r
 }
-
-//
 
 func performGEInt16Float64(a int16, b float64) bool {
 	var r bool
@@ -8174,8 +7408,6 @@ func performGEInt16Float64(a int16, b float64) bool {
 	return r
 }
 
-//
-
 func performGEInt32Float64(a int32, b float64) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -8212,8 +7444,6 @@ func performGEInt32Float64(a int32, b float64) bool {
 
 	return r
 }
-
-//
 
 func performGEInt64Float64(a int64, b float64) bool {
 	var r bool
@@ -8252,8 +7482,6 @@ func performGEInt64Float64(a int64, b float64) bool {
 	return r
 }
 
-//
-
 func performGEInt16Decimal(a int16, b apd.Decimal) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -8277,8 +7505,6 @@ func performGEInt16Decimal(a int16, b apd.Decimal) bool {
 
 	return r
 }
-
-//
 
 func performGEInt32Decimal(a int32, b apd.Decimal) bool {
 	var r bool
@@ -8304,8 +7530,6 @@ func performGEInt32Decimal(a int32, b apd.Decimal) bool {
 	return r
 }
 
-//
-
 func performGEInt64Decimal(a int64, b apd.Decimal) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -8329,8 +7553,6 @@ func performGEInt64Decimal(a int64, b apd.Decimal) bool {
 
 	return r
 }
-
-//
 
 func performGEFloat64Int16(a float64, b int16) bool {
 	var r bool
@@ -8369,8 +7591,6 @@ func performGEFloat64Int16(a float64, b int16) bool {
 	return r
 }
 
-//
-
 func performGEFloat64Int32(a float64, b int32) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -8407,8 +7627,6 @@ func performGEFloat64Int32(a float64, b int32) bool {
 
 	return r
 }
-
-//
 
 func performGEFloat64Int64(a float64, b int64) bool {
 	var r bool
@@ -8447,8 +7665,6 @@ func performGEFloat64Int64(a float64, b int64) bool {
 	return r
 }
 
-//
-
 func performGEFloat64Float64(a float64, b float64) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -8486,8 +7702,6 @@ func performGEFloat64Float64(a float64, b float64) bool {
 	return r
 }
 
-//
-
 func performGEFloat64Decimal(a float64, b apd.Decimal) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -8514,8 +7728,6 @@ func performGEFloat64Decimal(a float64, b apd.Decimal) bool {
 	return r
 }
 
-//
-
 func performGETimestampTimestamp(a time.Time, b time.Time) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -8541,8 +7753,6 @@ func performGETimestampTimestamp(a time.Time, b time.Time) bool {
 	return r
 }
 
-//
-
 func performGEIntervalInterval(a duration.Duration, b duration.Duration) bool {
 	var r bool
 	// In order to inline the templated code of overloads, we need to have a
@@ -8560,5 +7770,3 @@ func performGEIntervalInterval(a duration.Duration, b duration.Duration) bool {
 
 	return r
 }
-
-//
