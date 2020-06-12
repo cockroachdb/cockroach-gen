@@ -9,6 +9,7 @@ import (
 	"github.com/cockroachdb/cockroach/pkg/sql/opt"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/cat"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/constraint"
+	"github.com/cockroachdb/cockroach/pkg/sql/opt/invertedexpr"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/props"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/props/physical"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
@@ -1056,6 +1057,10 @@ type ScanPrivate struct {
 	// If set, the scan is a constrained scan; the constraint contains the spans
 	// that need to be scanned.
 	Constraint *constraint.Constraint
+
+	// If set, the scan is a constrained scan of an inverted index; the
+	// SpanExpression contains the spans that need to be scanned.
+	InvertedConstraint *invertedexpr.SpanExpression
 
 	// HardLimit specifies the maximum number of rows that the scan can return
 	// (after applying any constraint), as well as the required scan direction.
@@ -21533,6 +21538,7 @@ func (in *interner) InternScan(val *ScanExpr) *ScanExpr {
 	in.hasher.HashIndexOrdinal(val.Index)
 	in.hasher.HashColSet(val.Cols)
 	in.hasher.HashPointer(unsafe.Pointer(val.Constraint))
+	in.hasher.HashPointer(unsafe.Pointer(val.InvertedConstraint))
 	in.hasher.HashScanLimit(val.HardLimit)
 	in.hasher.HashScanFlags(val.Flags)
 	in.hasher.HashLockingItem(val.Locking)
@@ -21545,6 +21551,7 @@ func (in *interner) InternScan(val *ScanExpr) *ScanExpr {
 				in.hasher.IsIndexOrdinalEqual(val.Index, existing.Index) &&
 				in.hasher.IsColSetEqual(val.Cols, existing.Cols) &&
 				in.hasher.IsPointerEqual(unsafe.Pointer(val.Constraint), unsafe.Pointer(existing.Constraint)) &&
+				in.hasher.IsPointerEqual(unsafe.Pointer(val.InvertedConstraint), unsafe.Pointer(existing.InvertedConstraint)) &&
 				in.hasher.IsScanLimitEqual(val.HardLimit, existing.HardLimit) &&
 				in.hasher.IsScanFlagsEqual(val.Flags, existing.Flags) &&
 				in.hasher.IsLockingItemEqual(val.Locking, existing.Locking) &&
