@@ -2638,6 +2638,174 @@ func (_f *Factory) ConstructInnerJoin(
 		}
 	}
 
+	// [LeftAssociateJoinsLeft]
+	{
+		_innerJoin, _ := left.(*memo.InnerJoinExpr)
+		if _innerJoin != nil {
+			insideLeft := _innerJoin.Left
+			insideRight := _innerJoin.Right
+			if len(_innerJoin.On) == 0 {
+				insidePrivate := &_innerJoin.JoinPrivate
+				if _f.funcs.NoJoinHints(insidePrivate) {
+					outsideRight := right
+					outsideOn := on
+					for i := range outsideOn {
+						item := &outsideOn[i]
+						cols := _f.funcs.OutputCols2(insideLeft, outsideRight)
+						if _f.funcs.IsBoundBy(item, cols) {
+							outsidePrivate := joinPrivate
+							if _f.funcs.NoJoinHints(outsidePrivate) {
+								if _f.matchedRule == nil || _f.matchedRule(opt.LeftAssociateJoinsLeft) {
+									_expr := _f.ConstructInnerJoin(
+										insideRight,
+										_f.ConstructInnerJoin(
+											insideLeft,
+											outsideRight,
+											_f.funcs.ExtractBoundConditions(outsideOn, cols),
+											_f.funcs.EmptyJoinPrivate(),
+										),
+										_f.funcs.ExtractUnboundConditions(outsideOn, cols),
+										_f.funcs.EmptyJoinPrivate(),
+									)
+									if _f.appliedRule != nil {
+										_f.appliedRule(opt.LeftAssociateJoinsLeft, nil, _expr)
+									}
+									return _expr
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [LeftAssociateJoinsRight]
+	{
+		_innerJoin, _ := left.(*memo.InnerJoinExpr)
+		if _innerJoin != nil {
+			insideLeft := _innerJoin.Left
+			insideRight := _innerJoin.Right
+			if len(_innerJoin.On) == 0 {
+				insidePrivate := &_innerJoin.JoinPrivate
+				if _f.funcs.NoJoinHints(insidePrivate) {
+					outsideRight := right
+					outsideOn := on
+					for i := range outsideOn {
+						item := &outsideOn[i]
+						cols := _f.funcs.OutputCols2(insideRight, outsideRight)
+						if _f.funcs.IsBoundBy(item, cols) {
+							outsidePrivate := joinPrivate
+							if _f.funcs.NoJoinHints(outsidePrivate) {
+								if _f.matchedRule == nil || _f.matchedRule(opt.LeftAssociateJoinsRight) {
+									_expr := _f.ConstructInnerJoin(
+										insideLeft,
+										_f.ConstructInnerJoin(
+											insideRight,
+											outsideRight,
+											_f.funcs.ExtractBoundConditions(outsideOn, cols),
+											_f.funcs.EmptyJoinPrivate(),
+										),
+										_f.funcs.ExtractUnboundConditions(outsideOn, cols),
+										_f.funcs.EmptyJoinPrivate(),
+									)
+									if _f.appliedRule != nil {
+										_f.appliedRule(opt.LeftAssociateJoinsRight, nil, _expr)
+									}
+									return _expr
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [RightAssociateJoinsLeft]
+	{
+		outsideLeft := left
+		_innerJoin, _ := right.(*memo.InnerJoinExpr)
+		if _innerJoin != nil {
+			insideLeft := _innerJoin.Left
+			insideRight := _innerJoin.Right
+			if len(_innerJoin.On) == 0 {
+				insidePrivate := &_innerJoin.JoinPrivate
+				if _f.funcs.NoJoinHints(insidePrivate) {
+					outsideOn := on
+					for i := range outsideOn {
+						item := &outsideOn[i]
+						cols := _f.funcs.OutputCols2(insideLeft, outsideLeft)
+						if _f.funcs.IsBoundBy(item, cols) {
+							outsidePrivate := joinPrivate
+							if _f.funcs.NoJoinHints(outsidePrivate) {
+								if _f.matchedRule == nil || _f.matchedRule(opt.RightAssociateJoinsLeft) {
+									_expr := _f.ConstructInnerJoin(
+										_f.ConstructInnerJoin(
+											outsideLeft,
+											insideLeft,
+											_f.funcs.ExtractBoundConditions(outsideOn, cols),
+											_f.funcs.EmptyJoinPrivate(),
+										),
+										insideRight,
+										_f.funcs.ExtractUnboundConditions(outsideOn, cols),
+										_f.funcs.EmptyJoinPrivate(),
+									)
+									if _f.appliedRule != nil {
+										_f.appliedRule(opt.RightAssociateJoinsLeft, nil, _expr)
+									}
+									return _expr
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [RightAssociateJoinsRight]
+	{
+		outsideLeft := left
+		_innerJoin, _ := right.(*memo.InnerJoinExpr)
+		if _innerJoin != nil {
+			insideLeft := _innerJoin.Left
+			insideRight := _innerJoin.Right
+			if len(_innerJoin.On) == 0 {
+				insidePrivate := &_innerJoin.JoinPrivate
+				if _f.funcs.NoJoinHints(insidePrivate) {
+					outsideOn := on
+					for i := range outsideOn {
+						item := &outsideOn[i]
+						cols := _f.funcs.OutputCols2(insideRight, outsideLeft)
+						if _f.funcs.IsBoundBy(item, cols) {
+							outsidePrivate := joinPrivate
+							if _f.funcs.NoJoinHints(outsidePrivate) {
+								if _f.matchedRule == nil || _f.matchedRule(opt.RightAssociateJoinsRight) {
+									_expr := _f.ConstructInnerJoin(
+										_f.ConstructInnerJoin(
+											outsideLeft,
+											insideRight,
+											_f.funcs.ExtractBoundConditions(outsideOn, cols),
+											_f.funcs.EmptyJoinPrivate(),
+										),
+										insideLeft,
+										_f.funcs.ExtractUnboundConditions(outsideOn, cols),
+										_f.funcs.EmptyJoinPrivate(),
+									)
+									if _f.appliedRule != nil {
+										_f.appliedRule(opt.RightAssociateJoinsRight, nil, _expr)
+									}
+									return _expr
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	e := _f.mem.MemoizeInnerJoin(left, right, on, joinPrivate)
 	return _f.onConstructRelational(e)
 }

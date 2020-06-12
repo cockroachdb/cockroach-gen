@@ -134,6 +134,10 @@ const (
 	SimplifyJoinNotNullEquality
 	ExtractJoinEqualities
 	SortFiltersInJoin
+	LeftAssociateJoinsLeft
+	LeftAssociateJoinsRight
+	RightAssociateJoinsLeft
+	RightAssociateJoinsRight
 	EliminateLimit
 	EliminateOffset
 	PushLimitIntoProject
