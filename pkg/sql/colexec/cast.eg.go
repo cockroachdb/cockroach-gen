@@ -16,6 +16,7 @@ import (
 
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
+	"github.com/cockroachdb/cockroach/pkg/col/coldataext"
 	"github.com/cockroachdb/cockroach/pkg/col/typeconv"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase/colexecerror"
@@ -2031,6 +2032,100 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 				}
 			}
 		}
+	case typeconv.DatumVecCanonicalTypeFamily:
+		switch inputVec.Type().Width() {
+		case -1:
+		default:
+			switch outputVec.CanonicalTypeFamily() {
+			case types.BoolFamily:
+				switch outputVec.Type().Width() {
+				case -1:
+				default:
+					inputCol := inputVec.Datum()
+					outputCol := outputVec.Bool()
+					if inputVec.MaybeHasNulls() {
+						inputNulls := inputVec.Nulls()
+						outputNulls := outputVec.Nulls()
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol.Get(i)
+									var r bool
+
+									{
+										_castedDatum, err := v.(*coldataext.Datum).Cast(inputCol, types.Bool)
+										if err != nil {
+											colexecerror.ExpectedError(err)
+										}
+										r = _castedDatum == tree.DBoolTrue
+									}
+
+									outputCol[i] = r
+								}
+							}
+						} else {
+							inputCol = inputCol.Slice(0, n)
+							for i := 0; i < n; i++ {
+								if inputNulls.NullAt(i) {
+									outputNulls.SetNull(i)
+								} else {
+									v := inputCol.Get(i)
+									var r bool
+
+									{
+										_castedDatum, err := v.(*coldataext.Datum).Cast(inputCol, types.Bool)
+										if err != nil {
+											colexecerror.ExpectedError(err)
+										}
+										r = _castedDatum == tree.DBoolTrue
+									}
+
+									outputCol[i] = r
+								}
+							}
+						}
+					} else {
+						if sel != nil {
+							sel = sel[:n]
+							for _, i := range sel {
+								v := inputCol.Get(i)
+								var r bool
+
+								{
+									_castedDatum, err := v.(*coldataext.Datum).Cast(inputCol, types.Bool)
+									if err != nil {
+										colexecerror.ExpectedError(err)
+									}
+									r = _castedDatum == tree.DBoolTrue
+								}
+
+								outputCol[i] = r
+							}
+						} else {
+							inputCol = inputCol.Slice(0, n)
+							for i := 0; i < n; i++ {
+								v := inputCol.Get(i)
+								var r bool
+
+								{
+									_castedDatum, err := v.(*coldataext.Datum).Cast(inputCol, types.Bool)
+									if err != nil {
+										colexecerror.ExpectedError(err)
+									}
+									r = _castedDatum == tree.DBoolTrue
+								}
+
+								outputCol[i] = r
+							}
+						}
+					}
+					castPerformed = true
+				}
+			}
+		}
 	}
 	if !castPerformed {
 		colexecerror.InternalError(fmt.Sprintf("unhandled cast %s -> %s", inputVec.Type(), outputVec.Type()))
@@ -2380,6 +2475,24 @@ func GetCastOperator(
 						colIdx:       colIdx,
 						outputIdx:    resultIdx,
 					}, nil
+				case -1:
+				default:
+					return &castOp{
+						OneInputNode: NewOneInputNode(input),
+						allocator:    allocator,
+						colIdx:       colIdx,
+						outputIdx:    resultIdx,
+					}, nil
+				}
+			}
+		}
+	case typeconv.DatumVecCanonicalTypeFamily:
+		switch leftType.Width() {
+		case -1:
+		default:
+			switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
+			case types.BoolFamily:
+				switch rightType.Width() {
 				case -1:
 				default:
 					return &castOp{
