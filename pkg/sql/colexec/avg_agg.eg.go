@@ -14,32 +14,816 @@ import (
 
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
-	"github.com/cockroachdb/cockroach/pkg/col/typeconv"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase/colexecerror"
-	"github.com/cockroachdb/cockroach/pkg/sql/colmem"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
-	"github.com/cockroachdb/cockroach/pkg/sql/types"
-	"github.com/cockroachdb/errors"
+	"github.com/cockroachdb/cockroach/pkg/util/duration"
 )
 
-func newAvgAggAlloc(
-	allocator *colmem.Allocator, t *types.T, allocSize int64,
-) (aggregateFuncAlloc, error) {
-	switch typeconv.TypeFamilyToCanonicalTypeFamily(t.Family()) {
-	case types.DecimalFamily:
-		switch t.Width() {
-		case -1:
-		default:
-			return &avgDecimalAggAlloc{allocator: allocator, allocSize: allocSize}, nil
+type avgInt16Agg struct {
+	groups  []bool
+	scratch struct {
+		curIdx int
+		// curSum keeps track of the sum of elements belonging to the current group,
+		// so we can index into the slice once per group, instead of on each
+		// iteration.
+		curSum apd.Decimal
+		// curCount keeps track of the number of elements that we've seen
+		// belonging to the current group.
+		curCount int64
+		// vec points to the output vector.
+		vec []apd.Decimal
+		// nulls points to the output null vector that we are updating.
+		nulls *coldata.Nulls
+		// foundNonNullForCurrentGroup tracks if we have seen any non-null values
+		// for the group that is currently being aggregated.
+		foundNonNullForCurrentGroup bool
+	}
+	overloadHelper overloadHelper
+}
+
+var _ aggregateFunc = &avgInt16Agg{}
+
+const sizeOfAvgInt16Agg = int64(unsafe.Sizeof(avgInt16Agg{}))
+
+func (a *avgInt16Agg) Init(groups []bool, v coldata.Vec) {
+	a.groups = groups
+	a.scratch.vec = v.Decimal()
+	a.scratch.nulls = v.Nulls()
+	a.Reset()
+}
+
+func (a *avgInt16Agg) Reset() {
+	a.scratch.curIdx = -1
+	a.scratch.curSum = zeroDecimalValue
+	a.scratch.curCount = 0
+	a.scratch.foundNonNullForCurrentGroup = false
+	a.scratch.nulls.UnsetNulls()
+}
+
+func (a *avgInt16Agg) CurrentOutputIndex() int {
+	return a.scratch.curIdx
+}
+
+func (a *avgInt16Agg) SetOutputIndex(idx int) {
+	if a.scratch.curIdx != -1 {
+		a.scratch.curIdx = idx
+		a.scratch.nulls.UnsetNullsAfter(idx + 1)
+	}
+}
+
+func (a *avgInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	_overloadHelper := a.overloadHelper
+	inputLen := b.Length()
+	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
+	col, nulls := vec.Int16(), vec.Nulls()
+	if nulls.MaybeHasNulls() {
+		if sel != nil {
+			sel = sel[:inputLen]
+			for _, i := range sel {
+
+				if a.groups[i] {
+					// If we encounter a new group, and we haven't found any non-nulls for the
+					// current group, the output for this group should be null. If
+					// a.scratch.curIdx is negative, it means that this is the first group.
+					if a.scratch.curIdx >= 0 {
+						if !a.scratch.foundNonNullForCurrentGroup {
+							a.scratch.nulls.SetNull(a.scratch.curIdx)
+						} else {
+
+							a.scratch.vec[a.scratch.curIdx].SetInt64(a.scratch.curCount)
+							if _, err := tree.DecimalCtx.Quo(&a.scratch.vec[a.scratch.curIdx], &a.scratch.curSum, &a.scratch.vec[a.scratch.curIdx]); err != nil {
+								colexecerror.InternalError(err)
+							}
+						}
+					}
+					a.scratch.curIdx++
+					a.scratch.curSum = zeroDecimalValue
+					a.scratch.curCount = 0
+
+					a.scratch.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = nulls.NullAt(i)
+				if !isNull {
+
+					{
+
+						tmpDec := &_overloadHelper.tmpDec1
+						tmpDec.SetInt64(int64(col[i]))
+						if _, err := tree.ExactCtx.Add(&a.scratch.curSum, &a.scratch.curSum, tmpDec); err != nil {
+							colexecerror.ExpectedError(err)
+						}
+					}
+
+					a.scratch.curCount++
+					a.scratch.foundNonNullForCurrentGroup = true
+				}
+			}
+		} else {
+			col = col[:inputLen]
+			for i := range col {
+
+				if a.groups[i] {
+					// If we encounter a new group, and we haven't found any non-nulls for the
+					// current group, the output for this group should be null. If
+					// a.scratch.curIdx is negative, it means that this is the first group.
+					if a.scratch.curIdx >= 0 {
+						if !a.scratch.foundNonNullForCurrentGroup {
+							a.scratch.nulls.SetNull(a.scratch.curIdx)
+						} else {
+
+							a.scratch.vec[a.scratch.curIdx].SetInt64(a.scratch.curCount)
+							if _, err := tree.DecimalCtx.Quo(&a.scratch.vec[a.scratch.curIdx], &a.scratch.curSum, &a.scratch.vec[a.scratch.curIdx]); err != nil {
+								colexecerror.InternalError(err)
+							}
+						}
+					}
+					a.scratch.curIdx++
+					a.scratch.curSum = zeroDecimalValue
+					a.scratch.curCount = 0
+
+					a.scratch.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = nulls.NullAt(i)
+				if !isNull {
+
+					{
+
+						tmpDec := &_overloadHelper.tmpDec1
+						tmpDec.SetInt64(int64(col[i]))
+						if _, err := tree.ExactCtx.Add(&a.scratch.curSum, &a.scratch.curSum, tmpDec); err != nil {
+							colexecerror.ExpectedError(err)
+						}
+					}
+
+					a.scratch.curCount++
+					a.scratch.foundNonNullForCurrentGroup = true
+				}
+			}
 		}
-	case types.FloatFamily:
-		switch t.Width() {
-		case -1:
-		default:
-			return &avgFloat64AggAlloc{allocator: allocator, allocSize: allocSize}, nil
+	} else {
+		if sel != nil {
+			sel = sel[:inputLen]
+			for _, i := range sel {
+
+				if a.groups[i] {
+					// If we encounter a new group, and we haven't found any non-nulls for the
+					// current group, the output for this group should be null. If
+					// a.scratch.curIdx is negative, it means that this is the first group.
+					if a.scratch.curIdx >= 0 {
+						if !a.scratch.foundNonNullForCurrentGroup {
+							a.scratch.nulls.SetNull(a.scratch.curIdx)
+						} else {
+
+							a.scratch.vec[a.scratch.curIdx].SetInt64(a.scratch.curCount)
+							if _, err := tree.DecimalCtx.Quo(&a.scratch.vec[a.scratch.curIdx], &a.scratch.curSum, &a.scratch.vec[a.scratch.curIdx]); err != nil {
+								colexecerror.InternalError(err)
+							}
+						}
+					}
+					a.scratch.curIdx++
+					a.scratch.curSum = zeroDecimalValue
+					a.scratch.curCount = 0
+
+				}
+				var isNull bool
+				isNull = false
+				if !isNull {
+
+					{
+
+						tmpDec := &_overloadHelper.tmpDec1
+						tmpDec.SetInt64(int64(col[i]))
+						if _, err := tree.ExactCtx.Add(&a.scratch.curSum, &a.scratch.curSum, tmpDec); err != nil {
+							colexecerror.ExpectedError(err)
+						}
+					}
+
+					a.scratch.curCount++
+					a.scratch.foundNonNullForCurrentGroup = true
+				}
+			}
+		} else {
+			col = col[:inputLen]
+			for i := range col {
+
+				if a.groups[i] {
+					// If we encounter a new group, and we haven't found any non-nulls for the
+					// current group, the output for this group should be null. If
+					// a.scratch.curIdx is negative, it means that this is the first group.
+					if a.scratch.curIdx >= 0 {
+						if !a.scratch.foundNonNullForCurrentGroup {
+							a.scratch.nulls.SetNull(a.scratch.curIdx)
+						} else {
+
+							a.scratch.vec[a.scratch.curIdx].SetInt64(a.scratch.curCount)
+							if _, err := tree.DecimalCtx.Quo(&a.scratch.vec[a.scratch.curIdx], &a.scratch.curSum, &a.scratch.vec[a.scratch.curIdx]); err != nil {
+								colexecerror.InternalError(err)
+							}
+						}
+					}
+					a.scratch.curIdx++
+					a.scratch.curSum = zeroDecimalValue
+					a.scratch.curCount = 0
+
+				}
+				var isNull bool
+				isNull = false
+				if !isNull {
+
+					{
+
+						tmpDec := &_overloadHelper.tmpDec1
+						tmpDec.SetInt64(int64(col[i]))
+						if _, err := tree.ExactCtx.Add(&a.scratch.curSum, &a.scratch.curSum, tmpDec); err != nil {
+							colexecerror.ExpectedError(err)
+						}
+					}
+
+					a.scratch.curCount++
+					a.scratch.foundNonNullForCurrentGroup = true
+				}
+			}
 		}
 	}
-	return nil, errors.Errorf("unsupported avg agg type %s", t.Name())
+}
+
+func (a *avgInt16Agg) Flush() {
+	// The aggregation is finished. Flush the last value. If we haven't found
+	// any non-nulls for this group so far, the output for this group should be
+	// NULL.
+	if !a.scratch.foundNonNullForCurrentGroup {
+		a.scratch.nulls.SetNull(a.scratch.curIdx)
+	} else {
+
+		a.scratch.vec[a.scratch.curIdx].SetInt64(a.scratch.curCount)
+		if _, err := tree.DecimalCtx.Quo(&a.scratch.vec[a.scratch.curIdx], &a.scratch.curSum, &a.scratch.vec[a.scratch.curIdx]); err != nil {
+			colexecerror.InternalError(err)
+		}
+	}
+	a.scratch.curIdx++
+}
+
+func (a *avgInt16Agg) HandleEmptyInputScalar() {
+	a.scratch.nulls.SetNull(0)
+}
+
+type avgInt16AggAlloc struct {
+	aggAllocBase
+	aggFuncs []avgInt16Agg
+}
+
+var _ aggregateFuncAlloc = &avgInt16AggAlloc{}
+
+func (a *avgInt16AggAlloc) newAggFunc() aggregateFunc {
+	if len(a.aggFuncs) == 0 {
+		a.allocator.AdjustMemoryUsage(sizeOfAvgInt16Agg * a.allocSize)
+		a.aggFuncs = make([]avgInt16Agg, a.allocSize)
+	}
+	f := &a.aggFuncs[0]
+	a.aggFuncs = a.aggFuncs[1:]
+	return f
+}
+
+type avgInt32Agg struct {
+	groups  []bool
+	scratch struct {
+		curIdx int
+		// curSum keeps track of the sum of elements belonging to the current group,
+		// so we can index into the slice once per group, instead of on each
+		// iteration.
+		curSum apd.Decimal
+		// curCount keeps track of the number of elements that we've seen
+		// belonging to the current group.
+		curCount int64
+		// vec points to the output vector.
+		vec []apd.Decimal
+		// nulls points to the output null vector that we are updating.
+		nulls *coldata.Nulls
+		// foundNonNullForCurrentGroup tracks if we have seen any non-null values
+		// for the group that is currently being aggregated.
+		foundNonNullForCurrentGroup bool
+	}
+	overloadHelper overloadHelper
+}
+
+var _ aggregateFunc = &avgInt32Agg{}
+
+const sizeOfAvgInt32Agg = int64(unsafe.Sizeof(avgInt32Agg{}))
+
+func (a *avgInt32Agg) Init(groups []bool, v coldata.Vec) {
+	a.groups = groups
+	a.scratch.vec = v.Decimal()
+	a.scratch.nulls = v.Nulls()
+	a.Reset()
+}
+
+func (a *avgInt32Agg) Reset() {
+	a.scratch.curIdx = -1
+	a.scratch.curSum = zeroDecimalValue
+	a.scratch.curCount = 0
+	a.scratch.foundNonNullForCurrentGroup = false
+	a.scratch.nulls.UnsetNulls()
+}
+
+func (a *avgInt32Agg) CurrentOutputIndex() int {
+	return a.scratch.curIdx
+}
+
+func (a *avgInt32Agg) SetOutputIndex(idx int) {
+	if a.scratch.curIdx != -1 {
+		a.scratch.curIdx = idx
+		a.scratch.nulls.UnsetNullsAfter(idx + 1)
+	}
+}
+
+func (a *avgInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	_overloadHelper := a.overloadHelper
+	inputLen := b.Length()
+	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
+	col, nulls := vec.Int32(), vec.Nulls()
+	if nulls.MaybeHasNulls() {
+		if sel != nil {
+			sel = sel[:inputLen]
+			for _, i := range sel {
+
+				if a.groups[i] {
+					// If we encounter a new group, and we haven't found any non-nulls for the
+					// current group, the output for this group should be null. If
+					// a.scratch.curIdx is negative, it means that this is the first group.
+					if a.scratch.curIdx >= 0 {
+						if !a.scratch.foundNonNullForCurrentGroup {
+							a.scratch.nulls.SetNull(a.scratch.curIdx)
+						} else {
+
+							a.scratch.vec[a.scratch.curIdx].SetInt64(a.scratch.curCount)
+							if _, err := tree.DecimalCtx.Quo(&a.scratch.vec[a.scratch.curIdx], &a.scratch.curSum, &a.scratch.vec[a.scratch.curIdx]); err != nil {
+								colexecerror.InternalError(err)
+							}
+						}
+					}
+					a.scratch.curIdx++
+					a.scratch.curSum = zeroDecimalValue
+					a.scratch.curCount = 0
+
+					a.scratch.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = nulls.NullAt(i)
+				if !isNull {
+
+					{
+
+						tmpDec := &_overloadHelper.tmpDec1
+						tmpDec.SetInt64(int64(col[i]))
+						if _, err := tree.ExactCtx.Add(&a.scratch.curSum, &a.scratch.curSum, tmpDec); err != nil {
+							colexecerror.ExpectedError(err)
+						}
+					}
+
+					a.scratch.curCount++
+					a.scratch.foundNonNullForCurrentGroup = true
+				}
+			}
+		} else {
+			col = col[:inputLen]
+			for i := range col {
+
+				if a.groups[i] {
+					// If we encounter a new group, and we haven't found any non-nulls for the
+					// current group, the output for this group should be null. If
+					// a.scratch.curIdx is negative, it means that this is the first group.
+					if a.scratch.curIdx >= 0 {
+						if !a.scratch.foundNonNullForCurrentGroup {
+							a.scratch.nulls.SetNull(a.scratch.curIdx)
+						} else {
+
+							a.scratch.vec[a.scratch.curIdx].SetInt64(a.scratch.curCount)
+							if _, err := tree.DecimalCtx.Quo(&a.scratch.vec[a.scratch.curIdx], &a.scratch.curSum, &a.scratch.vec[a.scratch.curIdx]); err != nil {
+								colexecerror.InternalError(err)
+							}
+						}
+					}
+					a.scratch.curIdx++
+					a.scratch.curSum = zeroDecimalValue
+					a.scratch.curCount = 0
+
+					a.scratch.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = nulls.NullAt(i)
+				if !isNull {
+
+					{
+
+						tmpDec := &_overloadHelper.tmpDec1
+						tmpDec.SetInt64(int64(col[i]))
+						if _, err := tree.ExactCtx.Add(&a.scratch.curSum, &a.scratch.curSum, tmpDec); err != nil {
+							colexecerror.ExpectedError(err)
+						}
+					}
+
+					a.scratch.curCount++
+					a.scratch.foundNonNullForCurrentGroup = true
+				}
+			}
+		}
+	} else {
+		if sel != nil {
+			sel = sel[:inputLen]
+			for _, i := range sel {
+
+				if a.groups[i] {
+					// If we encounter a new group, and we haven't found any non-nulls for the
+					// current group, the output for this group should be null. If
+					// a.scratch.curIdx is negative, it means that this is the first group.
+					if a.scratch.curIdx >= 0 {
+						if !a.scratch.foundNonNullForCurrentGroup {
+							a.scratch.nulls.SetNull(a.scratch.curIdx)
+						} else {
+
+							a.scratch.vec[a.scratch.curIdx].SetInt64(a.scratch.curCount)
+							if _, err := tree.DecimalCtx.Quo(&a.scratch.vec[a.scratch.curIdx], &a.scratch.curSum, &a.scratch.vec[a.scratch.curIdx]); err != nil {
+								colexecerror.InternalError(err)
+							}
+						}
+					}
+					a.scratch.curIdx++
+					a.scratch.curSum = zeroDecimalValue
+					a.scratch.curCount = 0
+
+				}
+				var isNull bool
+				isNull = false
+				if !isNull {
+
+					{
+
+						tmpDec := &_overloadHelper.tmpDec1
+						tmpDec.SetInt64(int64(col[i]))
+						if _, err := tree.ExactCtx.Add(&a.scratch.curSum, &a.scratch.curSum, tmpDec); err != nil {
+							colexecerror.ExpectedError(err)
+						}
+					}
+
+					a.scratch.curCount++
+					a.scratch.foundNonNullForCurrentGroup = true
+				}
+			}
+		} else {
+			col = col[:inputLen]
+			for i := range col {
+
+				if a.groups[i] {
+					// If we encounter a new group, and we haven't found any non-nulls for the
+					// current group, the output for this group should be null. If
+					// a.scratch.curIdx is negative, it means that this is the first group.
+					if a.scratch.curIdx >= 0 {
+						if !a.scratch.foundNonNullForCurrentGroup {
+							a.scratch.nulls.SetNull(a.scratch.curIdx)
+						} else {
+
+							a.scratch.vec[a.scratch.curIdx].SetInt64(a.scratch.curCount)
+							if _, err := tree.DecimalCtx.Quo(&a.scratch.vec[a.scratch.curIdx], &a.scratch.curSum, &a.scratch.vec[a.scratch.curIdx]); err != nil {
+								colexecerror.InternalError(err)
+							}
+						}
+					}
+					a.scratch.curIdx++
+					a.scratch.curSum = zeroDecimalValue
+					a.scratch.curCount = 0
+
+				}
+				var isNull bool
+				isNull = false
+				if !isNull {
+
+					{
+
+						tmpDec := &_overloadHelper.tmpDec1
+						tmpDec.SetInt64(int64(col[i]))
+						if _, err := tree.ExactCtx.Add(&a.scratch.curSum, &a.scratch.curSum, tmpDec); err != nil {
+							colexecerror.ExpectedError(err)
+						}
+					}
+
+					a.scratch.curCount++
+					a.scratch.foundNonNullForCurrentGroup = true
+				}
+			}
+		}
+	}
+}
+
+func (a *avgInt32Agg) Flush() {
+	// The aggregation is finished. Flush the last value. If we haven't found
+	// any non-nulls for this group so far, the output for this group should be
+	// NULL.
+	if !a.scratch.foundNonNullForCurrentGroup {
+		a.scratch.nulls.SetNull(a.scratch.curIdx)
+	} else {
+
+		a.scratch.vec[a.scratch.curIdx].SetInt64(a.scratch.curCount)
+		if _, err := tree.DecimalCtx.Quo(&a.scratch.vec[a.scratch.curIdx], &a.scratch.curSum, &a.scratch.vec[a.scratch.curIdx]); err != nil {
+			colexecerror.InternalError(err)
+		}
+	}
+	a.scratch.curIdx++
+}
+
+func (a *avgInt32Agg) HandleEmptyInputScalar() {
+	a.scratch.nulls.SetNull(0)
+}
+
+type avgInt32AggAlloc struct {
+	aggAllocBase
+	aggFuncs []avgInt32Agg
+}
+
+var _ aggregateFuncAlloc = &avgInt32AggAlloc{}
+
+func (a *avgInt32AggAlloc) newAggFunc() aggregateFunc {
+	if len(a.aggFuncs) == 0 {
+		a.allocator.AdjustMemoryUsage(sizeOfAvgInt32Agg * a.allocSize)
+		a.aggFuncs = make([]avgInt32Agg, a.allocSize)
+	}
+	f := &a.aggFuncs[0]
+	a.aggFuncs = a.aggFuncs[1:]
+	return f
+}
+
+type avgInt64Agg struct {
+	groups  []bool
+	scratch struct {
+		curIdx int
+		// curSum keeps track of the sum of elements belonging to the current group,
+		// so we can index into the slice once per group, instead of on each
+		// iteration.
+		curSum apd.Decimal
+		// curCount keeps track of the number of elements that we've seen
+		// belonging to the current group.
+		curCount int64
+		// vec points to the output vector.
+		vec []apd.Decimal
+		// nulls points to the output null vector that we are updating.
+		nulls *coldata.Nulls
+		// foundNonNullForCurrentGroup tracks if we have seen any non-null values
+		// for the group that is currently being aggregated.
+		foundNonNullForCurrentGroup bool
+	}
+	overloadHelper overloadHelper
+}
+
+var _ aggregateFunc = &avgInt64Agg{}
+
+const sizeOfAvgInt64Agg = int64(unsafe.Sizeof(avgInt64Agg{}))
+
+func (a *avgInt64Agg) Init(groups []bool, v coldata.Vec) {
+	a.groups = groups
+	a.scratch.vec = v.Decimal()
+	a.scratch.nulls = v.Nulls()
+	a.Reset()
+}
+
+func (a *avgInt64Agg) Reset() {
+	a.scratch.curIdx = -1
+	a.scratch.curSum = zeroDecimalValue
+	a.scratch.curCount = 0
+	a.scratch.foundNonNullForCurrentGroup = false
+	a.scratch.nulls.UnsetNulls()
+}
+
+func (a *avgInt64Agg) CurrentOutputIndex() int {
+	return a.scratch.curIdx
+}
+
+func (a *avgInt64Agg) SetOutputIndex(idx int) {
+	if a.scratch.curIdx != -1 {
+		a.scratch.curIdx = idx
+		a.scratch.nulls.UnsetNullsAfter(idx + 1)
+	}
+}
+
+func (a *avgInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	_overloadHelper := a.overloadHelper
+	inputLen := b.Length()
+	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
+	col, nulls := vec.Int64(), vec.Nulls()
+	if nulls.MaybeHasNulls() {
+		if sel != nil {
+			sel = sel[:inputLen]
+			for _, i := range sel {
+
+				if a.groups[i] {
+					// If we encounter a new group, and we haven't found any non-nulls for the
+					// current group, the output for this group should be null. If
+					// a.scratch.curIdx is negative, it means that this is the first group.
+					if a.scratch.curIdx >= 0 {
+						if !a.scratch.foundNonNullForCurrentGroup {
+							a.scratch.nulls.SetNull(a.scratch.curIdx)
+						} else {
+
+							a.scratch.vec[a.scratch.curIdx].SetInt64(a.scratch.curCount)
+							if _, err := tree.DecimalCtx.Quo(&a.scratch.vec[a.scratch.curIdx], &a.scratch.curSum, &a.scratch.vec[a.scratch.curIdx]); err != nil {
+								colexecerror.InternalError(err)
+							}
+						}
+					}
+					a.scratch.curIdx++
+					a.scratch.curSum = zeroDecimalValue
+					a.scratch.curCount = 0
+
+					a.scratch.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = nulls.NullAt(i)
+				if !isNull {
+
+					{
+
+						tmpDec := &_overloadHelper.tmpDec1
+						tmpDec.SetInt64(int64(col[i]))
+						if _, err := tree.ExactCtx.Add(&a.scratch.curSum, &a.scratch.curSum, tmpDec); err != nil {
+							colexecerror.ExpectedError(err)
+						}
+					}
+
+					a.scratch.curCount++
+					a.scratch.foundNonNullForCurrentGroup = true
+				}
+			}
+		} else {
+			col = col[:inputLen]
+			for i := range col {
+
+				if a.groups[i] {
+					// If we encounter a new group, and we haven't found any non-nulls for the
+					// current group, the output for this group should be null. If
+					// a.scratch.curIdx is negative, it means that this is the first group.
+					if a.scratch.curIdx >= 0 {
+						if !a.scratch.foundNonNullForCurrentGroup {
+							a.scratch.nulls.SetNull(a.scratch.curIdx)
+						} else {
+
+							a.scratch.vec[a.scratch.curIdx].SetInt64(a.scratch.curCount)
+							if _, err := tree.DecimalCtx.Quo(&a.scratch.vec[a.scratch.curIdx], &a.scratch.curSum, &a.scratch.vec[a.scratch.curIdx]); err != nil {
+								colexecerror.InternalError(err)
+							}
+						}
+					}
+					a.scratch.curIdx++
+					a.scratch.curSum = zeroDecimalValue
+					a.scratch.curCount = 0
+
+					a.scratch.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = nulls.NullAt(i)
+				if !isNull {
+
+					{
+
+						tmpDec := &_overloadHelper.tmpDec1
+						tmpDec.SetInt64(int64(col[i]))
+						if _, err := tree.ExactCtx.Add(&a.scratch.curSum, &a.scratch.curSum, tmpDec); err != nil {
+							colexecerror.ExpectedError(err)
+						}
+					}
+
+					a.scratch.curCount++
+					a.scratch.foundNonNullForCurrentGroup = true
+				}
+			}
+		}
+	} else {
+		if sel != nil {
+			sel = sel[:inputLen]
+			for _, i := range sel {
+
+				if a.groups[i] {
+					// If we encounter a new group, and we haven't found any non-nulls for the
+					// current group, the output for this group should be null. If
+					// a.scratch.curIdx is negative, it means that this is the first group.
+					if a.scratch.curIdx >= 0 {
+						if !a.scratch.foundNonNullForCurrentGroup {
+							a.scratch.nulls.SetNull(a.scratch.curIdx)
+						} else {
+
+							a.scratch.vec[a.scratch.curIdx].SetInt64(a.scratch.curCount)
+							if _, err := tree.DecimalCtx.Quo(&a.scratch.vec[a.scratch.curIdx], &a.scratch.curSum, &a.scratch.vec[a.scratch.curIdx]); err != nil {
+								colexecerror.InternalError(err)
+							}
+						}
+					}
+					a.scratch.curIdx++
+					a.scratch.curSum = zeroDecimalValue
+					a.scratch.curCount = 0
+
+				}
+				var isNull bool
+				isNull = false
+				if !isNull {
+
+					{
+
+						tmpDec := &_overloadHelper.tmpDec1
+						tmpDec.SetInt64(int64(col[i]))
+						if _, err := tree.ExactCtx.Add(&a.scratch.curSum, &a.scratch.curSum, tmpDec); err != nil {
+							colexecerror.ExpectedError(err)
+						}
+					}
+
+					a.scratch.curCount++
+					a.scratch.foundNonNullForCurrentGroup = true
+				}
+			}
+		} else {
+			col = col[:inputLen]
+			for i := range col {
+
+				if a.groups[i] {
+					// If we encounter a new group, and we haven't found any non-nulls for the
+					// current group, the output for this group should be null. If
+					// a.scratch.curIdx is negative, it means that this is the first group.
+					if a.scratch.curIdx >= 0 {
+						if !a.scratch.foundNonNullForCurrentGroup {
+							a.scratch.nulls.SetNull(a.scratch.curIdx)
+						} else {
+
+							a.scratch.vec[a.scratch.curIdx].SetInt64(a.scratch.curCount)
+							if _, err := tree.DecimalCtx.Quo(&a.scratch.vec[a.scratch.curIdx], &a.scratch.curSum, &a.scratch.vec[a.scratch.curIdx]); err != nil {
+								colexecerror.InternalError(err)
+							}
+						}
+					}
+					a.scratch.curIdx++
+					a.scratch.curSum = zeroDecimalValue
+					a.scratch.curCount = 0
+
+				}
+				var isNull bool
+				isNull = false
+				if !isNull {
+
+					{
+
+						tmpDec := &_overloadHelper.tmpDec1
+						tmpDec.SetInt64(int64(col[i]))
+						if _, err := tree.ExactCtx.Add(&a.scratch.curSum, &a.scratch.curSum, tmpDec); err != nil {
+							colexecerror.ExpectedError(err)
+						}
+					}
+
+					a.scratch.curCount++
+					a.scratch.foundNonNullForCurrentGroup = true
+				}
+			}
+		}
+	}
+}
+
+func (a *avgInt64Agg) Flush() {
+	// The aggregation is finished. Flush the last value. If we haven't found
+	// any non-nulls for this group so far, the output for this group should be
+	// NULL.
+	if !a.scratch.foundNonNullForCurrentGroup {
+		a.scratch.nulls.SetNull(a.scratch.curIdx)
+	} else {
+
+		a.scratch.vec[a.scratch.curIdx].SetInt64(a.scratch.curCount)
+		if _, err := tree.DecimalCtx.Quo(&a.scratch.vec[a.scratch.curIdx], &a.scratch.curSum, &a.scratch.vec[a.scratch.curIdx]); err != nil {
+			colexecerror.InternalError(err)
+		}
+	}
+	a.scratch.curIdx++
+}
+
+func (a *avgInt64Agg) HandleEmptyInputScalar() {
+	a.scratch.nulls.SetNull(0)
+}
+
+type avgInt64AggAlloc struct {
+	aggAllocBase
+	aggFuncs []avgInt64Agg
+}
+
+var _ aggregateFuncAlloc = &avgInt64AggAlloc{}
+
+func (a *avgInt64AggAlloc) newAggFunc() aggregateFunc {
+	if len(a.aggFuncs) == 0 {
+		a.allocator.AdjustMemoryUsage(sizeOfAvgInt64Agg * a.allocSize)
+		a.aggFuncs = make([]avgInt64Agg, a.allocSize)
+	}
+	f := &a.aggFuncs[0]
+	a.aggFuncs = a.aggFuncs[1:]
+	return f
 }
 
 type avgDecimalAgg struct {
@@ -287,9 +1071,8 @@ func (a *avgDecimalAgg) HandleEmptyInputScalar() {
 }
 
 type avgDecimalAggAlloc struct {
-	allocator *colmem.Allocator
-	allocSize int64
-	aggFuncs  []avgDecimalAgg
+	aggAllocBase
+	aggFuncs []avgDecimalAgg
 }
 
 var _ aggregateFuncAlloc = &avgDecimalAggAlloc{}
@@ -517,9 +1300,8 @@ func (a *avgFloat64Agg) HandleEmptyInputScalar() {
 }
 
 type avgFloat64AggAlloc struct {
-	allocator *colmem.Allocator
-	allocSize int64
-	aggFuncs  []avgFloat64Agg
+	aggAllocBase
+	aggFuncs []avgFloat64Agg
 }
 
 var _ aggregateFuncAlloc = &avgFloat64AggAlloc{}
@@ -528,6 +1310,215 @@ func (a *avgFloat64AggAlloc) newAggFunc() aggregateFunc {
 	if len(a.aggFuncs) == 0 {
 		a.allocator.AdjustMemoryUsage(sizeOfAvgFloat64Agg * a.allocSize)
 		a.aggFuncs = make([]avgFloat64Agg, a.allocSize)
+	}
+	f := &a.aggFuncs[0]
+	a.aggFuncs = a.aggFuncs[1:]
+	return f
+}
+
+type avgIntervalAgg struct {
+	groups  []bool
+	scratch struct {
+		curIdx int
+		// curSum keeps track of the sum of elements belonging to the current group,
+		// so we can index into the slice once per group, instead of on each
+		// iteration.
+		curSum duration.Duration
+		// curCount keeps track of the number of elements that we've seen
+		// belonging to the current group.
+		curCount int64
+		// vec points to the output vector.
+		vec []duration.Duration
+		// nulls points to the output null vector that we are updating.
+		nulls *coldata.Nulls
+		// foundNonNullForCurrentGroup tracks if we have seen any non-null values
+		// for the group that is currently being aggregated.
+		foundNonNullForCurrentGroup bool
+	}
+}
+
+var _ aggregateFunc = &avgIntervalAgg{}
+
+const sizeOfAvgIntervalAgg = int64(unsafe.Sizeof(avgIntervalAgg{}))
+
+func (a *avgIntervalAgg) Init(groups []bool, v coldata.Vec) {
+	a.groups = groups
+	a.scratch.vec = v.Interval()
+	a.scratch.nulls = v.Nulls()
+	a.Reset()
+}
+
+func (a *avgIntervalAgg) Reset() {
+	a.scratch.curIdx = -1
+	a.scratch.curSum = zeroIntervalValue
+	a.scratch.curCount = 0
+	a.scratch.foundNonNullForCurrentGroup = false
+	a.scratch.nulls.UnsetNulls()
+}
+
+func (a *avgIntervalAgg) CurrentOutputIndex() int {
+	return a.scratch.curIdx
+}
+
+func (a *avgIntervalAgg) SetOutputIndex(idx int) {
+	if a.scratch.curIdx != -1 {
+		a.scratch.curIdx = idx
+		a.scratch.nulls.UnsetNullsAfter(idx + 1)
+	}
+}
+
+func (a *avgIntervalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
+	inputLen := b.Length()
+	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
+	col, nulls := vec.Interval(), vec.Nulls()
+	if nulls.MaybeHasNulls() {
+		if sel != nil {
+			sel = sel[:inputLen]
+			for _, i := range sel {
+
+				if a.groups[i] {
+					// If we encounter a new group, and we haven't found any non-nulls for the
+					// current group, the output for this group should be null. If
+					// a.scratch.curIdx is negative, it means that this is the first group.
+					if a.scratch.curIdx >= 0 {
+						if !a.scratch.foundNonNullForCurrentGroup {
+							a.scratch.nulls.SetNull(a.scratch.curIdx)
+						} else {
+							a.scratch.vec[a.scratch.curIdx] = a.scratch.curSum.Div(int64(a.scratch.curCount))
+						}
+					}
+					a.scratch.curIdx++
+					a.scratch.curSum = zeroIntervalValue
+					a.scratch.curCount = 0
+
+					a.scratch.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = nulls.NullAt(i)
+				if !isNull {
+					a.scratch.curSum = a.scratch.curSum.Add(col[i])
+					a.scratch.curCount++
+					a.scratch.foundNonNullForCurrentGroup = true
+				}
+			}
+		} else {
+			col = col[:inputLen]
+			for i := range col {
+
+				if a.groups[i] {
+					// If we encounter a new group, and we haven't found any non-nulls for the
+					// current group, the output for this group should be null. If
+					// a.scratch.curIdx is negative, it means that this is the first group.
+					if a.scratch.curIdx >= 0 {
+						if !a.scratch.foundNonNullForCurrentGroup {
+							a.scratch.nulls.SetNull(a.scratch.curIdx)
+						} else {
+							a.scratch.vec[a.scratch.curIdx] = a.scratch.curSum.Div(int64(a.scratch.curCount))
+						}
+					}
+					a.scratch.curIdx++
+					a.scratch.curSum = zeroIntervalValue
+					a.scratch.curCount = 0
+
+					a.scratch.foundNonNullForCurrentGroup = false
+				}
+				var isNull bool
+				isNull = nulls.NullAt(i)
+				if !isNull {
+					a.scratch.curSum = a.scratch.curSum.Add(col[i])
+					a.scratch.curCount++
+					a.scratch.foundNonNullForCurrentGroup = true
+				}
+			}
+		}
+	} else {
+		if sel != nil {
+			sel = sel[:inputLen]
+			for _, i := range sel {
+
+				if a.groups[i] {
+					// If we encounter a new group, and we haven't found any non-nulls for the
+					// current group, the output for this group should be null. If
+					// a.scratch.curIdx is negative, it means that this is the first group.
+					if a.scratch.curIdx >= 0 {
+						if !a.scratch.foundNonNullForCurrentGroup {
+							a.scratch.nulls.SetNull(a.scratch.curIdx)
+						} else {
+							a.scratch.vec[a.scratch.curIdx] = a.scratch.curSum.Div(int64(a.scratch.curCount))
+						}
+					}
+					a.scratch.curIdx++
+					a.scratch.curSum = zeroIntervalValue
+					a.scratch.curCount = 0
+
+				}
+				var isNull bool
+				isNull = false
+				if !isNull {
+					a.scratch.curSum = a.scratch.curSum.Add(col[i])
+					a.scratch.curCount++
+					a.scratch.foundNonNullForCurrentGroup = true
+				}
+			}
+		} else {
+			col = col[:inputLen]
+			for i := range col {
+
+				if a.groups[i] {
+					// If we encounter a new group, and we haven't found any non-nulls for the
+					// current group, the output for this group should be null. If
+					// a.scratch.curIdx is negative, it means that this is the first group.
+					if a.scratch.curIdx >= 0 {
+						if !a.scratch.foundNonNullForCurrentGroup {
+							a.scratch.nulls.SetNull(a.scratch.curIdx)
+						} else {
+							a.scratch.vec[a.scratch.curIdx] = a.scratch.curSum.Div(int64(a.scratch.curCount))
+						}
+					}
+					a.scratch.curIdx++
+					a.scratch.curSum = zeroIntervalValue
+					a.scratch.curCount = 0
+
+				}
+				var isNull bool
+				isNull = false
+				if !isNull {
+					a.scratch.curSum = a.scratch.curSum.Add(col[i])
+					a.scratch.curCount++
+					a.scratch.foundNonNullForCurrentGroup = true
+				}
+			}
+		}
+	}
+}
+
+func (a *avgIntervalAgg) Flush() {
+	// The aggregation is finished. Flush the last value. If we haven't found
+	// any non-nulls for this group so far, the output for this group should be
+	// NULL.
+	if !a.scratch.foundNonNullForCurrentGroup {
+		a.scratch.nulls.SetNull(a.scratch.curIdx)
+	} else {
+		a.scratch.vec[a.scratch.curIdx] = a.scratch.curSum.Div(int64(a.scratch.curCount))
+	}
+	a.scratch.curIdx++
+}
+
+func (a *avgIntervalAgg) HandleEmptyInputScalar() {
+	a.scratch.nulls.SetNull(0)
+}
+
+type avgIntervalAggAlloc struct {
+	aggAllocBase
+	aggFuncs []avgIntervalAgg
+}
+
+var _ aggregateFuncAlloc = &avgIntervalAggAlloc{}
+
+func (a *avgIntervalAggAlloc) newAggFunc() aggregateFunc {
+	if len(a.aggFuncs) == 0 {
+		a.allocator.AdjustMemoryUsage(sizeOfAvgIntervalAgg * a.allocSize)
+		a.aggFuncs = make([]avgIntervalAgg, a.allocSize)
 	}
 	f := &a.aggFuncs[0]
 	a.aggFuncs = a.aggFuncs[1:]

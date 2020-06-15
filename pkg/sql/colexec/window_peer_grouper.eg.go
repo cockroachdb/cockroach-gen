@@ -16,6 +16,7 @@ import (
 	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase"
 	"github.com/cockroachdb/cockroach/pkg/sql/colmem"
 	"github.com/cockroachdb/cockroach/pkg/sql/execinfrapb"
+	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 	"github.com/cockroachdb/cockroach/pkg/sql/types"
 )
 
@@ -58,7 +59,7 @@ func NewWindowPeerGrouper(
 		outputColIdx:    outputColIdx,
 	}
 	if allPeers {
-		if partitionColIdx != columnOmitted {
+		if partitionColIdx != tree.NoColumnIdx {
 			return &windowPeerGrouperAllPeersWithPartitionOp{
 				windowPeerGrouperInitFields: initFields,
 			}, nil
@@ -67,7 +68,7 @@ func NewWindowPeerGrouper(
 			windowPeerGrouperInitFields: initFields,
 		}, nil
 	}
-	if partitionColIdx != columnOmitted {
+	if partitionColIdx != tree.NoColumnIdx {
 		return &windowPeerGrouperWithPartitionOp{
 			windowPeerGrouperInitFields: initFields,
 		}, nil

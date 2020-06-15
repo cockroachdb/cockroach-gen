@@ -18,77 +18,14 @@ import (
 	"github.com/cockroachdb/apd"
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
 	"github.com/cockroachdb/cockroach/pkg/col/coldataext"
-	"github.com/cockroachdb/cockroach/pkg/col/typeconv"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase/colexecerror"
 	"github.com/cockroachdb/cockroach/pkg/sql/colmem"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
-	"github.com/cockroachdb/cockroach/pkg/sql/types"
 	"github.com/cockroachdb/cockroach/pkg/util/duration"
-	"github.com/cockroachdb/errors"
 )
 
 // Remove unused warning.
 var _ = colexecerror.InternalError
-
-func newMinAggAlloc(
-	allocator *colmem.Allocator, t *types.T, allocSize int64,
-) (aggregateFuncAlloc, error) {
-	switch typeconv.TypeFamilyToCanonicalTypeFamily(t.Family()) {
-	case types.BoolFamily:
-		switch t.Width() {
-		case -1:
-		default:
-			return &minBoolAggAlloc{allocator: allocator, allocSize: allocSize}, nil
-		}
-	case types.BytesFamily:
-		switch t.Width() {
-		case -1:
-		default:
-			return &minBytesAggAlloc{allocator: allocator, allocSize: allocSize}, nil
-		}
-	case types.DecimalFamily:
-		switch t.Width() {
-		case -1:
-		default:
-			return &minDecimalAggAlloc{allocator: allocator, allocSize: allocSize}, nil
-		}
-	case types.IntFamily:
-		switch t.Width() {
-		case 16:
-			return &minInt16AggAlloc{allocator: allocator, allocSize: allocSize}, nil
-		case 32:
-			return &minInt32AggAlloc{allocator: allocator, allocSize: allocSize}, nil
-		case -1:
-		default:
-			return &minInt64AggAlloc{allocator: allocator, allocSize: allocSize}, nil
-		}
-	case types.FloatFamily:
-		switch t.Width() {
-		case -1:
-		default:
-			return &minFloat64AggAlloc{allocator: allocator, allocSize: allocSize}, nil
-		}
-	case types.TimestampTZFamily:
-		switch t.Width() {
-		case -1:
-		default:
-			return &minTimestampAggAlloc{allocator: allocator, allocSize: allocSize}, nil
-		}
-	case types.IntervalFamily:
-		switch t.Width() {
-		case -1:
-		default:
-			return &minIntervalAggAlloc{allocator: allocator, allocSize: allocSize}, nil
-		}
-	case typeconv.DatumVecCanonicalTypeFamily:
-		switch t.Width() {
-		case -1:
-		default:
-			return &minDatumAggAlloc{allocator: allocator, allocSize: allocSize}, nil
-		}
-	}
-	return nil, errors.Errorf("unsupported min agg type %s", t.Name())
-}
 
 type minBoolAgg struct {
 	allocator *colmem.Allocator
@@ -367,9 +304,8 @@ func (a *minBoolAgg) HandleEmptyInputScalar() {
 }
 
 type minBoolAggAlloc struct {
-	allocator *colmem.Allocator
-	allocSize int64
-	aggFuncs  []minBoolAgg
+	aggAllocBase
+	aggFuncs []minBoolAgg
 }
 
 var _ aggregateFuncAlloc = &minBoolAggAlloc{}
@@ -634,9 +570,8 @@ func (a *minBytesAgg) HandleEmptyInputScalar() {
 }
 
 type minBytesAggAlloc struct {
-	allocator *colmem.Allocator
-	allocSize int64
-	aggFuncs  []minBytesAgg
+	aggAllocBase
+	aggFuncs []minBytesAgg
 }
 
 var _ aggregateFuncAlloc = &minBytesAggAlloc{}
@@ -897,9 +832,8 @@ func (a *minDecimalAgg) HandleEmptyInputScalar() {
 }
 
 type minDecimalAggAlloc struct {
-	allocator *colmem.Allocator
-	allocSize int64
-	aggFuncs  []minDecimalAgg
+	aggAllocBase
+	aggFuncs []minDecimalAgg
 }
 
 var _ aggregateFuncAlloc = &minDecimalAggAlloc{}
@@ -922,9 +856,9 @@ type minInt16Agg struct {
 	// curAgg holds the running min/max, so we can index into the slice once per
 	// group, instead of on each iteration.
 	// NOTE: if foundNonNullForCurrentGroup is false, curAgg is undefined.
-	curAgg int16
+	curAgg int64
 	// col points to the output vector we are updating.
-	col []int16
+	col []int64
 	// vec is the same as col before conversion from coldata.Vec.
 	vec coldata.Vec
 	// nulls points to the output null vector that we are updating.
@@ -941,7 +875,7 @@ const sizeOfminInt16Agg = int64(unsafe.Sizeof(minInt16Agg{}))
 func (a *minInt16Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
 	a.vec = v
-	a.col = v.Int16()
+	a.col = v.Int64()
 	a.nulls = v.Nulls()
 	a.Reset()
 }
@@ -994,7 +928,7 @@ func (a *minInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
 								val := col[i]
-								a.curAgg = val
+								a.curAgg = int64(val)
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -1018,7 +952,7 @@ func (a *minInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 								}
 
 								if cmp {
-									a.curAgg = candidate
+									a.curAgg = int64(candidate)
 								}
 							}
 						}
@@ -1046,7 +980,7 @@ func (a *minInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
 								val := col[i]
-								a.curAgg = val
+								a.curAgg = int64(val)
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -1070,7 +1004,7 @@ func (a *minInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 								}
 
 								if cmp {
-									a.curAgg = candidate
+									a.curAgg = int64(candidate)
 								}
 							}
 						}
@@ -1100,7 +1034,7 @@ func (a *minInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
 								val := col[i]
-								a.curAgg = val
+								a.curAgg = int64(val)
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -1124,7 +1058,7 @@ func (a *minInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 								}
 
 								if cmp {
-									a.curAgg = candidate
+									a.curAgg = int64(candidate)
 								}
 							}
 						}
@@ -1152,7 +1086,7 @@ func (a *minInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
 								val := col[i]
-								a.curAgg = val
+								a.curAgg = int64(val)
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -1176,7 +1110,7 @@ func (a *minInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 								}
 
 								if cmp {
-									a.curAgg = candidate
+									a.curAgg = int64(candidate)
 								}
 							}
 						}
@@ -1204,9 +1138,8 @@ func (a *minInt16Agg) HandleEmptyInputScalar() {
 }
 
 type minInt16AggAlloc struct {
-	allocator *colmem.Allocator
-	allocSize int64
-	aggFuncs  []minInt16Agg
+	aggAllocBase
+	aggFuncs []minInt16Agg
 }
 
 var _ aggregateFuncAlloc = &minInt16AggAlloc{}
@@ -1229,9 +1162,9 @@ type minInt32Agg struct {
 	// curAgg holds the running min/max, so we can index into the slice once per
 	// group, instead of on each iteration.
 	// NOTE: if foundNonNullForCurrentGroup is false, curAgg is undefined.
-	curAgg int32
+	curAgg int64
 	// col points to the output vector we are updating.
-	col []int32
+	col []int64
 	// vec is the same as col before conversion from coldata.Vec.
 	vec coldata.Vec
 	// nulls points to the output null vector that we are updating.
@@ -1248,7 +1181,7 @@ const sizeOfminInt32Agg = int64(unsafe.Sizeof(minInt32Agg{}))
 func (a *minInt32Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
 	a.vec = v
-	a.col = v.Int32()
+	a.col = v.Int64()
 	a.nulls = v.Nulls()
 	a.Reset()
 }
@@ -1301,7 +1234,7 @@ func (a *minInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
 								val := col[i]
-								a.curAgg = val
+								a.curAgg = int64(val)
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -1325,7 +1258,7 @@ func (a *minInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 								}
 
 								if cmp {
-									a.curAgg = candidate
+									a.curAgg = int64(candidate)
 								}
 							}
 						}
@@ -1353,7 +1286,7 @@ func (a *minInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
 								val := col[i]
-								a.curAgg = val
+								a.curAgg = int64(val)
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -1377,7 +1310,7 @@ func (a *minInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 								}
 
 								if cmp {
-									a.curAgg = candidate
+									a.curAgg = int64(candidate)
 								}
 							}
 						}
@@ -1407,7 +1340,7 @@ func (a *minInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
 								val := col[i]
-								a.curAgg = val
+								a.curAgg = int64(val)
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -1431,7 +1364,7 @@ func (a *minInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 								}
 
 								if cmp {
-									a.curAgg = candidate
+									a.curAgg = int64(candidate)
 								}
 							}
 						}
@@ -1459,7 +1392,7 @@ func (a *minInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
 								val := col[i]
-								a.curAgg = val
+								a.curAgg = int64(val)
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -1483,7 +1416,7 @@ func (a *minInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 								}
 
 								if cmp {
-									a.curAgg = candidate
+									a.curAgg = int64(candidate)
 								}
 							}
 						}
@@ -1511,9 +1444,8 @@ func (a *minInt32Agg) HandleEmptyInputScalar() {
 }
 
 type minInt32AggAlloc struct {
-	allocator *colmem.Allocator
-	allocSize int64
-	aggFuncs  []minInt32Agg
+	aggAllocBase
+	aggFuncs []minInt32Agg
 }
 
 var _ aggregateFuncAlloc = &minInt32AggAlloc{}
@@ -1608,7 +1540,7 @@ func (a *minInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
 								val := col[i]
-								a.curAgg = val
+								a.curAgg = int64(val)
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -1632,7 +1564,7 @@ func (a *minInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 								}
 
 								if cmp {
-									a.curAgg = candidate
+									a.curAgg = int64(candidate)
 								}
 							}
 						}
@@ -1660,7 +1592,7 @@ func (a *minInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
 								val := col[i]
-								a.curAgg = val
+								a.curAgg = int64(val)
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -1684,7 +1616,7 @@ func (a *minInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 								}
 
 								if cmp {
-									a.curAgg = candidate
+									a.curAgg = int64(candidate)
 								}
 							}
 						}
@@ -1714,7 +1646,7 @@ func (a *minInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
 								val := col[i]
-								a.curAgg = val
+								a.curAgg = int64(val)
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -1738,7 +1670,7 @@ func (a *minInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 								}
 
 								if cmp {
-									a.curAgg = candidate
+									a.curAgg = int64(candidate)
 								}
 							}
 						}
@@ -1766,7 +1698,7 @@ func (a *minInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
 								val := col[i]
-								a.curAgg = val
+								a.curAgg = int64(val)
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -1790,7 +1722,7 @@ func (a *minInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 								}
 
 								if cmp {
-									a.curAgg = candidate
+									a.curAgg = int64(candidate)
 								}
 							}
 						}
@@ -1818,9 +1750,8 @@ func (a *minInt64Agg) HandleEmptyInputScalar() {
 }
 
 type minInt64AggAlloc struct {
-	allocator *colmem.Allocator
-	allocSize int64
-	aggFuncs  []minInt64Agg
+	aggAllocBase
+	aggFuncs []minInt64Agg
 }
 
 var _ aggregateFuncAlloc = &minInt64AggAlloc{}
@@ -2157,9 +2088,8 @@ func (a *minFloat64Agg) HandleEmptyInputScalar() {
 }
 
 type minFloat64AggAlloc struct {
-	allocator *colmem.Allocator
-	allocSize int64
-	aggFuncs  []minFloat64Agg
+	aggAllocBase
+	aggFuncs []minFloat64Agg
 }
 
 var _ aggregateFuncAlloc = &minFloat64AggAlloc{}
@@ -2448,9 +2378,8 @@ func (a *minTimestampAgg) HandleEmptyInputScalar() {
 }
 
 type minTimestampAggAlloc struct {
-	allocator *colmem.Allocator
-	allocSize int64
-	aggFuncs  []minTimestampAgg
+	aggAllocBase
+	aggFuncs []minTimestampAgg
 }
 
 var _ aggregateFuncAlloc = &minTimestampAggAlloc{}
@@ -2711,9 +2640,8 @@ func (a *minIntervalAgg) HandleEmptyInputScalar() {
 }
 
 type minIntervalAggAlloc struct {
-	allocator *colmem.Allocator
-	allocSize int64
-	aggFuncs  []minIntervalAgg
+	aggAllocBase
+	aggFuncs []minIntervalAgg
 }
 
 var _ aggregateFuncAlloc = &minIntervalAggAlloc{}
@@ -2982,9 +2910,8 @@ func (a *minDatumAgg) HandleEmptyInputScalar() {
 }
 
 type minDatumAggAlloc struct {
-	allocator *colmem.Allocator
-	allocSize int64
-	aggFuncs  []minDatumAgg
+	aggAllocBase
+	aggFuncs []minDatumAgg
 }
 
 var _ aggregateFuncAlloc = &minDatumAggAlloc{}
@@ -2998,66 +2925,6 @@ func (a *minDatumAggAlloc) newAggFunc() aggregateFunc {
 	f.allocator = a.allocator
 	a.aggFuncs = a.aggFuncs[1:]
 	return f
-}
-
-func newMaxAggAlloc(
-	allocator *colmem.Allocator, t *types.T, allocSize int64,
-) (aggregateFuncAlloc, error) {
-	switch typeconv.TypeFamilyToCanonicalTypeFamily(t.Family()) {
-	case types.BoolFamily:
-		switch t.Width() {
-		case -1:
-		default:
-			return &maxBoolAggAlloc{allocator: allocator, allocSize: allocSize}, nil
-		}
-	case types.BytesFamily:
-		switch t.Width() {
-		case -1:
-		default:
-			return &maxBytesAggAlloc{allocator: allocator, allocSize: allocSize}, nil
-		}
-	case types.DecimalFamily:
-		switch t.Width() {
-		case -1:
-		default:
-			return &maxDecimalAggAlloc{allocator: allocator, allocSize: allocSize}, nil
-		}
-	case types.IntFamily:
-		switch t.Width() {
-		case 16:
-			return &maxInt16AggAlloc{allocator: allocator, allocSize: allocSize}, nil
-		case 32:
-			return &maxInt32AggAlloc{allocator: allocator, allocSize: allocSize}, nil
-		case -1:
-		default:
-			return &maxInt64AggAlloc{allocator: allocator, allocSize: allocSize}, nil
-		}
-	case types.FloatFamily:
-		switch t.Width() {
-		case -1:
-		default:
-			return &maxFloat64AggAlloc{allocator: allocator, allocSize: allocSize}, nil
-		}
-	case types.TimestampTZFamily:
-		switch t.Width() {
-		case -1:
-		default:
-			return &maxTimestampAggAlloc{allocator: allocator, allocSize: allocSize}, nil
-		}
-	case types.IntervalFamily:
-		switch t.Width() {
-		case -1:
-		default:
-			return &maxIntervalAggAlloc{allocator: allocator, allocSize: allocSize}, nil
-		}
-	case typeconv.DatumVecCanonicalTypeFamily:
-		switch t.Width() {
-		case -1:
-		default:
-			return &maxDatumAggAlloc{allocator: allocator, allocSize: allocSize}, nil
-		}
-	}
-	return nil, errors.Errorf("unsupported max agg type %s", t.Name())
 }
 
 type maxBoolAgg struct {
@@ -3337,9 +3204,8 @@ func (a *maxBoolAgg) HandleEmptyInputScalar() {
 }
 
 type maxBoolAggAlloc struct {
-	allocator *colmem.Allocator
-	allocSize int64
-	aggFuncs  []maxBoolAgg
+	aggAllocBase
+	aggFuncs []maxBoolAgg
 }
 
 var _ aggregateFuncAlloc = &maxBoolAggAlloc{}
@@ -3604,9 +3470,8 @@ func (a *maxBytesAgg) HandleEmptyInputScalar() {
 }
 
 type maxBytesAggAlloc struct {
-	allocator *colmem.Allocator
-	allocSize int64
-	aggFuncs  []maxBytesAgg
+	aggAllocBase
+	aggFuncs []maxBytesAgg
 }
 
 var _ aggregateFuncAlloc = &maxBytesAggAlloc{}
@@ -3867,9 +3732,8 @@ func (a *maxDecimalAgg) HandleEmptyInputScalar() {
 }
 
 type maxDecimalAggAlloc struct {
-	allocator *colmem.Allocator
-	allocSize int64
-	aggFuncs  []maxDecimalAgg
+	aggAllocBase
+	aggFuncs []maxDecimalAgg
 }
 
 var _ aggregateFuncAlloc = &maxDecimalAggAlloc{}
@@ -3892,9 +3756,9 @@ type maxInt16Agg struct {
 	// curAgg holds the running min/max, so we can index into the slice once per
 	// group, instead of on each iteration.
 	// NOTE: if foundNonNullForCurrentGroup is false, curAgg is undefined.
-	curAgg int16
+	curAgg int64
 	// col points to the output vector we are updating.
-	col []int16
+	col []int64
 	// vec is the same as col before conversion from coldata.Vec.
 	vec coldata.Vec
 	// nulls points to the output null vector that we are updating.
@@ -3911,7 +3775,7 @@ const sizeOfmaxInt16Agg = int64(unsafe.Sizeof(maxInt16Agg{}))
 func (a *maxInt16Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
 	a.vec = v
-	a.col = v.Int16()
+	a.col = v.Int64()
 	a.nulls = v.Nulls()
 	a.Reset()
 }
@@ -3964,7 +3828,7 @@ func (a *maxInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
 								val := col[i]
-								a.curAgg = val
+								a.curAgg = int64(val)
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -3988,7 +3852,7 @@ func (a *maxInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 								}
 
 								if cmp {
-									a.curAgg = candidate
+									a.curAgg = int64(candidate)
 								}
 							}
 						}
@@ -4016,7 +3880,7 @@ func (a *maxInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
 								val := col[i]
-								a.curAgg = val
+								a.curAgg = int64(val)
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -4040,7 +3904,7 @@ func (a *maxInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 								}
 
 								if cmp {
-									a.curAgg = candidate
+									a.curAgg = int64(candidate)
 								}
 							}
 						}
@@ -4070,7 +3934,7 @@ func (a *maxInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
 								val := col[i]
-								a.curAgg = val
+								a.curAgg = int64(val)
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -4094,7 +3958,7 @@ func (a *maxInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 								}
 
 								if cmp {
-									a.curAgg = candidate
+									a.curAgg = int64(candidate)
 								}
 							}
 						}
@@ -4122,7 +3986,7 @@ func (a *maxInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
 								val := col[i]
-								a.curAgg = val
+								a.curAgg = int64(val)
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -4146,7 +4010,7 @@ func (a *maxInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 								}
 
 								if cmp {
-									a.curAgg = candidate
+									a.curAgg = int64(candidate)
 								}
 							}
 						}
@@ -4174,9 +4038,8 @@ func (a *maxInt16Agg) HandleEmptyInputScalar() {
 }
 
 type maxInt16AggAlloc struct {
-	allocator *colmem.Allocator
-	allocSize int64
-	aggFuncs  []maxInt16Agg
+	aggAllocBase
+	aggFuncs []maxInt16Agg
 }
 
 var _ aggregateFuncAlloc = &maxInt16AggAlloc{}
@@ -4199,9 +4062,9 @@ type maxInt32Agg struct {
 	// curAgg holds the running min/max, so we can index into the slice once per
 	// group, instead of on each iteration.
 	// NOTE: if foundNonNullForCurrentGroup is false, curAgg is undefined.
-	curAgg int32
+	curAgg int64
 	// col points to the output vector we are updating.
-	col []int32
+	col []int64
 	// vec is the same as col before conversion from coldata.Vec.
 	vec coldata.Vec
 	// nulls points to the output null vector that we are updating.
@@ -4218,7 +4081,7 @@ const sizeOfmaxInt32Agg = int64(unsafe.Sizeof(maxInt32Agg{}))
 func (a *maxInt32Agg) Init(groups []bool, v coldata.Vec) {
 	a.groups = groups
 	a.vec = v
-	a.col = v.Int32()
+	a.col = v.Int64()
 	a.nulls = v.Nulls()
 	a.Reset()
 }
@@ -4271,7 +4134,7 @@ func (a *maxInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
 								val := col[i]
-								a.curAgg = val
+								a.curAgg = int64(val)
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -4295,7 +4158,7 @@ func (a *maxInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 								}
 
 								if cmp {
-									a.curAgg = candidate
+									a.curAgg = int64(candidate)
 								}
 							}
 						}
@@ -4323,7 +4186,7 @@ func (a *maxInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
 								val := col[i]
-								a.curAgg = val
+								a.curAgg = int64(val)
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -4347,7 +4210,7 @@ func (a *maxInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 								}
 
 								if cmp {
-									a.curAgg = candidate
+									a.curAgg = int64(candidate)
 								}
 							}
 						}
@@ -4377,7 +4240,7 @@ func (a *maxInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
 								val := col[i]
-								a.curAgg = val
+								a.curAgg = int64(val)
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -4401,7 +4264,7 @@ func (a *maxInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 								}
 
 								if cmp {
-									a.curAgg = candidate
+									a.curAgg = int64(candidate)
 								}
 							}
 						}
@@ -4429,7 +4292,7 @@ func (a *maxInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
 								val := col[i]
-								a.curAgg = val
+								a.curAgg = int64(val)
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -4453,7 +4316,7 @@ func (a *maxInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 								}
 
 								if cmp {
-									a.curAgg = candidate
+									a.curAgg = int64(candidate)
 								}
 							}
 						}
@@ -4481,9 +4344,8 @@ func (a *maxInt32Agg) HandleEmptyInputScalar() {
 }
 
 type maxInt32AggAlloc struct {
-	allocator *colmem.Allocator
-	allocSize int64
-	aggFuncs  []maxInt32Agg
+	aggAllocBase
+	aggFuncs []maxInt32Agg
 }
 
 var _ aggregateFuncAlloc = &maxInt32AggAlloc{}
@@ -4578,7 +4440,7 @@ func (a *maxInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
 								val := col[i]
-								a.curAgg = val
+								a.curAgg = int64(val)
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -4602,7 +4464,7 @@ func (a *maxInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 								}
 
 								if cmp {
-									a.curAgg = candidate
+									a.curAgg = int64(candidate)
 								}
 							}
 						}
@@ -4630,7 +4492,7 @@ func (a *maxInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
 								val := col[i]
-								a.curAgg = val
+								a.curAgg = int64(val)
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -4654,7 +4516,7 @@ func (a *maxInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 								}
 
 								if cmp {
-									a.curAgg = candidate
+									a.curAgg = int64(candidate)
 								}
 							}
 						}
@@ -4684,7 +4546,7 @@ func (a *maxInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
 								val := col[i]
-								a.curAgg = val
+								a.curAgg = int64(val)
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -4708,7 +4570,7 @@ func (a *maxInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 								}
 
 								if cmp {
-									a.curAgg = candidate
+									a.curAgg = int64(candidate)
 								}
 							}
 						}
@@ -4736,7 +4598,7 @@ func (a *maxInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						if !isNull {
 							if !a.foundNonNullForCurrentGroup {
 								val := col[i]
-								a.curAgg = val
+								a.curAgg = int64(val)
 								a.foundNonNullForCurrentGroup = true
 							} else {
 								var cmp bool
@@ -4760,7 +4622,7 @@ func (a *maxInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 								}
 
 								if cmp {
-									a.curAgg = candidate
+									a.curAgg = int64(candidate)
 								}
 							}
 						}
@@ -4788,9 +4650,8 @@ func (a *maxInt64Agg) HandleEmptyInputScalar() {
 }
 
 type maxInt64AggAlloc struct {
-	allocator *colmem.Allocator
-	allocSize int64
-	aggFuncs  []maxInt64Agg
+	aggAllocBase
+	aggFuncs []maxInt64Agg
 }
 
 var _ aggregateFuncAlloc = &maxInt64AggAlloc{}
@@ -5127,9 +4988,8 @@ func (a *maxFloat64Agg) HandleEmptyInputScalar() {
 }
 
 type maxFloat64AggAlloc struct {
-	allocator *colmem.Allocator
-	allocSize int64
-	aggFuncs  []maxFloat64Agg
+	aggAllocBase
+	aggFuncs []maxFloat64Agg
 }
 
 var _ aggregateFuncAlloc = &maxFloat64AggAlloc{}
@@ -5418,9 +5278,8 @@ func (a *maxTimestampAgg) HandleEmptyInputScalar() {
 }
 
 type maxTimestampAggAlloc struct {
-	allocator *colmem.Allocator
-	allocSize int64
-	aggFuncs  []maxTimestampAgg
+	aggAllocBase
+	aggFuncs []maxTimestampAgg
 }
 
 var _ aggregateFuncAlloc = &maxTimestampAggAlloc{}
@@ -5681,9 +5540,8 @@ func (a *maxIntervalAgg) HandleEmptyInputScalar() {
 }
 
 type maxIntervalAggAlloc struct {
-	allocator *colmem.Allocator
-	allocSize int64
-	aggFuncs  []maxIntervalAgg
+	aggAllocBase
+	aggFuncs []maxIntervalAgg
 }
 
 var _ aggregateFuncAlloc = &maxIntervalAggAlloc{}
@@ -5952,9 +5810,8 @@ func (a *maxDatumAgg) HandleEmptyInputScalar() {
 }
 
 type maxDatumAggAlloc struct {
-	allocator *colmem.Allocator
-	allocSize int64
-	aggFuncs  []maxDatumAgg
+	aggAllocBase
+	aggFuncs []maxDatumAgg
 }
 
 var _ aggregateFuncAlloc = &maxDatumAggAlloc{}
