@@ -267,6 +267,7 @@ const (
 	PushLimitIntoConstrainedScan
 	PushLimitIntoIndexJoin
 	GenerateIndexScans
+	GeneratePartialIndexScans
 	GenerateConstrainedScans
 	GenerateInvertedIndexScans
 	SplitDisjunction

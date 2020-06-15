@@ -164,6 +164,42 @@ func (_e *explorer) exploreSelect(
 		}
 	}
 
+	// [GeneratePartialIndexScans]
+	{
+		_partlyExplored := _rootOrd < _rootState.start
+		_state := _e.lookupExploreState(_root.Input)
+		if !_state.fullyExplored {
+			_fullyExplored = false
+		}
+		var _member memo.RelExpr
+		for _ord := 0; _ord < _state.end; _ord++ {
+			if _member == nil {
+				_member = _root.Input.FirstExpr()
+			} else {
+				_member = _member.NextExpr()
+			}
+			if !_partlyExplored || _ord >= _state.start {
+				_scan, _ := _member.(*memo.ScanExpr)
+				if _scan != nil {
+					scanPrivate := &_scan.ScanPrivate
+					if _e.funcs.IsCanonicalScan(scanPrivate) {
+						filters := _root.Filters
+						if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GeneratePartialIndexScans) {
+							var _last memo.RelExpr
+							if _e.o.appliedRule != nil {
+								_last = memo.LastGroupMember(_root)
+							}
+							_e.funcs.GeneratePartialIndexScans(_root, scanPrivate, filters)
+							if _e.o.appliedRule != nil {
+								_e.o.appliedRule(opt.GeneratePartialIndexScans, _root, _last.NextExpr())
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [GenerateConstrainedScans]
 	{
 		_partlyExplored := _rootOrd < _rootState.start
