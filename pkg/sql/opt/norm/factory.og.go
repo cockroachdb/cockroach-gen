@@ -16171,6 +16171,24 @@ func (_f *Factory) ConstructJsonbAgg(
 	return _f.onConstructScalar(e)
 }
 
+// ConstructJsonObjectAgg constructs an expression for the JsonObjectAgg operator.
+func (_f *Factory) ConstructJsonObjectAgg(
+	key opt.ScalarExpr,
+	value opt.ScalarExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeJsonObjectAgg(key, value)
+	return _f.onConstructScalar(e)
+}
+
+// ConstructJsonbObjectAgg constructs an expression for the JsonbObjectAgg operator.
+func (_f *Factory) ConstructJsonbObjectAgg(
+	key opt.ScalarExpr,
+	value opt.ScalarExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeJsonbObjectAgg(key, value)
+	return _f.onConstructScalar(e)
+}
+
 // ConstructStringAgg constructs an expression for the StringAgg operator.
 func (_f *Factory) ConstructStringAgg(
 	input opt.ScalarExpr,
@@ -17728,6 +17746,22 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		}
 		return t
 
+	case *memo.JsonObjectAggExpr:
+		key := replace(t.Key).(opt.ScalarExpr)
+		value := replace(t.Value).(opt.ScalarExpr)
+		if key != t.Key || value != t.Value {
+			return f.ConstructJsonObjectAgg(key, value)
+		}
+		return t
+
+	case *memo.JsonbObjectAggExpr:
+		key := replace(t.Key).(opt.ScalarExpr)
+		value := replace(t.Value).(opt.ScalarExpr)
+		if key != t.Key || value != t.Value {
+			return f.ConstructJsonbObjectAgg(key, value)
+		}
+		return t
+
 	case *memo.StringAggExpr:
 		input := replace(t.Input).(opt.ScalarExpr)
 		sep := replace(t.Sep).(opt.ScalarExpr)
@@ -18986,6 +19020,18 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
 		)
 
+	case *memo.JsonObjectAggExpr:
+		return f.ConstructJsonObjectAgg(
+			f.invokeReplace(t.Key, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Value, replace).(opt.ScalarExpr),
+		)
+
+	case *memo.JsonbObjectAggExpr:
+		return f.ConstructJsonbObjectAgg(
+			f.invokeReplace(t.Key, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Value, replace).(opt.ScalarExpr),
+		)
+
 	case *memo.StringAggExpr:
 		return f.ConstructStringAgg(
 			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
@@ -19985,6 +20031,16 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 	case opt.JsonbAggOp:
 		return f.ConstructJsonbAgg(
 			args[0].(opt.ScalarExpr),
+		)
+	case opt.JsonObjectAggOp:
+		return f.ConstructJsonObjectAgg(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.JsonbObjectAggOp:
+		return f.ConstructJsonbObjectAgg(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
 		)
 	case opt.StringAggOp:
 		return f.ConstructStringAgg(

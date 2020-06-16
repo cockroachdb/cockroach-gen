@@ -12768,6 +12768,122 @@ func (e *JsonbAggExpr) DataType() *types.T {
 	return e.Typ
 }
 
+type JsonObjectAggExpr struct {
+	Key   opt.ScalarExpr
+	Value opt.ScalarExpr
+
+	Typ *types.T
+	id  opt.ScalarID
+}
+
+var _ opt.ScalarExpr = &JsonObjectAggExpr{}
+
+func (e *JsonObjectAggExpr) ID() opt.ScalarID {
+	return e.id
+}
+
+func (e *JsonObjectAggExpr) Op() opt.Operator {
+	return opt.JsonObjectAggOp
+}
+
+func (e *JsonObjectAggExpr) ChildCount() int {
+	return 2
+}
+
+func (e *JsonObjectAggExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Key
+	case 1:
+		return e.Value
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *JsonObjectAggExpr) Private() interface{} {
+	return nil
+}
+
+func (e *JsonObjectAggExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *JsonObjectAggExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Key = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Value = child.(opt.ScalarExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *JsonObjectAggExpr) DataType() *types.T {
+	return e.Typ
+}
+
+type JsonbObjectAggExpr struct {
+	Key   opt.ScalarExpr
+	Value opt.ScalarExpr
+
+	Typ *types.T
+	id  opt.ScalarID
+}
+
+var _ opt.ScalarExpr = &JsonbObjectAggExpr{}
+
+func (e *JsonbObjectAggExpr) ID() opt.ScalarID {
+	return e.id
+}
+
+func (e *JsonbObjectAggExpr) Op() opt.Operator {
+	return opt.JsonbObjectAggOp
+}
+
+func (e *JsonbObjectAggExpr) ChildCount() int {
+	return 2
+}
+
+func (e *JsonbObjectAggExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Key
+	case 1:
+		return e.Value
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *JsonbObjectAggExpr) Private() interface{} {
+	return nil
+}
+
+func (e *JsonbObjectAggExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *JsonbObjectAggExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Key = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Value = child.(opt.ScalarExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *JsonbObjectAggExpr) DataType() *types.T {
+	return e.Typ
+}
+
 type StringAggExpr struct {
 	Input opt.ScalarExpr
 
@@ -19318,6 +19434,50 @@ func (m *Memo) MemoizeJsonbAgg(
 	return interned
 }
 
+func (m *Memo) MemoizeJsonObjectAgg(
+	key opt.ScalarExpr,
+	value opt.ScalarExpr,
+) *JsonObjectAggExpr {
+	const size = int64(unsafe.Sizeof(JsonObjectAggExpr{}))
+	e := &JsonObjectAggExpr{
+		Key:   key,
+		Value: value,
+		id:    m.NextID(),
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternJsonObjectAgg(e)
+	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
+		m.memEstimate += size
+		m.CheckExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeJsonbObjectAgg(
+	key opt.ScalarExpr,
+	value opt.ScalarExpr,
+) *JsonbObjectAggExpr {
+	const size = int64(unsafe.Sizeof(JsonbObjectAggExpr{}))
+	e := &JsonbObjectAggExpr{
+		Key:   key,
+		Value: value,
+		id:    m.NextID(),
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternJsonbObjectAgg(e)
+	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
+		m.memEstimate += size
+		m.CheckExpr(e)
+	}
+	return interned
+}
+
 func (m *Memo) MemoizeStringAgg(
 	input opt.ScalarExpr,
 	sep opt.ScalarExpr,
@@ -21218,6 +21378,10 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternJsonAgg(t)
 	case *JsonbAggExpr:
 		return in.InternJsonbAgg(t)
+	case *JsonObjectAggExpr:
+		return in.InternJsonObjectAgg(t)
+	case *JsonbObjectAggExpr:
+		return in.InternJsonbObjectAgg(t)
 	case *StringAggExpr:
 		return in.InternStringAgg(t)
 	case *ConstAggExpr:
@@ -24623,6 +24787,46 @@ func (in *interner) InternJsonbAgg(val *JsonbAggExpr) *JsonbAggExpr {
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*JsonbAggExpr); ok {
 			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternJsonObjectAgg(val *JsonObjectAggExpr) *JsonObjectAggExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.JsonObjectAggOp)
+	in.hasher.HashScalarExpr(val.Key)
+	in.hasher.HashScalarExpr(val.Value)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*JsonObjectAggExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Key, existing.Key) &&
+				in.hasher.IsScalarExprEqual(val.Value, existing.Value) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternJsonbObjectAgg(val *JsonbObjectAggExpr) *JsonbObjectAggExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.JsonbObjectAggOp)
+	in.hasher.HashScalarExpr(val.Key)
+	in.hasher.HashScalarExpr(val.Value)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*JsonbObjectAggExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Key, existing.Key) &&
+				in.hasher.IsScalarExprEqual(val.Value, existing.Value) {
 				return existing
 			}
 		}
