@@ -9107,39 +9107,41 @@ func (_f *Factory) ConstructLimit(
 	{
 		if input.Op() == opt.InnerJoinOp || input.Op() == opt.LeftJoinOp {
 			left := input.Child(0).(memo.RelExpr)
-			right := input.Child(1).(memo.RelExpr)
-			on := *input.Child(2).(*memo.FiltersExpr)
-			private := input.Private().(*memo.JoinPrivate)
-			if _f.funcs.JoinPreservesLeftRows(input) {
-				limitExpr := limit
-				_const, _ := limitExpr.(*memo.ConstExpr)
-				if _const != nil {
-					limit := _const.Value
-					if _f.funcs.IsPositiveInt(limit) {
-						if !_f.funcs.LimitGeMaxRows(limit, left) {
-							cols := _f.funcs.OutputCols(left)
-							if _f.funcs.OrderingCanProjectCols(ordering, cols) {
-								if _f.matchedRule == nil || _f.matchedRule(opt.PushLimitIntoJoinLeft) {
-									on := on
-									_expr := _f.ConstructLimit(
-										_f.DynamicConstruct(
-											input.Op(),
-											_f.ConstructLimit(
-												left,
-												limitExpr,
-												_f.funcs.PruneOrdering(ordering, cols),
-											),
-											right,
-											&on,
-											private,
-										).(memo.RelExpr),
-										limitExpr,
-										ordering,
-									)
-									if _f.appliedRule != nil {
-										_f.appliedRule(opt.PushLimitIntoJoinLeft, nil, _expr)
+			if !_f.funcs.HasOuterCols(left) {
+				right := input.Child(1).(memo.RelExpr)
+				on := *input.Child(2).(*memo.FiltersExpr)
+				private := input.Private().(*memo.JoinPrivate)
+				if _f.funcs.JoinPreservesLeftRows(input) {
+					limitExpr := limit
+					_const, _ := limitExpr.(*memo.ConstExpr)
+					if _const != nil {
+						limit := _const.Value
+						if _f.funcs.IsPositiveInt(limit) {
+							if !_f.funcs.LimitGeMaxRows(limit, left) {
+								cols := _f.funcs.OutputCols(left)
+								if _f.funcs.OrderingCanProjectCols(ordering, cols) {
+									if _f.matchedRule == nil || _f.matchedRule(opt.PushLimitIntoJoinLeft) {
+										on := on
+										_expr := _f.ConstructLimit(
+											_f.DynamicConstruct(
+												input.Op(),
+												_f.ConstructLimit(
+													left,
+													limitExpr,
+													_f.funcs.PruneOrdering(ordering, cols),
+												),
+												right,
+												&on,
+												private,
+											).(memo.RelExpr),
+											limitExpr,
+											ordering,
+										)
+										if _f.appliedRule != nil {
+											_f.appliedRule(opt.PushLimitIntoJoinLeft, nil, _expr)
+										}
+										return _expr
 									}
-									return _expr
 								}
 							}
 						}
@@ -9155,36 +9157,38 @@ func (_f *Factory) ConstructLimit(
 		if _innerJoin != nil {
 			left := _innerJoin.Left
 			right := _innerJoin.Right
-			on := _innerJoin.On
-			private := &_innerJoin.JoinPrivate
-			if _f.funcs.JoinPreservesRightRows(input) {
-				limitExpr := limit
-				_const, _ := limitExpr.(*memo.ConstExpr)
-				if _const != nil {
-					limit := _const.Value
-					if _f.funcs.IsPositiveInt(limit) {
-						if !_f.funcs.LimitGeMaxRows(limit, right) {
-							cols := _f.funcs.OutputCols(right)
-							if _f.funcs.OrderingCanProjectCols(ordering, cols) {
-								if _f.matchedRule == nil || _f.matchedRule(opt.PushLimitIntoJoinRight) {
-									_expr := _f.ConstructLimit(
-										_f.ConstructInnerJoin(
-											left,
-											_f.ConstructLimit(
-												right,
-												limitExpr,
-												_f.funcs.PruneOrdering(ordering, cols),
+			if !_f.funcs.HasOuterCols(right) {
+				on := _innerJoin.On
+				private := &_innerJoin.JoinPrivate
+				if _f.funcs.JoinPreservesRightRows(input) {
+					limitExpr := limit
+					_const, _ := limitExpr.(*memo.ConstExpr)
+					if _const != nil {
+						limit := _const.Value
+						if _f.funcs.IsPositiveInt(limit) {
+							if !_f.funcs.LimitGeMaxRows(limit, right) {
+								cols := _f.funcs.OutputCols(right)
+								if _f.funcs.OrderingCanProjectCols(ordering, cols) {
+									if _f.matchedRule == nil || _f.matchedRule(opt.PushLimitIntoJoinRight) {
+										_expr := _f.ConstructLimit(
+											_f.ConstructInnerJoin(
+												left,
+												_f.ConstructLimit(
+													right,
+													limitExpr,
+													_f.funcs.PruneOrdering(ordering, cols),
+												),
+												on,
+												private,
 											),
-											on,
-											private,
-										),
-										limitExpr,
-										ordering,
-									)
-									if _f.appliedRule != nil {
-										_f.appliedRule(opt.PushLimitIntoJoinRight, nil, _expr)
+											limitExpr,
+											ordering,
+										)
+										if _f.appliedRule != nil {
+											_f.appliedRule(opt.PushLimitIntoJoinRight, nil, _expr)
+										}
+										return _expr
 									}
-									return _expr
 								}
 							}
 						}
