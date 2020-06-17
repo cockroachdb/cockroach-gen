@@ -54,7 +54,7 @@ func (p projBitandInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		// output vector.
 		projVec.Nulls().UnsetNulls()
 	}
-	projCol := projVec.Int16()
+	projCol := projVec.Int64()
 	if vec.Nulls().MaybeHasNulls() {
 		colNulls := vec.Nulls()
 		if sel := batch.Selection(); sel != nil {
@@ -64,7 +64,7 @@ func (p projBitandInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 					// We only want to perform the projection operation if the value is not null.
 					arg := col[i]
 
-					projCol[i] = p.constArg & arg
+					projCol[i] = int64(p.constArg) & int64(arg)
 
 				}
 			}
@@ -76,7 +76,7 @@ func (p projBitandInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 					// We only want to perform the projection operation if the value is not null.
 					arg := col[i]
 
-					projCol[i] = p.constArg & arg
+					projCol[i] = int64(p.constArg) & int64(arg)
 
 				}
 			}
@@ -89,7 +89,7 @@ func (p projBitandInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 			for _, i := range sel {
 				arg := col[i]
 
-				projCol[i] = p.constArg & arg
+				projCol[i] = int64(p.constArg) & int64(arg)
 
 			}
 		} else {
@@ -98,7 +98,7 @@ func (p projBitandInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 			for i := range col {
 				arg := col[i]
 
-				projCol[i] = p.constArg & arg
+				projCol[i] = int64(p.constArg) & int64(arg)
 
 			}
 		}
@@ -394,7 +394,7 @@ func (p projBitandInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		// output vector.
 		projVec.Nulls().UnsetNulls()
 	}
-	projCol := projVec.Int32()
+	projCol := projVec.Int64()
 	if vec.Nulls().MaybeHasNulls() {
 		colNulls := vec.Nulls()
 		if sel := batch.Selection(); sel != nil {
@@ -404,7 +404,7 @@ func (p projBitandInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 					// We only want to perform the projection operation if the value is not null.
 					arg := col[i]
 
-					projCol[i] = p.constArg & arg
+					projCol[i] = int64(p.constArg) & int64(arg)
 
 				}
 			}
@@ -416,7 +416,7 @@ func (p projBitandInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 					// We only want to perform the projection operation if the value is not null.
 					arg := col[i]
 
-					projCol[i] = p.constArg & arg
+					projCol[i] = int64(p.constArg) & int64(arg)
 
 				}
 			}
@@ -429,7 +429,7 @@ func (p projBitandInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 			for _, i := range sel {
 				arg := col[i]
 
-				projCol[i] = p.constArg & arg
+				projCol[i] = int64(p.constArg) & int64(arg)
 
 			}
 		} else {
@@ -438,7 +438,7 @@ func (p projBitandInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 			for i := range col {
 				arg := col[i]
 
-				projCol[i] = p.constArg & arg
+				projCol[i] = int64(p.constArg) & int64(arg)
 
 			}
 		}
@@ -920,7 +920,7 @@ func (p projBitorInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		// output vector.
 		projVec.Nulls().UnsetNulls()
 	}
-	projCol := projVec.Int16()
+	projCol := projVec.Int64()
 	if vec.Nulls().MaybeHasNulls() {
 		colNulls := vec.Nulls()
 		if sel := batch.Selection(); sel != nil {
@@ -930,7 +930,7 @@ func (p projBitorInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 					// We only want to perform the projection operation if the value is not null.
 					arg := col[i]
 
-					projCol[i] = p.constArg | arg
+					projCol[i] = int64(p.constArg) | int64(arg)
 
 				}
 			}
@@ -942,7 +942,7 @@ func (p projBitorInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 					// We only want to perform the projection operation if the value is not null.
 					arg := col[i]
 
-					projCol[i] = p.constArg | arg
+					projCol[i] = int64(p.constArg) | int64(arg)
 
 				}
 			}
@@ -955,7 +955,7 @@ func (p projBitorInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 			for _, i := range sel {
 				arg := col[i]
 
-				projCol[i] = p.constArg | arg
+				projCol[i] = int64(p.constArg) | int64(arg)
 
 			}
 		} else {
@@ -964,7 +964,7 @@ func (p projBitorInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 			for i := range col {
 				arg := col[i]
 
-				projCol[i] = p.constArg | arg
+				projCol[i] = int64(p.constArg) | int64(arg)
 
 			}
 		}
@@ -1260,7 +1260,7 @@ func (p projBitorInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		// output vector.
 		projVec.Nulls().UnsetNulls()
 	}
-	projCol := projVec.Int32()
+	projCol := projVec.Int64()
 	if vec.Nulls().MaybeHasNulls() {
 		colNulls := vec.Nulls()
 		if sel := batch.Selection(); sel != nil {
@@ -1270,7 +1270,7 @@ func (p projBitorInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 					// We only want to perform the projection operation if the value is not null.
 					arg := col[i]
 
-					projCol[i] = p.constArg | arg
+					projCol[i] = int64(p.constArg) | int64(arg)
 
 				}
 			}
@@ -1282,7 +1282,7 @@ func (p projBitorInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 					// We only want to perform the projection operation if the value is not null.
 					arg := col[i]
 
-					projCol[i] = p.constArg | arg
+					projCol[i] = int64(p.constArg) | int64(arg)
 
 				}
 			}
@@ -1295,7 +1295,7 @@ func (p projBitorInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 			for _, i := range sel {
 				arg := col[i]
 
-				projCol[i] = p.constArg | arg
+				projCol[i] = int64(p.constArg) | int64(arg)
 
 			}
 		} else {
@@ -1304,7 +1304,7 @@ func (p projBitorInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 			for i := range col {
 				arg := col[i]
 
-				projCol[i] = p.constArg | arg
+				projCol[i] = int64(p.constArg) | int64(arg)
 
 			}
 		}
@@ -1786,7 +1786,7 @@ func (p projBitxorInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		// output vector.
 		projVec.Nulls().UnsetNulls()
 	}
-	projCol := projVec.Int16()
+	projCol := projVec.Int64()
 	if vec.Nulls().MaybeHasNulls() {
 		colNulls := vec.Nulls()
 		if sel := batch.Selection(); sel != nil {
@@ -1796,7 +1796,7 @@ func (p projBitxorInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 					// We only want to perform the projection operation if the value is not null.
 					arg := col[i]
 
-					projCol[i] = p.constArg ^ arg
+					projCol[i] = int64(p.constArg) ^ int64(arg)
 
 				}
 			}
@@ -1808,7 +1808,7 @@ func (p projBitxorInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 					// We only want to perform the projection operation if the value is not null.
 					arg := col[i]
 
-					projCol[i] = p.constArg ^ arg
+					projCol[i] = int64(p.constArg) ^ int64(arg)
 
 				}
 			}
@@ -1821,7 +1821,7 @@ func (p projBitxorInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 			for _, i := range sel {
 				arg := col[i]
 
-				projCol[i] = p.constArg ^ arg
+				projCol[i] = int64(p.constArg) ^ int64(arg)
 
 			}
 		} else {
@@ -1830,7 +1830,7 @@ func (p projBitxorInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 			for i := range col {
 				arg := col[i]
 
-				projCol[i] = p.constArg ^ arg
+				projCol[i] = int64(p.constArg) ^ int64(arg)
 
 			}
 		}
@@ -2126,7 +2126,7 @@ func (p projBitxorInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		// output vector.
 		projVec.Nulls().UnsetNulls()
 	}
-	projCol := projVec.Int32()
+	projCol := projVec.Int64()
 	if vec.Nulls().MaybeHasNulls() {
 		colNulls := vec.Nulls()
 		if sel := batch.Selection(); sel != nil {
@@ -2136,7 +2136,7 @@ func (p projBitxorInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 					// We only want to perform the projection operation if the value is not null.
 					arg := col[i]
 
-					projCol[i] = p.constArg ^ arg
+					projCol[i] = int64(p.constArg) ^ int64(arg)
 
 				}
 			}
@@ -2148,7 +2148,7 @@ func (p projBitxorInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 					// We only want to perform the projection operation if the value is not null.
 					arg := col[i]
 
-					projCol[i] = p.constArg ^ arg
+					projCol[i] = int64(p.constArg) ^ int64(arg)
 
 				}
 			}
@@ -2161,7 +2161,7 @@ func (p projBitxorInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 			for _, i := range sel {
 				arg := col[i]
 
-				projCol[i] = p.constArg ^ arg
+				projCol[i] = int64(p.constArg) ^ int64(arg)
 
 			}
 		} else {
@@ -2170,7 +2170,7 @@ func (p projBitxorInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 			for i := range col {
 				arg := col[i]
 
-				projCol[i] = p.constArg ^ arg
+				projCol[i] = int64(p.constArg) ^ int64(arg)
 
 			}
 		}
@@ -3350,7 +3350,7 @@ func (p projPlusInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		// output vector.
 		projVec.Nulls().UnsetNulls()
 	}
-	projCol := projVec.Int16()
+	projCol := projVec.Int64()
 	if vec.Nulls().MaybeHasNulls() {
 		colNulls := vec.Nulls()
 		if sel := batch.Selection(); sel != nil {
@@ -3361,8 +3361,8 @@ func (p projPlusInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						result := p.constArg + arg
-						if (result < p.constArg) != (arg < 0) {
+						result := int64(p.constArg) + int64(arg)
+						if (result < int64(p.constArg)) != (int64(arg) < 0) {
 							colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 						}
 						projCol[i] = result
@@ -3379,8 +3379,8 @@ func (p projPlusInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						result := p.constArg + arg
-						if (result < p.constArg) != (arg < 0) {
+						result := int64(p.constArg) + int64(arg)
+						if (result < int64(p.constArg)) != (int64(arg) < 0) {
 							colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 						}
 						projCol[i] = result
@@ -3398,8 +3398,8 @@ func (p projPlusInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					result := p.constArg + arg
-					if (result < p.constArg) != (arg < 0) {
+					result := int64(p.constArg) + int64(arg)
+					if (result < int64(p.constArg)) != (int64(arg) < 0) {
 						colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 					}
 					projCol[i] = result
@@ -3413,8 +3413,8 @@ func (p projPlusInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					result := p.constArg + arg
-					if (result < p.constArg) != (arg < 0) {
+					result := int64(p.constArg) + int64(arg)
+					if (result < int64(p.constArg)) != (int64(arg) < 0) {
 						colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 					}
 					projCol[i] = result
@@ -4028,7 +4028,7 @@ func (p projPlusInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		// output vector.
 		projVec.Nulls().UnsetNulls()
 	}
-	projCol := projVec.Int32()
+	projCol := projVec.Int64()
 	if vec.Nulls().MaybeHasNulls() {
 		colNulls := vec.Nulls()
 		if sel := batch.Selection(); sel != nil {
@@ -4039,8 +4039,8 @@ func (p projPlusInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						result := p.constArg + arg
-						if (result < p.constArg) != (arg < 0) {
+						result := int64(p.constArg) + int64(arg)
+						if (result < int64(p.constArg)) != (int64(arg) < 0) {
 							colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 						}
 						projCol[i] = result
@@ -4057,8 +4057,8 @@ func (p projPlusInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						result := p.constArg + arg
-						if (result < p.constArg) != (arg < 0) {
+						result := int64(p.constArg) + int64(arg)
+						if (result < int64(p.constArg)) != (int64(arg) < 0) {
 							colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 						}
 						projCol[i] = result
@@ -4076,8 +4076,8 @@ func (p projPlusInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					result := p.constArg + arg
-					if (result < p.constArg) != (arg < 0) {
+					result := int64(p.constArg) + int64(arg)
+					if (result < int64(p.constArg)) != (int64(arg) < 0) {
 						colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 					}
 					projCol[i] = result
@@ -4091,8 +4091,8 @@ func (p projPlusInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					result := p.constArg + arg
-					if (result < p.constArg) != (arg < 0) {
+					result := int64(p.constArg) + int64(arg)
+					if (result < int64(p.constArg)) != (int64(arg) < 0) {
 						colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 					}
 					projCol[i] = result
@@ -7374,7 +7374,7 @@ func (p projMinusInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		// output vector.
 		projVec.Nulls().UnsetNulls()
 	}
-	projCol := projVec.Int16()
+	projCol := projVec.Int64()
 	if vec.Nulls().MaybeHasNulls() {
 		colNulls := vec.Nulls()
 		if sel := batch.Selection(); sel != nil {
@@ -7385,8 +7385,8 @@ func (p projMinusInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						result := p.constArg - arg
-						if (result < p.constArg) != (arg > 0) {
+						result := int64(p.constArg) - int64(arg)
+						if (result < int64(p.constArg)) != (int64(arg) > 0) {
 							colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 						}
 						projCol[i] = result
@@ -7403,8 +7403,8 @@ func (p projMinusInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						result := p.constArg - arg
-						if (result < p.constArg) != (arg > 0) {
+						result := int64(p.constArg) - int64(arg)
+						if (result < int64(p.constArg)) != (int64(arg) > 0) {
 							colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 						}
 						projCol[i] = result
@@ -7422,8 +7422,8 @@ func (p projMinusInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					result := p.constArg - arg
-					if (result < p.constArg) != (arg > 0) {
+					result := int64(p.constArg) - int64(arg)
+					if (result < int64(p.constArg)) != (int64(arg) > 0) {
 						colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 					}
 					projCol[i] = result
@@ -7437,8 +7437,8 @@ func (p projMinusInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					result := p.constArg - arg
-					if (result < p.constArg) != (arg > 0) {
+					result := int64(p.constArg) - int64(arg)
+					if (result < int64(p.constArg)) != (int64(arg) > 0) {
 						colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 					}
 					projCol[i] = result
@@ -8052,7 +8052,7 @@ func (p projMinusInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		// output vector.
 		projVec.Nulls().UnsetNulls()
 	}
-	projCol := projVec.Int32()
+	projCol := projVec.Int64()
 	if vec.Nulls().MaybeHasNulls() {
 		colNulls := vec.Nulls()
 		if sel := batch.Selection(); sel != nil {
@@ -8063,8 +8063,8 @@ func (p projMinusInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						result := p.constArg - arg
-						if (result < p.constArg) != (arg > 0) {
+						result := int64(p.constArg) - int64(arg)
+						if (result < int64(p.constArg)) != (int64(arg) > 0) {
 							colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 						}
 						projCol[i] = result
@@ -8081,8 +8081,8 @@ func (p projMinusInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						result := p.constArg - arg
-						if (result < p.constArg) != (arg > 0) {
+						result := int64(p.constArg) - int64(arg)
+						if (result < int64(p.constArg)) != (int64(arg) > 0) {
 							colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 						}
 						projCol[i] = result
@@ -8100,8 +8100,8 @@ func (p projMinusInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					result := p.constArg - arg
-					if (result < p.constArg) != (arg > 0) {
+					result := int64(p.constArg) - int64(arg)
+					if (result < int64(p.constArg)) != (int64(arg) > 0) {
 						colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 					}
 					projCol[i] = result
@@ -8115,8 +8115,8 @@ func (p projMinusInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					result := p.constArg - arg
-					if (result < p.constArg) != (arg > 0) {
+					result := int64(p.constArg) - int64(arg)
+					if (result < int64(p.constArg)) != (int64(arg) > 0) {
 						colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 					}
 					projCol[i] = result
@@ -11507,7 +11507,7 @@ func (p projMultInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		// output vector.
 		projVec.Nulls().UnsetNulls()
 	}
-	projCol := projVec.Int16()
+	projCol := projVec.Int64()
 	if vec.Nulls().MaybeHasNulls() {
 		colNulls := vec.Nulls()
 		if sel := batch.Selection(); sel != nil {
@@ -11518,13 +11518,14 @@ func (p projMultInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						result := p.constArg * arg
-						if p.constArg > math.MaxInt8 || p.constArg < math.MinInt8 || arg > math.MaxInt8 || arg < math.MinInt8 {
-							if p.constArg != 0 && arg != 0 {
-								sameSign := (p.constArg < 0) == (arg < 0)
+						_left, _right := int64(p.constArg), int64(arg)
+						result := _left * _right
+						if _left > math.MaxInt8 || _left < math.MinInt8 || _right > math.MaxInt8 || _right < math.MinInt8 {
+							if _left != 0 && _right != 0 {
+								sameSign := (_left < 0) == (_right < 0)
 								if (result < 0) == sameSign {
 									colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-								} else if result/arg != p.constArg {
+								} else if result/_right != _left {
 									colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 								}
 							}
@@ -11543,13 +11544,14 @@ func (p projMultInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						result := p.constArg * arg
-						if p.constArg > math.MaxInt8 || p.constArg < math.MinInt8 || arg > math.MaxInt8 || arg < math.MinInt8 {
-							if p.constArg != 0 && arg != 0 {
-								sameSign := (p.constArg < 0) == (arg < 0)
+						_left, _right := int64(p.constArg), int64(arg)
+						result := _left * _right
+						if _left > math.MaxInt8 || _left < math.MinInt8 || _right > math.MaxInt8 || _right < math.MinInt8 {
+							if _left != 0 && _right != 0 {
+								sameSign := (_left < 0) == (_right < 0)
 								if (result < 0) == sameSign {
 									colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-								} else if result/arg != p.constArg {
+								} else if result/_right != _left {
 									colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 								}
 							}
@@ -11569,13 +11571,14 @@ func (p projMultInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					result := p.constArg * arg
-					if p.constArg > math.MaxInt8 || p.constArg < math.MinInt8 || arg > math.MaxInt8 || arg < math.MinInt8 {
-						if p.constArg != 0 && arg != 0 {
-							sameSign := (p.constArg < 0) == (arg < 0)
+					_left, _right := int64(p.constArg), int64(arg)
+					result := _left * _right
+					if _left > math.MaxInt8 || _left < math.MinInt8 || _right > math.MaxInt8 || _right < math.MinInt8 {
+						if _left != 0 && _right != 0 {
+							sameSign := (_left < 0) == (_right < 0)
 							if (result < 0) == sameSign {
 								colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-							} else if result/arg != p.constArg {
+							} else if result/_right != _left {
 								colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 							}
 						}
@@ -11591,13 +11594,14 @@ func (p projMultInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					result := p.constArg * arg
-					if p.constArg > math.MaxInt8 || p.constArg < math.MinInt8 || arg > math.MaxInt8 || arg < math.MinInt8 {
-						if p.constArg != 0 && arg != 0 {
-							sameSign := (p.constArg < 0) == (arg < 0)
+					_left, _right := int64(p.constArg), int64(arg)
+					result := _left * _right
+					if _left > math.MaxInt8 || _left < math.MinInt8 || _right > math.MaxInt8 || _right < math.MinInt8 {
+						if _left != 0 && _right != 0 {
+							sameSign := (_left < 0) == (_right < 0)
 							if (result < 0) == sameSign {
 								colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-							} else if result/arg != p.constArg {
+							} else if result/_right != _left {
 								colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 							}
 						}
@@ -11655,13 +11659,14 @@ func (p projMultInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						result := int64(p.constArg) * int64(arg)
-						if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
-							if int64(p.constArg) != 0 && int64(arg) != 0 {
-								sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
+						_left, _right := int64(p.constArg), int64(arg)
+						result := _left * _right
+						if _left > math.MaxInt32 || _left < math.MinInt32 || _right > math.MaxInt32 || _right < math.MinInt32 {
+							if _left != 0 && _right != 0 {
+								sameSign := (_left < 0) == (_right < 0)
 								if (result < 0) == sameSign {
 									colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-								} else if result/int64(arg) != int64(p.constArg) {
+								} else if result/_right != _left {
 									colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 								}
 							}
@@ -11680,13 +11685,14 @@ func (p projMultInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						result := int64(p.constArg) * int64(arg)
-						if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
-							if int64(p.constArg) != 0 && int64(arg) != 0 {
-								sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
+						_left, _right := int64(p.constArg), int64(arg)
+						result := _left * _right
+						if _left > math.MaxInt32 || _left < math.MinInt32 || _right > math.MaxInt32 || _right < math.MinInt32 {
+							if _left != 0 && _right != 0 {
+								sameSign := (_left < 0) == (_right < 0)
 								if (result < 0) == sameSign {
 									colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-								} else if result/int64(arg) != int64(p.constArg) {
+								} else if result/_right != _left {
 									colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 								}
 							}
@@ -11706,13 +11712,14 @@ func (p projMultInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					result := int64(p.constArg) * int64(arg)
-					if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
-						if int64(p.constArg) != 0 && int64(arg) != 0 {
-							sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
+					_left, _right := int64(p.constArg), int64(arg)
+					result := _left * _right
+					if _left > math.MaxInt32 || _left < math.MinInt32 || _right > math.MaxInt32 || _right < math.MinInt32 {
+						if _left != 0 && _right != 0 {
+							sameSign := (_left < 0) == (_right < 0)
 							if (result < 0) == sameSign {
 								colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-							} else if result/int64(arg) != int64(p.constArg) {
+							} else if result/_right != _left {
 								colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 							}
 						}
@@ -11728,13 +11735,14 @@ func (p projMultInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					result := int64(p.constArg) * int64(arg)
-					if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
-						if int64(p.constArg) != 0 && int64(arg) != 0 {
-							sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
+					_left, _right := int64(p.constArg), int64(arg)
+					result := _left * _right
+					if _left > math.MaxInt32 || _left < math.MinInt32 || _right > math.MaxInt32 || _right < math.MinInt32 {
+						if _left != 0 && _right != 0 {
+							sameSign := (_left < 0) == (_right < 0)
 							if (result < 0) == sameSign {
 								colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-							} else if result/int64(arg) != int64(p.constArg) {
+							} else if result/_right != _left {
 								colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 							}
 						}
@@ -11792,13 +11800,14 @@ func (p projMultInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						result := int64(p.constArg) * int64(arg)
-						if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
-							if int64(p.constArg) != 0 && int64(arg) != 0 {
-								sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
+						_left, _right := int64(p.constArg), int64(arg)
+						result := _left * _right
+						if _left > math.MaxInt32 || _left < math.MinInt32 || _right > math.MaxInt32 || _right < math.MinInt32 {
+							if _left != 0 && _right != 0 {
+								sameSign := (_left < 0) == (_right < 0)
 								if (result < 0) == sameSign {
 									colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-								} else if result/int64(arg) != int64(p.constArg) {
+								} else if result/_right != _left {
 									colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 								}
 							}
@@ -11817,13 +11826,14 @@ func (p projMultInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						result := int64(p.constArg) * int64(arg)
-						if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
-							if int64(p.constArg) != 0 && int64(arg) != 0 {
-								sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
+						_left, _right := int64(p.constArg), int64(arg)
+						result := _left * _right
+						if _left > math.MaxInt32 || _left < math.MinInt32 || _right > math.MaxInt32 || _right < math.MinInt32 {
+							if _left != 0 && _right != 0 {
+								sameSign := (_left < 0) == (_right < 0)
 								if (result < 0) == sameSign {
 									colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-								} else if result/int64(arg) != int64(p.constArg) {
+								} else if result/_right != _left {
 									colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 								}
 							}
@@ -11843,13 +11853,14 @@ func (p projMultInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					result := int64(p.constArg) * int64(arg)
-					if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
-						if int64(p.constArg) != 0 && int64(arg) != 0 {
-							sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
+					_left, _right := int64(p.constArg), int64(arg)
+					result := _left * _right
+					if _left > math.MaxInt32 || _left < math.MinInt32 || _right > math.MaxInt32 || _right < math.MinInt32 {
+						if _left != 0 && _right != 0 {
+							sameSign := (_left < 0) == (_right < 0)
 							if (result < 0) == sameSign {
 								colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-							} else if result/int64(arg) != int64(p.constArg) {
+							} else if result/_right != _left {
 								colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 							}
 						}
@@ -11865,13 +11876,14 @@ func (p projMultInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					result := int64(p.constArg) * int64(arg)
-					if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
-						if int64(p.constArg) != 0 && int64(arg) != 0 {
-							sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
+					_left, _right := int64(p.constArg), int64(arg)
+					result := _left * _right
+					if _left > math.MaxInt32 || _left < math.MinInt32 || _right > math.MaxInt32 || _right < math.MinInt32 {
+						if _left != 0 && _right != 0 {
+							sameSign := (_left < 0) == (_right < 0)
 							if (result < 0) == sameSign {
 								colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-							} else if result/int64(arg) != int64(p.constArg) {
+							} else if result/_right != _left {
 								colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 							}
 						}
@@ -12006,6 +12018,83 @@ func (p projMultInt16ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 }
 
 func (p projMultInt16ConstDecimalOp) Init() {
+	p.input.Init()
+}
+
+type projMultInt16ConstIntervalOp struct {
+	projConstOpBase
+	constArg int16
+}
+
+func (p projMultInt16ConstIntervalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []duration.Duration
+	col = vec.Interval()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Interval()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+					projCol[i] = arg.Mul(int64(p.constArg))
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+					projCol[i] = arg.Mul(int64(p.constArg))
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+				projCol[i] = arg.Mul(int64(p.constArg))
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+				projCol[i] = arg.Mul(int64(p.constArg))
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projMultInt16ConstIntervalOp) Init() {
 	p.input.Init()
 }
 
@@ -12171,13 +12260,14 @@ func (p projMultInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						result := int64(p.constArg) * int64(arg)
-						if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
-							if int64(p.constArg) != 0 && int64(arg) != 0 {
-								sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
+						_left, _right := int64(p.constArg), int64(arg)
+						result := _left * _right
+						if _left > math.MaxInt32 || _left < math.MinInt32 || _right > math.MaxInt32 || _right < math.MinInt32 {
+							if _left != 0 && _right != 0 {
+								sameSign := (_left < 0) == (_right < 0)
 								if (result < 0) == sameSign {
 									colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-								} else if result/int64(arg) != int64(p.constArg) {
+								} else if result/_right != _left {
 									colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 								}
 							}
@@ -12196,13 +12286,14 @@ func (p projMultInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						result := int64(p.constArg) * int64(arg)
-						if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
-							if int64(p.constArg) != 0 && int64(arg) != 0 {
-								sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
+						_left, _right := int64(p.constArg), int64(arg)
+						result := _left * _right
+						if _left > math.MaxInt32 || _left < math.MinInt32 || _right > math.MaxInt32 || _right < math.MinInt32 {
+							if _left != 0 && _right != 0 {
+								sameSign := (_left < 0) == (_right < 0)
 								if (result < 0) == sameSign {
 									colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-								} else if result/int64(arg) != int64(p.constArg) {
+								} else if result/_right != _left {
 									colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 								}
 							}
@@ -12222,13 +12313,14 @@ func (p projMultInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					result := int64(p.constArg) * int64(arg)
-					if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
-						if int64(p.constArg) != 0 && int64(arg) != 0 {
-							sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
+					_left, _right := int64(p.constArg), int64(arg)
+					result := _left * _right
+					if _left > math.MaxInt32 || _left < math.MinInt32 || _right > math.MaxInt32 || _right < math.MinInt32 {
+						if _left != 0 && _right != 0 {
+							sameSign := (_left < 0) == (_right < 0)
 							if (result < 0) == sameSign {
 								colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-							} else if result/int64(arg) != int64(p.constArg) {
+							} else if result/_right != _left {
 								colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 							}
 						}
@@ -12244,13 +12336,14 @@ func (p projMultInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					result := int64(p.constArg) * int64(arg)
-					if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
-						if int64(p.constArg) != 0 && int64(arg) != 0 {
-							sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
+					_left, _right := int64(p.constArg), int64(arg)
+					result := _left * _right
+					if _left > math.MaxInt32 || _left < math.MinInt32 || _right > math.MaxInt32 || _right < math.MinInt32 {
+						if _left != 0 && _right != 0 {
+							sameSign := (_left < 0) == (_right < 0)
 							if (result < 0) == sameSign {
 								colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-							} else if result/int64(arg) != int64(p.constArg) {
+							} else if result/_right != _left {
 								colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 							}
 						}
@@ -12297,7 +12390,7 @@ func (p projMultInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		// output vector.
 		projVec.Nulls().UnsetNulls()
 	}
-	projCol := projVec.Int32()
+	projCol := projVec.Int64()
 	if vec.Nulls().MaybeHasNulls() {
 		colNulls := vec.Nulls()
 		if sel := batch.Selection(); sel != nil {
@@ -12308,13 +12401,14 @@ func (p projMultInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						result := p.constArg * arg
-						if p.constArg > math.MaxInt16 || p.constArg < math.MinInt16 || arg > math.MaxInt16 || arg < math.MinInt16 {
-							if p.constArg != 0 && arg != 0 {
-								sameSign := (p.constArg < 0) == (arg < 0)
+						_left, _right := int64(p.constArg), int64(arg)
+						result := _left * _right
+						if _left > math.MaxInt16 || _left < math.MinInt16 || _right > math.MaxInt16 || _right < math.MinInt16 {
+							if _left != 0 && _right != 0 {
+								sameSign := (_left < 0) == (_right < 0)
 								if (result < 0) == sameSign {
 									colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-								} else if result/arg != p.constArg {
+								} else if result/_right != _left {
 									colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 								}
 							}
@@ -12333,13 +12427,14 @@ func (p projMultInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						result := p.constArg * arg
-						if p.constArg > math.MaxInt16 || p.constArg < math.MinInt16 || arg > math.MaxInt16 || arg < math.MinInt16 {
-							if p.constArg != 0 && arg != 0 {
-								sameSign := (p.constArg < 0) == (arg < 0)
+						_left, _right := int64(p.constArg), int64(arg)
+						result := _left * _right
+						if _left > math.MaxInt16 || _left < math.MinInt16 || _right > math.MaxInt16 || _right < math.MinInt16 {
+							if _left != 0 && _right != 0 {
+								sameSign := (_left < 0) == (_right < 0)
 								if (result < 0) == sameSign {
 									colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-								} else if result/arg != p.constArg {
+								} else if result/_right != _left {
 									colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 								}
 							}
@@ -12359,13 +12454,14 @@ func (p projMultInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					result := p.constArg * arg
-					if p.constArg > math.MaxInt16 || p.constArg < math.MinInt16 || arg > math.MaxInt16 || arg < math.MinInt16 {
-						if p.constArg != 0 && arg != 0 {
-							sameSign := (p.constArg < 0) == (arg < 0)
+					_left, _right := int64(p.constArg), int64(arg)
+					result := _left * _right
+					if _left > math.MaxInt16 || _left < math.MinInt16 || _right > math.MaxInt16 || _right < math.MinInt16 {
+						if _left != 0 && _right != 0 {
+							sameSign := (_left < 0) == (_right < 0)
 							if (result < 0) == sameSign {
 								colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-							} else if result/arg != p.constArg {
+							} else if result/_right != _left {
 								colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 							}
 						}
@@ -12381,13 +12477,14 @@ func (p projMultInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					result := p.constArg * arg
-					if p.constArg > math.MaxInt16 || p.constArg < math.MinInt16 || arg > math.MaxInt16 || arg < math.MinInt16 {
-						if p.constArg != 0 && arg != 0 {
-							sameSign := (p.constArg < 0) == (arg < 0)
+					_left, _right := int64(p.constArg), int64(arg)
+					result := _left * _right
+					if _left > math.MaxInt16 || _left < math.MinInt16 || _right > math.MaxInt16 || _right < math.MinInt16 {
+						if _left != 0 && _right != 0 {
+							sameSign := (_left < 0) == (_right < 0)
 							if (result < 0) == sameSign {
 								colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-							} else if result/arg != p.constArg {
+							} else if result/_right != _left {
 								colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 							}
 						}
@@ -12445,13 +12542,14 @@ func (p projMultInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						result := int64(p.constArg) * int64(arg)
-						if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
-							if int64(p.constArg) != 0 && int64(arg) != 0 {
-								sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
+						_left, _right := int64(p.constArg), int64(arg)
+						result := _left * _right
+						if _left > math.MaxInt32 || _left < math.MinInt32 || _right > math.MaxInt32 || _right < math.MinInt32 {
+							if _left != 0 && _right != 0 {
+								sameSign := (_left < 0) == (_right < 0)
 								if (result < 0) == sameSign {
 									colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-								} else if result/int64(arg) != int64(p.constArg) {
+								} else if result/_right != _left {
 									colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 								}
 							}
@@ -12470,13 +12568,14 @@ func (p projMultInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						result := int64(p.constArg) * int64(arg)
-						if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
-							if int64(p.constArg) != 0 && int64(arg) != 0 {
-								sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
+						_left, _right := int64(p.constArg), int64(arg)
+						result := _left * _right
+						if _left > math.MaxInt32 || _left < math.MinInt32 || _right > math.MaxInt32 || _right < math.MinInt32 {
+							if _left != 0 && _right != 0 {
+								sameSign := (_left < 0) == (_right < 0)
 								if (result < 0) == sameSign {
 									colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-								} else if result/int64(arg) != int64(p.constArg) {
+								} else if result/_right != _left {
 									colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 								}
 							}
@@ -12496,13 +12595,14 @@ func (p projMultInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					result := int64(p.constArg) * int64(arg)
-					if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
-						if int64(p.constArg) != 0 && int64(arg) != 0 {
-							sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
+					_left, _right := int64(p.constArg), int64(arg)
+					result := _left * _right
+					if _left > math.MaxInt32 || _left < math.MinInt32 || _right > math.MaxInt32 || _right < math.MinInt32 {
+						if _left != 0 && _right != 0 {
+							sameSign := (_left < 0) == (_right < 0)
 							if (result < 0) == sameSign {
 								colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-							} else if result/int64(arg) != int64(p.constArg) {
+							} else if result/_right != _left {
 								colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 							}
 						}
@@ -12518,13 +12618,14 @@ func (p projMultInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					result := int64(p.constArg) * int64(arg)
-					if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
-						if int64(p.constArg) != 0 && int64(arg) != 0 {
-							sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
+					_left, _right := int64(p.constArg), int64(arg)
+					result := _left * _right
+					if _left > math.MaxInt32 || _left < math.MinInt32 || _right > math.MaxInt32 || _right < math.MinInt32 {
+						if _left != 0 && _right != 0 {
+							sameSign := (_left < 0) == (_right < 0)
 							if (result < 0) == sameSign {
 								colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-							} else if result/int64(arg) != int64(p.constArg) {
+							} else if result/_right != _left {
 								colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 							}
 						}
@@ -12659,6 +12760,83 @@ func (p projMultInt32ConstDecimalOp) Next(ctx context.Context) coldata.Batch {
 }
 
 func (p projMultInt32ConstDecimalOp) Init() {
+	p.input.Init()
+}
+
+type projMultInt32ConstIntervalOp struct {
+	projConstOpBase
+	constArg int32
+}
+
+func (p projMultInt32ConstIntervalOp) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []duration.Duration
+	col = vec.Interval()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Interval()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+					projCol[i] = arg.Mul(int64(p.constArg))
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+					projCol[i] = arg.Mul(int64(p.constArg))
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+				projCol[i] = arg.Mul(int64(p.constArg))
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+				projCol[i] = arg.Mul(int64(p.constArg))
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projMultInt32ConstIntervalOp) Init() {
 	p.input.Init()
 }
 
@@ -12824,13 +13002,14 @@ func (p projMultInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						result := int64(p.constArg) * int64(arg)
-						if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
-							if int64(p.constArg) != 0 && int64(arg) != 0 {
-								sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
+						_left, _right := int64(p.constArg), int64(arg)
+						result := _left * _right
+						if _left > math.MaxInt32 || _left < math.MinInt32 || _right > math.MaxInt32 || _right < math.MinInt32 {
+							if _left != 0 && _right != 0 {
+								sameSign := (_left < 0) == (_right < 0)
 								if (result < 0) == sameSign {
 									colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-								} else if result/int64(arg) != int64(p.constArg) {
+								} else if result/_right != _left {
 									colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 								}
 							}
@@ -12849,13 +13028,14 @@ func (p projMultInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						result := int64(p.constArg) * int64(arg)
-						if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
-							if int64(p.constArg) != 0 && int64(arg) != 0 {
-								sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
+						_left, _right := int64(p.constArg), int64(arg)
+						result := _left * _right
+						if _left > math.MaxInt32 || _left < math.MinInt32 || _right > math.MaxInt32 || _right < math.MinInt32 {
+							if _left != 0 && _right != 0 {
+								sameSign := (_left < 0) == (_right < 0)
 								if (result < 0) == sameSign {
 									colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-								} else if result/int64(arg) != int64(p.constArg) {
+								} else if result/_right != _left {
 									colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 								}
 							}
@@ -12875,13 +13055,14 @@ func (p projMultInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					result := int64(p.constArg) * int64(arg)
-					if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
-						if int64(p.constArg) != 0 && int64(arg) != 0 {
-							sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
+					_left, _right := int64(p.constArg), int64(arg)
+					result := _left * _right
+					if _left > math.MaxInt32 || _left < math.MinInt32 || _right > math.MaxInt32 || _right < math.MinInt32 {
+						if _left != 0 && _right != 0 {
+							sameSign := (_left < 0) == (_right < 0)
 							if (result < 0) == sameSign {
 								colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-							} else if result/int64(arg) != int64(p.constArg) {
+							} else if result/_right != _left {
 								colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 							}
 						}
@@ -12897,13 +13078,14 @@ func (p projMultInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					result := int64(p.constArg) * int64(arg)
-					if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
-						if int64(p.constArg) != 0 && int64(arg) != 0 {
-							sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
+					_left, _right := int64(p.constArg), int64(arg)
+					result := _left * _right
+					if _left > math.MaxInt32 || _left < math.MinInt32 || _right > math.MaxInt32 || _right < math.MinInt32 {
+						if _left != 0 && _right != 0 {
+							sameSign := (_left < 0) == (_right < 0)
 							if (result < 0) == sameSign {
 								colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-							} else if result/int64(arg) != int64(p.constArg) {
+							} else if result/_right != _left {
 								colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 							}
 						}
@@ -12961,13 +13143,14 @@ func (p projMultInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						result := int64(p.constArg) * int64(arg)
-						if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
-							if int64(p.constArg) != 0 && int64(arg) != 0 {
-								sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
+						_left, _right := int64(p.constArg), int64(arg)
+						result := _left * _right
+						if _left > math.MaxInt32 || _left < math.MinInt32 || _right > math.MaxInt32 || _right < math.MinInt32 {
+							if _left != 0 && _right != 0 {
+								sameSign := (_left < 0) == (_right < 0)
 								if (result < 0) == sameSign {
 									colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-								} else if result/int64(arg) != int64(p.constArg) {
+								} else if result/_right != _left {
 									colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 								}
 							}
@@ -12986,13 +13169,14 @@ func (p projMultInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						result := int64(p.constArg) * int64(arg)
-						if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
-							if int64(p.constArg) != 0 && int64(arg) != 0 {
-								sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
+						_left, _right := int64(p.constArg), int64(arg)
+						result := _left * _right
+						if _left > math.MaxInt32 || _left < math.MinInt32 || _right > math.MaxInt32 || _right < math.MinInt32 {
+							if _left != 0 && _right != 0 {
+								sameSign := (_left < 0) == (_right < 0)
 								if (result < 0) == sameSign {
 									colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-								} else if result/int64(arg) != int64(p.constArg) {
+								} else if result/_right != _left {
 									colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 								}
 							}
@@ -13012,13 +13196,14 @@ func (p projMultInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					result := int64(p.constArg) * int64(arg)
-					if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
-						if int64(p.constArg) != 0 && int64(arg) != 0 {
-							sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
+					_left, _right := int64(p.constArg), int64(arg)
+					result := _left * _right
+					if _left > math.MaxInt32 || _left < math.MinInt32 || _right > math.MaxInt32 || _right < math.MinInt32 {
+						if _left != 0 && _right != 0 {
+							sameSign := (_left < 0) == (_right < 0)
 							if (result < 0) == sameSign {
 								colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-							} else if result/int64(arg) != int64(p.constArg) {
+							} else if result/_right != _left {
 								colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 							}
 						}
@@ -13034,13 +13219,14 @@ func (p projMultInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					result := int64(p.constArg) * int64(arg)
-					if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
-						if int64(p.constArg) != 0 && int64(arg) != 0 {
-							sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
+					_left, _right := int64(p.constArg), int64(arg)
+					result := _left * _right
+					if _left > math.MaxInt32 || _left < math.MinInt32 || _right > math.MaxInt32 || _right < math.MinInt32 {
+						if _left != 0 && _right != 0 {
+							sameSign := (_left < 0) == (_right < 0)
 							if (result < 0) == sameSign {
 								colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-							} else if result/int64(arg) != int64(p.constArg) {
+							} else if result/_right != _left {
 								colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 							}
 						}
@@ -13098,13 +13284,14 @@ func (p projMultInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						result := int64(p.constArg) * int64(arg)
-						if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
-							if int64(p.constArg) != 0 && int64(arg) != 0 {
-								sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
+						_left, _right := int64(p.constArg), int64(arg)
+						result := _left * _right
+						if _left > math.MaxInt32 || _left < math.MinInt32 || _right > math.MaxInt32 || _right < math.MinInt32 {
+							if _left != 0 && _right != 0 {
+								sameSign := (_left < 0) == (_right < 0)
 								if (result < 0) == sameSign {
 									colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-								} else if result/int64(arg) != int64(p.constArg) {
+								} else if result/_right != _left {
 									colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 								}
 							}
@@ -13123,13 +13310,14 @@ func (p projMultInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						result := int64(p.constArg) * int64(arg)
-						if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
-							if int64(p.constArg) != 0 && int64(arg) != 0 {
-								sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
+						_left, _right := int64(p.constArg), int64(arg)
+						result := _left * _right
+						if _left > math.MaxInt32 || _left < math.MinInt32 || _right > math.MaxInt32 || _right < math.MinInt32 {
+							if _left != 0 && _right != 0 {
+								sameSign := (_left < 0) == (_right < 0)
 								if (result < 0) == sameSign {
 									colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-								} else if result/int64(arg) != int64(p.constArg) {
+								} else if result/_right != _left {
 									colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 								}
 							}
@@ -13149,13 +13337,14 @@ func (p projMultInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					result := int64(p.constArg) * int64(arg)
-					if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
-						if int64(p.constArg) != 0 && int64(arg) != 0 {
-							sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
+					_left, _right := int64(p.constArg), int64(arg)
+					result := _left * _right
+					if _left > math.MaxInt32 || _left < math.MinInt32 || _right > math.MaxInt32 || _right < math.MinInt32 {
+						if _left != 0 && _right != 0 {
+							sameSign := (_left < 0) == (_right < 0)
 							if (result < 0) == sameSign {
 								colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-							} else if result/int64(arg) != int64(p.constArg) {
+							} else if result/_right != _left {
 								colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 							}
 						}
@@ -13171,13 +13360,14 @@ func (p projMultInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					result := int64(p.constArg) * int64(arg)
-					if int64(p.constArg) > math.MaxInt32 || int64(p.constArg) < math.MinInt32 || int64(arg) > math.MaxInt32 || int64(arg) < math.MinInt32 {
-						if int64(p.constArg) != 0 && int64(arg) != 0 {
-							sameSign := (int64(p.constArg) < 0) == (int64(arg) < 0)
+					_left, _right := int64(p.constArg), int64(arg)
+					result := _left * _right
+					if _left > math.MaxInt32 || _left < math.MinInt32 || _right > math.MaxInt32 || _right < math.MinInt32 {
+						if _left != 0 && _right != 0 {
+							sameSign := (_left < 0) == (_right < 0)
 							if (result < 0) == sameSign {
 								colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-							} else if result/int64(arg) != int64(p.constArg) {
+							} else if result/_right != _left {
 								colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 							}
 						}
@@ -13813,6 +14003,160 @@ func (p projMultFloat64ConstDatumOp) Next(ctx context.Context) coldata.Batch {
 }
 
 func (p projMultFloat64ConstDatumOp) Init() {
+	p.input.Init()
+}
+
+type projMultIntervalConstInt16Op struct {
+	projConstOpBase
+	constArg duration.Duration
+}
+
+func (p projMultIntervalConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int16
+	col = vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Interval()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+					projCol[i] = p.constArg.Mul(int64(arg))
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+					projCol[i] = p.constArg.Mul(int64(arg))
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+				projCol[i] = p.constArg.Mul(int64(arg))
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+				projCol[i] = p.constArg.Mul(int64(arg))
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projMultIntervalConstInt16Op) Init() {
+	p.input.Init()
+}
+
+type projMultIntervalConstInt32Op struct {
+	projConstOpBase
+	constArg duration.Duration
+}
+
+func (p projMultIntervalConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int32
+	col = vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Interval()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+					projCol[i] = p.constArg.Mul(int64(arg))
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+					projCol[i] = p.constArg.Mul(int64(arg))
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+				projCol[i] = p.constArg.Mul(int64(arg))
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+				projCol[i] = p.constArg.Mul(int64(arg))
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projMultIntervalConstInt32Op) Init() {
 	p.input.Init()
 }
 
@@ -16032,12 +16376,12 @@ func (p projDivInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						if arg == 0 {
+						if int64(arg) == 0 {
 							colexecerror.ExpectedError(tree.ErrDivByZero)
 						}
 						leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
-						leftTmpDec.SetInt64(int64(p.constArg))
-						rightTmpDec.SetInt64(int64(arg))
+						leftTmpDec.SetInt64(int64(int64(p.constArg)))
+						rightTmpDec.SetInt64(int64(int64(arg)))
 						if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -16054,12 +16398,12 @@ func (p projDivInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						if arg == 0 {
+						if int64(arg) == 0 {
 							colexecerror.ExpectedError(tree.ErrDivByZero)
 						}
 						leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
-						leftTmpDec.SetInt64(int64(p.constArg))
-						rightTmpDec.SetInt64(int64(arg))
+						leftTmpDec.SetInt64(int64(int64(p.constArg)))
+						rightTmpDec.SetInt64(int64(int64(arg)))
 						if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -16077,12 +16421,12 @@ func (p projDivInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					if arg == 0 {
+					if int64(arg) == 0 {
 						colexecerror.ExpectedError(tree.ErrDivByZero)
 					}
 					leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
-					leftTmpDec.SetInt64(int64(p.constArg))
-					rightTmpDec.SetInt64(int64(arg))
+					leftTmpDec.SetInt64(int64(int64(p.constArg)))
+					rightTmpDec.SetInt64(int64(int64(arg)))
 					if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
 						colexecerror.ExpectedError(err)
 					}
@@ -16096,12 +16440,12 @@ func (p projDivInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					if arg == 0 {
+					if int64(arg) == 0 {
 						colexecerror.ExpectedError(tree.ErrDivByZero)
 					}
 					leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
-					leftTmpDec.SetInt64(int64(p.constArg))
-					rightTmpDec.SetInt64(int64(arg))
+					leftTmpDec.SetInt64(int64(int64(p.constArg)))
+					rightTmpDec.SetInt64(int64(int64(arg)))
 					if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
 						colexecerror.ExpectedError(err)
 					}
@@ -16790,12 +17134,12 @@ func (p projDivInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						if arg == 0 {
+						if int64(arg) == 0 {
 							colexecerror.ExpectedError(tree.ErrDivByZero)
 						}
 						leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
-						leftTmpDec.SetInt64(int64(p.constArg))
-						rightTmpDec.SetInt64(int64(arg))
+						leftTmpDec.SetInt64(int64(int64(p.constArg)))
+						rightTmpDec.SetInt64(int64(int64(arg)))
 						if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -16812,12 +17156,12 @@ func (p projDivInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						if arg == 0 {
+						if int64(arg) == 0 {
 							colexecerror.ExpectedError(tree.ErrDivByZero)
 						}
 						leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
-						leftTmpDec.SetInt64(int64(p.constArg))
-						rightTmpDec.SetInt64(int64(arg))
+						leftTmpDec.SetInt64(int64(int64(p.constArg)))
+						rightTmpDec.SetInt64(int64(int64(arg)))
 						if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
 							colexecerror.ExpectedError(err)
 						}
@@ -16835,12 +17179,12 @@ func (p projDivInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					if arg == 0 {
+					if int64(arg) == 0 {
 						colexecerror.ExpectedError(tree.ErrDivByZero)
 					}
 					leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
-					leftTmpDec.SetInt64(int64(p.constArg))
-					rightTmpDec.SetInt64(int64(arg))
+					leftTmpDec.SetInt64(int64(int64(p.constArg)))
+					rightTmpDec.SetInt64(int64(int64(arg)))
 					if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
 						colexecerror.ExpectedError(err)
 					}
@@ -16854,12 +17198,12 @@ func (p projDivInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					if arg == 0 {
+					if int64(arg) == 0 {
 						colexecerror.ExpectedError(tree.ErrDivByZero)
 					}
 					leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
-					leftTmpDec.SetInt64(int64(p.constArg))
-					rightTmpDec.SetInt64(int64(arg))
+					leftTmpDec.SetInt64(int64(int64(p.constArg)))
+					rightTmpDec.SetInt64(int64(int64(arg)))
 					if _, err := tree.DecimalCtx.Quo(&projCol[i], leftTmpDec, rightTmpDec); err != nil {
 						colexecerror.ExpectedError(err)
 					}
@@ -20022,7 +20366,7 @@ func (p projFloorDivInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		// output vector.
 		projVec.Nulls().UnsetNulls()
 	}
-	projCol := projVec.Int16()
+	projCol := projVec.Int64()
 	if vec.Nulls().MaybeHasNulls() {
 		colNulls := vec.Nulls()
 		if sel := batch.Selection(); sel != nil {
@@ -20033,10 +20377,10 @@ func (p projFloorDivInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						if arg == 0 {
+						if int64(arg) == 0 {
 							colexecerror.ExpectedError(tree.ErrDivByZero)
 						}
-						projCol[i] = p.constArg // arg
+						projCol[i] = int64(p.constArg) // int64(arg)
 					}
 
 				}
@@ -20050,10 +20394,10 @@ func (p projFloorDivInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						if arg == 0 {
+						if int64(arg) == 0 {
 							colexecerror.ExpectedError(tree.ErrDivByZero)
 						}
-						projCol[i] = p.constArg // arg
+						projCol[i] = int64(p.constArg) // int64(arg)
 					}
 
 				}
@@ -20068,10 +20412,10 @@ func (p projFloorDivInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					if arg == 0 {
+					if int64(arg) == 0 {
 						colexecerror.ExpectedError(tree.ErrDivByZero)
 					}
-					projCol[i] = p.constArg // arg
+					projCol[i] = int64(p.constArg) // int64(arg)
 				}
 
 			}
@@ -20082,10 +20426,10 @@ func (p projFloorDivInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					if arg == 0 {
+					if int64(arg) == 0 {
 						colexecerror.ExpectedError(tree.ErrDivByZero)
 					}
-					projCol[i] = p.constArg // arg
+					projCol[i] = int64(p.constArg) // int64(arg)
 				}
 
 			}
@@ -20575,7 +20919,7 @@ func (p projFloorDivInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		// output vector.
 		projVec.Nulls().UnsetNulls()
 	}
-	projCol := projVec.Int32()
+	projCol := projVec.Int64()
 	if vec.Nulls().MaybeHasNulls() {
 		colNulls := vec.Nulls()
 		if sel := batch.Selection(); sel != nil {
@@ -20586,10 +20930,10 @@ func (p projFloorDivInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						if arg == 0 {
+						if int64(arg) == 0 {
 							colexecerror.ExpectedError(tree.ErrDivByZero)
 						}
-						projCol[i] = p.constArg // arg
+						projCol[i] = int64(p.constArg) // int64(arg)
 					}
 
 				}
@@ -20603,10 +20947,10 @@ func (p projFloorDivInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						if arg == 0 {
+						if int64(arg) == 0 {
 							colexecerror.ExpectedError(tree.ErrDivByZero)
 						}
-						projCol[i] = p.constArg // arg
+						projCol[i] = int64(p.constArg) // int64(arg)
 					}
 
 				}
@@ -20621,10 +20965,10 @@ func (p projFloorDivInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					if arg == 0 {
+					if int64(arg) == 0 {
 						colexecerror.ExpectedError(tree.ErrDivByZero)
 					}
-					projCol[i] = p.constArg // arg
+					projCol[i] = int64(p.constArg) // int64(arg)
 				}
 
 			}
@@ -20635,10 +20979,10 @@ func (p projFloorDivInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					if arg == 0 {
+					if int64(arg) == 0 {
 						colexecerror.ExpectedError(tree.ErrDivByZero)
 					}
-					projCol[i] = p.constArg // arg
+					projCol[i] = int64(p.constArg) // int64(arg)
 				}
 
 			}
@@ -21991,7 +22335,7 @@ func (p projModInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 		// output vector.
 		projVec.Nulls().UnsetNulls()
 	}
-	projCol := projVec.Int16()
+	projCol := projVec.Int64()
 	if vec.Nulls().MaybeHasNulls() {
 		colNulls := vec.Nulls()
 		if sel := batch.Selection(); sel != nil {
@@ -22002,10 +22346,10 @@ func (p projModInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						if arg == 0 {
+						if int64(arg) == 0 {
 							colexecerror.ExpectedError(tree.ErrDivByZero)
 						}
-						projCol[i] = p.constArg % arg
+						projCol[i] = int64(p.constArg) % int64(arg)
 					}
 
 				}
@@ -22019,10 +22363,10 @@ func (p projModInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						if arg == 0 {
+						if int64(arg) == 0 {
 							colexecerror.ExpectedError(tree.ErrDivByZero)
 						}
-						projCol[i] = p.constArg % arg
+						projCol[i] = int64(p.constArg) % int64(arg)
 					}
 
 				}
@@ -22037,10 +22381,10 @@ func (p projModInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					if arg == 0 {
+					if int64(arg) == 0 {
 						colexecerror.ExpectedError(tree.ErrDivByZero)
 					}
-					projCol[i] = p.constArg % arg
+					projCol[i] = int64(p.constArg) % int64(arg)
 				}
 
 			}
@@ -22051,10 +22395,10 @@ func (p projModInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					if arg == 0 {
+					if int64(arg) == 0 {
 						colexecerror.ExpectedError(tree.ErrDivByZero)
 					}
-					projCol[i] = p.constArg % arg
+					projCol[i] = int64(p.constArg) % int64(arg)
 				}
 
 			}
@@ -22544,7 +22888,7 @@ func (p projModInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 		// output vector.
 		projVec.Nulls().UnsetNulls()
 	}
-	projCol := projVec.Int32()
+	projCol := projVec.Int64()
 	if vec.Nulls().MaybeHasNulls() {
 		colNulls := vec.Nulls()
 		if sel := batch.Selection(); sel != nil {
@@ -22555,10 +22899,10 @@ func (p projModInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						if arg == 0 {
+						if int64(arg) == 0 {
 							colexecerror.ExpectedError(tree.ErrDivByZero)
 						}
-						projCol[i] = p.constArg % arg
+						projCol[i] = int64(p.constArg) % int64(arg)
 					}
 
 				}
@@ -22572,10 +22916,10 @@ func (p projModInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 					arg := col[i]
 
 					{
-						if arg == 0 {
+						if int64(arg) == 0 {
 							colexecerror.ExpectedError(tree.ErrDivByZero)
 						}
-						projCol[i] = p.constArg % arg
+						projCol[i] = int64(p.constArg) % int64(arg)
 					}
 
 				}
@@ -22590,10 +22934,10 @@ func (p projModInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					if arg == 0 {
+					if int64(arg) == 0 {
 						colexecerror.ExpectedError(tree.ErrDivByZero)
 					}
-					projCol[i] = p.constArg % arg
+					projCol[i] = int64(p.constArg) % int64(arg)
 				}
 
 			}
@@ -22604,10 +22948,10 @@ func (p projModInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
 				arg := col[i]
 
 				{
-					if arg == 0 {
+					if int64(arg) == 0 {
 						colexecerror.ExpectedError(tree.ErrDivByZero)
 					}
-					projCol[i] = p.constArg % arg
+					projCol[i] = int64(p.constArg) % int64(arg)
 				}
 
 			}
@@ -50619,6 +50963,15 @@ func GetProjectionLConstOperator(
 								constArg:        c.(int16),
 							}, nil
 						}
+					case types.IntervalFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projMultInt16ConstIntervalOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int16),
+							}, nil
+						}
 					case typeconv.DatumVecCanonicalTypeFamily:
 						switch rightType.Width() {
 						case -1:
@@ -50655,6 +51008,15 @@ func GetProjectionLConstOperator(
 						case -1:
 						default:
 							return &projMultInt32ConstDecimalOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int32),
+							}, nil
+						}
+					case types.IntervalFamily:
+						switch rightType.Width() {
+						case -1:
+						default:
+							return &projMultInt32ConstIntervalOp{
 								projConstOpBase: projConstOpBase,
 								constArg:        c.(int32),
 							}, nil
@@ -50761,6 +51123,16 @@ func GetProjectionLConstOperator(
 					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
 					case types.IntFamily:
 						switch rightType.Width() {
+						case 16:
+							return &projMultIntervalConstInt16Op{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(duration.Duration),
+							}, nil
+						case 32:
+							return &projMultIntervalConstInt32Op{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(duration.Duration),
+							}, nil
 						case -1:
 						default:
 							return &projMultIntervalConstInt64Op{

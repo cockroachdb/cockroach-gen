@@ -110,7 +110,7 @@ func (a *sumIntInt16OrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				if !isNull {
 
 					{
-						result := (int64(a.scratch.curAgg) + int64(col[i]))
+						result := int64(a.scratch.curAgg) + int64(col[i])
 						if (result < int64(a.scratch.curAgg)) != (int64(col[i]) < 0) {
 							colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 						}
@@ -143,7 +143,7 @@ func (a *sumIntInt16OrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				if !isNull {
 
 					{
-						result := (int64(a.scratch.curAgg) + int64(col[i]))
+						result := int64(a.scratch.curAgg) + int64(col[i])
 						if (result < int64(a.scratch.curAgg)) != (int64(col[i]) < 0) {
 							colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 						}
@@ -177,7 +177,7 @@ func (a *sumIntInt16OrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				if !isNull {
 
 					{
-						result := (int64(a.scratch.curAgg) + int64(col[i]))
+						result := int64(a.scratch.curAgg) + int64(col[i])
 						if (result < int64(a.scratch.curAgg)) != (int64(col[i]) < 0) {
 							colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 						}
@@ -209,7 +209,7 @@ func (a *sumIntInt16OrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				if !isNull {
 
 					{
-						result := (int64(a.scratch.curAgg) + int64(col[i]))
+						result := int64(a.scratch.curAgg) + int64(col[i])
 						if (result < int64(a.scratch.curAgg)) != (int64(col[i]) < 0) {
 							colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 						}
@@ -326,7 +326,7 @@ func (a *sumIntInt32OrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				if !isNull {
 
 					{
-						result := (int64(a.scratch.curAgg) + int64(col[i]))
+						result := int64(a.scratch.curAgg) + int64(col[i])
 						if (result < int64(a.scratch.curAgg)) != (int64(col[i]) < 0) {
 							colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 						}
@@ -359,7 +359,7 @@ func (a *sumIntInt32OrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				if !isNull {
 
 					{
-						result := (int64(a.scratch.curAgg) + int64(col[i]))
+						result := int64(a.scratch.curAgg) + int64(col[i])
 						if (result < int64(a.scratch.curAgg)) != (int64(col[i]) < 0) {
 							colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 						}
@@ -393,7 +393,7 @@ func (a *sumIntInt32OrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				if !isNull {
 
 					{
-						result := (int64(a.scratch.curAgg) + int64(col[i]))
+						result := int64(a.scratch.curAgg) + int64(col[i])
 						if (result < int64(a.scratch.curAgg)) != (int64(col[i]) < 0) {
 							colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 						}
@@ -425,7 +425,7 @@ func (a *sumIntInt32OrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				if !isNull {
 
 					{
-						result := (int64(a.scratch.curAgg) + int64(col[i]))
+						result := int64(a.scratch.curAgg) + int64(col[i])
 						if (result < int64(a.scratch.curAgg)) != (int64(col[i]) < 0) {
 							colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 						}
@@ -542,7 +542,7 @@ func (a *sumIntInt64OrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				if !isNull {
 
 					{
-						result := (int64(a.scratch.curAgg) + int64(col[i]))
+						result := int64(a.scratch.curAgg) + int64(col[i])
 						if (result < int64(a.scratch.curAgg)) != (int64(col[i]) < 0) {
 							colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 						}
@@ -575,7 +575,7 @@ func (a *sumIntInt64OrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				if !isNull {
 
 					{
-						result := (int64(a.scratch.curAgg) + int64(col[i]))
+						result := int64(a.scratch.curAgg) + int64(col[i])
 						if (result < int64(a.scratch.curAgg)) != (int64(col[i]) < 0) {
 							colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 						}
@@ -609,7 +609,7 @@ func (a *sumIntInt64OrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				if !isNull {
 
 					{
-						result := (int64(a.scratch.curAgg) + int64(col[i]))
+						result := int64(a.scratch.curAgg) + int64(col[i])
 						if (result < int64(a.scratch.curAgg)) != (int64(col[i]) < 0) {
 							colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 						}
@@ -641,7 +641,7 @@ func (a *sumIntInt64OrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 				if !isNull {
 
 					{
-						result := (int64(a.scratch.curAgg) + int64(col[i]))
+						result := int64(a.scratch.curAgg) + int64(col[i])
 						if (result < int64(a.scratch.curAgg)) != (int64(col[i]) < 0) {
 							colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 						}

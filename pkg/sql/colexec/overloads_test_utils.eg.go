@@ -13,8 +13,8 @@ import (
 	"github.com/cockroachdb/cockroach/pkg/util/duration"
 )
 
-func performBitandInt16Int16(a int16, b int16) int16 {
-	var r int16
+func performBitandInt16Int16(a int16, b int16) int64 {
+	var r int64
 	// In order to inline the templated code of overloads, we need to have a
 	// "_overloadHelper" local variable of type "overloadHelper".
 	var _overloadHelper overloadHelper
@@ -22,7 +22,7 @@ func performBitandInt16Int16(a int16, b int16) int16 {
 	// to go around "unused" error.
 	_ = _overloadHelper
 
-	r = a & b
+	r = int64(a) & int64(b)
 
 	return r
 }
@@ -69,8 +69,8 @@ func performBitandInt32Int16(a int32, b int16) int64 {
 	return r
 }
 
-func performBitandInt32Int32(a int32, b int32) int32 {
-	var r int32
+func performBitandInt32Int32(a int32, b int32) int64 {
+	var r int64
 	// In order to inline the templated code of overloads, we need to have a
 	// "_overloadHelper" local variable of type "overloadHelper".
 	var _overloadHelper overloadHelper
@@ -78,7 +78,7 @@ func performBitandInt32Int32(a int32, b int32) int32 {
 	// to go around "unused" error.
 	_ = _overloadHelper
 
-	r = a & b
+	r = int64(a) & int64(b)
 
 	return r
 }
@@ -139,8 +139,8 @@ func performBitandInt64Int64(a int64, b int64) int64 {
 	return r
 }
 
-func performBitorInt16Int16(a int16, b int16) int16 {
-	var r int16
+func performBitorInt16Int16(a int16, b int16) int64 {
+	var r int64
 	// In order to inline the templated code of overloads, we need to have a
 	// "_overloadHelper" local variable of type "overloadHelper".
 	var _overloadHelper overloadHelper
@@ -148,7 +148,7 @@ func performBitorInt16Int16(a int16, b int16) int16 {
 	// to go around "unused" error.
 	_ = _overloadHelper
 
-	r = a | b
+	r = int64(a) | int64(b)
 
 	return r
 }
@@ -195,8 +195,8 @@ func performBitorInt32Int16(a int32, b int16) int64 {
 	return r
 }
 
-func performBitorInt32Int32(a int32, b int32) int32 {
-	var r int32
+func performBitorInt32Int32(a int32, b int32) int64 {
+	var r int64
 	// In order to inline the templated code of overloads, we need to have a
 	// "_overloadHelper" local variable of type "overloadHelper".
 	var _overloadHelper overloadHelper
@@ -204,7 +204,7 @@ func performBitorInt32Int32(a int32, b int32) int32 {
 	// to go around "unused" error.
 	_ = _overloadHelper
 
-	r = a | b
+	r = int64(a) | int64(b)
 
 	return r
 }
@@ -265,8 +265,8 @@ func performBitorInt64Int64(a int64, b int64) int64 {
 	return r
 }
 
-func performBitxorInt16Int16(a int16, b int16) int16 {
-	var r int16
+func performBitxorInt16Int16(a int16, b int16) int64 {
+	var r int64
 	// In order to inline the templated code of overloads, we need to have a
 	// "_overloadHelper" local variable of type "overloadHelper".
 	var _overloadHelper overloadHelper
@@ -274,7 +274,7 @@ func performBitxorInt16Int16(a int16, b int16) int16 {
 	// to go around "unused" error.
 	_ = _overloadHelper
 
-	r = a ^ b
+	r = int64(a) ^ int64(b)
 
 	return r
 }
@@ -321,8 +321,8 @@ func performBitxorInt32Int16(a int32, b int16) int64 {
 	return r
 }
 
-func performBitxorInt32Int32(a int32, b int32) int32 {
-	var r int32
+func performBitxorInt32Int32(a int32, b int32) int64 {
+	var r int64
 	// In order to inline the templated code of overloads, we need to have a
 	// "_overloadHelper" local variable of type "overloadHelper".
 	var _overloadHelper overloadHelper
@@ -330,7 +330,7 @@ func performBitxorInt32Int32(a int32, b int32) int32 {
 	// to go around "unused" error.
 	_ = _overloadHelper
 
-	r = a ^ b
+	r = int64(a) ^ int64(b)
 
 	return r
 }
@@ -474,8 +474,8 @@ func performPlusDecimalDecimal(a apd.Decimal, b apd.Decimal) apd.Decimal {
 	return r
 }
 
-func performPlusInt16Int16(a int16, b int16) int16 {
-	var r int16
+func performPlusInt16Int16(a int16, b int16) int64 {
+	var r int64
 	// In order to inline the templated code of overloads, we need to have a
 	// "_overloadHelper" local variable of type "overloadHelper".
 	var _overloadHelper overloadHelper
@@ -484,8 +484,8 @@ func performPlusInt16Int16(a int16, b int16) int16 {
 	_ = _overloadHelper
 
 	{
-		result := a + b
-		if (result < a) != (b < 0) {
+		result := int64(a) + int64(b)
+		if (result < int64(a)) != (int64(b) < 0) {
 			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 		}
 		r = result
@@ -554,8 +554,8 @@ func performPlusInt32Int16(a int32, b int16) int64 {
 	return r
 }
 
-func performPlusInt32Int32(a int32, b int32) int32 {
-	var r int32
+func performPlusInt32Int32(a int32, b int32) int64 {
+	var r int64
 	// In order to inline the templated code of overloads, we need to have a
 	// "_overloadHelper" local variable of type "overloadHelper".
 	var _overloadHelper overloadHelper
@@ -564,8 +564,8 @@ func performPlusInt32Int32(a int32, b int32) int32 {
 	_ = _overloadHelper
 
 	{
-		result := a + b
-		if (result < a) != (b < 0) {
+		result := int64(a) + int64(b)
+		if (result < int64(a)) != (int64(b) < 0) {
 			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 		}
 		r = result
@@ -856,8 +856,8 @@ func performMinusDecimalDecimal(a apd.Decimal, b apd.Decimal) apd.Decimal {
 	return r
 }
 
-func performMinusInt16Int16(a int16, b int16) int16 {
-	var r int16
+func performMinusInt16Int16(a int16, b int16) int64 {
+	var r int64
 	// In order to inline the templated code of overloads, we need to have a
 	// "_overloadHelper" local variable of type "overloadHelper".
 	var _overloadHelper overloadHelper
@@ -866,8 +866,8 @@ func performMinusInt16Int16(a int16, b int16) int16 {
 	_ = _overloadHelper
 
 	{
-		result := a - b
-		if (result < a) != (b > 0) {
+		result := int64(a) - int64(b)
+		if (result < int64(a)) != (int64(b) > 0) {
 			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 		}
 		r = result
@@ -936,8 +936,8 @@ func performMinusInt32Int16(a int32, b int16) int64 {
 	return r
 }
 
-func performMinusInt32Int32(a int32, b int32) int32 {
-	var r int32
+func performMinusInt32Int32(a int32, b int32) int64 {
+	var r int64
 	// In order to inline the templated code of overloads, we need to have a
 	// "_overloadHelper" local variable of type "overloadHelper".
 	var _overloadHelper overloadHelper
@@ -946,8 +946,8 @@ func performMinusInt32Int32(a int32, b int32) int32 {
 	_ = _overloadHelper
 
 	{
-		result := a - b
-		if (result < a) != (b > 0) {
+		result := int64(a) - int64(b)
+		if (result < int64(a)) != (int64(b) > 0) {
 			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 		}
 		r = result
@@ -1258,8 +1258,8 @@ func performMultDecimalInterval(a apd.Decimal, b duration.Duration) duration.Dur
 	return r
 }
 
-func performMultInt16Int16(a int16, b int16) int16 {
-	var r int16
+func performMultInt16Int16(a int16, b int16) int64 {
+	var r int64
 	// In order to inline the templated code of overloads, we need to have a
 	// "_overloadHelper" local variable of type "overloadHelper".
 	var _overloadHelper overloadHelper
@@ -1268,13 +1268,14 @@ func performMultInt16Int16(a int16, b int16) int16 {
 	_ = _overloadHelper
 
 	{
-		result := a * b
-		if a > math.MaxInt8 || a < math.MinInt8 || b > math.MaxInt8 || b < math.MinInt8 {
-			if a != 0 && b != 0 {
-				sameSign := (a < 0) == (b < 0)
+		_left, _right := int64(a), int64(b)
+		result := _left * _right
+		if _left > math.MaxInt8 || _left < math.MinInt8 || _right > math.MaxInt8 || _right < math.MinInt8 {
+			if _left != 0 && _right != 0 {
+				sameSign := (_left < 0) == (_right < 0)
 				if (result < 0) == sameSign {
 					colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-				} else if result/b != a {
+				} else if result/_right != _left {
 					colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 				}
 			}
@@ -1295,13 +1296,14 @@ func performMultInt16Int32(a int16, b int32) int64 {
 	_ = _overloadHelper
 
 	{
-		result := int64(a) * int64(b)
-		if int64(a) > math.MaxInt32 || int64(a) < math.MinInt32 || int64(b) > math.MaxInt32 || int64(b) < math.MinInt32 {
-			if int64(a) != 0 && int64(b) != 0 {
-				sameSign := (int64(a) < 0) == (int64(b) < 0)
+		_left, _right := int64(a), int64(b)
+		result := _left * _right
+		if _left > math.MaxInt32 || _left < math.MinInt32 || _right > math.MaxInt32 || _right < math.MinInt32 {
+			if _left != 0 && _right != 0 {
+				sameSign := (_left < 0) == (_right < 0)
 				if (result < 0) == sameSign {
 					colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-				} else if result/int64(b) != int64(a) {
+				} else if result/_right != _left {
 					colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 				}
 			}
@@ -1322,13 +1324,14 @@ func performMultInt16Int64(a int16, b int64) int64 {
 	_ = _overloadHelper
 
 	{
-		result := int64(a) * int64(b)
-		if int64(a) > math.MaxInt32 || int64(a) < math.MinInt32 || int64(b) > math.MaxInt32 || int64(b) < math.MinInt32 {
-			if int64(a) != 0 && int64(b) != 0 {
-				sameSign := (int64(a) < 0) == (int64(b) < 0)
+		_left, _right := int64(a), int64(b)
+		result := _left * _right
+		if _left > math.MaxInt32 || _left < math.MinInt32 || _right > math.MaxInt32 || _right < math.MinInt32 {
+			if _left != 0 && _right != 0 {
+				sameSign := (_left < 0) == (_right < 0)
 				if (result < 0) == sameSign {
 					colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-				} else if result/int64(b) != int64(a) {
+				} else if result/_right != _left {
 					colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 				}
 			}
@@ -1349,13 +1352,14 @@ func performMultInt32Int16(a int32, b int16) int64 {
 	_ = _overloadHelper
 
 	{
-		result := int64(a) * int64(b)
-		if int64(a) > math.MaxInt32 || int64(a) < math.MinInt32 || int64(b) > math.MaxInt32 || int64(b) < math.MinInt32 {
-			if int64(a) != 0 && int64(b) != 0 {
-				sameSign := (int64(a) < 0) == (int64(b) < 0)
+		_left, _right := int64(a), int64(b)
+		result := _left * _right
+		if _left > math.MaxInt32 || _left < math.MinInt32 || _right > math.MaxInt32 || _right < math.MinInt32 {
+			if _left != 0 && _right != 0 {
+				sameSign := (_left < 0) == (_right < 0)
 				if (result < 0) == sameSign {
 					colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-				} else if result/int64(b) != int64(a) {
+				} else if result/_right != _left {
 					colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 				}
 			}
@@ -1366,8 +1370,8 @@ func performMultInt32Int16(a int32, b int16) int64 {
 	return r
 }
 
-func performMultInt32Int32(a int32, b int32) int32 {
-	var r int32
+func performMultInt32Int32(a int32, b int32) int64 {
+	var r int64
 	// In order to inline the templated code of overloads, we need to have a
 	// "_overloadHelper" local variable of type "overloadHelper".
 	var _overloadHelper overloadHelper
@@ -1376,13 +1380,14 @@ func performMultInt32Int32(a int32, b int32) int32 {
 	_ = _overloadHelper
 
 	{
-		result := a * b
-		if a > math.MaxInt16 || a < math.MinInt16 || b > math.MaxInt16 || b < math.MinInt16 {
-			if a != 0 && b != 0 {
-				sameSign := (a < 0) == (b < 0)
+		_left, _right := int64(a), int64(b)
+		result := _left * _right
+		if _left > math.MaxInt16 || _left < math.MinInt16 || _right > math.MaxInt16 || _right < math.MinInt16 {
+			if _left != 0 && _right != 0 {
+				sameSign := (_left < 0) == (_right < 0)
 				if (result < 0) == sameSign {
 					colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-				} else if result/b != a {
+				} else if result/_right != _left {
 					colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 				}
 			}
@@ -1403,13 +1408,14 @@ func performMultInt32Int64(a int32, b int64) int64 {
 	_ = _overloadHelper
 
 	{
-		result := int64(a) * int64(b)
-		if int64(a) > math.MaxInt32 || int64(a) < math.MinInt32 || int64(b) > math.MaxInt32 || int64(b) < math.MinInt32 {
-			if int64(a) != 0 && int64(b) != 0 {
-				sameSign := (int64(a) < 0) == (int64(b) < 0)
+		_left, _right := int64(a), int64(b)
+		result := _left * _right
+		if _left > math.MaxInt32 || _left < math.MinInt32 || _right > math.MaxInt32 || _right < math.MinInt32 {
+			if _left != 0 && _right != 0 {
+				sameSign := (_left < 0) == (_right < 0)
 				if (result < 0) == sameSign {
 					colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-				} else if result/int64(b) != int64(a) {
+				} else if result/_right != _left {
 					colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 				}
 			}
@@ -1430,13 +1436,14 @@ func performMultInt64Int16(a int64, b int16) int64 {
 	_ = _overloadHelper
 
 	{
-		result := int64(a) * int64(b)
-		if int64(a) > math.MaxInt32 || int64(a) < math.MinInt32 || int64(b) > math.MaxInt32 || int64(b) < math.MinInt32 {
-			if int64(a) != 0 && int64(b) != 0 {
-				sameSign := (int64(a) < 0) == (int64(b) < 0)
+		_left, _right := int64(a), int64(b)
+		result := _left * _right
+		if _left > math.MaxInt32 || _left < math.MinInt32 || _right > math.MaxInt32 || _right < math.MinInt32 {
+			if _left != 0 && _right != 0 {
+				sameSign := (_left < 0) == (_right < 0)
 				if (result < 0) == sameSign {
 					colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-				} else if result/int64(b) != int64(a) {
+				} else if result/_right != _left {
 					colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 				}
 			}
@@ -1457,13 +1464,14 @@ func performMultInt64Int32(a int64, b int32) int64 {
 	_ = _overloadHelper
 
 	{
-		result := int64(a) * int64(b)
-		if int64(a) > math.MaxInt32 || int64(a) < math.MinInt32 || int64(b) > math.MaxInt32 || int64(b) < math.MinInt32 {
-			if int64(a) != 0 && int64(b) != 0 {
-				sameSign := (int64(a) < 0) == (int64(b) < 0)
+		_left, _right := int64(a), int64(b)
+		result := _left * _right
+		if _left > math.MaxInt32 || _left < math.MinInt32 || _right > math.MaxInt32 || _right < math.MinInt32 {
+			if _left != 0 && _right != 0 {
+				sameSign := (_left < 0) == (_right < 0)
 				if (result < 0) == sameSign {
 					colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-				} else if result/int64(b) != int64(a) {
+				} else if result/_right != _left {
 					colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 				}
 			}
@@ -1484,13 +1492,14 @@ func performMultInt64Int64(a int64, b int64) int64 {
 	_ = _overloadHelper
 
 	{
-		result := int64(a) * int64(b)
-		if int64(a) > math.MaxInt32 || int64(a) < math.MinInt32 || int64(b) > math.MaxInt32 || int64(b) < math.MinInt32 {
-			if int64(a) != 0 && int64(b) != 0 {
-				sameSign := (int64(a) < 0) == (int64(b) < 0)
+		_left, _right := int64(a), int64(b)
+		result := _left * _right
+		if _left > math.MaxInt32 || _left < math.MinInt32 || _right > math.MaxInt32 || _right < math.MinInt32 {
+			if _left != 0 && _right != 0 {
+				sameSign := (_left < 0) == (_right < 0)
 				if (result < 0) == sameSign {
 					colexecerror.ExpectedError(tree.ErrIntOutOfRange)
-				} else if result/int64(b) != int64(a) {
+				} else if result/_right != _left {
 					colexecerror.ExpectedError(tree.ErrIntOutOfRange)
 				}
 			}
@@ -1567,6 +1576,30 @@ func performMultInt64Decimal(a int64, b apd.Decimal) apd.Decimal {
 	return r
 }
 
+func performMultInt16Interval(a int16, b duration.Duration) duration.Duration {
+	var r duration.Duration
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+	r = b.Mul(int64(a))
+	return r
+}
+
+func performMultInt32Interval(a int32, b duration.Duration) duration.Duration {
+	var r duration.Duration
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+	r = b.Mul(int64(a))
+	return r
+}
+
 func performMultInt64Interval(a int64, b duration.Duration) duration.Duration {
 	var r duration.Duration
 	// In order to inline the templated code of overloads, we need to have a
@@ -1605,6 +1638,30 @@ func performMultFloat64Interval(a float64, b duration.Duration) duration.Duratio
 	// to go around "unused" error.
 	_ = _overloadHelper
 	r = b.MulFloat(float64(a))
+	return r
+}
+
+func performMultIntervalInt16(a duration.Duration, b int16) duration.Duration {
+	var r duration.Duration
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+	r = a.Mul(int64(b))
+	return r
+}
+
+func performMultIntervalInt32(a duration.Duration, b int32) duration.Duration {
+	var r duration.Duration
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+	r = a.Mul(int64(b))
 	return r
 }
 
@@ -1758,12 +1815,12 @@ func performDivInt16Int16(a int16, b int16) apd.Decimal {
 	_ = _overloadHelper
 
 	{
-		if b == 0 {
+		if int64(b) == 0 {
 			colexecerror.ExpectedError(tree.ErrDivByZero)
 		}
 		leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
-		leftTmpDec.SetInt64(int64(a))
-		rightTmpDec.SetInt64(int64(b))
+		leftTmpDec.SetInt64(int64(int64(a)))
+		rightTmpDec.SetInt64(int64(int64(b)))
 		if _, err := tree.DecimalCtx.Quo(&r, leftTmpDec, rightTmpDec); err != nil {
 			colexecerror.ExpectedError(err)
 		}
@@ -1854,12 +1911,12 @@ func performDivInt32Int32(a int32, b int32) apd.Decimal {
 	_ = _overloadHelper
 
 	{
-		if b == 0 {
+		if int64(b) == 0 {
 			colexecerror.ExpectedError(tree.ErrDivByZero)
 		}
 		leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
-		leftTmpDec.SetInt64(int64(a))
-		rightTmpDec.SetInt64(int64(b))
+		leftTmpDec.SetInt64(int64(int64(a)))
+		rightTmpDec.SetInt64(int64(int64(b)))
 		if _, err := tree.DecimalCtx.Quo(&r, leftTmpDec, rightTmpDec); err != nil {
 			colexecerror.ExpectedError(err)
 		}
@@ -2194,8 +2251,8 @@ func performFloorDivDecimalDecimal(a apd.Decimal, b apd.Decimal) apd.Decimal {
 	return r
 }
 
-func performFloorDivInt16Int16(a int16, b int16) int16 {
-	var r int16
+func performFloorDivInt16Int16(a int16, b int16) int64 {
+	var r int64
 	// In order to inline the templated code of overloads, we need to have a
 	// "_overloadHelper" local variable of type "overloadHelper".
 	var _overloadHelper overloadHelper
@@ -2204,10 +2261,10 @@ func performFloorDivInt16Int16(a int16, b int16) int16 {
 	_ = _overloadHelper
 
 	{
-		if b == 0 {
+		if int64(b) == 0 {
 			colexecerror.ExpectedError(tree.ErrDivByZero)
 		}
-		r = a // b
+		r = int64(a) // int64(b)
 	}
 
 	return r
@@ -2270,8 +2327,8 @@ func performFloorDivInt32Int16(a int32, b int16) int64 {
 	return r
 }
 
-func performFloorDivInt32Int32(a int32, b int32) int32 {
-	var r int32
+func performFloorDivInt32Int32(a int32, b int32) int64 {
+	var r int64
 	// In order to inline the templated code of overloads, we need to have a
 	// "_overloadHelper" local variable of type "overloadHelper".
 	var _overloadHelper overloadHelper
@@ -2280,10 +2337,10 @@ func performFloorDivInt32Int32(a int32, b int32) int32 {
 	_ = _overloadHelper
 
 	{
-		if b == 0 {
+		if int64(b) == 0 {
 			colexecerror.ExpectedError(tree.ErrDivByZero)
 		}
-		r = a // b
+		r = int64(a) // int64(b)
 	}
 
 	return r
@@ -2563,8 +2620,8 @@ func performModDecimalDecimal(a apd.Decimal, b apd.Decimal) apd.Decimal {
 	return r
 }
 
-func performModInt16Int16(a int16, b int16) int16 {
-	var r int16
+func performModInt16Int16(a int16, b int16) int64 {
+	var r int64
 	// In order to inline the templated code of overloads, we need to have a
 	// "_overloadHelper" local variable of type "overloadHelper".
 	var _overloadHelper overloadHelper
@@ -2573,10 +2630,10 @@ func performModInt16Int16(a int16, b int16) int16 {
 	_ = _overloadHelper
 
 	{
-		if b == 0 {
+		if int64(b) == 0 {
 			colexecerror.ExpectedError(tree.ErrDivByZero)
 		}
-		r = a % b
+		r = int64(a) % int64(b)
 	}
 
 	return r
@@ -2639,8 +2696,8 @@ func performModInt32Int16(a int32, b int16) int64 {
 	return r
 }
 
-func performModInt32Int32(a int32, b int32) int32 {
-	var r int32
+func performModInt32Int32(a int32, b int32) int64 {
+	var r int64
 	// In order to inline the templated code of overloads, we need to have a
 	// "_overloadHelper" local variable of type "overloadHelper".
 	var _overloadHelper overloadHelper
@@ -2649,10 +2706,10 @@ func performModInt32Int32(a int32, b int32) int32 {
 	_ = _overloadHelper
 
 	{
-		if b == 0 {
+		if int64(b) == 0 {
 			colexecerror.ExpectedError(tree.ErrDivByZero)
 		}
-		r = a % b
+		r = int64(a) % int64(b)
 	}
 
 	return r
