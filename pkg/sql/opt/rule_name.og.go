@@ -170,6 +170,7 @@ const (
 	MergeProjectWithValues
 	PushColumnRemappingIntoValues
 	FoldTupleAccessIntoValues
+	FoldJSONAccessIntoValues
 	ConvertZipArraysToValues
 	PruneProjectCols
 	PruneScanCols

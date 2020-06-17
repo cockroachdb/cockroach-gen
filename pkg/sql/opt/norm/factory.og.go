@@ -1191,21 +1191,53 @@ func (_f *Factory) ConstructProject(
 	{
 		_values, _ := input.(*memo.ValuesExpr)
 		if _values != nil {
-			if _f.funcs.CanUnnestTuplesFromValues(input) {
-				col := _f.funcs.SingleColFromSet(_f.funcs.OutputCols(input))
-				if _f.funcs.OnlyTupleColumnsAccessed(projections, col) {
-					if _f.funcs.ColsAreEmpty(passthrough) {
-						if _f.matchedRule == nil || _f.matchedRule(opt.FoldTupleAccessIntoValues) {
-							tuplecols := _f.funcs.MakeColsForUnnestTuples(col)
-							_expr := _f.ConstructProject(
-								_f.funcs.UnnestTuplesFromValues(input, tuplecols),
-								_f.funcs.FoldTupleColumnAccess(projections, tuplecols, col),
-								passthrough,
-							)
-							if _f.appliedRule != nil {
-								_f.appliedRule(opt.FoldTupleAccessIntoValues, nil, _expr)
+			if len(_values.Rows) > 0 {
+				if _f.funcs.ColsAreLenOne(_f.funcs.OutputCols(input)) {
+					if _f.funcs.CanUnnestTuplesFromValues(input) {
+						col := _f.funcs.SingleColFromSet(_f.funcs.OutputCols(input))
+						if _f.funcs.HasNoDirectTupleReferences(projections, col) {
+							if _f.funcs.ColsAreEmpty(passthrough) {
+								if _f.matchedRule == nil || _f.matchedRule(opt.FoldTupleAccessIntoValues) {
+									tupleCols := _f.funcs.MakeColsForUnnestTuples(col)
+									_expr := _f.ConstructProject(
+										_f.funcs.UnnestTuplesFromValues(input, tupleCols),
+										_f.funcs.FoldTupleColumnAccess(projections, tupleCols, col),
+										passthrough,
+									)
+									if _f.appliedRule != nil {
+										_f.appliedRule(opt.FoldTupleAccessIntoValues, nil, _expr)
+									}
+									return _expr
+								}
 							}
-							return _expr
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [FoldJSONAccessIntoValues]
+	{
+		_values, _ := input.(*memo.ValuesExpr)
+		if _values != nil {
+			if len(_values.Rows) > 0 {
+				if _f.funcs.ColsAreLenOne(_f.funcs.OutputCols(input)) {
+					col := _f.funcs.SingleColFromSet(_f.funcs.OutputCols(input))
+					if _f.funcs.CanUnnestJSONFromValues(input, projections, col) {
+						if _f.funcs.ColsAreEmpty(passthrough) {
+							if _f.matchedRule == nil || _f.matchedRule(opt.FoldJSONAccessIntoValues) {
+								jsonCols := _f.funcs.MakeColsForUnnestJSON(input, col)
+								_expr := _f.ConstructProject(
+									_f.funcs.UnnestJSONFromValues(input, jsonCols),
+									_f.funcs.FoldJSONFieldAccess(projections, jsonCols, col, input),
+									passthrough,
+								)
+								if _f.appliedRule != nil {
+									_f.appliedRule(opt.FoldJSONAccessIntoValues, nil, _expr)
+								}
+								return _expr
+							}
 						}
 					}
 				}
@@ -2440,7 +2472,7 @@ func (_f *Factory) ConstructInnerJoin(
 
 	// [EliminateJoinNoColsLeft]
 	{
-		if _f.funcs.HasNoCols(left) {
+		if _f.funcs.ColsAreEmpty(_f.funcs.OutputCols(left)) {
 			if _f.funcs.HasOneRow(left) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateJoinNoColsLeft) {
 					_expr := _f.ConstructSelect(
@@ -2458,7 +2490,7 @@ func (_f *Factory) ConstructInnerJoin(
 
 	// [EliminateJoinNoColsRight]
 	{
-		if _f.funcs.HasNoCols(right) {
+		if _f.funcs.ColsAreEmpty(_f.funcs.OutputCols(right)) {
 			if _f.funcs.HasOneRow(right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateJoinNoColsRight) {
 					_expr := _f.ConstructSelect(
@@ -5895,7 +5927,7 @@ func (_f *Factory) ConstructInnerJoinApply(
 
 	// [EliminateJoinNoColsLeft]
 	{
-		if _f.funcs.HasNoCols(left) {
+		if _f.funcs.ColsAreEmpty(_f.funcs.OutputCols(left)) {
 			if _f.funcs.HasOneRow(left) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateJoinNoColsLeft) {
 					_expr := _f.ConstructSelect(
@@ -5913,7 +5945,7 @@ func (_f *Factory) ConstructInnerJoinApply(
 
 	// [EliminateJoinNoColsRight]
 	{
-		if _f.funcs.HasNoCols(right) {
+		if _f.funcs.ColsAreEmpty(_f.funcs.OutputCols(right)) {
 			if _f.funcs.HasOneRow(right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateJoinNoColsRight) {
 					_expr := _f.ConstructSelect(
