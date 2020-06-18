@@ -267,6 +267,7 @@ const (
 	GenerateLimitedScans
 	PushLimitIntoConstrainedScan
 	PushLimitIntoIndexJoin
+	SplitScanIntoUnionScans
 	GenerateIndexScans
 	GeneratePartialIndexScans
 	GenerateConstrainedScans
