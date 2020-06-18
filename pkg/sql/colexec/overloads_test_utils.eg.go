@@ -2890,6 +2890,406 @@ func performModFloat64Float64(a float64, b float64) float64 {
 	return r
 }
 
+func performPowDecimalInt16(a apd.Decimal, b int16) apd.Decimal {
+	var r apd.Decimal
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+
+		tmpDec := &_overloadHelper.tmpDec1
+		tmpDec.SetInt64(int64(b))
+		if _, err := tree.DecimalCtx.Pow(&r, &a, tmpDec); err != nil {
+			colexecerror.ExpectedError(err)
+		}
+	}
+
+	return r
+}
+
+func performPowDecimalInt32(a apd.Decimal, b int32) apd.Decimal {
+	var r apd.Decimal
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+
+		tmpDec := &_overloadHelper.tmpDec1
+		tmpDec.SetInt64(int64(b))
+		if _, err := tree.DecimalCtx.Pow(&r, &a, tmpDec); err != nil {
+			colexecerror.ExpectedError(err)
+		}
+	}
+
+	return r
+}
+
+func performPowDecimalInt64(a apd.Decimal, b int64) apd.Decimal {
+	var r apd.Decimal
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+
+		tmpDec := &_overloadHelper.tmpDec1
+		tmpDec.SetInt64(int64(b))
+		if _, err := tree.DecimalCtx.Pow(&r, &a, tmpDec); err != nil {
+			colexecerror.ExpectedError(err)
+		}
+	}
+
+	return r
+}
+
+func performPowDecimalDecimal(a apd.Decimal, b apd.Decimal) apd.Decimal {
+	var r apd.Decimal
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+
+		_, err := tree.DecimalCtx.Pow(&r, &a, &b)
+		if err != nil {
+			colexecerror.ExpectedError(err)
+		}
+	}
+
+	return r
+}
+
+func performPowInt16Int16(a int16, b int16) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+		leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
+		leftTmpDec.SetInt64(int64(int64(a)))
+		rightTmpDec.SetInt64(int64(int64(b)))
+		if _, err := tree.DecimalCtx.Pow(leftTmpDec, leftTmpDec, rightTmpDec); err != nil {
+			colexecerror.ExpectedError(err)
+		}
+		resultInt, err := leftTmpDec.Int64()
+		if err != nil {
+			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
+		}
+		r = resultInt
+	}
+
+	return r
+}
+
+func performPowInt16Int32(a int16, b int32) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+		leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
+		leftTmpDec.SetInt64(int64(int64(a)))
+		rightTmpDec.SetInt64(int64(int64(b)))
+		if _, err := tree.DecimalCtx.Pow(leftTmpDec, leftTmpDec, rightTmpDec); err != nil {
+			colexecerror.ExpectedError(err)
+		}
+		resultInt, err := leftTmpDec.Int64()
+		if err != nil {
+			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
+		}
+		r = resultInt
+	}
+
+	return r
+}
+
+func performPowInt16Int64(a int16, b int64) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+		leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
+		leftTmpDec.SetInt64(int64(int64(a)))
+		rightTmpDec.SetInt64(int64(int64(b)))
+		if _, err := tree.DecimalCtx.Pow(leftTmpDec, leftTmpDec, rightTmpDec); err != nil {
+			colexecerror.ExpectedError(err)
+		}
+		resultInt, err := leftTmpDec.Int64()
+		if err != nil {
+			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
+		}
+		r = resultInt
+	}
+
+	return r
+}
+
+func performPowInt32Int16(a int32, b int16) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+		leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
+		leftTmpDec.SetInt64(int64(int64(a)))
+		rightTmpDec.SetInt64(int64(int64(b)))
+		if _, err := tree.DecimalCtx.Pow(leftTmpDec, leftTmpDec, rightTmpDec); err != nil {
+			colexecerror.ExpectedError(err)
+		}
+		resultInt, err := leftTmpDec.Int64()
+		if err != nil {
+			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
+		}
+		r = resultInt
+	}
+
+	return r
+}
+
+func performPowInt32Int32(a int32, b int32) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+		leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
+		leftTmpDec.SetInt64(int64(int64(a)))
+		rightTmpDec.SetInt64(int64(int64(b)))
+		if _, err := tree.DecimalCtx.Pow(leftTmpDec, leftTmpDec, rightTmpDec); err != nil {
+			colexecerror.ExpectedError(err)
+		}
+		resultInt, err := leftTmpDec.Int64()
+		if err != nil {
+			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
+		}
+		r = resultInt
+	}
+
+	return r
+}
+
+func performPowInt32Int64(a int32, b int64) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+		leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
+		leftTmpDec.SetInt64(int64(int64(a)))
+		rightTmpDec.SetInt64(int64(int64(b)))
+		if _, err := tree.DecimalCtx.Pow(leftTmpDec, leftTmpDec, rightTmpDec); err != nil {
+			colexecerror.ExpectedError(err)
+		}
+		resultInt, err := leftTmpDec.Int64()
+		if err != nil {
+			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
+		}
+		r = resultInt
+	}
+
+	return r
+}
+
+func performPowInt64Int16(a int64, b int16) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+		leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
+		leftTmpDec.SetInt64(int64(int64(a)))
+		rightTmpDec.SetInt64(int64(int64(b)))
+		if _, err := tree.DecimalCtx.Pow(leftTmpDec, leftTmpDec, rightTmpDec); err != nil {
+			colexecerror.ExpectedError(err)
+		}
+		resultInt, err := leftTmpDec.Int64()
+		if err != nil {
+			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
+		}
+		r = resultInt
+	}
+
+	return r
+}
+
+func performPowInt64Int32(a int64, b int32) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+		leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
+		leftTmpDec.SetInt64(int64(int64(a)))
+		rightTmpDec.SetInt64(int64(int64(b)))
+		if _, err := tree.DecimalCtx.Pow(leftTmpDec, leftTmpDec, rightTmpDec); err != nil {
+			colexecerror.ExpectedError(err)
+		}
+		resultInt, err := leftTmpDec.Int64()
+		if err != nil {
+			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
+		}
+		r = resultInt
+	}
+
+	return r
+}
+
+func performPowInt64Int64(a int64, b int64) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+		leftTmpDec, rightTmpDec := &_overloadHelper.tmpDec1, &_overloadHelper.tmpDec2
+		leftTmpDec.SetInt64(int64(int64(a)))
+		rightTmpDec.SetInt64(int64(int64(b)))
+		if _, err := tree.DecimalCtx.Pow(leftTmpDec, leftTmpDec, rightTmpDec); err != nil {
+			colexecerror.ExpectedError(err)
+		}
+		resultInt, err := leftTmpDec.Int64()
+		if err != nil {
+			colexecerror.ExpectedError(tree.ErrIntOutOfRange)
+		}
+		r = resultInt
+	}
+
+	return r
+}
+
+func performPowInt16Decimal(a int16, b apd.Decimal) apd.Decimal {
+	var r apd.Decimal
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+
+		tmpDec := &_overloadHelper.tmpDec1
+		tmpDec.SetInt64(int64(a))
+		_, err := tree.DecimalCtx.Pow(&r, tmpDec, &b)
+		if err != nil {
+			colexecerror.ExpectedError(err)
+		}
+	}
+
+	return r
+}
+
+func performPowInt32Decimal(a int32, b apd.Decimal) apd.Decimal {
+	var r apd.Decimal
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+
+		tmpDec := &_overloadHelper.tmpDec1
+		tmpDec.SetInt64(int64(a))
+		_, err := tree.DecimalCtx.Pow(&r, tmpDec, &b)
+		if err != nil {
+			colexecerror.ExpectedError(err)
+		}
+	}
+
+	return r
+}
+
+func performPowInt64Decimal(a int64, b apd.Decimal) apd.Decimal {
+	var r apd.Decimal
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+
+		tmpDec := &_overloadHelper.tmpDec1
+		tmpDec.SetInt64(int64(a))
+		_, err := tree.DecimalCtx.Pow(&r, tmpDec, &b)
+		if err != nil {
+			colexecerror.ExpectedError(err)
+		}
+	}
+
+	return r
+}
+
+func performPowFloat64Float64(a float64, b float64) float64 {
+	var r float64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+
+		r = math.Pow(float64(a), float64(b))
+	}
+
+	return r
+}
+
 func performConcatBytesBytes(a []byte, b []byte) []byte {
 	var r []byte
 	// In order to inline the templated code of overloads, we need to have a
