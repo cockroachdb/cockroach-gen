@@ -19,10 +19,12 @@ import (
 	"github.com/cockroachdb/cockroach/pkg/col/coldata"
 	"github.com/cockroachdb/cockroach/pkg/col/coldataext"
 	"github.com/cockroachdb/cockroach/pkg/col/typeconv"
+	"github.com/cockroachdb/cockroach/pkg/server/telemetry"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase/colexecerror"
 	"github.com/cockroachdb/cockroach/pkg/sql/colmem"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
+	"github.com/cockroachdb/cockroach/pkg/sql/sqltelemetry"
 	"github.com/cockroachdb/cockroach/pkg/sql/types"
 	"github.com/cockroachdb/cockroach/pkg/util/duration"
 	"github.com/cockroachdb/errors"
@@ -26066,6 +26068,2670 @@ func (p projConcatDatumConstDatumOp) Next(ctx context.Context) coldata.Batch {
 }
 
 func (p projConcatDatumConstDatumOp) Init() {
+	p.input.Init()
+}
+
+type projLShiftInt16ConstInt16Op struct {
+	projConstOpBase
+	constArg int16
+}
+
+func (p projLShiftInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int16
+	col = vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(arg) < 0 || int64(arg) >= 64 {
+							telemetry.Inc(sqltelemetry.LargeLShiftArgumentCounter)
+							colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+						}
+						projCol[i] = int64(p.constArg) << int64(arg)
+					}
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(arg) < 0 || int64(arg) >= 64 {
+							telemetry.Inc(sqltelemetry.LargeLShiftArgumentCounter)
+							colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+						}
+						projCol[i] = int64(p.constArg) << int64(arg)
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				{
+					if int64(arg) < 0 || int64(arg) >= 64 {
+						telemetry.Inc(sqltelemetry.LargeLShiftArgumentCounter)
+						colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+					}
+					projCol[i] = int64(p.constArg) << int64(arg)
+				}
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				{
+					if int64(arg) < 0 || int64(arg) >= 64 {
+						telemetry.Inc(sqltelemetry.LargeLShiftArgumentCounter)
+						colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+					}
+					projCol[i] = int64(p.constArg) << int64(arg)
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projLShiftInt16ConstInt16Op) Init() {
+	p.input.Init()
+}
+
+type projLShiftInt16ConstInt32Op struct {
+	projConstOpBase
+	constArg int16
+}
+
+func (p projLShiftInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int32
+	col = vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(arg) < 0 || int64(arg) >= 64 {
+							telemetry.Inc(sqltelemetry.LargeLShiftArgumentCounter)
+							colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+						}
+						projCol[i] = int64(p.constArg) << int64(arg)
+					}
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(arg) < 0 || int64(arg) >= 64 {
+							telemetry.Inc(sqltelemetry.LargeLShiftArgumentCounter)
+							colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+						}
+						projCol[i] = int64(p.constArg) << int64(arg)
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				{
+					if int64(arg) < 0 || int64(arg) >= 64 {
+						telemetry.Inc(sqltelemetry.LargeLShiftArgumentCounter)
+						colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+					}
+					projCol[i] = int64(p.constArg) << int64(arg)
+				}
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				{
+					if int64(arg) < 0 || int64(arg) >= 64 {
+						telemetry.Inc(sqltelemetry.LargeLShiftArgumentCounter)
+						colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+					}
+					projCol[i] = int64(p.constArg) << int64(arg)
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projLShiftInt16ConstInt32Op) Init() {
+	p.input.Init()
+}
+
+type projLShiftInt16ConstInt64Op struct {
+	projConstOpBase
+	constArg int16
+}
+
+func (p projLShiftInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int64
+	col = vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(arg) < 0 || int64(arg) >= 64 {
+							telemetry.Inc(sqltelemetry.LargeLShiftArgumentCounter)
+							colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+						}
+						projCol[i] = int64(p.constArg) << int64(arg)
+					}
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(arg) < 0 || int64(arg) >= 64 {
+							telemetry.Inc(sqltelemetry.LargeLShiftArgumentCounter)
+							colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+						}
+						projCol[i] = int64(p.constArg) << int64(arg)
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				{
+					if int64(arg) < 0 || int64(arg) >= 64 {
+						telemetry.Inc(sqltelemetry.LargeLShiftArgumentCounter)
+						colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+					}
+					projCol[i] = int64(p.constArg) << int64(arg)
+				}
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				{
+					if int64(arg) < 0 || int64(arg) >= 64 {
+						telemetry.Inc(sqltelemetry.LargeLShiftArgumentCounter)
+						colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+					}
+					projCol[i] = int64(p.constArg) << int64(arg)
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projLShiftInt16ConstInt64Op) Init() {
+	p.input.Init()
+}
+
+type projLShiftInt32ConstInt16Op struct {
+	projConstOpBase
+	constArg int32
+}
+
+func (p projLShiftInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int16
+	col = vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(arg) < 0 || int64(arg) >= 64 {
+							telemetry.Inc(sqltelemetry.LargeLShiftArgumentCounter)
+							colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+						}
+						projCol[i] = int64(p.constArg) << int64(arg)
+					}
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(arg) < 0 || int64(arg) >= 64 {
+							telemetry.Inc(sqltelemetry.LargeLShiftArgumentCounter)
+							colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+						}
+						projCol[i] = int64(p.constArg) << int64(arg)
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				{
+					if int64(arg) < 0 || int64(arg) >= 64 {
+						telemetry.Inc(sqltelemetry.LargeLShiftArgumentCounter)
+						colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+					}
+					projCol[i] = int64(p.constArg) << int64(arg)
+				}
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				{
+					if int64(arg) < 0 || int64(arg) >= 64 {
+						telemetry.Inc(sqltelemetry.LargeLShiftArgumentCounter)
+						colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+					}
+					projCol[i] = int64(p.constArg) << int64(arg)
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projLShiftInt32ConstInt16Op) Init() {
+	p.input.Init()
+}
+
+type projLShiftInt32ConstInt32Op struct {
+	projConstOpBase
+	constArg int32
+}
+
+func (p projLShiftInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int32
+	col = vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(arg) < 0 || int64(arg) >= 64 {
+							telemetry.Inc(sqltelemetry.LargeLShiftArgumentCounter)
+							colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+						}
+						projCol[i] = int64(p.constArg) << int64(arg)
+					}
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(arg) < 0 || int64(arg) >= 64 {
+							telemetry.Inc(sqltelemetry.LargeLShiftArgumentCounter)
+							colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+						}
+						projCol[i] = int64(p.constArg) << int64(arg)
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				{
+					if int64(arg) < 0 || int64(arg) >= 64 {
+						telemetry.Inc(sqltelemetry.LargeLShiftArgumentCounter)
+						colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+					}
+					projCol[i] = int64(p.constArg) << int64(arg)
+				}
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				{
+					if int64(arg) < 0 || int64(arg) >= 64 {
+						telemetry.Inc(sqltelemetry.LargeLShiftArgumentCounter)
+						colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+					}
+					projCol[i] = int64(p.constArg) << int64(arg)
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projLShiftInt32ConstInt32Op) Init() {
+	p.input.Init()
+}
+
+type projLShiftInt32ConstInt64Op struct {
+	projConstOpBase
+	constArg int32
+}
+
+func (p projLShiftInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int64
+	col = vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(arg) < 0 || int64(arg) >= 64 {
+							telemetry.Inc(sqltelemetry.LargeLShiftArgumentCounter)
+							colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+						}
+						projCol[i] = int64(p.constArg) << int64(arg)
+					}
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(arg) < 0 || int64(arg) >= 64 {
+							telemetry.Inc(sqltelemetry.LargeLShiftArgumentCounter)
+							colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+						}
+						projCol[i] = int64(p.constArg) << int64(arg)
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				{
+					if int64(arg) < 0 || int64(arg) >= 64 {
+						telemetry.Inc(sqltelemetry.LargeLShiftArgumentCounter)
+						colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+					}
+					projCol[i] = int64(p.constArg) << int64(arg)
+				}
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				{
+					if int64(arg) < 0 || int64(arg) >= 64 {
+						telemetry.Inc(sqltelemetry.LargeLShiftArgumentCounter)
+						colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+					}
+					projCol[i] = int64(p.constArg) << int64(arg)
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projLShiftInt32ConstInt64Op) Init() {
+	p.input.Init()
+}
+
+type projLShiftInt64ConstInt16Op struct {
+	projConstOpBase
+	constArg int64
+}
+
+func (p projLShiftInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int16
+	col = vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(arg) < 0 || int64(arg) >= 64 {
+							telemetry.Inc(sqltelemetry.LargeLShiftArgumentCounter)
+							colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+						}
+						projCol[i] = int64(p.constArg) << int64(arg)
+					}
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(arg) < 0 || int64(arg) >= 64 {
+							telemetry.Inc(sqltelemetry.LargeLShiftArgumentCounter)
+							colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+						}
+						projCol[i] = int64(p.constArg) << int64(arg)
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				{
+					if int64(arg) < 0 || int64(arg) >= 64 {
+						telemetry.Inc(sqltelemetry.LargeLShiftArgumentCounter)
+						colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+					}
+					projCol[i] = int64(p.constArg) << int64(arg)
+				}
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				{
+					if int64(arg) < 0 || int64(arg) >= 64 {
+						telemetry.Inc(sqltelemetry.LargeLShiftArgumentCounter)
+						colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+					}
+					projCol[i] = int64(p.constArg) << int64(arg)
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projLShiftInt64ConstInt16Op) Init() {
+	p.input.Init()
+}
+
+type projLShiftInt64ConstInt32Op struct {
+	projConstOpBase
+	constArg int64
+}
+
+func (p projLShiftInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int32
+	col = vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(arg) < 0 || int64(arg) >= 64 {
+							telemetry.Inc(sqltelemetry.LargeLShiftArgumentCounter)
+							colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+						}
+						projCol[i] = int64(p.constArg) << int64(arg)
+					}
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(arg) < 0 || int64(arg) >= 64 {
+							telemetry.Inc(sqltelemetry.LargeLShiftArgumentCounter)
+							colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+						}
+						projCol[i] = int64(p.constArg) << int64(arg)
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				{
+					if int64(arg) < 0 || int64(arg) >= 64 {
+						telemetry.Inc(sqltelemetry.LargeLShiftArgumentCounter)
+						colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+					}
+					projCol[i] = int64(p.constArg) << int64(arg)
+				}
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				{
+					if int64(arg) < 0 || int64(arg) >= 64 {
+						telemetry.Inc(sqltelemetry.LargeLShiftArgumentCounter)
+						colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+					}
+					projCol[i] = int64(p.constArg) << int64(arg)
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projLShiftInt64ConstInt32Op) Init() {
+	p.input.Init()
+}
+
+type projLShiftInt64ConstInt64Op struct {
+	projConstOpBase
+	constArg int64
+}
+
+func (p projLShiftInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int64
+	col = vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(arg) < 0 || int64(arg) >= 64 {
+							telemetry.Inc(sqltelemetry.LargeLShiftArgumentCounter)
+							colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+						}
+						projCol[i] = int64(p.constArg) << int64(arg)
+					}
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(arg) < 0 || int64(arg) >= 64 {
+							telemetry.Inc(sqltelemetry.LargeLShiftArgumentCounter)
+							colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+						}
+						projCol[i] = int64(p.constArg) << int64(arg)
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				{
+					if int64(arg) < 0 || int64(arg) >= 64 {
+						telemetry.Inc(sqltelemetry.LargeLShiftArgumentCounter)
+						colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+					}
+					projCol[i] = int64(p.constArg) << int64(arg)
+				}
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				{
+					if int64(arg) < 0 || int64(arg) >= 64 {
+						telemetry.Inc(sqltelemetry.LargeLShiftArgumentCounter)
+						colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+					}
+					projCol[i] = int64(p.constArg) << int64(arg)
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projLShiftInt64ConstInt64Op) Init() {
+	p.input.Init()
+}
+
+type projLShiftDatumConstInt16Op struct {
+	projConstOpBase
+	constArg interface{}
+}
+
+func (p projLShiftDatumConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int16
+	col = vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DInt(arg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DInt(arg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DInt(arg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DInt(arg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projLShiftDatumConstInt16Op) Init() {
+	p.input.Init()
+}
+
+type projLShiftDatumConstInt32Op struct {
+	projConstOpBase
+	constArg interface{}
+}
+
+func (p projLShiftDatumConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int32
+	col = vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DInt(arg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DInt(arg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DInt(arg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DInt(arg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projLShiftDatumConstInt32Op) Init() {
+	p.input.Init()
+}
+
+type projLShiftDatumConstInt64Op struct {
+	projConstOpBase
+	constArg interface{}
+}
+
+func (p projLShiftDatumConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int64
+	col = vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DInt(arg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DInt(arg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DInt(arg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DInt(arg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projLShiftDatumConstInt64Op) Init() {
+	p.input.Init()
+}
+
+type projRShiftInt16ConstInt16Op struct {
+	projConstOpBase
+	constArg int16
+}
+
+func (p projRShiftInt16ConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int16
+	col = vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(arg) < 0 || int64(arg) >= 64 {
+							telemetry.Inc(sqltelemetry.LargeRShiftArgumentCounter)
+							colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+						}
+						projCol[i] = int64(p.constArg) >> int64(arg)
+					}
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(arg) < 0 || int64(arg) >= 64 {
+							telemetry.Inc(sqltelemetry.LargeRShiftArgumentCounter)
+							colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+						}
+						projCol[i] = int64(p.constArg) >> int64(arg)
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				{
+					if int64(arg) < 0 || int64(arg) >= 64 {
+						telemetry.Inc(sqltelemetry.LargeRShiftArgumentCounter)
+						colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+					}
+					projCol[i] = int64(p.constArg) >> int64(arg)
+				}
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				{
+					if int64(arg) < 0 || int64(arg) >= 64 {
+						telemetry.Inc(sqltelemetry.LargeRShiftArgumentCounter)
+						colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+					}
+					projCol[i] = int64(p.constArg) >> int64(arg)
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projRShiftInt16ConstInt16Op) Init() {
+	p.input.Init()
+}
+
+type projRShiftInt16ConstInt32Op struct {
+	projConstOpBase
+	constArg int16
+}
+
+func (p projRShiftInt16ConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int32
+	col = vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(arg) < 0 || int64(arg) >= 64 {
+							telemetry.Inc(sqltelemetry.LargeRShiftArgumentCounter)
+							colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+						}
+						projCol[i] = int64(p.constArg) >> int64(arg)
+					}
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(arg) < 0 || int64(arg) >= 64 {
+							telemetry.Inc(sqltelemetry.LargeRShiftArgumentCounter)
+							colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+						}
+						projCol[i] = int64(p.constArg) >> int64(arg)
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				{
+					if int64(arg) < 0 || int64(arg) >= 64 {
+						telemetry.Inc(sqltelemetry.LargeRShiftArgumentCounter)
+						colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+					}
+					projCol[i] = int64(p.constArg) >> int64(arg)
+				}
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				{
+					if int64(arg) < 0 || int64(arg) >= 64 {
+						telemetry.Inc(sqltelemetry.LargeRShiftArgumentCounter)
+						colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+					}
+					projCol[i] = int64(p.constArg) >> int64(arg)
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projRShiftInt16ConstInt32Op) Init() {
+	p.input.Init()
+}
+
+type projRShiftInt16ConstInt64Op struct {
+	projConstOpBase
+	constArg int16
+}
+
+func (p projRShiftInt16ConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int64
+	col = vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(arg) < 0 || int64(arg) >= 64 {
+							telemetry.Inc(sqltelemetry.LargeRShiftArgumentCounter)
+							colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+						}
+						projCol[i] = int64(p.constArg) >> int64(arg)
+					}
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(arg) < 0 || int64(arg) >= 64 {
+							telemetry.Inc(sqltelemetry.LargeRShiftArgumentCounter)
+							colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+						}
+						projCol[i] = int64(p.constArg) >> int64(arg)
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				{
+					if int64(arg) < 0 || int64(arg) >= 64 {
+						telemetry.Inc(sqltelemetry.LargeRShiftArgumentCounter)
+						colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+					}
+					projCol[i] = int64(p.constArg) >> int64(arg)
+				}
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				{
+					if int64(arg) < 0 || int64(arg) >= 64 {
+						telemetry.Inc(sqltelemetry.LargeRShiftArgumentCounter)
+						colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+					}
+					projCol[i] = int64(p.constArg) >> int64(arg)
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projRShiftInt16ConstInt64Op) Init() {
+	p.input.Init()
+}
+
+type projRShiftInt32ConstInt16Op struct {
+	projConstOpBase
+	constArg int32
+}
+
+func (p projRShiftInt32ConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int16
+	col = vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(arg) < 0 || int64(arg) >= 64 {
+							telemetry.Inc(sqltelemetry.LargeRShiftArgumentCounter)
+							colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+						}
+						projCol[i] = int64(p.constArg) >> int64(arg)
+					}
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(arg) < 0 || int64(arg) >= 64 {
+							telemetry.Inc(sqltelemetry.LargeRShiftArgumentCounter)
+							colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+						}
+						projCol[i] = int64(p.constArg) >> int64(arg)
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				{
+					if int64(arg) < 0 || int64(arg) >= 64 {
+						telemetry.Inc(sqltelemetry.LargeRShiftArgumentCounter)
+						colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+					}
+					projCol[i] = int64(p.constArg) >> int64(arg)
+				}
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				{
+					if int64(arg) < 0 || int64(arg) >= 64 {
+						telemetry.Inc(sqltelemetry.LargeRShiftArgumentCounter)
+						colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+					}
+					projCol[i] = int64(p.constArg) >> int64(arg)
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projRShiftInt32ConstInt16Op) Init() {
+	p.input.Init()
+}
+
+type projRShiftInt32ConstInt32Op struct {
+	projConstOpBase
+	constArg int32
+}
+
+func (p projRShiftInt32ConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int32
+	col = vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(arg) < 0 || int64(arg) >= 64 {
+							telemetry.Inc(sqltelemetry.LargeRShiftArgumentCounter)
+							colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+						}
+						projCol[i] = int64(p.constArg) >> int64(arg)
+					}
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(arg) < 0 || int64(arg) >= 64 {
+							telemetry.Inc(sqltelemetry.LargeRShiftArgumentCounter)
+							colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+						}
+						projCol[i] = int64(p.constArg) >> int64(arg)
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				{
+					if int64(arg) < 0 || int64(arg) >= 64 {
+						telemetry.Inc(sqltelemetry.LargeRShiftArgumentCounter)
+						colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+					}
+					projCol[i] = int64(p.constArg) >> int64(arg)
+				}
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				{
+					if int64(arg) < 0 || int64(arg) >= 64 {
+						telemetry.Inc(sqltelemetry.LargeRShiftArgumentCounter)
+						colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+					}
+					projCol[i] = int64(p.constArg) >> int64(arg)
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projRShiftInt32ConstInt32Op) Init() {
+	p.input.Init()
+}
+
+type projRShiftInt32ConstInt64Op struct {
+	projConstOpBase
+	constArg int32
+}
+
+func (p projRShiftInt32ConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int64
+	col = vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(arg) < 0 || int64(arg) >= 64 {
+							telemetry.Inc(sqltelemetry.LargeRShiftArgumentCounter)
+							colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+						}
+						projCol[i] = int64(p.constArg) >> int64(arg)
+					}
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(arg) < 0 || int64(arg) >= 64 {
+							telemetry.Inc(sqltelemetry.LargeRShiftArgumentCounter)
+							colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+						}
+						projCol[i] = int64(p.constArg) >> int64(arg)
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				{
+					if int64(arg) < 0 || int64(arg) >= 64 {
+						telemetry.Inc(sqltelemetry.LargeRShiftArgumentCounter)
+						colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+					}
+					projCol[i] = int64(p.constArg) >> int64(arg)
+				}
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				{
+					if int64(arg) < 0 || int64(arg) >= 64 {
+						telemetry.Inc(sqltelemetry.LargeRShiftArgumentCounter)
+						colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+					}
+					projCol[i] = int64(p.constArg) >> int64(arg)
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projRShiftInt32ConstInt64Op) Init() {
+	p.input.Init()
+}
+
+type projRShiftInt64ConstInt16Op struct {
+	projConstOpBase
+	constArg int64
+}
+
+func (p projRShiftInt64ConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int16
+	col = vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(arg) < 0 || int64(arg) >= 64 {
+							telemetry.Inc(sqltelemetry.LargeRShiftArgumentCounter)
+							colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+						}
+						projCol[i] = int64(p.constArg) >> int64(arg)
+					}
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(arg) < 0 || int64(arg) >= 64 {
+							telemetry.Inc(sqltelemetry.LargeRShiftArgumentCounter)
+							colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+						}
+						projCol[i] = int64(p.constArg) >> int64(arg)
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				{
+					if int64(arg) < 0 || int64(arg) >= 64 {
+						telemetry.Inc(sqltelemetry.LargeRShiftArgumentCounter)
+						colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+					}
+					projCol[i] = int64(p.constArg) >> int64(arg)
+				}
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				{
+					if int64(arg) < 0 || int64(arg) >= 64 {
+						telemetry.Inc(sqltelemetry.LargeRShiftArgumentCounter)
+						colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+					}
+					projCol[i] = int64(p.constArg) >> int64(arg)
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projRShiftInt64ConstInt16Op) Init() {
+	p.input.Init()
+}
+
+type projRShiftInt64ConstInt32Op struct {
+	projConstOpBase
+	constArg int64
+}
+
+func (p projRShiftInt64ConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int32
+	col = vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(arg) < 0 || int64(arg) >= 64 {
+							telemetry.Inc(sqltelemetry.LargeRShiftArgumentCounter)
+							colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+						}
+						projCol[i] = int64(p.constArg) >> int64(arg)
+					}
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(arg) < 0 || int64(arg) >= 64 {
+							telemetry.Inc(sqltelemetry.LargeRShiftArgumentCounter)
+							colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+						}
+						projCol[i] = int64(p.constArg) >> int64(arg)
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				{
+					if int64(arg) < 0 || int64(arg) >= 64 {
+						telemetry.Inc(sqltelemetry.LargeRShiftArgumentCounter)
+						colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+					}
+					projCol[i] = int64(p.constArg) >> int64(arg)
+				}
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				{
+					if int64(arg) < 0 || int64(arg) >= 64 {
+						telemetry.Inc(sqltelemetry.LargeRShiftArgumentCounter)
+						colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+					}
+					projCol[i] = int64(p.constArg) >> int64(arg)
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projRShiftInt64ConstInt32Op) Init() {
+	p.input.Init()
+}
+
+type projRShiftInt64ConstInt64Op struct {
+	projConstOpBase
+	constArg int64
+}
+
+func (p projRShiftInt64ConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int64
+	col = vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Int64()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(arg) < 0 || int64(arg) >= 64 {
+							telemetry.Inc(sqltelemetry.LargeRShiftArgumentCounter)
+							colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+						}
+						projCol[i] = int64(p.constArg) >> int64(arg)
+					}
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					{
+						if int64(arg) < 0 || int64(arg) >= 64 {
+							telemetry.Inc(sqltelemetry.LargeRShiftArgumentCounter)
+							colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+						}
+						projCol[i] = int64(p.constArg) >> int64(arg)
+					}
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				{
+					if int64(arg) < 0 || int64(arg) >= 64 {
+						telemetry.Inc(sqltelemetry.LargeRShiftArgumentCounter)
+						colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+					}
+					projCol[i] = int64(p.constArg) >> int64(arg)
+				}
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol[n-1]
+			for i := range col {
+				arg := col[i]
+
+				{
+					if int64(arg) < 0 || int64(arg) >= 64 {
+						telemetry.Inc(sqltelemetry.LargeRShiftArgumentCounter)
+						colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+					}
+					projCol[i] = int64(p.constArg) >> int64(arg)
+				}
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projRShiftInt64ConstInt64Op) Init() {
+	p.input.Init()
+}
+
+type projRShiftDatumConstInt16Op struct {
+	projConstOpBase
+	constArg interface{}
+}
+
+func (p projRShiftDatumConstInt16Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int16
+	col = vec.Int16()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DInt(arg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DInt(arg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DInt(arg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DInt(arg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projRShiftDatumConstInt16Op) Init() {
+	p.input.Init()
+}
+
+type projRShiftDatumConstInt32Op struct {
+	projConstOpBase
+	constArg interface{}
+}
+
+func (p projRShiftDatumConstInt32Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int32
+	col = vec.Int32()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DInt(arg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DInt(arg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DInt(arg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DInt(arg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projRShiftDatumConstInt32Op) Init() {
+	p.input.Init()
+}
+
+type projRShiftDatumConstInt64Op struct {
+	projConstOpBase
+	constArg interface{}
+}
+
+func (p projRShiftDatumConstInt64Op) Next(ctx context.Context) coldata.Batch {
+	// In order to inline the templated code of overloads, we need to have a
+	// `_overloadHelper` local variable of type `overloadHelper`.
+	_overloadHelper := p.overloadHelper
+	// However, the scratch is not used in all of the projection operators, so
+	// we add this to go around "unused" error.
+	_ = _overloadHelper
+	batch := p.input.Next(ctx)
+	n := batch.Length()
+	if n == 0 {
+		return coldata.ZeroBatch
+	}
+	vec := batch.ColVec(p.colIdx)
+	var col []int64
+	col = vec.Int64()
+	projVec := batch.ColVec(p.outputIdx)
+	if projVec.MaybeHasNulls() {
+		// We need to make sure that there are no left over null values in the
+		// output vector.
+		projVec.Nulls().UnsetNulls()
+	}
+	projCol := projVec.Datum()
+	if vec.Nulls().MaybeHasNulls() {
+		colNulls := vec.Nulls()
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DInt(arg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				if !colNulls.NullAt(i) {
+					// We only want to perform the projection operation if the value is not null.
+					arg := col[i]
+
+					_convertedNativeElem := tree.DInt(arg)
+					var _nonDatumArgAsDatum tree.Datum
+					_nonDatumArgAsDatum = &_convertedNativeElem
+
+					_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+					if err != nil {
+						colexecerror.ExpectedError(err)
+					}
+					projCol.Set(i, _res)
+
+				}
+			}
+		}
+		colNullsCopy := colNulls.Copy()
+		projVec.SetNulls(&colNullsCopy)
+	} else {
+		if sel := batch.Selection(); sel != nil {
+			sel = sel[:n]
+			for _, i := range sel {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DInt(arg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		} else {
+			col = col[0:n]
+			_ = projCol.Get(n - 1)
+			for i := range col {
+				arg := col[i]
+
+				_convertedNativeElem := tree.DInt(arg)
+				var _nonDatumArgAsDatum tree.Datum
+				_nonDatumArgAsDatum = &_convertedNativeElem
+
+				_res, err := p.constArg.(*coldataext.Datum).BinFn(_overloadHelper.binFn, col, _nonDatumArgAsDatum)
+				if err != nil {
+					colexecerror.ExpectedError(err)
+				}
+				projCol.Set(i, _res)
+
+			}
+		}
+	}
+	// Although we didn't change the length of the batch, it is necessary to set
+	// the length anyway (this helps maintaining the invariant of flat bytes).
+	batch.SetLength(n)
+	return batch
+}
+
+func (p projRShiftDatumConstInt64Op) Init() {
 	p.input.Init()
 }
 
@@ -54150,6 +56816,204 @@ func GetProjectionLConstOperator(
 						case -1:
 						default:
 							return &projConcatDatumConstDatumOp{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(interface{}),
+							}, nil
+						}
+					}
+				}
+			}
+		case tree.LShift:
+			switch typeconv.TypeFamilyToCanonicalTypeFamily(leftType.Family()) {
+			case types.IntFamily:
+				switch leftType.Width() {
+				case 16:
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
+					case types.IntFamily:
+						switch rightType.Width() {
+						case 16:
+							return &projLShiftInt16ConstInt16Op{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int16),
+							}, nil
+						case 32:
+							return &projLShiftInt16ConstInt32Op{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int16),
+							}, nil
+						case -1:
+						default:
+							return &projLShiftInt16ConstInt64Op{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int16),
+							}, nil
+						}
+					}
+				case 32:
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
+					case types.IntFamily:
+						switch rightType.Width() {
+						case 16:
+							return &projLShiftInt32ConstInt16Op{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int32),
+							}, nil
+						case 32:
+							return &projLShiftInt32ConstInt32Op{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int32),
+							}, nil
+						case -1:
+						default:
+							return &projLShiftInt32ConstInt64Op{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int32),
+							}, nil
+						}
+					}
+				case -1:
+				default:
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
+					case types.IntFamily:
+						switch rightType.Width() {
+						case 16:
+							return &projLShiftInt64ConstInt16Op{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int64),
+							}, nil
+						case 32:
+							return &projLShiftInt64ConstInt32Op{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int64),
+							}, nil
+						case -1:
+						default:
+							return &projLShiftInt64ConstInt64Op{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int64),
+							}, nil
+						}
+					}
+				}
+			case typeconv.DatumVecCanonicalTypeFamily:
+				switch leftType.Width() {
+				case -1:
+				default:
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
+					case types.IntFamily:
+						switch rightType.Width() {
+						case 16:
+							return &projLShiftDatumConstInt16Op{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(interface{}),
+							}, nil
+						case 32:
+							return &projLShiftDatumConstInt32Op{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(interface{}),
+							}, nil
+						case -1:
+						default:
+							return &projLShiftDatumConstInt64Op{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(interface{}),
+							}, nil
+						}
+					}
+				}
+			}
+		case tree.RShift:
+			switch typeconv.TypeFamilyToCanonicalTypeFamily(leftType.Family()) {
+			case types.IntFamily:
+				switch leftType.Width() {
+				case 16:
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
+					case types.IntFamily:
+						switch rightType.Width() {
+						case 16:
+							return &projRShiftInt16ConstInt16Op{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int16),
+							}, nil
+						case 32:
+							return &projRShiftInt16ConstInt32Op{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int16),
+							}, nil
+						case -1:
+						default:
+							return &projRShiftInt16ConstInt64Op{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int16),
+							}, nil
+						}
+					}
+				case 32:
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
+					case types.IntFamily:
+						switch rightType.Width() {
+						case 16:
+							return &projRShiftInt32ConstInt16Op{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int32),
+							}, nil
+						case 32:
+							return &projRShiftInt32ConstInt32Op{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int32),
+							}, nil
+						case -1:
+						default:
+							return &projRShiftInt32ConstInt64Op{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int32),
+							}, nil
+						}
+					}
+				case -1:
+				default:
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
+					case types.IntFamily:
+						switch rightType.Width() {
+						case 16:
+							return &projRShiftInt64ConstInt16Op{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int64),
+							}, nil
+						case 32:
+							return &projRShiftInt64ConstInt32Op{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int64),
+							}, nil
+						case -1:
+						default:
+							return &projRShiftInt64ConstInt64Op{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(int64),
+							}, nil
+						}
+					}
+				}
+			case typeconv.DatumVecCanonicalTypeFamily:
+				switch leftType.Width() {
+				case -1:
+				default:
+					switch typeconv.TypeFamilyToCanonicalTypeFamily(rightType.Family()) {
+					case types.IntFamily:
+						switch rightType.Width() {
+						case 16:
+							return &projRShiftDatumConstInt16Op{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(interface{}),
+							}, nil
+						case 32:
+							return &projRShiftDatumConstInt32Op{
+								projConstOpBase: projConstOpBase,
+								constArg:        c.(interface{}),
+							}, nil
+						case -1:
+						default:
+							return &projRShiftDatumConstInt64Op{
 								projConstOpBase: projConstOpBase,
 								constArg:        c.(interface{}),
 							}, nil

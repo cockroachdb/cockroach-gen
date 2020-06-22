@@ -8,8 +8,10 @@ import (
 	"time"
 
 	"github.com/cockroachdb/apd"
+	"github.com/cockroachdb/cockroach/pkg/server/telemetry"
 	"github.com/cockroachdb/cockroach/pkg/sql/colexecbase/colexecerror"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
+	"github.com/cockroachdb/cockroach/pkg/sql/sqltelemetry"
 	"github.com/cockroachdb/cockroach/pkg/util/duration"
 )
 
@@ -3299,6 +3301,366 @@ func performConcatBytesBytes(a []byte, b []byte) []byte {
 	// to go around "unused" error.
 	_ = _overloadHelper
 	colexecerror.InternalError("couldn't translate indexing on target element: r")
+	return r
+}
+
+func performLShiftInt16Int16(a int16, b int16) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+		if int64(b) < 0 || int64(b) >= 64 {
+			telemetry.Inc(sqltelemetry.LargeLShiftArgumentCounter)
+			colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+		}
+		r = int64(a) << int64(b)
+	}
+
+	return r
+}
+
+func performLShiftInt16Int32(a int16, b int32) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+		if int64(b) < 0 || int64(b) >= 64 {
+			telemetry.Inc(sqltelemetry.LargeLShiftArgumentCounter)
+			colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+		}
+		r = int64(a) << int64(b)
+	}
+
+	return r
+}
+
+func performLShiftInt16Int64(a int16, b int64) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+		if int64(b) < 0 || int64(b) >= 64 {
+			telemetry.Inc(sqltelemetry.LargeLShiftArgumentCounter)
+			colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+		}
+		r = int64(a) << int64(b)
+	}
+
+	return r
+}
+
+func performLShiftInt32Int16(a int32, b int16) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+		if int64(b) < 0 || int64(b) >= 64 {
+			telemetry.Inc(sqltelemetry.LargeLShiftArgumentCounter)
+			colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+		}
+		r = int64(a) << int64(b)
+	}
+
+	return r
+}
+
+func performLShiftInt32Int32(a int32, b int32) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+		if int64(b) < 0 || int64(b) >= 64 {
+			telemetry.Inc(sqltelemetry.LargeLShiftArgumentCounter)
+			colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+		}
+		r = int64(a) << int64(b)
+	}
+
+	return r
+}
+
+func performLShiftInt32Int64(a int32, b int64) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+		if int64(b) < 0 || int64(b) >= 64 {
+			telemetry.Inc(sqltelemetry.LargeLShiftArgumentCounter)
+			colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+		}
+		r = int64(a) << int64(b)
+	}
+
+	return r
+}
+
+func performLShiftInt64Int16(a int64, b int16) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+		if int64(b) < 0 || int64(b) >= 64 {
+			telemetry.Inc(sqltelemetry.LargeLShiftArgumentCounter)
+			colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+		}
+		r = int64(a) << int64(b)
+	}
+
+	return r
+}
+
+func performLShiftInt64Int32(a int64, b int32) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+		if int64(b) < 0 || int64(b) >= 64 {
+			telemetry.Inc(sqltelemetry.LargeLShiftArgumentCounter)
+			colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+		}
+		r = int64(a) << int64(b)
+	}
+
+	return r
+}
+
+func performLShiftInt64Int64(a int64, b int64) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+		if int64(b) < 0 || int64(b) >= 64 {
+			telemetry.Inc(sqltelemetry.LargeLShiftArgumentCounter)
+			colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+		}
+		r = int64(a) << int64(b)
+	}
+
+	return r
+}
+
+func performRShiftInt16Int16(a int16, b int16) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+		if int64(b) < 0 || int64(b) >= 64 {
+			telemetry.Inc(sqltelemetry.LargeRShiftArgumentCounter)
+			colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+		}
+		r = int64(a) >> int64(b)
+	}
+
+	return r
+}
+
+func performRShiftInt16Int32(a int16, b int32) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+		if int64(b) < 0 || int64(b) >= 64 {
+			telemetry.Inc(sqltelemetry.LargeRShiftArgumentCounter)
+			colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+		}
+		r = int64(a) >> int64(b)
+	}
+
+	return r
+}
+
+func performRShiftInt16Int64(a int16, b int64) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+		if int64(b) < 0 || int64(b) >= 64 {
+			telemetry.Inc(sqltelemetry.LargeRShiftArgumentCounter)
+			colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+		}
+		r = int64(a) >> int64(b)
+	}
+
+	return r
+}
+
+func performRShiftInt32Int16(a int32, b int16) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+		if int64(b) < 0 || int64(b) >= 64 {
+			telemetry.Inc(sqltelemetry.LargeRShiftArgumentCounter)
+			colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+		}
+		r = int64(a) >> int64(b)
+	}
+
+	return r
+}
+
+func performRShiftInt32Int32(a int32, b int32) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+		if int64(b) < 0 || int64(b) >= 64 {
+			telemetry.Inc(sqltelemetry.LargeRShiftArgumentCounter)
+			colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+		}
+		r = int64(a) >> int64(b)
+	}
+
+	return r
+}
+
+func performRShiftInt32Int64(a int32, b int64) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+		if int64(b) < 0 || int64(b) >= 64 {
+			telemetry.Inc(sqltelemetry.LargeRShiftArgumentCounter)
+			colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+		}
+		r = int64(a) >> int64(b)
+	}
+
+	return r
+}
+
+func performRShiftInt64Int16(a int64, b int16) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+		if int64(b) < 0 || int64(b) >= 64 {
+			telemetry.Inc(sqltelemetry.LargeRShiftArgumentCounter)
+			colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+		}
+		r = int64(a) >> int64(b)
+	}
+
+	return r
+}
+
+func performRShiftInt64Int32(a int64, b int32) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+		if int64(b) < 0 || int64(b) >= 64 {
+			telemetry.Inc(sqltelemetry.LargeRShiftArgumentCounter)
+			colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+		}
+		r = int64(a) >> int64(b)
+	}
+
+	return r
+}
+
+func performRShiftInt64Int64(a int64, b int64) int64 {
+	var r int64
+	// In order to inline the templated code of overloads, we need to have a
+	// "_overloadHelper" local variable of type "overloadHelper".
+	var _overloadHelper overloadHelper
+	// However, the scratch is not used in all of the functions, so we add this
+	// to go around "unused" error.
+	_ = _overloadHelper
+
+	{
+		if int64(b) < 0 || int64(b) >= 64 {
+			telemetry.Inc(sqltelemetry.LargeRShiftArgumentCounter)
+			colexecerror.ExpectedError(tree.ErrShiftArgOutOfRange)
+		}
+		r = int64(a) >> int64(b)
+	}
+
 	return r
 }
 
