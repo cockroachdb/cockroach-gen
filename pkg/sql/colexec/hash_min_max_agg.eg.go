@@ -179,7 +179,7 @@ func (a *minBoolHashAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						var isNull bool
 						isNull = nulls.NullAt(i)
@@ -251,7 +251,7 @@ func (a *minBoolHashAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						var isNull bool
 						isNull = false
@@ -609,7 +609,7 @@ func (a *minDecimalHashAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						var isNull bool
 						isNull = nulls.NullAt(i)
@@ -665,7 +665,7 @@ func (a *minDecimalHashAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						var isNull bool
 						isNull = false
@@ -821,7 +821,7 @@ func (a *minInt16HashAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						var isNull bool
 						isNull = nulls.NullAt(i)
@@ -899,7 +899,7 @@ func (a *minInt16HashAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						var isNull bool
 						isNull = false
@@ -1066,7 +1066,7 @@ func (a *minInt32HashAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						var isNull bool
 						isNull = nulls.NullAt(i)
@@ -1144,7 +1144,7 @@ func (a *minInt32HashAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						var isNull bool
 						isNull = false
@@ -1311,7 +1311,7 @@ func (a *minInt64HashAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						var isNull bool
 						isNull = nulls.NullAt(i)
@@ -1389,7 +1389,7 @@ func (a *minInt64HashAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						var isNull bool
 						isNull = false
@@ -1564,7 +1564,7 @@ func (a *minFloat64HashAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						var isNull bool
 						isNull = nulls.NullAt(i)
@@ -1658,7 +1658,7 @@ func (a *minFloat64HashAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						var isNull bool
 						isNull = false
@@ -1829,7 +1829,7 @@ func (a *minTimestampHashAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						var isNull bool
 						isNull = nulls.NullAt(i)
@@ -1899,7 +1899,7 @@ func (a *minTimestampHashAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						var isNull bool
 						isNull = false
@@ -2051,7 +2051,7 @@ func (a *minIntervalHashAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						var isNull bool
 						isNull = nulls.NullAt(i)
@@ -2107,7 +2107,7 @@ func (a *minIntervalHashAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						var isNull bool
 						isNull = false
@@ -2469,7 +2469,7 @@ func (a *maxBoolHashAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						var isNull bool
 						isNull = nulls.NullAt(i)
@@ -2541,7 +2541,7 @@ func (a *maxBoolHashAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						var isNull bool
 						isNull = false
@@ -2899,7 +2899,7 @@ func (a *maxDecimalHashAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						var isNull bool
 						isNull = nulls.NullAt(i)
@@ -2955,7 +2955,7 @@ func (a *maxDecimalHashAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						var isNull bool
 						isNull = false
@@ -3111,7 +3111,7 @@ func (a *maxInt16HashAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						var isNull bool
 						isNull = nulls.NullAt(i)
@@ -3189,7 +3189,7 @@ func (a *maxInt16HashAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						var isNull bool
 						isNull = false
@@ -3356,7 +3356,7 @@ func (a *maxInt32HashAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						var isNull bool
 						isNull = nulls.NullAt(i)
@@ -3434,7 +3434,7 @@ func (a *maxInt32HashAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						var isNull bool
 						isNull = false
@@ -3601,7 +3601,7 @@ func (a *maxInt64HashAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						var isNull bool
 						isNull = nulls.NullAt(i)
@@ -3679,7 +3679,7 @@ func (a *maxInt64HashAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						var isNull bool
 						isNull = false
@@ -3854,7 +3854,7 @@ func (a *maxFloat64HashAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						var isNull bool
 						isNull = nulls.NullAt(i)
@@ -3948,7 +3948,7 @@ func (a *maxFloat64HashAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						var isNull bool
 						isNull = false
@@ -4119,7 +4119,7 @@ func (a *maxTimestampHashAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						var isNull bool
 						isNull = nulls.NullAt(i)
@@ -4189,7 +4189,7 @@ func (a *maxTimestampHashAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						var isNull bool
 						isNull = false
@@ -4341,7 +4341,7 @@ func (a *maxIntervalHashAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						var isNull bool
 						isNull = nulls.NullAt(i)
@@ -4397,7 +4397,7 @@ func (a *maxIntervalHashAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						var isNull bool
 						isNull = false

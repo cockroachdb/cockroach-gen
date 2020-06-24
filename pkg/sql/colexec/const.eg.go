@@ -168,13 +168,18 @@ func (c constBoolOp) Next(ctx context.Context) coldata.Batch {
 	c.allocator.PerformOperation(
 		[]coldata.Vec{vec},
 		func() {
+			// Shallow copy col to work around Go issue
+			// https://github.com/golang/go/issues/39756 which prevents bound check
+			// elimination from working in this case.
+			col := col
 			if sel := batch.Selection(); sel != nil {
 				for _, i := range sel[:n] {
 					col[i] = c.constVal
 				}
 			} else {
 				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					col[i] = c.constVal
 				}
 			}
@@ -211,6 +216,10 @@ func (c constBytesOp) Next(ctx context.Context) coldata.Batch {
 	c.allocator.PerformOperation(
 		[]coldata.Vec{vec},
 		func() {
+			// Shallow copy col to work around Go issue
+			// https://github.com/golang/go/issues/39756 which prevents bound check
+			// elimination from working in this case.
+			col := col
 			if sel := batch.Selection(); sel != nil {
 				for _, i := range sel[:n] {
 					col.Set(i, c.constVal)
@@ -219,6 +228,7 @@ func (c constBytesOp) Next(ctx context.Context) coldata.Batch {
 				col = col
 				_ = 0
 				_ = n
+				_ = col.Get(n - 1)
 				for i := 0; i < n; i++ {
 					col.Set(i, c.constVal)
 				}
@@ -256,13 +266,18 @@ func (c constDecimalOp) Next(ctx context.Context) coldata.Batch {
 	c.allocator.PerformOperation(
 		[]coldata.Vec{vec},
 		func() {
+			// Shallow copy col to work around Go issue
+			// https://github.com/golang/go/issues/39756 which prevents bound check
+			// elimination from working in this case.
+			col := col
 			if sel := batch.Selection(); sel != nil {
 				for _, i := range sel[:n] {
 					col[i].Set(&c.constVal)
 				}
 			} else {
 				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					col[i].Set(&c.constVal)
 				}
 			}
@@ -299,13 +314,18 @@ func (c constInt16Op) Next(ctx context.Context) coldata.Batch {
 	c.allocator.PerformOperation(
 		[]coldata.Vec{vec},
 		func() {
+			// Shallow copy col to work around Go issue
+			// https://github.com/golang/go/issues/39756 which prevents bound check
+			// elimination from working in this case.
+			col := col
 			if sel := batch.Selection(); sel != nil {
 				for _, i := range sel[:n] {
 					col[i] = c.constVal
 				}
 			} else {
 				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					col[i] = c.constVal
 				}
 			}
@@ -342,13 +362,18 @@ func (c constInt32Op) Next(ctx context.Context) coldata.Batch {
 	c.allocator.PerformOperation(
 		[]coldata.Vec{vec},
 		func() {
+			// Shallow copy col to work around Go issue
+			// https://github.com/golang/go/issues/39756 which prevents bound check
+			// elimination from working in this case.
+			col := col
 			if sel := batch.Selection(); sel != nil {
 				for _, i := range sel[:n] {
 					col[i] = c.constVal
 				}
 			} else {
 				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					col[i] = c.constVal
 				}
 			}
@@ -385,13 +410,18 @@ func (c constInt64Op) Next(ctx context.Context) coldata.Batch {
 	c.allocator.PerformOperation(
 		[]coldata.Vec{vec},
 		func() {
+			// Shallow copy col to work around Go issue
+			// https://github.com/golang/go/issues/39756 which prevents bound check
+			// elimination from working in this case.
+			col := col
 			if sel := batch.Selection(); sel != nil {
 				for _, i := range sel[:n] {
 					col[i] = c.constVal
 				}
 			} else {
 				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					col[i] = c.constVal
 				}
 			}
@@ -428,13 +458,18 @@ func (c constFloat64Op) Next(ctx context.Context) coldata.Batch {
 	c.allocator.PerformOperation(
 		[]coldata.Vec{vec},
 		func() {
+			// Shallow copy col to work around Go issue
+			// https://github.com/golang/go/issues/39756 which prevents bound check
+			// elimination from working in this case.
+			col := col
 			if sel := batch.Selection(); sel != nil {
 				for _, i := range sel[:n] {
 					col[i] = c.constVal
 				}
 			} else {
 				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					col[i] = c.constVal
 				}
 			}
@@ -471,13 +506,18 @@ func (c constTimestampOp) Next(ctx context.Context) coldata.Batch {
 	c.allocator.PerformOperation(
 		[]coldata.Vec{vec},
 		func() {
+			// Shallow copy col to work around Go issue
+			// https://github.com/golang/go/issues/39756 which prevents bound check
+			// elimination from working in this case.
+			col := col
 			if sel := batch.Selection(); sel != nil {
 				for _, i := range sel[:n] {
 					col[i] = c.constVal
 				}
 			} else {
 				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					col[i] = c.constVal
 				}
 			}
@@ -514,13 +554,18 @@ func (c constIntervalOp) Next(ctx context.Context) coldata.Batch {
 	c.allocator.PerformOperation(
 		[]coldata.Vec{vec},
 		func() {
+			// Shallow copy col to work around Go issue
+			// https://github.com/golang/go/issues/39756 which prevents bound check
+			// elimination from working in this case.
+			col := col
 			if sel := batch.Selection(); sel != nil {
 				for _, i := range sel[:n] {
 					col[i] = c.constVal
 				}
 			} else {
 				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					col[i] = c.constVal
 				}
 			}
@@ -557,12 +602,17 @@ func (c constDatumOp) Next(ctx context.Context) coldata.Batch {
 	c.allocator.PerformOperation(
 		[]coldata.Vec{vec},
 		func() {
+			// Shallow copy col to work around Go issue
+			// https://github.com/golang/go/issues/39756 which prevents bound check
+			// elimination from working in this case.
+			col := col
 			if sel := batch.Selection(); sel != nil {
 				for _, i := range sel[:n] {
 					col.Set(i, c.constVal)
 				}
 			} else {
 				col = col.Slice(0, n)
+				_ = col.Get(n - 1)
 				for i := 0; i < n; i++ {
 					col.Set(i, c.constVal)
 				}

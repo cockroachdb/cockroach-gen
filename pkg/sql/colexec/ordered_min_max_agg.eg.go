@@ -193,7 +193,7 @@ func (a *minBoolOrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						if a.groups[i] {
 							// If we encounter a new group, and we haven't found any non-nulls for the
@@ -289,7 +289,7 @@ func (a *minBoolOrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						if a.groups[i] {
 							// If we encounter a new group, and we haven't found any non-nulls for the
@@ -723,7 +723,7 @@ func (a *minDecimalOrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						if a.groups[i] {
 							// If we encounter a new group, and we haven't found any non-nulls for the
@@ -803,7 +803,7 @@ func (a *minDecimalOrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						if a.groups[i] {
 							// If we encounter a new group, and we haven't found any non-nulls for the
@@ -985,7 +985,7 @@ func (a *minInt16OrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						if a.groups[i] {
 							// If we encounter a new group, and we haven't found any non-nulls for the
@@ -1087,7 +1087,7 @@ func (a *minInt16OrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						if a.groups[i] {
 							// If we encounter a new group, and we haven't found any non-nulls for the
@@ -1280,7 +1280,7 @@ func (a *minInt32OrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						if a.groups[i] {
 							// If we encounter a new group, and we haven't found any non-nulls for the
@@ -1382,7 +1382,7 @@ func (a *minInt32OrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						if a.groups[i] {
 							// If we encounter a new group, and we haven't found any non-nulls for the
@@ -1575,7 +1575,7 @@ func (a *minInt64OrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						if a.groups[i] {
 							// If we encounter a new group, and we haven't found any non-nulls for the
@@ -1677,7 +1677,7 @@ func (a *minInt64OrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						if a.groups[i] {
 							// If we encounter a new group, and we haven't found any non-nulls for the
@@ -1878,7 +1878,7 @@ func (a *minFloat64OrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						if a.groups[i] {
 							// If we encounter a new group, and we haven't found any non-nulls for the
@@ -1996,7 +1996,7 @@ func (a *minFloat64OrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						if a.groups[i] {
 							// If we encounter a new group, and we haven't found any non-nulls for the
@@ -2193,7 +2193,7 @@ func (a *minTimestampOrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						if a.groups[i] {
 							// If we encounter a new group, and we haven't found any non-nulls for the
@@ -2287,7 +2287,7 @@ func (a *minTimestampOrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						if a.groups[i] {
 							// If we encounter a new group, and we haven't found any non-nulls for the
@@ -2465,7 +2465,7 @@ func (a *minIntervalOrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						if a.groups[i] {
 							// If we encounter a new group, and we haven't found any non-nulls for the
@@ -2545,7 +2545,7 @@ func (a *minIntervalOrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						if a.groups[i] {
 							// If we encounter a new group, and we haven't found any non-nulls for the
@@ -2983,7 +2983,7 @@ func (a *maxBoolOrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						if a.groups[i] {
 							// If we encounter a new group, and we haven't found any non-nulls for the
@@ -3079,7 +3079,7 @@ func (a *maxBoolOrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						if a.groups[i] {
 							// If we encounter a new group, and we haven't found any non-nulls for the
@@ -3513,7 +3513,7 @@ func (a *maxDecimalOrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						if a.groups[i] {
 							// If we encounter a new group, and we haven't found any non-nulls for the
@@ -3593,7 +3593,7 @@ func (a *maxDecimalOrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						if a.groups[i] {
 							// If we encounter a new group, and we haven't found any non-nulls for the
@@ -3775,7 +3775,7 @@ func (a *maxInt16OrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						if a.groups[i] {
 							// If we encounter a new group, and we haven't found any non-nulls for the
@@ -3877,7 +3877,7 @@ func (a *maxInt16OrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						if a.groups[i] {
 							// If we encounter a new group, and we haven't found any non-nulls for the
@@ -4070,7 +4070,7 @@ func (a *maxInt32OrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						if a.groups[i] {
 							// If we encounter a new group, and we haven't found any non-nulls for the
@@ -4172,7 +4172,7 @@ func (a *maxInt32OrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						if a.groups[i] {
 							// If we encounter a new group, and we haven't found any non-nulls for the
@@ -4365,7 +4365,7 @@ func (a *maxInt64OrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						if a.groups[i] {
 							// If we encounter a new group, and we haven't found any non-nulls for the
@@ -4467,7 +4467,7 @@ func (a *maxInt64OrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						if a.groups[i] {
 							// If we encounter a new group, and we haven't found any non-nulls for the
@@ -4668,7 +4668,7 @@ func (a *maxFloat64OrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						if a.groups[i] {
 							// If we encounter a new group, and we haven't found any non-nulls for the
@@ -4786,7 +4786,7 @@ func (a *maxFloat64OrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						if a.groups[i] {
 							// If we encounter a new group, and we haven't found any non-nulls for the
@@ -4983,7 +4983,7 @@ func (a *maxTimestampOrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						if a.groups[i] {
 							// If we encounter a new group, and we haven't found any non-nulls for the
@@ -5077,7 +5077,7 @@ func (a *maxTimestampOrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						if a.groups[i] {
 							// If we encounter a new group, and we haven't found any non-nulls for the
@@ -5255,7 +5255,7 @@ func (a *maxIntervalOrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						if a.groups[i] {
 							// If we encounter a new group, and we haven't found any non-nulls for the
@@ -5335,7 +5335,7 @@ func (a *maxIntervalOrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 					}
 				} else {
 					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						if a.groups[i] {
 							// If we encounter a new group, and we haven't found any non-nulls for the

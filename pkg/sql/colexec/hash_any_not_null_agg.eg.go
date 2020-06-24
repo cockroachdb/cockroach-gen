@@ -135,6 +135,10 @@ func (a *anyNotNullBoolHashAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	a.allocator.PerformOperation(
 		[]coldata.Vec{a.vec},
 		func() {
+			// Capture col to force bounds check to work. See
+			// https://github.com/golang/go/issues/39756
+			col := col
+			_ = col[inputLen-1]
 			if nulls.MaybeHasNulls() {
 				if sel != nil {
 					sel = sel[:inputLen]
@@ -156,8 +160,7 @@ func (a *anyNotNullBoolHashAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 				} else {
-					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						var isNull bool
 						isNull = nulls.NullAt(i)
@@ -196,8 +199,7 @@ func (a *anyNotNullBoolHashAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 				} else {
-					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						var isNull bool
 						isNull = false
@@ -305,6 +307,10 @@ func (a *anyNotNullBytesHashAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	a.allocator.PerformOperation(
 		[]coldata.Vec{a.vec},
 		func() {
+			// Capture col to force bounds check to work. See
+			// https://github.com/golang/go/issues/39756
+			col := col
+			_ = col.Get(inputLen - 1)
 			if nulls.MaybeHasNulls() {
 				if sel != nil {
 					sel = sel[:inputLen]
@@ -326,9 +332,6 @@ func (a *anyNotNullBytesHashAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 				} else {
-					col = col
-					_ = 0
-					_ = inputLen
 					for i := 0; i < inputLen; i++ {
 
 						var isNull bool
@@ -368,9 +371,6 @@ func (a *anyNotNullBytesHashAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 				} else {
-					col = col
-					_ = 0
-					_ = inputLen
 					for i := 0; i < inputLen; i++ {
 
 						var isNull bool
@@ -479,6 +479,10 @@ func (a *anyNotNullDecimalHashAgg) Compute(b coldata.Batch, inputIdxs []uint32) 
 	a.allocator.PerformOperation(
 		[]coldata.Vec{a.vec},
 		func() {
+			// Capture col to force bounds check to work. See
+			// https://github.com/golang/go/issues/39756
+			col := col
+			_ = col[inputLen-1]
 			if nulls.MaybeHasNulls() {
 				if sel != nil {
 					sel = sel[:inputLen]
@@ -500,8 +504,7 @@ func (a *anyNotNullDecimalHashAgg) Compute(b coldata.Batch, inputIdxs []uint32) 
 						}
 					}
 				} else {
-					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						var isNull bool
 						isNull = nulls.NullAt(i)
@@ -540,8 +543,7 @@ func (a *anyNotNullDecimalHashAgg) Compute(b coldata.Batch, inputIdxs []uint32) 
 						}
 					}
 				} else {
-					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						var isNull bool
 						isNull = false
@@ -649,6 +651,10 @@ func (a *anyNotNullInt16HashAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	a.allocator.PerformOperation(
 		[]coldata.Vec{a.vec},
 		func() {
+			// Capture col to force bounds check to work. See
+			// https://github.com/golang/go/issues/39756
+			col := col
+			_ = col[inputLen-1]
 			if nulls.MaybeHasNulls() {
 				if sel != nil {
 					sel = sel[:inputLen]
@@ -670,8 +676,7 @@ func (a *anyNotNullInt16HashAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 				} else {
-					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						var isNull bool
 						isNull = nulls.NullAt(i)
@@ -710,8 +715,7 @@ func (a *anyNotNullInt16HashAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 				} else {
-					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						var isNull bool
 						isNull = false
@@ -819,6 +823,10 @@ func (a *anyNotNullInt32HashAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	a.allocator.PerformOperation(
 		[]coldata.Vec{a.vec},
 		func() {
+			// Capture col to force bounds check to work. See
+			// https://github.com/golang/go/issues/39756
+			col := col
+			_ = col[inputLen-1]
 			if nulls.MaybeHasNulls() {
 				if sel != nil {
 					sel = sel[:inputLen]
@@ -840,8 +848,7 @@ func (a *anyNotNullInt32HashAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 				} else {
-					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						var isNull bool
 						isNull = nulls.NullAt(i)
@@ -880,8 +887,7 @@ func (a *anyNotNullInt32HashAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 				} else {
-					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						var isNull bool
 						isNull = false
@@ -989,6 +995,10 @@ func (a *anyNotNullInt64HashAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	a.allocator.PerformOperation(
 		[]coldata.Vec{a.vec},
 		func() {
+			// Capture col to force bounds check to work. See
+			// https://github.com/golang/go/issues/39756
+			col := col
+			_ = col[inputLen-1]
 			if nulls.MaybeHasNulls() {
 				if sel != nil {
 					sel = sel[:inputLen]
@@ -1010,8 +1020,7 @@ func (a *anyNotNullInt64HashAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 				} else {
-					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						var isNull bool
 						isNull = nulls.NullAt(i)
@@ -1050,8 +1059,7 @@ func (a *anyNotNullInt64HashAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 				} else {
-					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						var isNull bool
 						isNull = false
@@ -1159,6 +1167,10 @@ func (a *anyNotNullFloat64HashAgg) Compute(b coldata.Batch, inputIdxs []uint32) 
 	a.allocator.PerformOperation(
 		[]coldata.Vec{a.vec},
 		func() {
+			// Capture col to force bounds check to work. See
+			// https://github.com/golang/go/issues/39756
+			col := col
+			_ = col[inputLen-1]
 			if nulls.MaybeHasNulls() {
 				if sel != nil {
 					sel = sel[:inputLen]
@@ -1180,8 +1192,7 @@ func (a *anyNotNullFloat64HashAgg) Compute(b coldata.Batch, inputIdxs []uint32) 
 						}
 					}
 				} else {
-					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						var isNull bool
 						isNull = nulls.NullAt(i)
@@ -1220,8 +1231,7 @@ func (a *anyNotNullFloat64HashAgg) Compute(b coldata.Batch, inputIdxs []uint32) 
 						}
 					}
 				} else {
-					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						var isNull bool
 						isNull = false
@@ -1329,6 +1339,10 @@ func (a *anyNotNullTimestampHashAgg) Compute(b coldata.Batch, inputIdxs []uint32
 	a.allocator.PerformOperation(
 		[]coldata.Vec{a.vec},
 		func() {
+			// Capture col to force bounds check to work. See
+			// https://github.com/golang/go/issues/39756
+			col := col
+			_ = col[inputLen-1]
 			if nulls.MaybeHasNulls() {
 				if sel != nil {
 					sel = sel[:inputLen]
@@ -1350,8 +1364,7 @@ func (a *anyNotNullTimestampHashAgg) Compute(b coldata.Batch, inputIdxs []uint32
 						}
 					}
 				} else {
-					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						var isNull bool
 						isNull = nulls.NullAt(i)
@@ -1390,8 +1403,7 @@ func (a *anyNotNullTimestampHashAgg) Compute(b coldata.Batch, inputIdxs []uint32
 						}
 					}
 				} else {
-					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						var isNull bool
 						isNull = false
@@ -1499,6 +1511,10 @@ func (a *anyNotNullIntervalHashAgg) Compute(b coldata.Batch, inputIdxs []uint32)
 	a.allocator.PerformOperation(
 		[]coldata.Vec{a.vec},
 		func() {
+			// Capture col to force bounds check to work. See
+			// https://github.com/golang/go/issues/39756
+			col := col
+			_ = col[inputLen-1]
 			if nulls.MaybeHasNulls() {
 				if sel != nil {
 					sel = sel[:inputLen]
@@ -1520,8 +1536,7 @@ func (a *anyNotNullIntervalHashAgg) Compute(b coldata.Batch, inputIdxs []uint32)
 						}
 					}
 				} else {
-					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						var isNull bool
 						isNull = nulls.NullAt(i)
@@ -1560,8 +1575,7 @@ func (a *anyNotNullIntervalHashAgg) Compute(b coldata.Batch, inputIdxs []uint32)
 						}
 					}
 				} else {
-					col = col[0:inputLen]
-					for i := range col {
+					for i := 0; i < inputLen; i++ {
 
 						var isNull bool
 						isNull = false
@@ -1669,6 +1683,10 @@ func (a *anyNotNullDatumHashAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	a.allocator.PerformOperation(
 		[]coldata.Vec{a.vec},
 		func() {
+			// Capture col to force bounds check to work. See
+			// https://github.com/golang/go/issues/39756
+			col := col
+			_ = col.Get(inputLen - 1)
 			if nulls.MaybeHasNulls() {
 				if sel != nil {
 					sel = sel[:inputLen]
@@ -1690,7 +1708,6 @@ func (a *anyNotNullDatumHashAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 				} else {
-					col = col.Slice(0, inputLen)
 					for i := 0; i < inputLen; i++ {
 
 						var isNull bool
@@ -1730,7 +1747,6 @@ func (a *anyNotNullDatumHashAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 						}
 					}
 				} else {
-					col = col.Slice(0, inputLen)
 					for i := 0; i < inputLen; i++ {
 
 						var isNull bool

@@ -56,8 +56,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								}
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								if inputNulls.NullAt(i) {
 									outputNulls.SetNull(i)
 								} else {
@@ -78,8 +81,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								outputCol[i] = r
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								v := inputCol[i]
 								var r bool
 								r = v
@@ -116,8 +122,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								}
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								if inputNulls.NullAt(i) {
 									outputNulls.SetNull(i)
 								} else {
@@ -148,8 +157,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								outputCol[i] = r
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								v := inputCol[i]
 								var r float64
 
@@ -190,8 +202,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								}
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								if inputNulls.NullAt(i) {
 									outputNulls.SetNull(i)
 								} else {
@@ -222,8 +237,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								outputCol[i] = r
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								v := inputCol[i]
 								var r int16
 
@@ -261,8 +279,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								}
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								if inputNulls.NullAt(i) {
 									outputNulls.SetNull(i)
 								} else {
@@ -293,8 +314,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								outputCol[i] = r
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								v := inputCol[i]
 								var r int32
 
@@ -333,8 +357,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								}
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								if inputNulls.NullAt(i) {
 									outputNulls.SetNull(i)
 								} else {
@@ -365,8 +392,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								outputCol[i] = r
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								v := inputCol[i]
 								var r int64
 
@@ -410,8 +440,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								}
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								if inputNulls.NullAt(i) {
 									outputNulls.SetNull(i)
 								} else {
@@ -432,8 +465,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								outputCol[i].Set(&r)
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								v := inputCol[i]
 								var r apd.Decimal
 								r = v
@@ -465,8 +501,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								}
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								if inputNulls.NullAt(i) {
 									outputNulls.SetNull(i)
 								} else {
@@ -487,8 +526,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								outputCol[i] = r
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								v := inputCol[i]
 								var r bool
 								r = v.Sign() != 0
@@ -525,8 +567,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								}
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								if inputNulls.NullAt(i) {
 									outputNulls.SetNull(i)
 								} else {
@@ -547,8 +592,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								outputCol[i] = r
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								v := inputCol[i]
 								var r int16
 								r = v
@@ -578,8 +626,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								}
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								if inputNulls.NullAt(i) {
 									outputNulls.SetNull(i)
 								} else {
@@ -604,8 +655,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								outputCol[i] = r
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								v := inputCol[i]
 								var r int32
 
@@ -638,8 +692,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								}
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								if inputNulls.NullAt(i) {
 									outputNulls.SetNull(i)
 								} else {
@@ -664,8 +721,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								outputCol[i] = r
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								v := inputCol[i]
 								var r int64
 
@@ -701,8 +761,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								}
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								if inputNulls.NullAt(i) {
 									outputNulls.SetNull(i)
 								} else {
@@ -727,8 +790,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								outputCol[i] = r
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								v := inputCol[i]
 								var r bool
 
@@ -764,8 +830,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								}
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								if inputNulls.NullAt(i) {
 									outputNulls.SetNull(i)
 								} else {
@@ -790,8 +859,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								outputCol[i].Set(&r)
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								v := inputCol[i]
 								var r apd.Decimal
 
@@ -827,8 +899,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								}
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								if inputNulls.NullAt(i) {
 									outputNulls.SetNull(i)
 								} else {
@@ -853,8 +928,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								outputCol[i] = r
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								v := inputCol[i]
 								var r float64
 
@@ -892,8 +970,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								}
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								if inputNulls.NullAt(i) {
 									outputNulls.SetNull(i)
 								} else {
@@ -918,8 +999,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								outputCol[i] = r
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								v := inputCol[i]
 								var r int16
 
@@ -949,8 +1033,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								}
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								if inputNulls.NullAt(i) {
 									outputNulls.SetNull(i)
 								} else {
@@ -971,8 +1058,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								outputCol[i] = r
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								v := inputCol[i]
 								var r int32
 								r = v
@@ -1003,8 +1093,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								}
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								if inputNulls.NullAt(i) {
 									outputNulls.SetNull(i)
 								} else {
@@ -1029,8 +1122,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								outputCol[i] = r
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								v := inputCol[i]
 								var r int64
 
@@ -1066,8 +1162,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								}
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								if inputNulls.NullAt(i) {
 									outputNulls.SetNull(i)
 								} else {
@@ -1092,8 +1191,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								outputCol[i] = r
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								v := inputCol[i]
 								var r bool
 
@@ -1129,8 +1231,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								}
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								if inputNulls.NullAt(i) {
 									outputNulls.SetNull(i)
 								} else {
@@ -1155,8 +1260,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								outputCol[i].Set(&r)
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								v := inputCol[i]
 								var r apd.Decimal
 
@@ -1192,8 +1300,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								}
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								if inputNulls.NullAt(i) {
 									outputNulls.SetNull(i)
 								} else {
@@ -1218,8 +1329,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								outputCol[i] = r
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								v := inputCol[i]
 								var r float64
 
@@ -1258,8 +1372,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								}
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								if inputNulls.NullAt(i) {
 									outputNulls.SetNull(i)
 								} else {
@@ -1284,8 +1401,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								outputCol[i] = r
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								v := inputCol[i]
 								var r int16
 
@@ -1317,8 +1437,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								}
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								if inputNulls.NullAt(i) {
 									outputNulls.SetNull(i)
 								} else {
@@ -1343,8 +1466,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								outputCol[i] = r
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								v := inputCol[i]
 								var r int32
 
@@ -1375,8 +1501,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								}
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								if inputNulls.NullAt(i) {
 									outputNulls.SetNull(i)
 								} else {
@@ -1397,8 +1526,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								outputCol[i] = r
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								v := inputCol[i]
 								var r int64
 								r = v
@@ -1432,8 +1564,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								}
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								if inputNulls.NullAt(i) {
 									outputNulls.SetNull(i)
 								} else {
@@ -1458,8 +1593,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								outputCol[i] = r
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								v := inputCol[i]
 								var r bool
 
@@ -1495,8 +1633,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								}
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								if inputNulls.NullAt(i) {
 									outputNulls.SetNull(i)
 								} else {
@@ -1521,8 +1662,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								outputCol[i].Set(&r)
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								v := inputCol[i]
 								var r apd.Decimal
 
@@ -1558,8 +1702,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								}
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								if inputNulls.NullAt(i) {
 									outputNulls.SetNull(i)
 								} else {
@@ -1584,8 +1731,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								outputCol[i] = r
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								v := inputCol[i]
 								var r float64
 
@@ -1626,8 +1776,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								}
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								if inputNulls.NullAt(i) {
 									outputNulls.SetNull(i)
 								} else {
@@ -1648,8 +1801,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								outputCol[i] = r
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								v := inputCol[i]
 								var r float64
 								r = v
@@ -1683,8 +1839,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								}
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								if inputNulls.NullAt(i) {
 									outputNulls.SetNull(i)
 								} else {
@@ -1709,8 +1868,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								outputCol[i] = r
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								v := inputCol[i]
 								var r bool
 
@@ -1753,8 +1915,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								}
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								if inputNulls.NullAt(i) {
 									outputNulls.SetNull(i)
 								} else {
@@ -1793,8 +1958,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								outputCol[i].Set(&r)
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								v := inputCol[i]
 								var r apd.Decimal
 
@@ -1839,8 +2007,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								}
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								if inputNulls.NullAt(i) {
 									outputNulls.SetNull(i)
 								} else {
@@ -1871,8 +2042,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								outputCol[i] = r
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								v := inputCol[i]
 								var r int16
 
@@ -1910,8 +2084,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								}
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								if inputNulls.NullAt(i) {
 									outputNulls.SetNull(i)
 								} else {
@@ -1942,8 +2119,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								outputCol[i] = r
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								v := inputCol[i]
 								var r int32
 
@@ -1982,8 +2162,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								}
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								if inputNulls.NullAt(i) {
 									outputNulls.SetNull(i)
 								} else {
@@ -2014,8 +2197,11 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								outputCol[i] = r
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol[0:n]
-							for i := range inputCol {
+							_ = inputCol[n-1]
+							_ = outputCol[n-1]
+							for i := 0; i < n; i++ {
 								v := inputCol[i]
 								var r int64
 
@@ -2067,7 +2253,10 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								}
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol.Slice(0, n)
+							_ = inputCol.Get(n - 1)
+							_ = outputCol[n-1]
 							for i := 0; i < n; i++ {
 								if inputNulls.NullAt(i) {
 									outputNulls.SetNull(i)
@@ -2105,7 +2294,10 @@ func cast(inputVec, outputVec coldata.Vec, n int, sel []int) {
 								outputCol[i] = r
 							}
 						} else {
+							// Remove bounds checks for inputCol[i] and outputCol[i].
 							inputCol = inputCol.Slice(0, n)
+							_ = inputCol.Get(n - 1)
+							_ = outputCol[n-1]
 							for i := 0; i < n; i++ {
 								v := inputCol.Get(i)
 								var r bool

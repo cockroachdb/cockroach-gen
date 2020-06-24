@@ -50,9 +50,7 @@ func (p *selPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col
-				_ = 0
-				_ = n
+				_ = col.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col.Get(i)
@@ -80,9 +78,7 @@ func (p *selPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col
-				_ = 0
-				_ = n
+				_ = col.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col.Get(i)
@@ -227,9 +223,7 @@ func (p *selSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col
-				_ = 0
-				_ = n
+				_ = col.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col.Get(i)
@@ -257,9 +251,7 @@ func (p *selSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col
-				_ = 0
-				_ = n
+				_ = col.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col.Get(i)
@@ -404,9 +396,7 @@ func (p *selRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col
-				_ = 0
-				_ = n
+				_ = col.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col.Get(i)
@@ -434,9 +424,7 @@ func (p *selRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col
-				_ = 0
-				_ = n
+				_ = col.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col.Get(i)
@@ -581,9 +569,7 @@ func (p *selNotPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col
-				_ = 0
-				_ = n
+				_ = col.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col.Get(i)
@@ -611,9 +597,7 @@ func (p *selNotPrefixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col
-				_ = 0
-				_ = n
+				_ = col.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col.Get(i)
@@ -758,9 +742,7 @@ func (p *selNotSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col
-				_ = 0
-				_ = n
+				_ = col.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col.Get(i)
@@ -788,9 +770,7 @@ func (p *selNotSuffixBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col
-				_ = 0
-				_ = n
+				_ = col.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col.Get(i)
@@ -935,9 +915,7 @@ func (p *selNotRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col
-				_ = 0
-				_ = n
+				_ = col.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col.Get(i)
@@ -965,9 +943,7 @@ func (p *selNotRegexpBytesBytesConstOp) Next(ctx context.Context) coldata.Batch 
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col
-				_ = 0
-				_ = n
+				_ = col.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col.Get(i)

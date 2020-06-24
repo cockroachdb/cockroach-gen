@@ -131,11 +131,16 @@ func (a *anyNotNullBoolOrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32) 
 	a.allocator.PerformOperation(
 		[]coldata.Vec{a.vec},
 		func() {
+			// Capture col to force bounds check to work. See
+			// https://github.com/golang/go/issues/39756
+			col := col
+			_ = col[inputLen-1]
+			groups := a.groups
 			if nulls.MaybeHasNulls() {
 				if sel != nil {
 					sel = sel[:inputLen]
 					for _, i := range sel {
-						if a.groups[i] {
+						if groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group.
 							if !a.foundNonNullForCurrentGroup {
@@ -159,9 +164,9 @@ func (a *anyNotNullBoolOrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32) 
 						}
 					}
 				} else {
-					col = col[0:inputLen]
-					for i := range col {
-						if a.groups[i] {
+					_ = groups[inputLen-1]
+					for i := 0; i < inputLen; i++ {
+						if groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group.
 							if !a.foundNonNullForCurrentGroup {
@@ -189,7 +194,7 @@ func (a *anyNotNullBoolOrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32) 
 				if sel != nil {
 					sel = sel[:inputLen]
 					for _, i := range sel {
-						if a.groups[i] {
+						if groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group.
 							if !a.foundNonNullForCurrentGroup {
@@ -213,9 +218,9 @@ func (a *anyNotNullBoolOrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32) 
 						}
 					}
 				} else {
-					col = col[0:inputLen]
-					for i := range col {
-						if a.groups[i] {
+					_ = groups[inputLen-1]
+					for i := 0; i < inputLen; i++ {
+						if groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group.
 							if !a.foundNonNullForCurrentGroup {
@@ -325,11 +330,16 @@ func (a *anyNotNullBytesOrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32)
 	a.allocator.PerformOperation(
 		[]coldata.Vec{a.vec},
 		func() {
+			// Capture col to force bounds check to work. See
+			// https://github.com/golang/go/issues/39756
+			col := col
+			_ = col.Get(inputLen - 1)
+			groups := a.groups
 			if nulls.MaybeHasNulls() {
 				if sel != nil {
 					sel = sel[:inputLen]
 					for _, i := range sel {
-						if a.groups[i] {
+						if groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group.
 							if !a.foundNonNullForCurrentGroup {
@@ -353,11 +363,9 @@ func (a *anyNotNullBytesOrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32)
 						}
 					}
 				} else {
-					col = col
-					_ = 0
-					_ = inputLen
+					_ = groups[inputLen-1]
 					for i := 0; i < inputLen; i++ {
-						if a.groups[i] {
+						if groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group.
 							if !a.foundNonNullForCurrentGroup {
@@ -385,7 +393,7 @@ func (a *anyNotNullBytesOrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32)
 				if sel != nil {
 					sel = sel[:inputLen]
 					for _, i := range sel {
-						if a.groups[i] {
+						if groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group.
 							if !a.foundNonNullForCurrentGroup {
@@ -409,11 +417,9 @@ func (a *anyNotNullBytesOrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32)
 						}
 					}
 				} else {
-					col = col
-					_ = 0
-					_ = inputLen
+					_ = groups[inputLen-1]
 					for i := 0; i < inputLen; i++ {
-						if a.groups[i] {
+						if groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group.
 							if !a.foundNonNullForCurrentGroup {
@@ -523,11 +529,16 @@ func (a *anyNotNullDecimalOrderedAgg) Compute(b coldata.Batch, inputIdxs []uint3
 	a.allocator.PerformOperation(
 		[]coldata.Vec{a.vec},
 		func() {
+			// Capture col to force bounds check to work. See
+			// https://github.com/golang/go/issues/39756
+			col := col
+			_ = col[inputLen-1]
+			groups := a.groups
 			if nulls.MaybeHasNulls() {
 				if sel != nil {
 					sel = sel[:inputLen]
 					for _, i := range sel {
-						if a.groups[i] {
+						if groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group.
 							if !a.foundNonNullForCurrentGroup {
@@ -551,9 +562,9 @@ func (a *anyNotNullDecimalOrderedAgg) Compute(b coldata.Batch, inputIdxs []uint3
 						}
 					}
 				} else {
-					col = col[0:inputLen]
-					for i := range col {
-						if a.groups[i] {
+					_ = groups[inputLen-1]
+					for i := 0; i < inputLen; i++ {
+						if groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group.
 							if !a.foundNonNullForCurrentGroup {
@@ -581,7 +592,7 @@ func (a *anyNotNullDecimalOrderedAgg) Compute(b coldata.Batch, inputIdxs []uint3
 				if sel != nil {
 					sel = sel[:inputLen]
 					for _, i := range sel {
-						if a.groups[i] {
+						if groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group.
 							if !a.foundNonNullForCurrentGroup {
@@ -605,9 +616,9 @@ func (a *anyNotNullDecimalOrderedAgg) Compute(b coldata.Batch, inputIdxs []uint3
 						}
 					}
 				} else {
-					col = col[0:inputLen]
-					for i := range col {
-						if a.groups[i] {
+					_ = groups[inputLen-1]
+					for i := 0; i < inputLen; i++ {
+						if groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group.
 							if !a.foundNonNullForCurrentGroup {
@@ -717,11 +728,16 @@ func (a *anyNotNullInt16OrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32)
 	a.allocator.PerformOperation(
 		[]coldata.Vec{a.vec},
 		func() {
+			// Capture col to force bounds check to work. See
+			// https://github.com/golang/go/issues/39756
+			col := col
+			_ = col[inputLen-1]
+			groups := a.groups
 			if nulls.MaybeHasNulls() {
 				if sel != nil {
 					sel = sel[:inputLen]
 					for _, i := range sel {
-						if a.groups[i] {
+						if groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group.
 							if !a.foundNonNullForCurrentGroup {
@@ -745,9 +761,9 @@ func (a *anyNotNullInt16OrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32)
 						}
 					}
 				} else {
-					col = col[0:inputLen]
-					for i := range col {
-						if a.groups[i] {
+					_ = groups[inputLen-1]
+					for i := 0; i < inputLen; i++ {
+						if groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group.
 							if !a.foundNonNullForCurrentGroup {
@@ -775,7 +791,7 @@ func (a *anyNotNullInt16OrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32)
 				if sel != nil {
 					sel = sel[:inputLen]
 					for _, i := range sel {
-						if a.groups[i] {
+						if groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group.
 							if !a.foundNonNullForCurrentGroup {
@@ -799,9 +815,9 @@ func (a *anyNotNullInt16OrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32)
 						}
 					}
 				} else {
-					col = col[0:inputLen]
-					for i := range col {
-						if a.groups[i] {
+					_ = groups[inputLen-1]
+					for i := 0; i < inputLen; i++ {
+						if groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group.
 							if !a.foundNonNullForCurrentGroup {
@@ -911,11 +927,16 @@ func (a *anyNotNullInt32OrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32)
 	a.allocator.PerformOperation(
 		[]coldata.Vec{a.vec},
 		func() {
+			// Capture col to force bounds check to work. See
+			// https://github.com/golang/go/issues/39756
+			col := col
+			_ = col[inputLen-1]
+			groups := a.groups
 			if nulls.MaybeHasNulls() {
 				if sel != nil {
 					sel = sel[:inputLen]
 					for _, i := range sel {
-						if a.groups[i] {
+						if groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group.
 							if !a.foundNonNullForCurrentGroup {
@@ -939,9 +960,9 @@ func (a *anyNotNullInt32OrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32)
 						}
 					}
 				} else {
-					col = col[0:inputLen]
-					for i := range col {
-						if a.groups[i] {
+					_ = groups[inputLen-1]
+					for i := 0; i < inputLen; i++ {
+						if groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group.
 							if !a.foundNonNullForCurrentGroup {
@@ -969,7 +990,7 @@ func (a *anyNotNullInt32OrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32)
 				if sel != nil {
 					sel = sel[:inputLen]
 					for _, i := range sel {
-						if a.groups[i] {
+						if groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group.
 							if !a.foundNonNullForCurrentGroup {
@@ -993,9 +1014,9 @@ func (a *anyNotNullInt32OrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32)
 						}
 					}
 				} else {
-					col = col[0:inputLen]
-					for i := range col {
-						if a.groups[i] {
+					_ = groups[inputLen-1]
+					for i := 0; i < inputLen; i++ {
+						if groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group.
 							if !a.foundNonNullForCurrentGroup {
@@ -1105,11 +1126,16 @@ func (a *anyNotNullInt64OrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32)
 	a.allocator.PerformOperation(
 		[]coldata.Vec{a.vec},
 		func() {
+			// Capture col to force bounds check to work. See
+			// https://github.com/golang/go/issues/39756
+			col := col
+			_ = col[inputLen-1]
+			groups := a.groups
 			if nulls.MaybeHasNulls() {
 				if sel != nil {
 					sel = sel[:inputLen]
 					for _, i := range sel {
-						if a.groups[i] {
+						if groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group.
 							if !a.foundNonNullForCurrentGroup {
@@ -1133,9 +1159,9 @@ func (a *anyNotNullInt64OrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32)
 						}
 					}
 				} else {
-					col = col[0:inputLen]
-					for i := range col {
-						if a.groups[i] {
+					_ = groups[inputLen-1]
+					for i := 0; i < inputLen; i++ {
+						if groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group.
 							if !a.foundNonNullForCurrentGroup {
@@ -1163,7 +1189,7 @@ func (a *anyNotNullInt64OrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32)
 				if sel != nil {
 					sel = sel[:inputLen]
 					for _, i := range sel {
-						if a.groups[i] {
+						if groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group.
 							if !a.foundNonNullForCurrentGroup {
@@ -1187,9 +1213,9 @@ func (a *anyNotNullInt64OrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32)
 						}
 					}
 				} else {
-					col = col[0:inputLen]
-					for i := range col {
-						if a.groups[i] {
+					_ = groups[inputLen-1]
+					for i := 0; i < inputLen; i++ {
+						if groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group.
 							if !a.foundNonNullForCurrentGroup {
@@ -1299,11 +1325,16 @@ func (a *anyNotNullFloat64OrderedAgg) Compute(b coldata.Batch, inputIdxs []uint3
 	a.allocator.PerformOperation(
 		[]coldata.Vec{a.vec},
 		func() {
+			// Capture col to force bounds check to work. See
+			// https://github.com/golang/go/issues/39756
+			col := col
+			_ = col[inputLen-1]
+			groups := a.groups
 			if nulls.MaybeHasNulls() {
 				if sel != nil {
 					sel = sel[:inputLen]
 					for _, i := range sel {
-						if a.groups[i] {
+						if groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group.
 							if !a.foundNonNullForCurrentGroup {
@@ -1327,9 +1358,9 @@ func (a *anyNotNullFloat64OrderedAgg) Compute(b coldata.Batch, inputIdxs []uint3
 						}
 					}
 				} else {
-					col = col[0:inputLen]
-					for i := range col {
-						if a.groups[i] {
+					_ = groups[inputLen-1]
+					for i := 0; i < inputLen; i++ {
+						if groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group.
 							if !a.foundNonNullForCurrentGroup {
@@ -1357,7 +1388,7 @@ func (a *anyNotNullFloat64OrderedAgg) Compute(b coldata.Batch, inputIdxs []uint3
 				if sel != nil {
 					sel = sel[:inputLen]
 					for _, i := range sel {
-						if a.groups[i] {
+						if groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group.
 							if !a.foundNonNullForCurrentGroup {
@@ -1381,9 +1412,9 @@ func (a *anyNotNullFloat64OrderedAgg) Compute(b coldata.Batch, inputIdxs []uint3
 						}
 					}
 				} else {
-					col = col[0:inputLen]
-					for i := range col {
-						if a.groups[i] {
+					_ = groups[inputLen-1]
+					for i := 0; i < inputLen; i++ {
+						if groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group.
 							if !a.foundNonNullForCurrentGroup {
@@ -1493,11 +1524,16 @@ func (a *anyNotNullTimestampOrderedAgg) Compute(b coldata.Batch, inputIdxs []uin
 	a.allocator.PerformOperation(
 		[]coldata.Vec{a.vec},
 		func() {
+			// Capture col to force bounds check to work. See
+			// https://github.com/golang/go/issues/39756
+			col := col
+			_ = col[inputLen-1]
+			groups := a.groups
 			if nulls.MaybeHasNulls() {
 				if sel != nil {
 					sel = sel[:inputLen]
 					for _, i := range sel {
-						if a.groups[i] {
+						if groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group.
 							if !a.foundNonNullForCurrentGroup {
@@ -1521,9 +1557,9 @@ func (a *anyNotNullTimestampOrderedAgg) Compute(b coldata.Batch, inputIdxs []uin
 						}
 					}
 				} else {
-					col = col[0:inputLen]
-					for i := range col {
-						if a.groups[i] {
+					_ = groups[inputLen-1]
+					for i := 0; i < inputLen; i++ {
+						if groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group.
 							if !a.foundNonNullForCurrentGroup {
@@ -1551,7 +1587,7 @@ func (a *anyNotNullTimestampOrderedAgg) Compute(b coldata.Batch, inputIdxs []uin
 				if sel != nil {
 					sel = sel[:inputLen]
 					for _, i := range sel {
-						if a.groups[i] {
+						if groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group.
 							if !a.foundNonNullForCurrentGroup {
@@ -1575,9 +1611,9 @@ func (a *anyNotNullTimestampOrderedAgg) Compute(b coldata.Batch, inputIdxs []uin
 						}
 					}
 				} else {
-					col = col[0:inputLen]
-					for i := range col {
-						if a.groups[i] {
+					_ = groups[inputLen-1]
+					for i := 0; i < inputLen; i++ {
+						if groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group.
 							if !a.foundNonNullForCurrentGroup {
@@ -1687,11 +1723,16 @@ func (a *anyNotNullIntervalOrderedAgg) Compute(b coldata.Batch, inputIdxs []uint
 	a.allocator.PerformOperation(
 		[]coldata.Vec{a.vec},
 		func() {
+			// Capture col to force bounds check to work. See
+			// https://github.com/golang/go/issues/39756
+			col := col
+			_ = col[inputLen-1]
+			groups := a.groups
 			if nulls.MaybeHasNulls() {
 				if sel != nil {
 					sel = sel[:inputLen]
 					for _, i := range sel {
-						if a.groups[i] {
+						if groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group.
 							if !a.foundNonNullForCurrentGroup {
@@ -1715,9 +1756,9 @@ func (a *anyNotNullIntervalOrderedAgg) Compute(b coldata.Batch, inputIdxs []uint
 						}
 					}
 				} else {
-					col = col[0:inputLen]
-					for i := range col {
-						if a.groups[i] {
+					_ = groups[inputLen-1]
+					for i := 0; i < inputLen; i++ {
+						if groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group.
 							if !a.foundNonNullForCurrentGroup {
@@ -1745,7 +1786,7 @@ func (a *anyNotNullIntervalOrderedAgg) Compute(b coldata.Batch, inputIdxs []uint
 				if sel != nil {
 					sel = sel[:inputLen]
 					for _, i := range sel {
-						if a.groups[i] {
+						if groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group.
 							if !a.foundNonNullForCurrentGroup {
@@ -1769,9 +1810,9 @@ func (a *anyNotNullIntervalOrderedAgg) Compute(b coldata.Batch, inputIdxs []uint
 						}
 					}
 				} else {
-					col = col[0:inputLen]
-					for i := range col {
-						if a.groups[i] {
+					_ = groups[inputLen-1]
+					for i := 0; i < inputLen; i++ {
+						if groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group.
 							if !a.foundNonNullForCurrentGroup {
@@ -1881,11 +1922,16 @@ func (a *anyNotNullDatumOrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32)
 	a.allocator.PerformOperation(
 		[]coldata.Vec{a.vec},
 		func() {
+			// Capture col to force bounds check to work. See
+			// https://github.com/golang/go/issues/39756
+			col := col
+			_ = col.Get(inputLen - 1)
+			groups := a.groups
 			if nulls.MaybeHasNulls() {
 				if sel != nil {
 					sel = sel[:inputLen]
 					for _, i := range sel {
-						if a.groups[i] {
+						if groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group.
 							if !a.foundNonNullForCurrentGroup {
@@ -1909,9 +1955,9 @@ func (a *anyNotNullDatumOrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32)
 						}
 					}
 				} else {
-					col = col.Slice(0, inputLen)
+					_ = groups[inputLen-1]
 					for i := 0; i < inputLen; i++ {
-						if a.groups[i] {
+						if groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group.
 							if !a.foundNonNullForCurrentGroup {
@@ -1939,7 +1985,7 @@ func (a *anyNotNullDatumOrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32)
 				if sel != nil {
 					sel = sel[:inputLen]
 					for _, i := range sel {
-						if a.groups[i] {
+						if groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group.
 							if !a.foundNonNullForCurrentGroup {
@@ -1963,9 +2009,9 @@ func (a *anyNotNullDatumOrderedAgg) Compute(b coldata.Batch, inputIdxs []uint32)
 						}
 					}
 				} else {
-					col = col.Slice(0, inputLen)
+					_ = groups[inputLen-1]
 					for i := 0; i < inputLen; i++ {
-						if a.groups[i] {
+						if groups[i] {
 							// If this is a new group, check if any non-nulls have been found for the
 							// current group.
 							if !a.foundNonNullForCurrentGroup {

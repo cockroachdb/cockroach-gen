@@ -97,8 +97,8 @@ func (p *selEQBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -153,8 +153,8 @@ func (p *selEQBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -248,10 +248,9 @@ func (p *selEQBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -308,10 +307,9 @@ func (p *selEQBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -395,9 +393,7 @@ func (p *selEQBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col
-				_ = 0
-				_ = n
+				_ = col.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col.Get(i)
@@ -437,9 +433,7 @@ func (p *selEQBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col
-				_ = 0
-				_ = n
+				_ = col.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col.Get(i)
@@ -518,6 +512,8 @@ func (p *selEQBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
+				_ = col1.Get(n - 1)
+				_ = col2.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1.Get(i)
@@ -559,6 +555,8 @@ func (p *selEQBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
+				_ = col1.Get(n - 1)
+				_ = col2.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1.Get(i)
@@ -641,8 +639,8 @@ func (p *selEQDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -693,8 +691,8 @@ func (p *selEQDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -784,10 +782,9 @@ func (p *selEQDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -840,10 +837,9 @@ func (p *selEQDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -931,8 +927,8 @@ func (p *selEQDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -983,8 +979,8 @@ func (p *selEQDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -1074,10 +1070,9 @@ func (p *selEQDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -1130,10 +1125,9 @@ func (p *selEQDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -1221,8 +1215,8 @@ func (p *selEQDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -1273,8 +1267,8 @@ func (p *selEQDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -1364,10 +1358,9 @@ func (p *selEQDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -1420,10 +1413,9 @@ func (p *selEQDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -1513,8 +1505,8 @@ func (p *selEQDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -1569,8 +1561,8 @@ func (p *selEQDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -1664,10 +1656,9 @@ func (p *selEQDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -1724,10 +1715,9 @@ func (p *selEQDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -1811,8 +1801,8 @@ func (p *selEQDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -1851,8 +1841,8 @@ func (p *selEQDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -1930,10 +1920,9 @@ func (p *selEQDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -1974,10 +1963,9 @@ func (p *selEQDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -2064,8 +2052,8 @@ func (p *selEQInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -2126,8 +2114,8 @@ func (p *selEQInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -2227,10 +2215,9 @@ func (p *selEQInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -2293,10 +2280,9 @@ func (p *selEQInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -2394,8 +2380,8 @@ func (p *selEQInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -2456,8 +2442,8 @@ func (p *selEQInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -2557,10 +2543,9 @@ func (p *selEQInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -2623,10 +2608,9 @@ func (p *selEQInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -2724,8 +2708,8 @@ func (p *selEQInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -2786,8 +2770,8 @@ func (p *selEQInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -2887,10 +2871,9 @@ func (p *selEQInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -2953,10 +2936,9 @@ func (p *selEQInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -3062,8 +3044,8 @@ func (p *selEQInt16Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -3140,8 +3122,8 @@ func (p *selEQInt16Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -3257,10 +3239,9 @@ func (p *selEQInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -3339,10 +3320,9 @@ func (p *selEQInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -3443,8 +3423,8 @@ func (p *selEQInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -3495,8 +3475,8 @@ func (p *selEQInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -3586,10 +3566,9 @@ func (p *selEQInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -3642,10 +3621,9 @@ func (p *selEQInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -3738,8 +3716,8 @@ func (p *selEQInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -3800,8 +3778,8 @@ func (p *selEQInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -3901,10 +3879,9 @@ func (p *selEQInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -3967,10 +3944,9 @@ func (p *selEQInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -4068,8 +4044,8 @@ func (p *selEQInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -4130,8 +4106,8 @@ func (p *selEQInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -4231,10 +4207,9 @@ func (p *selEQInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -4297,10 +4272,9 @@ func (p *selEQInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -4398,8 +4372,8 @@ func (p *selEQInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -4460,8 +4434,8 @@ func (p *selEQInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -4561,10 +4535,9 @@ func (p *selEQInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -4627,10 +4600,9 @@ func (p *selEQInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -4736,8 +4708,8 @@ func (p *selEQInt32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -4814,8 +4786,8 @@ func (p *selEQInt32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -4931,10 +4903,9 @@ func (p *selEQInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -5013,10 +4984,9 @@ func (p *selEQInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -5117,8 +5087,8 @@ func (p *selEQInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -5169,8 +5139,8 @@ func (p *selEQInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -5260,10 +5230,9 @@ func (p *selEQInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -5316,10 +5285,9 @@ func (p *selEQInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -5412,8 +5380,8 @@ func (p *selEQInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -5474,8 +5442,8 @@ func (p *selEQInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -5575,10 +5543,9 @@ func (p *selEQInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -5641,10 +5608,9 @@ func (p *selEQInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -5742,8 +5708,8 @@ func (p *selEQInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -5804,8 +5770,8 @@ func (p *selEQInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -5905,10 +5871,9 @@ func (p *selEQInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -5971,10 +5936,9 @@ func (p *selEQInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -6072,8 +6036,8 @@ func (p *selEQInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -6134,8 +6098,8 @@ func (p *selEQInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -6235,10 +6199,9 @@ func (p *selEQInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -6301,10 +6264,9 @@ func (p *selEQInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -6410,8 +6372,8 @@ func (p *selEQInt64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -6488,8 +6450,8 @@ func (p *selEQInt64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -6605,10 +6567,9 @@ func (p *selEQInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -6687,10 +6648,9 @@ func (p *selEQInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -6791,8 +6751,8 @@ func (p *selEQInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -6843,8 +6803,8 @@ func (p *selEQInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -6934,10 +6894,9 @@ func (p *selEQInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -6990,10 +6949,9 @@ func (p *selEQInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -7094,8 +7052,8 @@ func (p *selEQFloat64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -7172,8 +7130,8 @@ func (p *selEQFloat64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -7289,10 +7247,9 @@ func (p *selEQFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -7371,10 +7328,9 @@ func (p *selEQFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -7488,8 +7444,8 @@ func (p *selEQFloat64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -7566,8 +7522,8 @@ func (p *selEQFloat64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -7683,10 +7639,9 @@ func (p *selEQFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -7765,10 +7720,9 @@ func (p *selEQFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -7882,8 +7836,8 @@ func (p *selEQFloat64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -7960,8 +7914,8 @@ func (p *selEQFloat64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -8077,10 +8031,9 @@ func (p *selEQFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -8159,10 +8112,9 @@ func (p *selEQFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -8276,8 +8228,8 @@ func (p *selEQFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -8354,8 +8306,8 @@ func (p *selEQFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -8471,10 +8423,9 @@ func (p *selEQFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -8553,10 +8504,9 @@ func (p *selEQFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -8659,8 +8609,8 @@ func (p *selEQFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -8715,8 +8665,8 @@ func (p *selEQFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -8810,10 +8760,9 @@ func (p *selEQFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -8870,10 +8819,9 @@ func (p *selEQFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -8964,8 +8912,8 @@ func (p *selEQTimestampTimestampConstOp) Next(ctx context.Context) coldata.Batch
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -9018,8 +8966,8 @@ func (p *selEQTimestampTimestampConstOp) Next(ctx context.Context) coldata.Batch
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -9111,10 +9059,9 @@ func (p *selEQTimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -9169,10 +9116,9 @@ func (p *selEQTimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -9255,8 +9201,8 @@ func (p *selEQIntervalIntervalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -9295,8 +9241,8 @@ func (p *selEQIntervalIntervalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -9374,10 +9320,9 @@ func (p *selEQIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -9418,10 +9363,9 @@ func (p *selEQIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -9499,7 +9443,7 @@ func (p *selEQDatumDatumConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col.Slice(0, n)
+				_ = col.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col.Get(i)
@@ -9543,7 +9487,7 @@ func (p *selEQDatumDatumConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col.Slice(0, n)
+				_ = col.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col.Get(i)
@@ -9626,9 +9570,8 @@ func (p *selEQDatumDatumOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1.Slice(0, n)
-				col1Len := col1.Len()
-				col2 = col2.Slice(0, col1Len)
+				_ = col1.Get(n - 1)
+				_ = col2.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1.Get(i)
@@ -9674,9 +9617,8 @@ func (p *selEQDatumDatumOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1.Slice(0, n)
-				col1Len := col1.Len()
-				col2 = col2.Slice(0, col1Len)
+				_ = col1.Get(n - 1)
+				_ = col2.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1.Get(i)
@@ -9763,8 +9705,8 @@ func (p *selNEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -9819,8 +9761,8 @@ func (p *selNEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -9914,10 +9856,9 @@ func (p *selNEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -9974,10 +9915,9 @@ func (p *selNEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -10061,9 +10001,7 @@ func (p *selNEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col
-				_ = 0
-				_ = n
+				_ = col.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col.Get(i)
@@ -10103,9 +10041,7 @@ func (p *selNEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col
-				_ = 0
-				_ = n
+				_ = col.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col.Get(i)
@@ -10184,6 +10120,8 @@ func (p *selNEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
+				_ = col1.Get(n - 1)
+				_ = col2.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1.Get(i)
@@ -10225,6 +10163,8 @@ func (p *selNEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
+				_ = col1.Get(n - 1)
+				_ = col2.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1.Get(i)
@@ -10307,8 +10247,8 @@ func (p *selNEDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -10359,8 +10299,8 @@ func (p *selNEDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -10450,10 +10390,9 @@ func (p *selNEDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -10506,10 +10445,9 @@ func (p *selNEDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -10597,8 +10535,8 @@ func (p *selNEDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -10649,8 +10587,8 @@ func (p *selNEDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -10740,10 +10678,9 @@ func (p *selNEDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -10796,10 +10733,9 @@ func (p *selNEDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -10887,8 +10823,8 @@ func (p *selNEDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -10939,8 +10875,8 @@ func (p *selNEDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -11030,10 +10966,9 @@ func (p *selNEDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -11086,10 +11021,9 @@ func (p *selNEDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -11179,8 +11113,8 @@ func (p *selNEDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -11235,8 +11169,8 @@ func (p *selNEDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -11330,10 +11264,9 @@ func (p *selNEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -11390,10 +11323,9 @@ func (p *selNEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -11477,8 +11409,8 @@ func (p *selNEDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -11517,8 +11449,8 @@ func (p *selNEDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -11596,10 +11528,9 @@ func (p *selNEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -11640,10 +11571,9 @@ func (p *selNEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -11730,8 +11660,8 @@ func (p *selNEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -11792,8 +11722,8 @@ func (p *selNEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -11893,10 +11823,9 @@ func (p *selNEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -11959,10 +11888,9 @@ func (p *selNEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -12060,8 +11988,8 @@ func (p *selNEInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -12122,8 +12050,8 @@ func (p *selNEInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -12223,10 +12151,9 @@ func (p *selNEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -12289,10 +12216,9 @@ func (p *selNEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -12390,8 +12316,8 @@ func (p *selNEInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -12452,8 +12378,8 @@ func (p *selNEInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -12553,10 +12479,9 @@ func (p *selNEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -12619,10 +12544,9 @@ func (p *selNEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -12728,8 +12652,8 @@ func (p *selNEInt16Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -12806,8 +12730,8 @@ func (p *selNEInt16Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -12923,10 +12847,9 @@ func (p *selNEInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -13005,10 +12928,9 @@ func (p *selNEInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -13109,8 +13031,8 @@ func (p *selNEInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -13161,8 +13083,8 @@ func (p *selNEInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -13252,10 +13174,9 @@ func (p *selNEInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -13308,10 +13229,9 @@ func (p *selNEInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -13404,8 +13324,8 @@ func (p *selNEInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -13466,8 +13386,8 @@ func (p *selNEInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -13567,10 +13487,9 @@ func (p *selNEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -13633,10 +13552,9 @@ func (p *selNEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -13734,8 +13652,8 @@ func (p *selNEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -13796,8 +13714,8 @@ func (p *selNEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -13897,10 +13815,9 @@ func (p *selNEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -13963,10 +13880,9 @@ func (p *selNEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -14064,8 +13980,8 @@ func (p *selNEInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -14126,8 +14042,8 @@ func (p *selNEInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -14227,10 +14143,9 @@ func (p *selNEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -14293,10 +14208,9 @@ func (p *selNEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -14402,8 +14316,8 @@ func (p *selNEInt32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -14480,8 +14394,8 @@ func (p *selNEInt32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -14597,10 +14511,9 @@ func (p *selNEInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -14679,10 +14592,9 @@ func (p *selNEInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -14783,8 +14695,8 @@ func (p *selNEInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -14835,8 +14747,8 @@ func (p *selNEInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -14926,10 +14838,9 @@ func (p *selNEInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -14982,10 +14893,9 @@ func (p *selNEInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -15078,8 +14988,8 @@ func (p *selNEInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -15140,8 +15050,8 @@ func (p *selNEInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -15241,10 +15151,9 @@ func (p *selNEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -15307,10 +15216,9 @@ func (p *selNEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -15408,8 +15316,8 @@ func (p *selNEInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -15470,8 +15378,8 @@ func (p *selNEInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -15571,10 +15479,9 @@ func (p *selNEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -15637,10 +15544,9 @@ func (p *selNEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -15738,8 +15644,8 @@ func (p *selNEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -15800,8 +15706,8 @@ func (p *selNEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -15901,10 +15807,9 @@ func (p *selNEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -15967,10 +15872,9 @@ func (p *selNEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -16076,8 +15980,8 @@ func (p *selNEInt64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -16154,8 +16058,8 @@ func (p *selNEInt64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -16271,10 +16175,9 @@ func (p *selNEInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -16353,10 +16256,9 @@ func (p *selNEInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -16457,8 +16359,8 @@ func (p *selNEInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -16509,8 +16411,8 @@ func (p *selNEInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -16600,10 +16502,9 @@ func (p *selNEInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -16656,10 +16557,9 @@ func (p *selNEInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -16760,8 +16660,8 @@ func (p *selNEFloat64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -16838,8 +16738,8 @@ func (p *selNEFloat64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -16955,10 +16855,9 @@ func (p *selNEFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -17037,10 +16936,9 @@ func (p *selNEFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -17154,8 +17052,8 @@ func (p *selNEFloat64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -17232,8 +17130,8 @@ func (p *selNEFloat64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -17349,10 +17247,9 @@ func (p *selNEFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -17431,10 +17328,9 @@ func (p *selNEFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -17548,8 +17444,8 @@ func (p *selNEFloat64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -17626,8 +17522,8 @@ func (p *selNEFloat64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -17743,10 +17639,9 @@ func (p *selNEFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -17825,10 +17720,9 @@ func (p *selNEFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -17942,8 +17836,8 @@ func (p *selNEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -18020,8 +17914,8 @@ func (p *selNEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -18137,10 +18031,9 @@ func (p *selNEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -18219,10 +18112,9 @@ func (p *selNEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -18325,8 +18217,8 @@ func (p *selNEFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -18381,8 +18273,8 @@ func (p *selNEFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -18476,10 +18368,9 @@ func (p *selNEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -18536,10 +18427,9 @@ func (p *selNEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -18630,8 +18520,8 @@ func (p *selNETimestampTimestampConstOp) Next(ctx context.Context) coldata.Batch
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -18684,8 +18574,8 @@ func (p *selNETimestampTimestampConstOp) Next(ctx context.Context) coldata.Batch
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -18777,10 +18667,9 @@ func (p *selNETimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -18835,10 +18724,9 @@ func (p *selNETimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -18921,8 +18809,8 @@ func (p *selNEIntervalIntervalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -18961,8 +18849,8 @@ func (p *selNEIntervalIntervalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -19040,10 +18928,9 @@ func (p *selNEIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -19084,10 +18971,9 @@ func (p *selNEIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -19165,7 +19051,7 @@ func (p *selNEDatumDatumConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col.Slice(0, n)
+				_ = col.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col.Get(i)
@@ -19209,7 +19095,7 @@ func (p *selNEDatumDatumConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col.Slice(0, n)
+				_ = col.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col.Get(i)
@@ -19292,9 +19178,8 @@ func (p *selNEDatumDatumOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1.Slice(0, n)
-				col1Len := col1.Len()
-				col2 = col2.Slice(0, col1Len)
+				_ = col1.Get(n - 1)
+				_ = col2.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1.Get(i)
@@ -19340,9 +19225,8 @@ func (p *selNEDatumDatumOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1.Slice(0, n)
-				col1Len := col1.Len()
-				col2 = col2.Slice(0, col1Len)
+				_ = col1.Get(n - 1)
+				_ = col2.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1.Get(i)
@@ -19429,8 +19313,8 @@ func (p *selLTBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -19485,8 +19369,8 @@ func (p *selLTBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -19580,10 +19464,9 @@ func (p *selLTBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -19640,10 +19523,9 @@ func (p *selLTBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -19727,9 +19609,7 @@ func (p *selLTBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col
-				_ = 0
-				_ = n
+				_ = col.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col.Get(i)
@@ -19769,9 +19649,7 @@ func (p *selLTBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col
-				_ = 0
-				_ = n
+				_ = col.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col.Get(i)
@@ -19850,6 +19728,8 @@ func (p *selLTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
+				_ = col1.Get(n - 1)
+				_ = col2.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1.Get(i)
@@ -19891,6 +19771,8 @@ func (p *selLTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
+				_ = col1.Get(n - 1)
+				_ = col2.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1.Get(i)
@@ -19973,8 +19855,8 @@ func (p *selLTDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -20025,8 +19907,8 @@ func (p *selLTDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -20116,10 +19998,9 @@ func (p *selLTDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -20172,10 +20053,9 @@ func (p *selLTDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -20263,8 +20143,8 @@ func (p *selLTDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -20315,8 +20195,8 @@ func (p *selLTDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -20406,10 +20286,9 @@ func (p *selLTDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -20462,10 +20341,9 @@ func (p *selLTDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -20553,8 +20431,8 @@ func (p *selLTDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -20605,8 +20483,8 @@ func (p *selLTDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -20696,10 +20574,9 @@ func (p *selLTDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -20752,10 +20629,9 @@ func (p *selLTDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -20845,8 +20721,8 @@ func (p *selLTDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -20901,8 +20777,8 @@ func (p *selLTDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -20996,10 +20872,9 @@ func (p *selLTDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -21056,10 +20931,9 @@ func (p *selLTDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -21143,8 +21017,8 @@ func (p *selLTDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -21183,8 +21057,8 @@ func (p *selLTDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -21262,10 +21136,9 @@ func (p *selLTDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -21306,10 +21179,9 @@ func (p *selLTDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -21396,8 +21268,8 @@ func (p *selLTInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -21458,8 +21330,8 @@ func (p *selLTInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -21559,10 +21431,9 @@ func (p *selLTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -21625,10 +21496,9 @@ func (p *selLTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -21726,8 +21596,8 @@ func (p *selLTInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -21788,8 +21658,8 @@ func (p *selLTInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -21889,10 +21759,9 @@ func (p *selLTInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -21955,10 +21824,9 @@ func (p *selLTInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -22056,8 +21924,8 @@ func (p *selLTInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -22118,8 +21986,8 @@ func (p *selLTInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -22219,10 +22087,9 @@ func (p *selLTInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -22285,10 +22152,9 @@ func (p *selLTInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -22394,8 +22260,8 @@ func (p *selLTInt16Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -22472,8 +22338,8 @@ func (p *selLTInt16Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -22589,10 +22455,9 @@ func (p *selLTInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -22671,10 +22536,9 @@ func (p *selLTInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -22775,8 +22639,8 @@ func (p *selLTInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -22827,8 +22691,8 @@ func (p *selLTInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -22918,10 +22782,9 @@ func (p *selLTInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -22974,10 +22837,9 @@ func (p *selLTInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -23070,8 +22932,8 @@ func (p *selLTInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -23132,8 +22994,8 @@ func (p *selLTInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -23233,10 +23095,9 @@ func (p *selLTInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -23299,10 +23160,9 @@ func (p *selLTInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -23400,8 +23260,8 @@ func (p *selLTInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -23462,8 +23322,8 @@ func (p *selLTInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -23563,10 +23423,9 @@ func (p *selLTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -23629,10 +23488,9 @@ func (p *selLTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -23730,8 +23588,8 @@ func (p *selLTInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -23792,8 +23650,8 @@ func (p *selLTInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -23893,10 +23751,9 @@ func (p *selLTInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -23959,10 +23816,9 @@ func (p *selLTInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -24068,8 +23924,8 @@ func (p *selLTInt32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -24146,8 +24002,8 @@ func (p *selLTInt32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -24263,10 +24119,9 @@ func (p *selLTInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -24345,10 +24200,9 @@ func (p *selLTInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -24449,8 +24303,8 @@ func (p *selLTInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -24501,8 +24355,8 @@ func (p *selLTInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -24592,10 +24446,9 @@ func (p *selLTInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -24648,10 +24501,9 @@ func (p *selLTInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -24744,8 +24596,8 @@ func (p *selLTInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -24806,8 +24658,8 @@ func (p *selLTInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -24907,10 +24759,9 @@ func (p *selLTInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -24973,10 +24824,9 @@ func (p *selLTInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -25074,8 +24924,8 @@ func (p *selLTInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -25136,8 +24986,8 @@ func (p *selLTInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -25237,10 +25087,9 @@ func (p *selLTInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -25303,10 +25152,9 @@ func (p *selLTInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -25404,8 +25252,8 @@ func (p *selLTInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -25466,8 +25314,8 @@ func (p *selLTInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -25567,10 +25415,9 @@ func (p *selLTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -25633,10 +25480,9 @@ func (p *selLTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -25742,8 +25588,8 @@ func (p *selLTInt64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -25820,8 +25666,8 @@ func (p *selLTInt64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -25937,10 +25783,9 @@ func (p *selLTInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -26019,10 +25864,9 @@ func (p *selLTInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -26123,8 +25967,8 @@ func (p *selLTInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -26175,8 +26019,8 @@ func (p *selLTInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -26266,10 +26110,9 @@ func (p *selLTInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -26322,10 +26165,9 @@ func (p *selLTInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -26426,8 +26268,8 @@ func (p *selLTFloat64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -26504,8 +26346,8 @@ func (p *selLTFloat64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -26621,10 +26463,9 @@ func (p *selLTFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -26703,10 +26544,9 @@ func (p *selLTFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -26820,8 +26660,8 @@ func (p *selLTFloat64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -26898,8 +26738,8 @@ func (p *selLTFloat64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -27015,10 +26855,9 @@ func (p *selLTFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -27097,10 +26936,9 @@ func (p *selLTFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -27214,8 +27052,8 @@ func (p *selLTFloat64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -27292,8 +27130,8 @@ func (p *selLTFloat64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -27409,10 +27247,9 @@ func (p *selLTFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -27491,10 +27328,9 @@ func (p *selLTFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -27608,8 +27444,8 @@ func (p *selLTFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -27686,8 +27522,8 @@ func (p *selLTFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -27803,10 +27639,9 @@ func (p *selLTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -27885,10 +27720,9 @@ func (p *selLTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -27991,8 +27825,8 @@ func (p *selLTFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -28047,8 +27881,8 @@ func (p *selLTFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -28142,10 +27976,9 @@ func (p *selLTFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -28202,10 +28035,9 @@ func (p *selLTFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -28296,8 +28128,8 @@ func (p *selLTTimestampTimestampConstOp) Next(ctx context.Context) coldata.Batch
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -28350,8 +28182,8 @@ func (p *selLTTimestampTimestampConstOp) Next(ctx context.Context) coldata.Batch
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -28443,10 +28275,9 @@ func (p *selLTTimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -28501,10 +28332,9 @@ func (p *selLTTimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -28587,8 +28417,8 @@ func (p *selLTIntervalIntervalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -28627,8 +28457,8 @@ func (p *selLTIntervalIntervalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -28706,10 +28536,9 @@ func (p *selLTIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -28750,10 +28579,9 @@ func (p *selLTIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -28831,7 +28659,7 @@ func (p *selLTDatumDatumConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col.Slice(0, n)
+				_ = col.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col.Get(i)
@@ -28875,7 +28703,7 @@ func (p *selLTDatumDatumConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col.Slice(0, n)
+				_ = col.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col.Get(i)
@@ -28958,9 +28786,8 @@ func (p *selLTDatumDatumOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1.Slice(0, n)
-				col1Len := col1.Len()
-				col2 = col2.Slice(0, col1Len)
+				_ = col1.Get(n - 1)
+				_ = col2.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1.Get(i)
@@ -29006,9 +28833,8 @@ func (p *selLTDatumDatumOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1.Slice(0, n)
-				col1Len := col1.Len()
-				col2 = col2.Slice(0, col1Len)
+				_ = col1.Get(n - 1)
+				_ = col2.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1.Get(i)
@@ -29095,8 +28921,8 @@ func (p *selLEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -29151,8 +28977,8 @@ func (p *selLEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -29246,10 +29072,9 @@ func (p *selLEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -29306,10 +29131,9 @@ func (p *selLEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -29393,9 +29217,7 @@ func (p *selLEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col
-				_ = 0
-				_ = n
+				_ = col.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col.Get(i)
@@ -29435,9 +29257,7 @@ func (p *selLEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col
-				_ = 0
-				_ = n
+				_ = col.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col.Get(i)
@@ -29516,6 +29336,8 @@ func (p *selLEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
+				_ = col1.Get(n - 1)
+				_ = col2.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1.Get(i)
@@ -29557,6 +29379,8 @@ func (p *selLEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
+				_ = col1.Get(n - 1)
+				_ = col2.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1.Get(i)
@@ -29639,8 +29463,8 @@ func (p *selLEDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -29691,8 +29515,8 @@ func (p *selLEDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -29782,10 +29606,9 @@ func (p *selLEDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -29838,10 +29661,9 @@ func (p *selLEDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -29929,8 +29751,8 @@ func (p *selLEDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -29981,8 +29803,8 @@ func (p *selLEDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -30072,10 +29894,9 @@ func (p *selLEDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -30128,10 +29949,9 @@ func (p *selLEDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -30219,8 +30039,8 @@ func (p *selLEDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -30271,8 +30091,8 @@ func (p *selLEDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -30362,10 +30182,9 @@ func (p *selLEDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -30418,10 +30237,9 @@ func (p *selLEDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -30511,8 +30329,8 @@ func (p *selLEDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -30567,8 +30385,8 @@ func (p *selLEDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -30662,10 +30480,9 @@ func (p *selLEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -30722,10 +30539,9 @@ func (p *selLEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -30809,8 +30625,8 @@ func (p *selLEDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -30849,8 +30665,8 @@ func (p *selLEDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -30928,10 +30744,9 @@ func (p *selLEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -30972,10 +30787,9 @@ func (p *selLEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -31062,8 +30876,8 @@ func (p *selLEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -31124,8 +30938,8 @@ func (p *selLEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -31225,10 +31039,9 @@ func (p *selLEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -31291,10 +31104,9 @@ func (p *selLEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -31392,8 +31204,8 @@ func (p *selLEInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -31454,8 +31266,8 @@ func (p *selLEInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -31555,10 +31367,9 @@ func (p *selLEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -31621,10 +31432,9 @@ func (p *selLEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -31722,8 +31532,8 @@ func (p *selLEInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -31784,8 +31594,8 @@ func (p *selLEInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -31885,10 +31695,9 @@ func (p *selLEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -31951,10 +31760,9 @@ func (p *selLEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -32060,8 +31868,8 @@ func (p *selLEInt16Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -32138,8 +31946,8 @@ func (p *selLEInt16Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -32255,10 +32063,9 @@ func (p *selLEInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -32337,10 +32144,9 @@ func (p *selLEInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -32441,8 +32247,8 @@ func (p *selLEInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -32493,8 +32299,8 @@ func (p *selLEInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -32584,10 +32390,9 @@ func (p *selLEInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -32640,10 +32445,9 @@ func (p *selLEInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -32736,8 +32540,8 @@ func (p *selLEInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -32798,8 +32602,8 @@ func (p *selLEInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -32899,10 +32703,9 @@ func (p *selLEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -32965,10 +32768,9 @@ func (p *selLEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -33066,8 +32868,8 @@ func (p *selLEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -33128,8 +32930,8 @@ func (p *selLEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -33229,10 +33031,9 @@ func (p *selLEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -33295,10 +33096,9 @@ func (p *selLEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -33396,8 +33196,8 @@ func (p *selLEInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -33458,8 +33258,8 @@ func (p *selLEInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -33559,10 +33359,9 @@ func (p *selLEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -33625,10 +33424,9 @@ func (p *selLEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -33734,8 +33532,8 @@ func (p *selLEInt32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -33812,8 +33610,8 @@ func (p *selLEInt32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -33929,10 +33727,9 @@ func (p *selLEInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -34011,10 +33808,9 @@ func (p *selLEInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -34115,8 +33911,8 @@ func (p *selLEInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -34167,8 +33963,8 @@ func (p *selLEInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -34258,10 +34054,9 @@ func (p *selLEInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -34314,10 +34109,9 @@ func (p *selLEInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -34410,8 +34204,8 @@ func (p *selLEInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -34472,8 +34266,8 @@ func (p *selLEInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -34573,10 +34367,9 @@ func (p *selLEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -34639,10 +34432,9 @@ func (p *selLEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -34740,8 +34532,8 @@ func (p *selLEInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -34802,8 +34594,8 @@ func (p *selLEInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -34903,10 +34695,9 @@ func (p *selLEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -34969,10 +34760,9 @@ func (p *selLEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -35070,8 +34860,8 @@ func (p *selLEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -35132,8 +34922,8 @@ func (p *selLEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -35233,10 +35023,9 @@ func (p *selLEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -35299,10 +35088,9 @@ func (p *selLEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -35408,8 +35196,8 @@ func (p *selLEInt64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -35486,8 +35274,8 @@ func (p *selLEInt64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -35603,10 +35391,9 @@ func (p *selLEInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -35685,10 +35472,9 @@ func (p *selLEInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -35789,8 +35575,8 @@ func (p *selLEInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -35841,8 +35627,8 @@ func (p *selLEInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -35932,10 +35718,9 @@ func (p *selLEInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -35988,10 +35773,9 @@ func (p *selLEInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -36092,8 +35876,8 @@ func (p *selLEFloat64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -36170,8 +35954,8 @@ func (p *selLEFloat64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -36287,10 +36071,9 @@ func (p *selLEFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -36369,10 +36152,9 @@ func (p *selLEFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -36486,8 +36268,8 @@ func (p *selLEFloat64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -36564,8 +36346,8 @@ func (p *selLEFloat64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -36681,10 +36463,9 @@ func (p *selLEFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -36763,10 +36544,9 @@ func (p *selLEFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -36880,8 +36660,8 @@ func (p *selLEFloat64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -36958,8 +36738,8 @@ func (p *selLEFloat64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -37075,10 +36855,9 @@ func (p *selLEFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -37157,10 +36936,9 @@ func (p *selLEFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -37274,8 +37052,8 @@ func (p *selLEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -37352,8 +37130,8 @@ func (p *selLEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -37469,10 +37247,9 @@ func (p *selLEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -37551,10 +37328,9 @@ func (p *selLEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -37657,8 +37433,8 @@ func (p *selLEFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -37713,8 +37489,8 @@ func (p *selLEFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -37808,10 +37584,9 @@ func (p *selLEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -37868,10 +37643,9 @@ func (p *selLEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -37962,8 +37736,8 @@ func (p *selLETimestampTimestampConstOp) Next(ctx context.Context) coldata.Batch
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -38016,8 +37790,8 @@ func (p *selLETimestampTimestampConstOp) Next(ctx context.Context) coldata.Batch
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -38109,10 +37883,9 @@ func (p *selLETimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -38167,10 +37940,9 @@ func (p *selLETimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -38253,8 +38025,8 @@ func (p *selLEIntervalIntervalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -38293,8 +38065,8 @@ func (p *selLEIntervalIntervalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -38372,10 +38144,9 @@ func (p *selLEIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -38416,10 +38187,9 @@ func (p *selLEIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -38497,7 +38267,7 @@ func (p *selLEDatumDatumConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col.Slice(0, n)
+				_ = col.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col.Get(i)
@@ -38541,7 +38311,7 @@ func (p *selLEDatumDatumConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col.Slice(0, n)
+				_ = col.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col.Get(i)
@@ -38624,9 +38394,8 @@ func (p *selLEDatumDatumOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1.Slice(0, n)
-				col1Len := col1.Len()
-				col2 = col2.Slice(0, col1Len)
+				_ = col1.Get(n - 1)
+				_ = col2.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1.Get(i)
@@ -38672,9 +38441,8 @@ func (p *selLEDatumDatumOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1.Slice(0, n)
-				col1Len := col1.Len()
-				col2 = col2.Slice(0, col1Len)
+				_ = col1.Get(n - 1)
+				_ = col2.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1.Get(i)
@@ -38761,8 +38529,8 @@ func (p *selGTBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -38817,8 +38585,8 @@ func (p *selGTBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -38912,10 +38680,9 @@ func (p *selGTBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -38972,10 +38739,9 @@ func (p *selGTBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -39059,9 +38825,7 @@ func (p *selGTBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col
-				_ = 0
-				_ = n
+				_ = col.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col.Get(i)
@@ -39101,9 +38865,7 @@ func (p *selGTBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col
-				_ = 0
-				_ = n
+				_ = col.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col.Get(i)
@@ -39182,6 +38944,8 @@ func (p *selGTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
+				_ = col1.Get(n - 1)
+				_ = col2.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1.Get(i)
@@ -39223,6 +38987,8 @@ func (p *selGTBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
+				_ = col1.Get(n - 1)
+				_ = col2.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1.Get(i)
@@ -39305,8 +39071,8 @@ func (p *selGTDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -39357,8 +39123,8 @@ func (p *selGTDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -39448,10 +39214,9 @@ func (p *selGTDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -39504,10 +39269,9 @@ func (p *selGTDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -39595,8 +39359,8 @@ func (p *selGTDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -39647,8 +39411,8 @@ func (p *selGTDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -39738,10 +39502,9 @@ func (p *selGTDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -39794,10 +39557,9 @@ func (p *selGTDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -39885,8 +39647,8 @@ func (p *selGTDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -39937,8 +39699,8 @@ func (p *selGTDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -40028,10 +39790,9 @@ func (p *selGTDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -40084,10 +39845,9 @@ func (p *selGTDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -40177,8 +39937,8 @@ func (p *selGTDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -40233,8 +39993,8 @@ func (p *selGTDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -40328,10 +40088,9 @@ func (p *selGTDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -40388,10 +40147,9 @@ func (p *selGTDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -40475,8 +40233,8 @@ func (p *selGTDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -40515,8 +40273,8 @@ func (p *selGTDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -40594,10 +40352,9 @@ func (p *selGTDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -40638,10 +40395,9 @@ func (p *selGTDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -40728,8 +40484,8 @@ func (p *selGTInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -40790,8 +40546,8 @@ func (p *selGTInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -40891,10 +40647,9 @@ func (p *selGTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -40957,10 +40712,9 @@ func (p *selGTInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -41058,8 +40812,8 @@ func (p *selGTInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -41120,8 +40874,8 @@ func (p *selGTInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -41221,10 +40975,9 @@ func (p *selGTInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -41287,10 +41040,9 @@ func (p *selGTInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -41388,8 +41140,8 @@ func (p *selGTInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -41450,8 +41202,8 @@ func (p *selGTInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -41551,10 +41303,9 @@ func (p *selGTInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -41617,10 +41368,9 @@ func (p *selGTInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -41726,8 +41476,8 @@ func (p *selGTInt16Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -41804,8 +41554,8 @@ func (p *selGTInt16Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -41921,10 +41671,9 @@ func (p *selGTInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -42003,10 +41752,9 @@ func (p *selGTInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -42107,8 +41855,8 @@ func (p *selGTInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -42159,8 +41907,8 @@ func (p *selGTInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -42250,10 +41998,9 @@ func (p *selGTInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -42306,10 +42053,9 @@ func (p *selGTInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -42402,8 +42148,8 @@ func (p *selGTInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -42464,8 +42210,8 @@ func (p *selGTInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -42565,10 +42311,9 @@ func (p *selGTInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -42631,10 +42376,9 @@ func (p *selGTInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -42732,8 +42476,8 @@ func (p *selGTInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -42794,8 +42538,8 @@ func (p *selGTInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -42895,10 +42639,9 @@ func (p *selGTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -42961,10 +42704,9 @@ func (p *selGTInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -43062,8 +42804,8 @@ func (p *selGTInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -43124,8 +42866,8 @@ func (p *selGTInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -43225,10 +42967,9 @@ func (p *selGTInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -43291,10 +43032,9 @@ func (p *selGTInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -43400,8 +43140,8 @@ func (p *selGTInt32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -43478,8 +43218,8 @@ func (p *selGTInt32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -43595,10 +43335,9 @@ func (p *selGTInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -43677,10 +43416,9 @@ func (p *selGTInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -43781,8 +43519,8 @@ func (p *selGTInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -43833,8 +43571,8 @@ func (p *selGTInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -43924,10 +43662,9 @@ func (p *selGTInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -43980,10 +43717,9 @@ func (p *selGTInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -44076,8 +43812,8 @@ func (p *selGTInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -44138,8 +43874,8 @@ func (p *selGTInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -44239,10 +43975,9 @@ func (p *selGTInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -44305,10 +44040,9 @@ func (p *selGTInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -44406,8 +44140,8 @@ func (p *selGTInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -44468,8 +44202,8 @@ func (p *selGTInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -44569,10 +44303,9 @@ func (p *selGTInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -44635,10 +44368,9 @@ func (p *selGTInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -44736,8 +44468,8 @@ func (p *selGTInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -44798,8 +44530,8 @@ func (p *selGTInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -44899,10 +44631,9 @@ func (p *selGTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -44965,10 +44696,9 @@ func (p *selGTInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -45074,8 +44804,8 @@ func (p *selGTInt64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -45152,8 +44882,8 @@ func (p *selGTInt64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -45269,10 +44999,9 @@ func (p *selGTInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -45351,10 +45080,9 @@ func (p *selGTInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -45455,8 +45183,8 @@ func (p *selGTInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -45507,8 +45235,8 @@ func (p *selGTInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -45598,10 +45326,9 @@ func (p *selGTInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -45654,10 +45381,9 @@ func (p *selGTInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -45758,8 +45484,8 @@ func (p *selGTFloat64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -45836,8 +45562,8 @@ func (p *selGTFloat64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -45953,10 +45679,9 @@ func (p *selGTFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -46035,10 +45760,9 @@ func (p *selGTFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -46152,8 +45876,8 @@ func (p *selGTFloat64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -46230,8 +45954,8 @@ func (p *selGTFloat64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -46347,10 +46071,9 @@ func (p *selGTFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -46429,10 +46152,9 @@ func (p *selGTFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -46546,8 +46268,8 @@ func (p *selGTFloat64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -46624,8 +46346,8 @@ func (p *selGTFloat64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -46741,10 +46463,9 @@ func (p *selGTFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -46823,10 +46544,9 @@ func (p *selGTFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -46940,8 +46660,8 @@ func (p *selGTFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -47018,8 +46738,8 @@ func (p *selGTFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -47135,10 +46855,9 @@ func (p *selGTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -47217,10 +46936,9 @@ func (p *selGTFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -47323,8 +47041,8 @@ func (p *selGTFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -47379,8 +47097,8 @@ func (p *selGTFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -47474,10 +47192,9 @@ func (p *selGTFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -47534,10 +47251,9 @@ func (p *selGTFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -47628,8 +47344,8 @@ func (p *selGTTimestampTimestampConstOp) Next(ctx context.Context) coldata.Batch
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -47682,8 +47398,8 @@ func (p *selGTTimestampTimestampConstOp) Next(ctx context.Context) coldata.Batch
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -47775,10 +47491,9 @@ func (p *selGTTimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -47833,10 +47548,9 @@ func (p *selGTTimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -47919,8 +47633,8 @@ func (p *selGTIntervalIntervalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -47959,8 +47673,8 @@ func (p *selGTIntervalIntervalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -48038,10 +47752,9 @@ func (p *selGTIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -48082,10 +47795,9 @@ func (p *selGTIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -48163,7 +47875,7 @@ func (p *selGTDatumDatumConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col.Slice(0, n)
+				_ = col.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col.Get(i)
@@ -48207,7 +47919,7 @@ func (p *selGTDatumDatumConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col.Slice(0, n)
+				_ = col.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col.Get(i)
@@ -48290,9 +48002,8 @@ func (p *selGTDatumDatumOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1.Slice(0, n)
-				col1Len := col1.Len()
-				col2 = col2.Slice(0, col1Len)
+				_ = col1.Get(n - 1)
+				_ = col2.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1.Get(i)
@@ -48338,9 +48049,8 @@ func (p *selGTDatumDatumOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1.Slice(0, n)
-				col1Len := col1.Len()
-				col2 = col2.Slice(0, col1Len)
+				_ = col1.Get(n - 1)
+				_ = col2.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1.Get(i)
@@ -48427,8 +48137,8 @@ func (p *selGEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -48483,8 +48193,8 @@ func (p *selGEBoolBoolConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -48578,10 +48288,9 @@ func (p *selGEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -48638,10 +48347,9 @@ func (p *selGEBoolBoolOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -48725,9 +48433,7 @@ func (p *selGEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col
-				_ = 0
-				_ = n
+				_ = col.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col.Get(i)
@@ -48767,9 +48473,7 @@ func (p *selGEBytesBytesConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col
-				_ = 0
-				_ = n
+				_ = col.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col.Get(i)
@@ -48848,6 +48552,8 @@ func (p *selGEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
+				_ = col1.Get(n - 1)
+				_ = col2.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1.Get(i)
@@ -48889,6 +48595,8 @@ func (p *selGEBytesBytesOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
+				_ = col1.Get(n - 1)
+				_ = col2.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1.Get(i)
@@ -48971,8 +48679,8 @@ func (p *selGEDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -49023,8 +48731,8 @@ func (p *selGEDecimalInt16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -49114,10 +48822,9 @@ func (p *selGEDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -49170,10 +48877,9 @@ func (p *selGEDecimalInt16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -49261,8 +48967,8 @@ func (p *selGEDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -49313,8 +49019,8 @@ func (p *selGEDecimalInt32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -49404,10 +49110,9 @@ func (p *selGEDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -49460,10 +49165,9 @@ func (p *selGEDecimalInt32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -49551,8 +49255,8 @@ func (p *selGEDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -49603,8 +49307,8 @@ func (p *selGEDecimalInt64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -49694,10 +49398,9 @@ func (p *selGEDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -49750,10 +49453,9 @@ func (p *selGEDecimalInt64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -49843,8 +49545,8 @@ func (p *selGEDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -49899,8 +49601,8 @@ func (p *selGEDecimalFloat64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -49994,10 +49696,9 @@ func (p *selGEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -50054,10 +49755,9 @@ func (p *selGEDecimalFloat64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -50141,8 +49841,8 @@ func (p *selGEDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -50181,8 +49881,8 @@ func (p *selGEDecimalDecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -50260,10 +49960,9 @@ func (p *selGEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -50304,10 +50003,9 @@ func (p *selGEDecimalDecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -50394,8 +50092,8 @@ func (p *selGEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -50456,8 +50154,8 @@ func (p *selGEInt16Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -50557,10 +50255,9 @@ func (p *selGEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -50623,10 +50320,9 @@ func (p *selGEInt16Int16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -50724,8 +50420,8 @@ func (p *selGEInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -50786,8 +50482,8 @@ func (p *selGEInt16Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -50887,10 +50583,9 @@ func (p *selGEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -50953,10 +50648,9 @@ func (p *selGEInt16Int32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -51054,8 +50748,8 @@ func (p *selGEInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -51116,8 +50810,8 @@ func (p *selGEInt16Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -51217,10 +50911,9 @@ func (p *selGEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -51283,10 +50976,9 @@ func (p *selGEInt16Int64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -51392,8 +51084,8 @@ func (p *selGEInt16Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -51470,8 +51162,8 @@ func (p *selGEInt16Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -51587,10 +51279,9 @@ func (p *selGEInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -51669,10 +51360,9 @@ func (p *selGEInt16Float64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -51773,8 +51463,8 @@ func (p *selGEInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -51825,8 +51515,8 @@ func (p *selGEInt16DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -51916,10 +51606,9 @@ func (p *selGEInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -51972,10 +51661,9 @@ func (p *selGEInt16DecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -52068,8 +51756,8 @@ func (p *selGEInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -52130,8 +51818,8 @@ func (p *selGEInt32Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -52231,10 +51919,9 @@ func (p *selGEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -52297,10 +51984,9 @@ func (p *selGEInt32Int16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -52398,8 +52084,8 @@ func (p *selGEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -52460,8 +52146,8 @@ func (p *selGEInt32Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -52561,10 +52247,9 @@ func (p *selGEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -52627,10 +52312,9 @@ func (p *selGEInt32Int32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -52728,8 +52412,8 @@ func (p *selGEInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -52790,8 +52474,8 @@ func (p *selGEInt32Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -52891,10 +52575,9 @@ func (p *selGEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -52957,10 +52640,9 @@ func (p *selGEInt32Int64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -53066,8 +52748,8 @@ func (p *selGEInt32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -53144,8 +52826,8 @@ func (p *selGEInt32Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -53261,10 +52943,9 @@ func (p *selGEInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -53343,10 +53024,9 @@ func (p *selGEInt32Float64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -53447,8 +53127,8 @@ func (p *selGEInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -53499,8 +53179,8 @@ func (p *selGEInt32DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -53590,10 +53270,9 @@ func (p *selGEInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -53646,10 +53325,9 @@ func (p *selGEInt32DecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -53742,8 +53420,8 @@ func (p *selGEInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -53804,8 +53482,8 @@ func (p *selGEInt64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -53905,10 +53583,9 @@ func (p *selGEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -53971,10 +53648,9 @@ func (p *selGEInt64Int16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -54072,8 +53748,8 @@ func (p *selGEInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -54134,8 +53810,8 @@ func (p *selGEInt64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -54235,10 +53911,9 @@ func (p *selGEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -54301,10 +53976,9 @@ func (p *selGEInt64Int32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -54402,8 +54076,8 @@ func (p *selGEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -54464,8 +54138,8 @@ func (p *selGEInt64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -54565,10 +54239,9 @@ func (p *selGEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -54631,10 +54304,9 @@ func (p *selGEInt64Int64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -54740,8 +54412,8 @@ func (p *selGEInt64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -54818,8 +54490,8 @@ func (p *selGEInt64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -54935,10 +54607,9 @@ func (p *selGEInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -55017,10 +54688,9 @@ func (p *selGEInt64Float64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -55121,8 +54791,8 @@ func (p *selGEInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -55173,8 +54843,8 @@ func (p *selGEInt64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -55264,10 +54934,9 @@ func (p *selGEInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -55320,10 +54989,9 @@ func (p *selGEInt64DecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -55424,8 +55092,8 @@ func (p *selGEFloat64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -55502,8 +55170,8 @@ func (p *selGEFloat64Int16ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -55619,10 +55287,9 @@ func (p *selGEFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -55701,10 +55368,9 @@ func (p *selGEFloat64Int16Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -55818,8 +55484,8 @@ func (p *selGEFloat64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -55896,8 +55562,8 @@ func (p *selGEFloat64Int32ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -56013,10 +55679,9 @@ func (p *selGEFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -56095,10 +55760,9 @@ func (p *selGEFloat64Int32Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -56212,8 +55876,8 @@ func (p *selGEFloat64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -56290,8 +55954,8 @@ func (p *selGEFloat64Int64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -56407,10 +56071,9 @@ func (p *selGEFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -56489,10 +56152,9 @@ func (p *selGEFloat64Int64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -56606,8 +56268,8 @@ func (p *selGEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -56684,8 +56346,8 @@ func (p *selGEFloat64Float64ConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -56801,10 +56463,9 @@ func (p *selGEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -56883,10 +56544,9 @@ func (p *selGEFloat64Float64Op) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -56989,8 +56649,8 @@ func (p *selGEFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -57045,8 +56705,8 @@ func (p *selGEFloat64DecimalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -57140,10 +56800,9 @@ func (p *selGEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -57200,10 +56859,9 @@ func (p *selGEFloat64DecimalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -57294,8 +56952,8 @@ func (p *selGETimestampTimestampConstOp) Next(ctx context.Context) coldata.Batch
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -57348,8 +57006,8 @@ func (p *selGETimestampTimestampConstOp) Next(ctx context.Context) coldata.Batch
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -57441,10 +57099,9 @@ func (p *selGETimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -57499,10 +57156,9 @@ func (p *selGETimestampTimestampOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -57585,8 +57241,8 @@ func (p *selGEIntervalIntervalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -57625,8 +57281,8 @@ func (p *selGEIntervalIntervalConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col[0:n]
-				for i := range col {
+				_ = col[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col[i]
 
@@ -57704,10 +57360,9 @@ func (p *selGEIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -57748,10 +57403,9 @@ func (p *selGEIntervalIntervalOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1[0:n]
-				col1Len := len(col1)
-				col2 = col2[0:col1Len]
-				for i := range col1 {
+				_ = col1[n-1]
+				_ = col2[n-1]
+				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1[i]
 					arg2 := col2[i]
@@ -57829,7 +57483,7 @@ func (p *selGEDatumDatumConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col.Slice(0, n)
+				_ = col.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col.Get(i)
@@ -57873,7 +57527,7 @@ func (p *selGEDatumDatumConstOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col = col.Slice(0, n)
+				_ = col.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg := col.Get(i)
@@ -57956,9 +57610,8 @@ func (p *selGEDatumDatumOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1.Slice(0, n)
-				col1Len := col1.Len()
-				col2 = col2.Slice(0, col1Len)
+				_ = col1.Get(n - 1)
+				_ = col2.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1.Get(i)
@@ -58004,9 +57657,8 @@ func (p *selGEDatumDatumOp) Next(ctx context.Context) coldata.Batch {
 			} else {
 				batch.SetSelection(true)
 				sel := batch.Selection()
-				col1 = col1.Slice(0, n)
-				col1Len := col1.Len()
-				col2 = col2.Slice(0, col1Len)
+				_ = col1.Get(n - 1)
+				_ = col2.Get(n - 1)
 				for i := 0; i < n; i++ {
 					var cmp bool
 					arg1 := col1.Get(i)
