@@ -44,7 +44,7 @@ func EncDatumRowsToColVec(
 				case -1:
 				default:
 					col := vec.Bool()
-					datumToPhysicalFn := getDatumToPhysicalFn(t)
+					datumToPhysicalFn := GetDatumToPhysicalFn(t)
 					var v interface{}
 					for i := range rows {
 						row := rows[i]
@@ -72,7 +72,7 @@ func EncDatumRowsToColVec(
 				case -1:
 				default:
 					col := vec.Bytes()
-					datumToPhysicalFn := getDatumToPhysicalFn(t)
+					datumToPhysicalFn := GetDatumToPhysicalFn(t)
 					var v interface{}
 					for i := range rows {
 						row := rows[i]
@@ -100,7 +100,7 @@ func EncDatumRowsToColVec(
 				case -1:
 				default:
 					col := vec.Decimal()
-					datumToPhysicalFn := getDatumToPhysicalFn(t)
+					datumToPhysicalFn := GetDatumToPhysicalFn(t)
 					var v interface{}
 					for i := range rows {
 						row := rows[i]
@@ -127,7 +127,7 @@ func EncDatumRowsToColVec(
 				switch t.Width() {
 				case 16:
 					col := vec.Int16()
-					datumToPhysicalFn := getDatumToPhysicalFn(t)
+					datumToPhysicalFn := GetDatumToPhysicalFn(t)
 					var v interface{}
 					for i := range rows {
 						row := rows[i]
@@ -151,7 +151,7 @@ func EncDatumRowsToColVec(
 					}
 				case 32:
 					col := vec.Int32()
-					datumToPhysicalFn := getDatumToPhysicalFn(t)
+					datumToPhysicalFn := GetDatumToPhysicalFn(t)
 					var v interface{}
 					for i := range rows {
 						row := rows[i]
@@ -176,7 +176,7 @@ func EncDatumRowsToColVec(
 				case -1:
 				default:
 					col := vec.Int64()
-					datumToPhysicalFn := getDatumToPhysicalFn(t)
+					datumToPhysicalFn := GetDatumToPhysicalFn(t)
 					var v interface{}
 					for i := range rows {
 						row := rows[i]
@@ -204,7 +204,7 @@ func EncDatumRowsToColVec(
 				case -1:
 				default:
 					col := vec.Float64()
-					datumToPhysicalFn := getDatumToPhysicalFn(t)
+					datumToPhysicalFn := GetDatumToPhysicalFn(t)
 					var v interface{}
 					for i := range rows {
 						row := rows[i]
@@ -232,7 +232,7 @@ func EncDatumRowsToColVec(
 				case -1:
 				default:
 					col := vec.Timestamp()
-					datumToPhysicalFn := getDatumToPhysicalFn(t)
+					datumToPhysicalFn := GetDatumToPhysicalFn(t)
 					var v interface{}
 					for i := range rows {
 						row := rows[i]
@@ -260,7 +260,7 @@ func EncDatumRowsToColVec(
 				case -1:
 				default:
 					col := vec.Interval()
-					datumToPhysicalFn := getDatumToPhysicalFn(t)
+					datumToPhysicalFn := GetDatumToPhysicalFn(t)
 					var v interface{}
 					for i := range rows {
 						row := rows[i]
@@ -288,7 +288,7 @@ func EncDatumRowsToColVec(
 				case -1:
 				default:
 					col := vec.Datum()
-					datumToPhysicalFn := getDatumToPhysicalFn(t)
+					datumToPhysicalFn := GetDatumToPhysicalFn(t)
 					var v interface{}
 					for i := range rows {
 						row := rows[i]

@@ -41,7 +41,7 @@ func OrderedDistinctColsToOperators(
 	}
 	var (
 		err error
-		r   resettableOperator
+		r   ResettableOperator
 		ok  bool
 	)
 	for i := range distinctCols {
@@ -50,20 +50,20 @@ func OrderedDistinctColsToOperators(
 			return nil, nil, err
 		}
 	}
-	if r, ok = input.(resettableOperator); !ok {
+	if r, ok = input.(ResettableOperator); !ok {
 		colexecerror.InternalError("unexpectedly an ordered distinct is not a resetter")
 	}
 	distinctChain := &distinctChainOps{
-		resettableOperator: r,
+		ResettableOperator: r,
 	}
 	return distinctChain, distinctCol, nil
 }
 
 type distinctChainOps struct {
-	resettableOperator
+	ResettableOperator
 }
 
-var _ resettableOperator = &distinctChainOps{}
+var _ ResettableOperator = &distinctChainOps{}
 
 // NewOrderedDistinct creates a new ordered distinct operator on the given
 // input columns with the given types.
@@ -279,7 +279,7 @@ type distinctBoolOp struct {
 	lastValNull bool
 }
 
-var _ resettableOperator = &distinctBoolOp{}
+var _ ResettableOperator = &distinctBoolOp{}
 
 func (p *distinctBoolOp) Init() {
 	p.input.Init()
@@ -758,7 +758,7 @@ type distinctBytesOp struct {
 	lastValNull bool
 }
 
-var _ resettableOperator = &distinctBytesOp{}
+var _ ResettableOperator = &distinctBytesOp{}
 
 func (p *distinctBytesOp) Init() {
 	p.input.Init()
@@ -1175,7 +1175,7 @@ type distinctDecimalOp struct {
 	lastValNull bool
 }
 
-var _ resettableOperator = &distinctDecimalOp{}
+var _ ResettableOperator = &distinctDecimalOp{}
 
 func (p *distinctDecimalOp) Init() {
 	p.input.Init()
@@ -1590,7 +1590,7 @@ type distinctInt16Op struct {
 	lastValNull bool
 }
 
-var _ resettableOperator = &distinctInt16Op{}
+var _ ResettableOperator = &distinctInt16Op{}
 
 func (p *distinctInt16Op) Init() {
 	p.input.Init()
@@ -2093,7 +2093,7 @@ type distinctInt32Op struct {
 	lastValNull bool
 }
 
-var _ resettableOperator = &distinctInt32Op{}
+var _ ResettableOperator = &distinctInt32Op{}
 
 func (p *distinctInt32Op) Init() {
 	p.input.Init()
@@ -2596,7 +2596,7 @@ type distinctInt64Op struct {
 	lastValNull bool
 }
 
-var _ resettableOperator = &distinctInt64Op{}
+var _ ResettableOperator = &distinctInt64Op{}
 
 func (p *distinctInt64Op) Init() {
 	p.input.Init()
@@ -3099,7 +3099,7 @@ type distinctFloat64Op struct {
 	lastValNull bool
 }
 
-var _ resettableOperator = &distinctFloat64Op{}
+var _ ResettableOperator = &distinctFloat64Op{}
 
 func (p *distinctFloat64Op) Init() {
 	p.input.Init()
@@ -3666,7 +3666,7 @@ type distinctTimestampOp struct {
 	lastValNull bool
 }
 
-var _ resettableOperator = &distinctTimestampOp{}
+var _ ResettableOperator = &distinctTimestampOp{}
 
 func (p *distinctTimestampOp) Init() {
 	p.input.Init()
@@ -4137,7 +4137,7 @@ type distinctIntervalOp struct {
 	lastValNull bool
 }
 
-var _ resettableOperator = &distinctIntervalOp{}
+var _ ResettableOperator = &distinctIntervalOp{}
 
 func (p *distinctIntervalOp) Init() {
 	p.input.Init()
@@ -4552,7 +4552,7 @@ type distinctDatumOp struct {
 	lastValNull bool
 }
 
-var _ resettableOperator = &distinctDatumOp{}
+var _ ResettableOperator = &distinctDatumOp{}
 
 func (p *distinctDatumOp) Init() {
 	p.input.Init()

@@ -26,8 +26,8 @@ type andProjOp struct {
 
 	leftProjOpChain  colexecbase.Operator
 	rightProjOpChain colexecbase.Operator
-	leftFeedOp       *feedOperator
-	rightFeedOp      *feedOperator
+	leftFeedOp       *FeedOperator
+	rightFeedOp      *FeedOperator
 
 	leftIdx   int
 	rightIdx  int
@@ -45,7 +45,7 @@ type andProjOp struct {
 func NewAndProjOp(
 	allocator *colmem.Allocator,
 	input, leftProjOpChain, rightProjOpChain colexecbase.Operator,
-	leftFeedOp, rightFeedOp *feedOperator,
+	leftFeedOp, rightFeedOp *FeedOperator,
 	leftIdx, rightIdx, outputIdx int,
 ) colexecbase.Operator {
 	return &andProjOp{
@@ -464,8 +464,8 @@ type orProjOp struct {
 
 	leftProjOpChain  colexecbase.Operator
 	rightProjOpChain colexecbase.Operator
-	leftFeedOp       *feedOperator
-	rightFeedOp      *feedOperator
+	leftFeedOp       *FeedOperator
+	rightFeedOp      *FeedOperator
 
 	leftIdx   int
 	rightIdx  int
@@ -483,7 +483,7 @@ type orProjOp struct {
 func NewOrProjOp(
 	allocator *colmem.Allocator,
 	input, leftProjOpChain, rightProjOpChain colexecbase.Operator,
-	leftFeedOp, rightFeedOp *feedOperator,
+	leftFeedOp, rightFeedOp *FeedOperator,
 	leftIdx, rightIdx, outputIdx int,
 ) colexecbase.Operator {
 	return &orProjOp{

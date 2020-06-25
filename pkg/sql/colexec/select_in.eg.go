@@ -394,7 +394,7 @@ type projectInOpBool struct {
 var _ colexecbase.Operator = &projectInOpBool{}
 
 func fillDatumRowBool(t *types.T, datumTuple *tree.DTuple) ([]bool, bool, error) {
-	conv := getDatumToPhysicalFn(t)
+	conv := GetDatumToPhysicalFn(t)
 	var result []bool
 	hasNulls := false
 	for _, d := range datumTuple.D {
@@ -631,7 +631,7 @@ type projectInOpBytes struct {
 var _ colexecbase.Operator = &projectInOpBytes{}
 
 func fillDatumRowBytes(t *types.T, datumTuple *tree.DTuple) ([][]byte, bool, error) {
-	conv := getDatumToPhysicalFn(t)
+	conv := GetDatumToPhysicalFn(t)
 	var result [][]byte
 	hasNulls := false
 	for _, d := range datumTuple.D {
@@ -864,7 +864,7 @@ type projectInOpDecimal struct {
 var _ colexecbase.Operator = &projectInOpDecimal{}
 
 func fillDatumRowDecimal(t *types.T, datumTuple *tree.DTuple) ([]apd.Decimal, bool, error) {
-	conv := getDatumToPhysicalFn(t)
+	conv := GetDatumToPhysicalFn(t)
 	var result []apd.Decimal
 	hasNulls := false
 	for _, d := range datumTuple.D {
@@ -1093,7 +1093,7 @@ type projectInOpInt16 struct {
 var _ colexecbase.Operator = &projectInOpInt16{}
 
 func fillDatumRowInt16(t *types.T, datumTuple *tree.DTuple) ([]int16, bool, error) {
-	conv := getDatumToPhysicalFn(t)
+	conv := GetDatumToPhysicalFn(t)
 	var result []int16
 	hasNulls := false
 	for _, d := range datumTuple.D {
@@ -1333,7 +1333,7 @@ type projectInOpInt32 struct {
 var _ colexecbase.Operator = &projectInOpInt32{}
 
 func fillDatumRowInt32(t *types.T, datumTuple *tree.DTuple) ([]int32, bool, error) {
-	conv := getDatumToPhysicalFn(t)
+	conv := GetDatumToPhysicalFn(t)
 	var result []int32
 	hasNulls := false
 	for _, d := range datumTuple.D {
@@ -1573,7 +1573,7 @@ type projectInOpInt64 struct {
 var _ colexecbase.Operator = &projectInOpInt64{}
 
 func fillDatumRowInt64(t *types.T, datumTuple *tree.DTuple) ([]int64, bool, error) {
-	conv := getDatumToPhysicalFn(t)
+	conv := GetDatumToPhysicalFn(t)
 	var result []int64
 	hasNulls := false
 	for _, d := range datumTuple.D {
@@ -1813,7 +1813,7 @@ type projectInOpFloat64 struct {
 var _ colexecbase.Operator = &projectInOpFloat64{}
 
 func fillDatumRowFloat64(t *types.T, datumTuple *tree.DTuple) ([]float64, bool, error) {
-	conv := getDatumToPhysicalFn(t)
+	conv := GetDatumToPhysicalFn(t)
 	var result []float64
 	hasNulls := false
 	for _, d := range datumTuple.D {
@@ -2061,7 +2061,7 @@ type projectInOpTimestamp struct {
 var _ colexecbase.Operator = &projectInOpTimestamp{}
 
 func fillDatumRowTimestamp(t *types.T, datumTuple *tree.DTuple) ([]time.Time, bool, error) {
-	conv := getDatumToPhysicalFn(t)
+	conv := GetDatumToPhysicalFn(t)
 	var result []time.Time
 	hasNulls := false
 	for _, d := range datumTuple.D {
@@ -2297,7 +2297,7 @@ type projectInOpInterval struct {
 var _ colexecbase.Operator = &projectInOpInterval{}
 
 func fillDatumRowInterval(t *types.T, datumTuple *tree.DTuple) ([]duration.Duration, bool, error) {
-	conv := getDatumToPhysicalFn(t)
+	conv := GetDatumToPhysicalFn(t)
 	var result []duration.Duration
 	hasNulls := false
 	for _, d := range datumTuple.D {
@@ -2526,7 +2526,7 @@ type projectInOpDatum struct {
 var _ colexecbase.Operator = &projectInOpDatum{}
 
 func fillDatumRowDatum(t *types.T, datumTuple *tree.DTuple) ([]interface{}, bool, error) {
-	conv := getDatumToPhysicalFn(t)
+	conv := GetDatumToPhysicalFn(t)
 	var result []interface{}
 	hasNulls := false
 	for _, d := range datumTuple.D {

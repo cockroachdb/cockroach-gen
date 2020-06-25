@@ -54647,7 +54647,7 @@ func GetProjectionLConstOperator(
 	colIdx int,
 	constArg tree.Datum,
 	outputIdx int,
-	overloadHelper overloadHelper,
+	binFn *tree.BinOp,
 ) (colexecbase.Operator, error) {
 	input = newVectorTypeEnforcer(allocator, input, outputType, outputIdx)
 	projConstOpBase := projConstOpBase{
@@ -54655,13 +54655,13 @@ func GetProjectionLConstOperator(
 		allocator:      allocator,
 		colIdx:         colIdx,
 		outputIdx:      outputIdx,
-		overloadHelper: overloadHelper,
+		overloadHelper: overloadHelper{binFn: binFn},
 	}
 	var (
 		c   interface{}
 		err error
 	)
-	c, err = getDatumToPhysicalFn(leftType)(constArg)
+	c, err = GetDatumToPhysicalFn(leftType)(constArg)
 	if err != nil {
 		return nil, err
 	}
