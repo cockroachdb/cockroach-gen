@@ -46,15 +46,15 @@ func TestIndexPredicateValidator_Validate(t *testing.T) {
 	}{
 		// Allow expressions that result in a bool.
 		{"a", true, "a"},
-		{"b = 0", true, "b = 0"},
-		{"a AND b = 0", true, "a AND (b = 0)"},
+		{"b = 0", true, "b = 0:::INT8"},
+		{"a AND b = 0", true, "a AND (b = 0:::INT8)"},
 		{"a IS NULL", true, "a IS NULL"},
 		{"b IN (1, 2)", true, "b IN (1:::INT8, 2:::INT8)"},
 
 		// Allow immutable functions.
-		{"abs(b) > 0", true, "abs(b) > 0"},
-		{"c || c = 'foofoo'", true, "(c || c) = 'foofoo'"},
-		{"lower(c) = 'bar'", true, "lower(c) = 'bar'"},
+		{"abs(b) > 0", true, "abs(b) > 0:::INT8"},
+		{"c || c = 'foofoo'", true, "(c || c) = 'foofoo':::STRING"},
+		{"lower(c) = 'bar'", true, "lower(c) = 'bar':::STRING"},
 
 		// Disallow references to columns not in the table.
 		{"d", false, ""},
@@ -75,12 +75,12 @@ func TestIndexPredicateValidator_Validate(t *testing.T) {
 		{"row_number() OVER () > 1", false, ""},
 		{"generate_series(1, 1) > 2", false, ""},
 
-		// Dequalify column names.
+		// De-qualify column names.
 		{"bar.a", true, "a"},
 		{"foo.bar.a", true, "a"},
-		{"bar.b = 0", true, "b = 0"},
-		{"foo.bar.b = 0", true, "b = 0"},
-		{"bar.a AND foo.bar.b = 0", true, "a AND (b = 0)"},
+		{"bar.b = 0", true, "b = 0:::INT8"},
+		{"foo.bar.b = 0", true, "b = 0:::INT8"},
+		{"bar.a AND foo.bar.b = 0", true, "a AND (b = 0:::INT8)"},
 	}
 
 	for _, d := range testData {
