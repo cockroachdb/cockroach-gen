@@ -5152,34 +5152,15 @@ func (_f *Factory) ConstructLookupJoin(
 	return _f.onConstructRelational(e)
 }
 
-// ConstructGeoLookupJoin constructs an expression for the GeoLookupJoin operator.
-// GeoLookupJoin represents a join between an input expression and an index,
-// where the index is an inverted index on a Geometry or Geography column.
-//
-// A GeoLookupJoin can be generated for queries containing a join where one of
-// the join conditions is a geospatial binary function such as ST_Covers or
-// ST_CoveredBy, and at least one of the two inputs to the function is an
-// indexed geospatial column. The type of geospatial function implies the
-// GeoRelationshipType (Covers, CoveredBy or Intersects) for the join, which is
-// stored in the GeoLookupJoinPrivate and affects how the join is executed. For
-// a full list of the geospatial functions that can be index-accelerated and
-// their corresponding GeoRelationshipTypes, see geoRelationshipMap in
-// xform/custom_funcs.go.
-//
-// The GeoLookupJoin has no false negatives, but it may return false positives
-// that would not have been returned by the original geospatial function
-// join predicate. Therefore, the original function must still be applied on
-// the output of the join. Since the inverted index does not actually include
-// the geospatial column (or any other columns besides the primary key columns),
-// the GeoLookupJoin will be wrapped in an index join. The geospatial function
-// and any other filters on non-key columns will be appied as filters on the
-// outer index join.
-func (_f *Factory) ConstructGeoLookupJoin(
+// ConstructInvertedJoin constructs an expression for the InvertedJoin operator.
+// InvertedJoin represents a join between an input expression and an inverted
+// index. The type of join is in the InvertedJoinPrivate field.
+func (_f *Factory) ConstructInvertedJoin(
 	input memo.RelExpr,
 	on memo.FiltersExpr,
-	geoLookupJoinPrivate *memo.GeoLookupJoinPrivate,
+	invertedJoinPrivate *memo.InvertedJoinPrivate,
 ) memo.RelExpr {
-	e := _f.mem.MemoizeGeoLookupJoin(input, on, geoLookupJoinPrivate)
+	e := _f.mem.MemoizeInvertedJoin(input, on, invertedJoinPrivate)
 	return _f.onConstructRelational(e)
 }
 
@@ -16848,11 +16829,11 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		}
 		return t
 
-	case *memo.GeoLookupJoinExpr:
+	case *memo.InvertedJoinExpr:
 		input := replace(t.Input).(memo.RelExpr)
 		on, onChanged := f.replaceFiltersExpr(t.On, replace)
 		if input != t.Input || onChanged {
-			return f.ConstructGeoLookupJoin(input, on, &t.GeoLookupJoinPrivate)
+			return f.ConstructInvertedJoin(input, on, &t.InvertedJoinPrivate)
 		}
 		return t
 
@@ -18337,11 +18318,11 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 			&t.LookupJoinPrivate,
 		)
 
-	case *memo.GeoLookupJoinExpr:
-		return f.ConstructGeoLookupJoin(
+	case *memo.InvertedJoinExpr:
+		return f.ConstructInvertedJoin(
 			f.invokeReplace(t.Input, replace).(memo.RelExpr),
 			f.copyAndReplaceDefaultFiltersExpr(t.On, replace),
-			&t.GeoLookupJoinPrivate,
+			&t.InvertedJoinPrivate,
 		)
 
 	case *memo.MergeJoinExpr:
@@ -19458,11 +19439,11 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 			*args[1].(*memo.FiltersExpr),
 			args[2].(*memo.LookupJoinPrivate),
 		)
-	case opt.GeoLookupJoinOp:
-		return f.ConstructGeoLookupJoin(
+	case opt.InvertedJoinOp:
+		return f.ConstructInvertedJoin(
 			args[0].(memo.RelExpr),
 			*args[1].(*memo.FiltersExpr),
-			args[2].(*memo.GeoLookupJoinPrivate),
+			args[2].(*memo.InvertedJoinPrivate),
 		)
 	case opt.MergeJoinOp:
 		return f.ConstructMergeJoin(
