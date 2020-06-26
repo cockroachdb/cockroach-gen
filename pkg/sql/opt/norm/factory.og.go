@@ -1739,6 +1739,20 @@ func (_f *Factory) ConstructProject(
 	return _f.onConstructRelational(e)
 }
 
+// ConstructInvertedFilter constructs an expression for the InvertedFilter operator.
+// InvertedFilter filters rows from its input result set, based on the
+// InvertedExpression predicate (which is defined in InvertedFilterPrivate).
+// Rows which do not match the filter are discarded. The input should be a
+// constrained scan of an inverted index, possibly wrapped in other operators
+// such as Select.
+func (_f *Factory) ConstructInvertedFilter(
+	input memo.RelExpr,
+	invertedFilterPrivate *memo.InvertedFilterPrivate,
+) memo.RelExpr {
+	e := _f.mem.MemoizeInvertedFilter(input, invertedFilterPrivate)
+	return _f.onConstructRelational(e)
+}
+
 // ConstructInnerJoin constructs an expression for the InnerJoin operator.
 // InnerJoin creates a result set that combines columns from its left and right
 // inputs, based upon its "on" join predicate. Rows which do not match the
@@ -16760,6 +16774,13 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		}
 		return t
 
+	case *memo.InvertedFilterExpr:
+		input := replace(t.Input).(memo.RelExpr)
+		if input != t.Input {
+			return f.ConstructInvertedFilter(input, &t.InvertedFilterPrivate)
+		}
+		return t
+
 	case *memo.InnerJoinExpr:
 		left := replace(t.Left).(memo.RelExpr)
 		right := replace(t.Right).(memo.RelExpr)
@@ -18257,6 +18278,12 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 			t.Passthrough,
 		)
 
+	case *memo.InvertedFilterExpr:
+		return f.ConstructInvertedFilter(
+			f.invokeReplace(t.Input, replace).(memo.RelExpr),
+			&t.InvertedFilterPrivate,
+		)
+
 	case *memo.InnerJoinExpr:
 		return f.ConstructInnerJoin(
 			f.invokeReplace(t.Left, replace).(memo.RelExpr),
@@ -19385,6 +19412,11 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 			args[0].(memo.RelExpr),
 			*args[1].(*memo.ProjectionsExpr),
 			*args[2].(*opt.ColSet),
+		)
+	case opt.InvertedFilterOp:
+		return f.ConstructInvertedFilter(
+			args[0].(memo.RelExpr),
+			args[1].(*memo.InvertedFilterPrivate),
 		)
 	case opt.InnerJoinOp:
 		return f.ConstructInnerJoin(

@@ -1054,8 +1054,8 @@ type ScanPrivate struct {
 	Constraint *constraint.Constraint
 
 	// If set, the scan is a constrained scan of an inverted index; the
-	// SpanExpression contains the spans that need to be scanned.
-	InvertedConstraint *invertedexpr.SpanExpression
+	// InvertedConstraint contains the spans that need to be scanned.
+	InvertedConstraint invertedexpr.InvertedSpans
 
 	// HardLimit specifies the maximum number of rows that the scan can return
 	// (after applying any constraint), as well as the required scan direction.
@@ -1616,6 +1616,146 @@ func (g *projectGroup) firstExpr() RelExpr {
 
 func (g *projectGroup) bestProps() *bestProps {
 	return &g.best
+}
+
+// InvertedFilterExpr filters rows from its input result set, based on the
+// InvertedExpression predicate (which is defined in InvertedFilterPrivate).
+// Rows which do not match the filter are discarded. The input should be a
+// constrained scan of an inverted index, possibly wrapped in other operators
+// such as Select.
+type InvertedFilterExpr struct {
+	Input RelExpr
+	InvertedFilterPrivate
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &InvertedFilterExpr{}
+
+func (e *InvertedFilterExpr) Op() opt.Operator {
+	return opt.InvertedFilterOp
+}
+
+func (e *InvertedFilterExpr) ChildCount() int {
+	return 1
+}
+
+func (e *InvertedFilterExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *InvertedFilterExpr) Private() interface{} {
+	return &e.InvertedFilterPrivate
+}
+
+func (e *InvertedFilterExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *InvertedFilterExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(RelExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *InvertedFilterExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *InvertedFilterExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *InvertedFilterExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *InvertedFilterExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *InvertedFilterExpr) RequiredPhysical() *physical.Required {
+	return e.grp.bestProps().required
+}
+
+func (e *InvertedFilterExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
+func (e *InvertedFilterExpr) Cost() Cost {
+	return e.grp.bestProps().cost
+}
+
+func (e *InvertedFilterExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *InvertedFilterExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
+}
+
+func (e *InvertedFilterExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(errors.AssertionFailedf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *InvertedFilterExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(errors.AssertionFailedf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type invertedFilterGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	first InvertedFilterExpr
+	best  bestProps
+}
+
+var _ exprGroup = &invertedFilterGroup{}
+
+func (g *invertedFilterGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *invertedFilterGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *invertedFilterGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *invertedFilterGroup) bestProps() *bestProps {
+	return &g.best
+}
+
+type InvertedFilterPrivate struct {
+	// InvertedExpression represents the set operations (UNION or INTERSECTION)
+	// that should be executed on the inverted spans retrieved from the input.
+	// The input should already be filtered based on SpansToRead from the
+	// SpanExpression, but this InvertedExpression serves to filter the rows
+	// further by applying set operations on the primary key columns.
+	InvertedExpression *invertedexpr.SpanExpression
+
+	// The InvertedColumn is the id of the inverted column in the input. It is
+	// used during execution to map rows from the input to their corresponding
+	// spans in the SpanExpression.
+	InvertedColumn opt.ColumnID
 }
 
 // InnerJoinExpr creates a result set that combines columns from its left and right
@@ -16494,6 +16634,30 @@ func (m *Memo) MemoizeProject(
 	return interned.FirstExpr()
 }
 
+func (m *Memo) MemoizeInvertedFilter(
+	input RelExpr,
+	invertedFilterPrivate *InvertedFilterPrivate,
+) RelExpr {
+	const size = int64(unsafe.Sizeof(invertedFilterGroup{}))
+	grp := &invertedFilterGroup{mem: m, first: InvertedFilterExpr{
+		Input:                 input,
+		InvertedFilterPrivate: *invertedFilterPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternInvertedFilter(e)
+	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
+		m.logPropsBuilder.buildInvertedFilterProps(e, &grp.rel)
+		grp.rel.Populated = true
+		m.memEstimate += size
+		m.CheckExpr(e)
+	}
+	return interned.FirstExpr()
+}
+
 func (m *Memo) MemoizeInnerJoin(
 	left RelExpr,
 	right RelExpr,
@@ -20314,6 +20478,20 @@ func (m *Memo) AddProjectToGroup(e *ProjectExpr, grp RelExpr) *ProjectExpr {
 	return interned
 }
 
+func (m *Memo) AddInvertedFilterToGroup(e *InvertedFilterExpr, grp RelExpr) *InvertedFilterExpr {
+	const size = int64(unsafe.Sizeof(InvertedFilterExpr{}))
+	interned := m.interner.InternInvertedFilter(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.CheckExpr(e)
+	} else if interned.group() != grp.group() {
+		// This is a group collision, do nothing.
+		return nil
+	}
+	return interned
+}
+
 func (m *Memo) AddInnerJoinToGroup(e *InnerJoinExpr, grp RelExpr) *InnerJoinExpr {
 	const size = int64(unsafe.Sizeof(InnerJoinExpr{}))
 	interned := m.interner.InternInnerJoin(e)
@@ -21072,6 +21250,8 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternSelect(t)
 	case *ProjectExpr:
 		return in.InternProject(t)
+	case *InvertedFilterExpr:
+		return in.InternInvertedFilter(t)
 	case *InnerJoinExpr:
 		return in.InternInnerJoin(t)
 	case *LeftJoinExpr:
@@ -21668,7 +21848,7 @@ func (in *interner) InternScan(val *ScanExpr) *ScanExpr {
 	in.hasher.HashIndexOrdinal(val.Index)
 	in.hasher.HashColSet(val.Cols)
 	in.hasher.HashPointer(unsafe.Pointer(val.Constraint))
-	in.hasher.HashPointer(unsafe.Pointer(val.InvertedConstraint))
+	in.hasher.HashInvertedSpans(val.InvertedConstraint)
 	in.hasher.HashScanLimit(val.HardLimit)
 	in.hasher.HashScanFlags(val.Flags)
 	in.hasher.HashLockingItem(val.Locking)
@@ -21681,7 +21861,7 @@ func (in *interner) InternScan(val *ScanExpr) *ScanExpr {
 				in.hasher.IsIndexOrdinalEqual(val.Index, existing.Index) &&
 				in.hasher.IsColSetEqual(val.Cols, existing.Cols) &&
 				in.hasher.IsPointerEqual(unsafe.Pointer(val.Constraint), unsafe.Pointer(existing.Constraint)) &&
-				in.hasher.IsPointerEqual(unsafe.Pointer(val.InvertedConstraint), unsafe.Pointer(existing.InvertedConstraint)) &&
+				in.hasher.IsInvertedSpansEqual(val.InvertedConstraint, existing.InvertedConstraint) &&
 				in.hasher.IsScanLimitEqual(val.HardLimit, existing.HardLimit) &&
 				in.hasher.IsScanFlagsEqual(val.Flags, existing.Flags) &&
 				in.hasher.IsLockingItemEqual(val.Locking, existing.Locking) &&
@@ -21770,6 +21950,28 @@ func (in *interner) InternProject(val *ProjectExpr) *ProjectExpr {
 			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
 				in.hasher.IsProjectionsExprEqual(val.Projections, existing.Projections) &&
 				in.hasher.IsColSetEqual(val.Passthrough, existing.Passthrough) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternInvertedFilter(val *InvertedFilterExpr) *InvertedFilterExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.InvertedFilterOp)
+	in.hasher.HashRelExpr(val.Input)
+	in.hasher.HashPointer(unsafe.Pointer(val.InvertedExpression))
+	in.hasher.HashColumnID(val.InvertedColumn)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*InvertedFilterExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsPointerEqual(unsafe.Pointer(val.InvertedExpression), unsafe.Pointer(existing.InvertedExpression)) &&
+				in.hasher.IsColumnIDEqual(val.InvertedColumn, existing.InvertedColumn) {
 				return existing
 			}
 		}
@@ -25685,6 +25887,8 @@ func (b *logicalPropsBuilder) buildProps(e RelExpr, rel *props.Relational) {
 		b.buildSelectProps(t, rel)
 	case *ProjectExpr:
 		b.buildProjectProps(t, rel)
+	case *InvertedFilterExpr:
+		b.buildInvertedFilterProps(t, rel)
 	case *InnerJoinExpr:
 		b.buildInnerJoinProps(t, rel)
 	case *LeftJoinExpr:
