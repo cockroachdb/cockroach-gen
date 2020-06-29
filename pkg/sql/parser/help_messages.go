@@ -1129,7 +1129,7 @@ PAUSE JOB <jobid>
 	},
 	//line sql.y: 4575
 	`CREATE SCHEMA`: {
-		ShortDescription: `create a new schema (not yet supported)`,
+		ShortDescription: `create a new schema`,
 		//line sql.y: 4576
 		Category: hDDL,
 		//line sql.y: 4577
