@@ -104,6 +104,7 @@ var KeywordsCategories = map[string]string{
 	"drop":                      "U",
 	"else":                      "R",
 	"encoding":                  "U",
+	"encryption_passphrase":     "U",
 	"end":                       "R",
 	"enum":                      "U",
 	"escape":                    "U",
@@ -301,6 +302,7 @@ var KeywordsCategories = map[string]string{
 	"restrict":                  "U",
 	"resume":                    "U",
 	"returning":                 "R",
+	"revision_history":          "U",
 	"revoke":                    "U",
 	"right":                     "T",
 	"role":                      "U",
@@ -518,6 +520,7 @@ var KeywordNames = []string{
 	"drop",
 	"else",
 	"encoding",
+	"encryption_passphrase",
 	"end",
 	"enum",
 	"escape",
@@ -715,6 +718,7 @@ var KeywordNames = []string{
 	"restrict",
 	"resume",
 	"returning",
+	"revision_history",
 	"revoke",
 	"right",
 	"role",
@@ -1038,6 +1042,8 @@ func GetKeywordID(k string) int32 {
 		return ELSE
 	case "encoding":
 		return ENCODING
+	case "encryption_passphrase":
+		return ENCRYPTION_PASSPHRASE
 	case "end":
 		return END
 	case "enum":
@@ -1432,6 +1438,8 @@ func GetKeywordID(k string) int32 {
 		return RESUME
 	case "returning":
 		return RETURNING
+	case "revision_history":
+		return REVISION_HISTORY
 	case "revoke":
 		return REVOKE
 	case "right":
