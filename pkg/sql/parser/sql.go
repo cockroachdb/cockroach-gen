@@ -452,8 +452,8 @@ func (u *sqlSymUnion) partitionedBackup() tree.PartitionedBackup {
 func (u *sqlSymUnion) partitionedBackups() []tree.PartitionedBackup {
 	return u.val.([]tree.PartitionedBackup)
 }
-func (u *sqlSymUnion) geoFigure() geopb.Shape {
-	return u.val.(geopb.Shape)
+func (u *sqlSymUnion) geoShapeType() geopb.ShapeType {
+	return u.val.(geopb.ShapeType)
 }
 func newNameFromStr(s string) *tree.Name {
 	return (*tree.Name)(&s)
@@ -23084,49 +23084,49 @@ sqldefault:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
 //line sql-gen.y:7682
 		{
-			sqlVAL.union.val = geopb.Shape_Point
+			sqlVAL.union.val = geopb.ShapeType_Point
 		}
 	case 1327:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
 //line sql-gen.y:7683
 		{
-			sqlVAL.union.val = geopb.Shape_LineString
+			sqlVAL.union.val = geopb.ShapeType_LineString
 		}
 	case 1328:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
 //line sql-gen.y:7684
 		{
-			sqlVAL.union.val = geopb.Shape_Polygon
+			sqlVAL.union.val = geopb.ShapeType_Polygon
 		}
 	case 1329:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
 //line sql-gen.y:7685
 		{
-			sqlVAL.union.val = geopb.Shape_GeometryCollection
+			sqlVAL.union.val = geopb.ShapeType_GeometryCollection
 		}
 	case 1330:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
 //line sql-gen.y:7686
 		{
-			sqlVAL.union.val = geopb.Shape_MultiPolygon
+			sqlVAL.union.val = geopb.ShapeType_MultiPolygon
 		}
 	case 1331:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
 //line sql-gen.y:7687
 		{
-			sqlVAL.union.val = geopb.Shape_MultiLineString
+			sqlVAL.union.val = geopb.ShapeType_MultiLineString
 		}
 	case 1332:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
 //line sql-gen.y:7688
 		{
-			sqlVAL.union.val = geopb.Shape_MultiPoint
+			sqlVAL.union.val = geopb.ShapeType_MultiPoint
 		}
 	case 1333:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
 //line sql-gen.y:7689
 		{
-			sqlVAL.union.val = geopb.Shape_Geometry
+			sqlVAL.union.val = geopb.ShapeType_Geometry
 		}
 	case 1334:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
@@ -23144,13 +23144,13 @@ sqldefault:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
 //line sql-gen.y:7695
 		{
-			sqlVAL.union.val = types.MakeGeometry(sqlDollar[3].union.geoFigure(), 0)
+			sqlVAL.union.val = types.MakeGeometry(sqlDollar[3].union.geoShapeType(), 0)
 		}
 	case 1337:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
 //line sql-gen.y:7699
 		{
-			sqlVAL.union.val = types.MakeGeography(sqlDollar[3].union.geoFigure(), 0)
+			sqlVAL.union.val = types.MakeGeography(sqlDollar[3].union.geoShapeType(), 0)
 		}
 	case 1338:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
@@ -23160,7 +23160,7 @@ sqldefault:
 			if err != nil {
 				return setErr(sqllex, err)
 			}
-			sqlVAL.union.val = types.MakeGeometry(sqlDollar[3].union.geoFigure(), geopb.SRID(val))
+			sqlVAL.union.val = types.MakeGeometry(sqlDollar[3].union.geoShapeType(), geopb.SRID(val))
 		}
 	case 1339:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
@@ -23170,7 +23170,7 @@ sqldefault:
 			if err != nil {
 				return setErr(sqllex, err)
 			}
-			sqlVAL.union.val = types.MakeGeography(sqlDollar[3].union.geoFigure(), geopb.SRID(val))
+			sqlVAL.union.val = types.MakeGeography(sqlDollar[3].union.geoShapeType(), geopb.SRID(val))
 		}
 	case 1345:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
