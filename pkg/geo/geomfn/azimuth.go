@@ -18,12 +18,18 @@ import (
 	"github.com/twpayne/go-geom"
 )
 
-// Azimuth returns the azimuth in radians of the segment defined by the given point geometries.
-// The azimuth is angle is referenced from north, and is positive clockwise.
-// North = 0; East = π/2; South = π; West = 3π/2.
+// Azimuth returns the azimuth in radians of the segment defined by the given point geometries,
+// where point a is the reference point.
+// The reference direction from which the azimuth is calculated is north, and is positive clockwise.
+// i.e. North = 0; East = π/2; South = π; West = 3π/2.
+// See https://en.wikipedia.org/wiki/Polar_coordinate_system.
 // Returns nil if the two points are the same.
 // Returns an error if any of the two Geometry items are not points.
 func Azimuth(a *geo.Geometry, b *geo.Geometry) (*float64, error) {
+	if a.SRID() != b.SRID() {
+		return nil, geo.NewMismatchingSRIDsError(a, b)
+	}
+
 	aGeomT, err := a.AsGeomT()
 	if err != nil {
 		return nil, err
@@ -31,7 +37,7 @@ func Azimuth(a *geo.Geometry, b *geo.Geometry) (*float64, error) {
 
 	aPoint, ok := aGeomT.(*geom.Point)
 	if !ok {
-		return nil, errors.Newf("Argument must be POINT geometries")
+		return nil, errors.Newf("arguments must be POINT geometries")
 	}
 
 	bGeomT, err := b.AsGeomT()
@@ -41,18 +47,17 @@ func Azimuth(a *geo.Geometry, b *geo.Geometry) (*float64, error) {
 
 	bPoint, ok := bGeomT.(*geom.Point)
 	if !ok {
-		return nil, errors.Newf("Argument must be POINT geometries")
+		return nil, errors.Newf("arguments must be POINT geometries")
 	}
 
 	if aPoint.X() == bPoint.X() && aPoint.Y() == bPoint.Y() {
 		return nil, nil
 	}
 
-	atan := math.Atan2(bPoint.Y()-aPoint.Y(), bPoint.X()-aPoint.X()) // Started at East(90) counterclockwise.
-	const degree360 = 2 * math.Pi                                    // Added 360 degrees for always returns a positive value.
-	const degree90 = math.Pi / 2                                     // Added 90 degrees to get it started at North(0).
-
-	azimuth := math.Mod(degree360+degree90-atan, 2*math.Pi)
-
+	atan := math.Atan2(bPoint.Y()-aPoint.Y(), bPoint.X()-aPoint.X())
+	// math.Pi / 2 is North from the atan calculation this is a CCW direction.
+	// We want to return a CW direction, so subtract atan from math.Pi / 2 to get it into a CW direction.
+	// Then add 2*math.Pi to ensure a positive azimuth.
+	azimuth := math.Mod(math.Pi/2-atan+2*math.Pi, 2*math.Pi)
 	return &azimuth, nil
 }

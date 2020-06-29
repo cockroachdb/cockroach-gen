@@ -20,8 +20,8 @@ import (
 
 func TestAzimuth(t *testing.T) {
 	zero := 0.0
-	aQuarterPi := 0.7853981633974483
-	towQuartersPi := 1.5707963267948966
+	oneQuarterPi := 0.7853981633974483
+	twoQuartersPi := 1.5707963267948966
 	threeQuartersPi := 2.356194490192344
 
 	testCases := []struct {
@@ -37,12 +37,12 @@ func TestAzimuth(t *testing.T) {
 		{
 			"POINT(0 0)",
 			"POINT(1 1)",
-			&aQuarterPi,
+			&oneQuarterPi,
 		},
 		{
 			"POINT(0 0)",
 			"POINT(1 0)",
-			&towQuartersPi,
+			&twoQuartersPi,
 		},
 		{
 			"POINT(0 0)",
@@ -56,8 +56,8 @@ func TestAzimuth(t *testing.T) {
 		},
 	}
 
-	for i, tc := range testCases {
-		t.Run(fmt.Sprintf("tc:%d", i), func(t *testing.T) {
+	for _, tc := range testCases {
+		t.Run(fmt.Sprintf("%s <=> %s", tc.a, tc.b), func(t *testing.T) {
 			a, err := geo.ParseGeometry(tc.a)
 			require.NoError(t, err)
 			b, err := geo.ParseGeometry(tc.b)
@@ -73,4 +73,33 @@ func TestAzimuth(t *testing.T) {
 			}
 		})
 	}
+
+	errorTestCases := []struct {
+		a          string
+		b          string
+		errorMatch string
+	}{
+		{
+			"LINESTRING(0 0, 1 0)",
+			"POINT(0 0)",
+			"arguments must be POINT geometries",
+		},
+	}
+	for _, tc := range errorTestCases {
+		t.Run(fmt.Sprintf("%s <=> %s", tc.a, tc.b), func(t *testing.T) {
+			a, err := geo.ParseGeometry(tc.a)
+			require.NoError(t, err)
+			b, err := geo.ParseGeometry(tc.b)
+			require.NoError(t, err)
+
+			_, err = Azimuth(a, b)
+			require.Error(t, err)
+			require.EqualError(t, err, tc.errorMatch)
+		})
+	}
+
+	t.Run("errors if SRIDs mismatch", func(t *testing.T) {
+		_, err := Azimuth(mismatchingSRIDGeometryA, mismatchingSRIDGeometryB)
+		requireMismatchingSRIDError(t, err)
+	})
 }
