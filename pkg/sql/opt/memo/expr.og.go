@@ -3035,6 +3035,10 @@ type InvertedJoinPrivate struct {
 	// the cat.Table.Index() method in order to fetch the cat.Index metadata.
 	Index cat.IndexOrdinal
 
+	// InvertedCol is the inverted column in the index that is referenced by
+	// InvertedExpr.
+	InvertedCol opt.ColumnID
+
 	// InputCol is the column (produced by the input) that will be bound to
 	// InvertedExpr and used to determine the keys to scan in the inverted
 	// index.
@@ -22192,6 +22196,7 @@ func (in *interner) InternInvertedJoin(val *InvertedJoinExpr) *InvertedJoinExpr 
 	in.hasher.HashScalarExpr(val.InvertedExpr)
 	in.hasher.HashTableID(val.Table)
 	in.hasher.HashIndexOrdinal(val.Index)
+	in.hasher.HashColumnID(val.InvertedCol)
 	in.hasher.HashColumnID(val.InputCol)
 	in.hasher.HashColSet(val.Cols)
 	in.hasher.HashJoinFlags(val.Flags)
@@ -22205,6 +22210,7 @@ func (in *interner) InternInvertedJoin(val *InvertedJoinExpr) *InvertedJoinExpr 
 				in.hasher.IsScalarExprEqual(val.InvertedExpr, existing.InvertedExpr) &&
 				in.hasher.IsTableIDEqual(val.Table, existing.Table) &&
 				in.hasher.IsIndexOrdinalEqual(val.Index, existing.Index) &&
+				in.hasher.IsColumnIDEqual(val.InvertedCol, existing.InvertedCol) &&
 				in.hasher.IsColumnIDEqual(val.InputCol, existing.InputCol) &&
 				in.hasher.IsColSetEqual(val.Cols, existing.Cols) &&
 				in.hasher.IsJoinFlagsEqual(val.Flags, existing.Flags) {
