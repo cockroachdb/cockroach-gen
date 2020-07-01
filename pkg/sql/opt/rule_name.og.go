@@ -101,7 +101,7 @@ const (
 	EliminateDistinctNoColumns
 	EliminateEnsureDistinctNoColumns
 	EliminateDistinctOnValues
-	PushAggDistinctIntoScalarGroupBy
+	PushAggDistinctIntoGroupBy
 	PushAggFilterIntoScalarGroupBy
 	ConvertCountToCountRows
 	FoldGroupingOperators

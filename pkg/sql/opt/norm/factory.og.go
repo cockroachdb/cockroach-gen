@@ -7889,6 +7889,38 @@ func (_f *Factory) ConstructGroupBy(
 		}
 	}
 
+	// [PushAggDistinctIntoGroupBy]
+	{
+		if len(aggregations) == 1 {
+			item := &aggregations[0]
+			_aggDistinct, _ := item.Agg.(*memo.AggDistinctExpr)
+			if _aggDistinct != nil {
+				agg := _aggDistinct.Input
+				aggColID := item.Col
+				if _f.matchedRule == nil || _f.matchedRule(opt.PushAggDistinctIntoGroupBy) {
+					_expr := _f.ConstructGroupBy(
+						_f.ConstructDistinctOn(
+							input,
+							_f.funcs.MakeAggCols(opt.FirstAggOp, _f.funcs.OrderingCols(_f.funcs.ExtractGroupingOrdering(groupingPrivate))),
+							_f.funcs.MakeGrouping(_f.funcs.UnionCols(_f.funcs.GroupingCols(groupingPrivate), _f.funcs.ExtractAggInputColumns(agg)), _f.funcs.EmptyOrdering()),
+						),
+						memo.AggregationsExpr{
+							_f.ConstructAggregationsItem(
+								agg,
+								aggColID,
+							),
+						},
+						groupingPrivate,
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.PushAggDistinctIntoGroupBy, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
 	// [ConvertCountToCountRows]
 	{
 		for i := range aggregations {
@@ -8141,7 +8173,7 @@ func (_f *Factory) ConstructScalarGroupBy(
 		}
 	}
 
-	// [PushAggDistinctIntoScalarGroupBy]
+	// [PushAggDistinctIntoGroupBy]
 	{
 		if len(aggregations) == 1 {
 			item := &aggregations[0]
@@ -8149,12 +8181,12 @@ func (_f *Factory) ConstructScalarGroupBy(
 			if _aggDistinct != nil {
 				agg := _aggDistinct.Input
 				aggColID := item.Col
-				if _f.matchedRule == nil || _f.matchedRule(opt.PushAggDistinctIntoScalarGroupBy) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.PushAggDistinctIntoGroupBy) {
 					_expr := _f.ConstructScalarGroupBy(
 						_f.ConstructDistinctOn(
 							input,
-							memo.EmptyAggregationsExpr,
-							_f.funcs.MakeGrouping(_f.funcs.ExtractAggInputColumns(agg), _f.funcs.EmptyOrdering()),
+							_f.funcs.MakeAggCols(opt.FirstAggOp, _f.funcs.OrderingCols(_f.funcs.ExtractGroupingOrdering(groupingPrivate))),
+							_f.funcs.MakeGrouping(_f.funcs.UnionCols(_f.funcs.GroupingCols(groupingPrivate), _f.funcs.ExtractAggInputColumns(agg)), _f.funcs.EmptyOrdering()),
 						),
 						memo.AggregationsExpr{
 							_f.ConstructAggregationsItem(
@@ -8165,7 +8197,7 @@ func (_f *Factory) ConstructScalarGroupBy(
 						groupingPrivate,
 					)
 					if _f.appliedRule != nil {
-						_f.appliedRule(opt.PushAggDistinctIntoScalarGroupBy, nil, _expr)
+						_f.appliedRule(opt.PushAggDistinctIntoGroupBy, nil, _expr)
 					}
 					return _expr
 				}
