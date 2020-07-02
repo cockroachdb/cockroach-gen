@@ -264,6 +264,7 @@ const (
 	GenerateInvertedIndexZigzagJoins
 	GenerateLookupJoinsWithFilter
 	AssociateJoin
+	PushJoinIntoIndexJoin
 	GenerateLimitedScans
 	PushLimitIntoConstrainedScan
 	PushLimitIntoIndexJoin

@@ -661,6 +661,60 @@ func (_e *explorer) exploreInnerJoin(
 		}
 	}
 
+	// [PushJoinIntoIndexJoin]
+	{
+		_partlyExplored := _rootOrd < _rootState.start
+		left := _root.Left
+		_state := _e.lookupExploreState(left)
+		if !_state.fullyExplored {
+			_fullyExplored = false
+		}
+		var _member memo.RelExpr
+		for _ord := 0; _ord < _state.end; _ord++ {
+			if _member == nil {
+				_member = left.FirstExpr()
+			} else {
+				_member = _member.NextExpr()
+			}
+			if !_partlyExplored || _ord >= _state.start {
+				_indexJoin, _ := _member.(*memo.IndexJoinExpr)
+				if _indexJoin != nil {
+					indexInput := _indexJoin.Input
+					indexPrivate := &_indexJoin.IndexJoinPrivate
+					right := _root.Right
+					if !_e.funcs.HasOuterCols(right) {
+						on := _root.On
+						if _e.funcs.FiltersBoundBy(on, _e.funcs.OutputCols2(indexInput, right)) {
+							joinPrivate := &_root.JoinPrivate
+							if _e.funcs.NoJoinHints(joinPrivate) {
+								if _e.o.matchedRule == nil || _e.o.matchedRule(opt.PushJoinIntoIndexJoin) {
+									_expr := &memo.LookupJoinExpr{
+										Input: _e.f.ConstructInnerJoin(
+											indexInput,
+											right,
+											on,
+											joinPrivate,
+										),
+										On:                memo.EmptyFiltersExpr,
+										LookupJoinPrivate: *_e.funcs.ConvertIndexToLookupJoinPrivate(indexPrivate, _e.funcs.OutputCols2(left, right)),
+									}
+									_interned := _e.mem.AddLookupJoinToGroup(_expr, _root)
+									if _e.o.appliedRule != nil {
+										if _interned != _expr {
+											_e.o.appliedRule(opt.PushJoinIntoIndexJoin, _root, nil)
+										} else {
+											_e.o.appliedRule(opt.PushJoinIntoIndexJoin, _root, _interned)
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	return _fullyExplored
 }
 
