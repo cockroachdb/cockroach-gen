@@ -628,7 +628,7 @@ func (_e *explorer) exploreInnerJoin(
 					innerPrivate := &_innerJoin.JoinPrivate
 					if _e.funcs.NoJoinHints(innerPrivate) {
 						right := _root.Right
-						if _e.funcs.ShouldReorderJoins(left, right) {
+						if _e.funcs.ShouldReorderJoins(_root) {
 							on := _root.On
 							private := &_root.JoinPrivate
 							if _e.funcs.NoJoinHints(private) {
