@@ -524,16 +524,18 @@ func (_e *explorer) exploreInnerJoin(
 								_function, _ := fn.(*memo.FunctionExpr)
 								if _function != nil {
 									if _e.funcs.IsGeoIndexFunction(fn) {
-										if _e.funcs.HasAllVariableArgs(fn) {
-											private := &_root.JoinPrivate
-											if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateGeoLookupJoins) {
-												var _last memo.RelExpr
-												if _e.o.appliedRule != nil {
-													_last = memo.LastGroupMember(_root)
-												}
-												_e.funcs.GenerateGeoLookupJoins(_root, opt.InnerJoinOp, left, scanPrivate, on, private, fn)
-												if _e.o.appliedRule != nil {
-													_e.o.appliedRule(opt.GenerateGeoLookupJoins, _root, _last.NextExpr())
+										if _e.funcs.FirstArgIsVariable(fn) {
+											if _e.funcs.SecondArgIsVariable(fn) {
+												private := &_root.JoinPrivate
+												if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateGeoLookupJoins) {
+													var _last memo.RelExpr
+													if _e.o.appliedRule != nil {
+														_last = memo.LastGroupMember(_root)
+													}
+													_e.funcs.GenerateGeoLookupJoins(_root, opt.InnerJoinOp, left, scanPrivate, on, private, fn)
+													if _e.o.appliedRule != nil {
+														_e.o.appliedRule(opt.GenerateGeoLookupJoins, _root, _last.NextExpr())
+													}
 												}
 											}
 										}
@@ -1084,16 +1086,18 @@ func (_e *explorer) exploreSemiJoin(
 								_function, _ := fn.(*memo.FunctionExpr)
 								if _function != nil {
 									if _e.funcs.IsGeoIndexFunction(fn) {
-										if _e.funcs.HasAllVariableArgs(fn) {
-											private := &_root.JoinPrivate
-											if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateGeoLookupJoins) {
-												var _last memo.RelExpr
-												if _e.o.appliedRule != nil {
-													_last = memo.LastGroupMember(_root)
-												}
-												_e.funcs.GenerateGeoLookupJoins(_root, opt.SemiJoinOp, left, scanPrivate, on, private, fn)
-												if _e.o.appliedRule != nil {
-													_e.o.appliedRule(opt.GenerateGeoLookupJoins, _root, _last.NextExpr())
+										if _e.funcs.FirstArgIsVariable(fn) {
+											if _e.funcs.SecondArgIsVariable(fn) {
+												private := &_root.JoinPrivate
+												if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateGeoLookupJoins) {
+													var _last memo.RelExpr
+													if _e.o.appliedRule != nil {
+														_last = memo.LastGroupMember(_root)
+													}
+													_e.funcs.GenerateGeoLookupJoins(_root, opt.SemiJoinOp, left, scanPrivate, on, private, fn)
+													if _e.o.appliedRule != nil {
+														_e.o.appliedRule(opt.GenerateGeoLookupJoins, _root, _last.NextExpr())
+													}
 												}
 											}
 										}
@@ -1258,16 +1262,18 @@ func (_e *explorer) exploreAntiJoin(
 								_function, _ := fn.(*memo.FunctionExpr)
 								if _function != nil {
 									if _e.funcs.IsGeoIndexFunction(fn) {
-										if _e.funcs.HasAllVariableArgs(fn) {
-											private := &_root.JoinPrivate
-											if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateGeoLookupJoins) {
-												var _last memo.RelExpr
-												if _e.o.appliedRule != nil {
-													_last = memo.LastGroupMember(_root)
-												}
-												_e.funcs.GenerateGeoLookupJoins(_root, opt.AntiJoinOp, left, scanPrivate, on, private, fn)
-												if _e.o.appliedRule != nil {
-													_e.o.appliedRule(opt.GenerateGeoLookupJoins, _root, _last.NextExpr())
+										if _e.funcs.FirstArgIsVariable(fn) {
+											if _e.funcs.SecondArgIsVariable(fn) {
+												private := &_root.JoinPrivate
+												if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateGeoLookupJoins) {
+													var _last memo.RelExpr
+													if _e.o.appliedRule != nil {
+														_last = memo.LastGroupMember(_root)
+													}
+													_e.funcs.GenerateGeoLookupJoins(_root, opt.AntiJoinOp, left, scanPrivate, on, private, fn)
+													if _e.o.appliedRule != nil {
+														_e.o.appliedRule(opt.GenerateGeoLookupJoins, _root, _last.NextExpr())
+													}
 												}
 											}
 										}
