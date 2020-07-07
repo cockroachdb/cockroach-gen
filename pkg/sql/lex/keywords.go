@@ -113,6 +113,7 @@ var KeywordsCategories = map[string]string{
 	"exclude":                   "U",
 	"excluding":                 "U",
 	"execute":                   "U",
+	"execution":                 "U",
 	"exists":                    "C",
 	"experimental":              "U",
 	"experimental_audit":        "U",
@@ -227,6 +228,7 @@ var KeywordsCategories = map[string]string{
 	"names":                     "U",
 	"nan":                       "U",
 	"natural":                   "T",
+	"never":                     "U",
 	"next":                      "U",
 	"no":                        "U",
 	"nocreaterole":              "U",
@@ -290,6 +292,7 @@ var KeywordsCategories = map[string]string{
 	"ranges":                    "U",
 	"read":                      "U",
 	"real":                      "C",
+	"recurring":                 "U",
 	"recursive":                 "U",
 	"ref":                       "U",
 	"references":                "R",
@@ -302,6 +305,7 @@ var KeywordsCategories = map[string]string{
 	"restore":                   "U",
 	"restrict":                  "U",
 	"resume":                    "U",
+	"retry":                     "U",
 	"returning":                 "R",
 	"revision_history":          "U",
 	"revoke":                    "U",
@@ -315,6 +319,7 @@ var KeywordsCategories = map[string]string{
 	"rule":                      "U",
 	"savepoint":                 "U",
 	"scatter":                   "U",
+	"schedule":                  "U",
 	"schema":                    "U",
 	"schemas":                   "U",
 	"scrub":                     "U",
@@ -530,6 +535,7 @@ var KeywordNames = []string{
 	"exclude",
 	"excluding",
 	"execute",
+	"execution",
 	"exists",
 	"experimental",
 	"experimental_audit",
@@ -644,6 +650,7 @@ var KeywordNames = []string{
 	"names",
 	"nan",
 	"natural",
+	"never",
 	"next",
 	"no",
 	"nocreaterole",
@@ -707,6 +714,7 @@ var KeywordNames = []string{
 	"ranges",
 	"read",
 	"real",
+	"recurring",
 	"recursive",
 	"ref",
 	"references",
@@ -719,6 +727,7 @@ var KeywordNames = []string{
 	"restore",
 	"restrict",
 	"resume",
+	"retry",
 	"returning",
 	"revision_history",
 	"revoke",
@@ -732,6 +741,7 @@ var KeywordNames = []string{
 	"rule",
 	"savepoint",
 	"scatter",
+	"schedule",
 	"schema",
 	"schemas",
 	"scrub",
@@ -1062,6 +1072,8 @@ func GetKeywordID(k string) int32 {
 		return EXCLUDING
 	case "execute":
 		return EXECUTE
+	case "execution":
+		return EXECUTION
 	case "exists":
 		return EXISTS
 	case "experimental":
@@ -1290,6 +1302,8 @@ func GetKeywordID(k string) int32 {
 		return NAN
 	case "natural":
 		return NATURAL
+	case "never":
+		return NEVER
 	case "next":
 		return NEXT
 	case "no":
@@ -1416,6 +1430,8 @@ func GetKeywordID(k string) int32 {
 		return READ
 	case "real":
 		return REAL
+	case "recurring":
+		return RECURRING
 	case "recursive":
 		return RECURSIVE
 	case "ref":
@@ -1440,6 +1456,8 @@ func GetKeywordID(k string) int32 {
 		return RESTRICT
 	case "resume":
 		return RESUME
+	case "retry":
+		return RETRY
 	case "returning":
 		return RETURNING
 	case "revision_history":
@@ -1466,6 +1484,8 @@ func GetKeywordID(k string) int32 {
 		return SAVEPOINT
 	case "scatter":
 		return SCATTER
+	case "schedule":
+		return SCHEDULE
 	case "schema":
 		return SCHEMA
 	case "schemas":
