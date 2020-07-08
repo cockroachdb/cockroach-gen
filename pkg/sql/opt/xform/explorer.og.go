@@ -1818,8 +1818,8 @@ func (_e *explorer) exploreLimit(
 				_scan, _ := _member.(*memo.ScanExpr)
 				if _scan != nil {
 					scanPrivate := &_scan.ScanPrivate
-					if _e.funcs.ScanIsConstrained(scanPrivate) {
-						if !_e.funcs.ScanIsLimited(scanPrivate) {
+					if !_e.funcs.ScanIsLimited(scanPrivate) {
+						if !_e.funcs.ScanIsInverted(scanPrivate) {
 							limitExpr := _root.Limit
 							_const, _ := limitExpr.(*memo.ConstExpr)
 							if _const != nil {
