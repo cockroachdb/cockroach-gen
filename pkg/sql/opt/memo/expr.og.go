@@ -2309,6 +2309,7 @@ type SemiJoinExpr struct {
 	Right RelExpr
 	On    FiltersExpr
 	JoinPrivate
+	multiplicity props.JoinMultiplicity
 
 	grp  exprGroup
 	next RelExpr
@@ -16809,6 +16810,7 @@ func (m *Memo) MemoizeSemiJoin(
 		if m.newGroupFn != nil {
 			m.newGroupFn(e)
 		}
+		e.initUnexportedFields(m)
 		m.logPropsBuilder.buildSemiJoinProps(e, &grp.rel)
 		grp.rel.Populated = true
 		m.memEstimate += size
@@ -20571,6 +20573,7 @@ func (m *Memo) AddSemiJoinToGroup(e *SemiJoinExpr, grp RelExpr) *SemiJoinExpr {
 	const size = int64(unsafe.Sizeof(SemiJoinExpr{}))
 	interned := m.interner.InternSemiJoin(e)
 	if interned == e {
+		e.initUnexportedFields(m)
 		e.setGroup(grp)
 		m.memEstimate += size
 		m.CheckExpr(e)
