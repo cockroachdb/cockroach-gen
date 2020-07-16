@@ -679,7 +679,7 @@ Plan options:
 		Text: `
 Grant privileges:
   GRANT {ALL | <privileges...> } ON <targets...> TO <grantees...>
-Grant role membership (CCL only):
+Grant role membership:
   GRANT <roles...> TO <grantees...> [WITH ADMIN OPTION]
 
 Privileges:
@@ -703,7 +703,7 @@ Targets:
 		Text: `
 Revoke privileges:
   REVOKE {ALL | <privileges...> } ON <targets...> FROM <grantees...>
-Revoke role membership (CCL only):
+Revoke role membership:
   REVOKE [ADMIN OPTION FOR] <roles...> FROM <grantees...>
 
 Privileges:
