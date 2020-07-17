@@ -21502,11 +21502,11 @@ sqldefault:
 		{
 
 			switch sqlDollar[2].str {
-			case "gin":
+			case "gin", "gist":
 				sqlVAL.union.val = true
 			case "btree":
 				sqlVAL.union.val = false
-			case "hash", "gist", "spgist", "brin":
+			case "hash", "spgist", "brin":
 				return unimplemented(sqllex, "index using "+sqlDollar[2].str)
 			default:
 				sqllex.Error("unrecognized access method: " + sqlDollar[2].str)
