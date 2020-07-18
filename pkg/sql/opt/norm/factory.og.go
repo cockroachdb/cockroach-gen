@@ -16202,11 +16202,27 @@ func (_f *Factory) ConstructVariance(
 	return _f.onConstructScalar(e)
 }
 
+// ConstructVarPop constructs an expression for the VarPop operator.
+func (_f *Factory) ConstructVarPop(
+	input opt.ScalarExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeVarPop(input)
+	return _f.onConstructScalar(e)
+}
+
 // ConstructStdDev constructs an expression for the StdDev operator.
 func (_f *Factory) ConstructStdDev(
 	input opt.ScalarExpr,
 ) opt.ScalarExpr {
 	e := _f.mem.MemoizeStdDev(input)
+	return _f.onConstructScalar(e)
+}
+
+// ConstructStdDevPop constructs an expression for the StdDevPop operator.
+func (_f *Factory) ConstructStdDevPop(
+	input opt.ScalarExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeStdDevPop(input)
 	return _f.onConstructScalar(e)
 }
 
@@ -17788,10 +17804,24 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		}
 		return t
 
+	case *memo.VarPopExpr:
+		input := replace(t.Input).(opt.ScalarExpr)
+		if input != t.Input {
+			return f.ConstructVarPop(input)
+		}
+		return t
+
 	case *memo.StdDevExpr:
 		input := replace(t.Input).(opt.ScalarExpr)
 		if input != t.Input {
 			return f.ConstructStdDev(input)
+		}
+		return t
+
+	case *memo.StdDevPopExpr:
+		input := replace(t.Input).(opt.ScalarExpr)
+		if input != t.Input {
+			return f.ConstructStdDevPop(input)
 		}
 		return t
 
@@ -19076,8 +19106,18 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
 		)
 
+	case *memo.VarPopExpr:
+		return f.ConstructVarPop(
+			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
+		)
+
 	case *memo.StdDevExpr:
 		return f.ConstructStdDev(
+			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
+		)
+
+	case *memo.StdDevPopExpr:
+		return f.ConstructStdDevPop(
 			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
 		)
 
@@ -20097,8 +20137,16 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 		return f.ConstructVariance(
 			args[0].(opt.ScalarExpr),
 		)
+	case opt.VarPopOp:
+		return f.ConstructVarPop(
+			args[0].(opt.ScalarExpr),
+		)
 	case opt.StdDevOp:
 		return f.ConstructStdDev(
+			args[0].(opt.ScalarExpr),
+		)
+	case opt.StdDevPopOp:
+		return f.ConstructStdDevPop(
 			args[0].(opt.ScalarExpr),
 		)
 	case opt.XorAggOp:

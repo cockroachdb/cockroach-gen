@@ -12691,6 +12691,58 @@ func (e *VarianceExpr) DataType() *types.T {
 	return e.Typ
 }
 
+type VarPopExpr struct {
+	Input opt.ScalarExpr
+
+	Typ *types.T
+	id  opt.ScalarID
+}
+
+var _ opt.ScalarExpr = &VarPopExpr{}
+
+func (e *VarPopExpr) ID() opt.ScalarID {
+	return e.id
+}
+
+func (e *VarPopExpr) Op() opt.Operator {
+	return opt.VarPopOp
+}
+
+func (e *VarPopExpr) ChildCount() int {
+	return 1
+}
+
+func (e *VarPopExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *VarPopExpr) Private() interface{} {
+	return nil
+}
+
+func (e *VarPopExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *VarPopExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(opt.ScalarExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *VarPopExpr) DataType() *types.T {
+	return e.Typ
+}
+
 type StdDevExpr struct {
 	Input opt.ScalarExpr
 
@@ -12740,6 +12792,58 @@ func (e *StdDevExpr) SetChild(nth int, child opt.Expr) {
 }
 
 func (e *StdDevExpr) DataType() *types.T {
+	return e.Typ
+}
+
+type StdDevPopExpr struct {
+	Input opt.ScalarExpr
+
+	Typ *types.T
+	id  opt.ScalarID
+}
+
+var _ opt.ScalarExpr = &StdDevPopExpr{}
+
+func (e *StdDevPopExpr) ID() opt.ScalarID {
+	return e.id
+}
+
+func (e *StdDevPopExpr) Op() opt.Operator {
+	return opt.StdDevPopOp
+}
+
+func (e *StdDevPopExpr) ChildCount() int {
+	return 1
+}
+
+func (e *StdDevPopExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *StdDevPopExpr) Private() interface{} {
+	return nil
+}
+
+func (e *StdDevPopExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *StdDevPopExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(opt.ScalarExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *StdDevPopExpr) DataType() *types.T {
 	return e.Typ
 }
 
@@ -19510,6 +19614,26 @@ func (m *Memo) MemoizeVariance(
 	return interned
 }
 
+func (m *Memo) MemoizeVarPop(
+	input opt.ScalarExpr,
+) *VarPopExpr {
+	const size = int64(unsafe.Sizeof(VarPopExpr{}))
+	e := &VarPopExpr{
+		Input: input,
+		id:    m.NextID(),
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternVarPop(e)
+	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
+		m.memEstimate += size
+		m.CheckExpr(e)
+	}
+	return interned
+}
+
 func (m *Memo) MemoizeStdDev(
 	input opt.ScalarExpr,
 ) *StdDevExpr {
@@ -19520,6 +19644,26 @@ func (m *Memo) MemoizeStdDev(
 	}
 	e.Typ = InferType(m, e)
 	interned := m.interner.InternStdDev(e)
+	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
+		m.memEstimate += size
+		m.CheckExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeStdDevPop(
+	input opt.ScalarExpr,
+) *StdDevPopExpr {
+	const size = int64(unsafe.Sizeof(StdDevPopExpr{}))
+	e := &StdDevPopExpr{
+		Input: input,
+		id:    m.NextID(),
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternStdDevPop(e)
 	if interned == e {
 		if m.newGroupFn != nil {
 			m.newGroupFn(e)
@@ -21543,8 +21687,12 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternSqrDiff(t)
 	case *VarianceExpr:
 		return in.InternVariance(t)
+	case *VarPopExpr:
+		return in.InternVarPop(t)
 	case *StdDevExpr:
 		return in.InternStdDev(t)
+	case *StdDevPopExpr:
+		return in.InternStdDevPop(t)
 	case *XorAggExpr:
 		return in.InternXorAgg(t)
 	case *JsonAggExpr:
@@ -24921,6 +25069,24 @@ func (in *interner) InternVariance(val *VarianceExpr) *VarianceExpr {
 	return val
 }
 
+func (in *interner) InternVarPop(val *VarPopExpr) *VarPopExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.VarPopOp)
+	in.hasher.HashScalarExpr(val.Input)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*VarPopExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
 func (in *interner) InternStdDev(val *StdDevExpr) *StdDevExpr {
 	in.hasher.Init()
 	in.hasher.HashOperator(opt.StdDevOp)
@@ -24929,6 +25095,24 @@ func (in *interner) InternStdDev(val *StdDevExpr) *StdDevExpr {
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*StdDevExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternStdDevPop(val *StdDevPopExpr) *StdDevPopExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.StdDevPopOp)
+	in.hasher.HashScalarExpr(val.Input)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*StdDevPopExpr); ok {
 			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) {
 				return existing
 			}
