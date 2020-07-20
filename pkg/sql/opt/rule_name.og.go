@@ -254,6 +254,7 @@ const (
 	ReplaceMinWithLimit
 	ReplaceMaxWithLimit
 	GenerateStreamingGroupBy
+	ReorderJoins
 	CommuteJoin
 	CommuteLeftJoin
 	CommuteSemiJoin
@@ -263,7 +264,6 @@ const (
 	GenerateZigzagJoins
 	GenerateInvertedIndexZigzagJoins
 	GenerateLookupJoinsWithFilter
-	AssociateJoin
 	PushJoinIntoIndexJoin
 	GenerateLimitedScans
 	PushLimitIntoConstrainedScan

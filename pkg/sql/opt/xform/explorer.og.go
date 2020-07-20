@@ -412,6 +412,27 @@ func (_e *explorer) exploreInnerJoin(
 ) (_fullyExplored bool) {
 	_fullyExplored = true
 
+	// [ReorderJoins]
+	{
+		if _rootOrd >= _rootState.start {
+			joinPrivate := &_root.JoinPrivate
+			if _e.funcs.NoJoinHints(joinPrivate) {
+				if _e.funcs.ShouldReorderJoins(_root) {
+					if _e.o.matchedRule == nil || _e.o.matchedRule(opt.ReorderJoins) {
+						var _last memo.RelExpr
+						if _e.o.appliedRule != nil {
+							_last = memo.LastGroupMember(_root)
+						}
+						_e.funcs.ReorderJoins(_root)
+						if _e.o.appliedRule != nil {
+							_e.o.appliedRule(opt.ReorderJoins, _root, _last.NextExpr())
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [CommuteJoin]
 	{
 		if _rootOrd >= _rootState.start {
@@ -594,65 +615,6 @@ func (_e *explorer) exploreInnerJoin(
 									_e.funcs.GenerateLookupJoins(_root, opt.InnerJoinOp, left, scanPrivate, _e.funcs.ConcatFilters(on, filters), private)
 									if _e.o.appliedRule != nil {
 										_e.o.appliedRule(opt.GenerateLookupJoinsWithFilter, _root, _last.NextExpr())
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
-	// [AssociateJoin]
-	{
-		_partlyExplored := _rootOrd < _rootState.start
-		left := _root.Left
-		_state := _e.lookupExploreState(left)
-		if !_state.fullyExplored {
-			_fullyExplored = false
-		}
-		var _member memo.RelExpr
-		for _ord := 0; _ord < _state.end; _ord++ {
-			if _member == nil {
-				_member = left.FirstExpr()
-			} else {
-				_member = _member.NextExpr()
-			}
-			if !_partlyExplored || _ord >= _state.start {
-				_innerJoin, _ := _member.(*memo.InnerJoinExpr)
-				if _innerJoin != nil {
-					innerLeft := _innerJoin.Left
-					innerRight := _innerJoin.Right
-					innerOn := _innerJoin.On
-					innerPrivate := &_innerJoin.JoinPrivate
-					if _e.funcs.NoJoinHints(innerPrivate) {
-						right := _root.Right
-						if _e.funcs.ShouldReorderJoins(_root) {
-							on := _root.On
-							private := &_root.JoinPrivate
-							if _e.funcs.NoJoinHints(private) {
-								if _e.o.matchedRule == nil || _e.o.matchedRule(opt.AssociateJoin) {
-									cols := _e.funcs.OutputCols2(innerRight, right)
-									newOn := _e.funcs.MapJoinOpEqualities(_e.funcs.ConcatFilters(on, innerOn), _e.funcs.OutputCols(innerLeft), cols)
-									_expr := &memo.InnerJoinExpr{
-										Left: innerLeft,
-										Right: _e.f.ConstructInnerJoin(
-											innerRight,
-											right,
-											_e.funcs.SortFilters(_e.funcs.ExtractBoundConditions(newOn, cols)),
-											_e.funcs.EmptyJoinPrivate(),
-										),
-										On:          _e.funcs.SortFilters(_e.funcs.ExtractUnboundConditions(newOn, cols)),
-										JoinPrivate: *_e.funcs.EmptyJoinPrivate(),
-									}
-									_interned := _e.mem.AddInnerJoinToGroup(_expr, _root)
-									if _e.o.appliedRule != nil {
-										if _interned != _expr {
-											_e.o.appliedRule(opt.AssociateJoin, _root, nil)
-										} else {
-											_e.o.appliedRule(opt.AssociateJoin, _root, _interned)
-										}
 									}
 								}
 							}
