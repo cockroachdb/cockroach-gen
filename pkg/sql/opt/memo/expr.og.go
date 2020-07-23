@@ -14859,7 +14859,7 @@ func (g *createViewGroup) bestProps() *bestProps {
 type CreateViewPrivate struct {
 	// Schema is the ID of the catalog schema into which the new table goes.
 	Schema      opt.SchemaID
-	ViewName    string
+	ViewName    *tree.TableName
 	Temporary   bool
 	IfNotExists bool
 	Replace     bool
@@ -25774,7 +25774,7 @@ func (in *interner) InternCreateView(val *CreateViewExpr) *CreateViewExpr {
 	in.hasher.Init()
 	in.hasher.HashOperator(opt.CreateViewOp)
 	in.hasher.HashSchemaID(val.Schema)
-	in.hasher.HashString(val.ViewName)
+	in.hasher.HashPointer(unsafe.Pointer(val.ViewName))
 	in.hasher.HashBool(val.Temporary)
 	in.hasher.HashBool(val.IfNotExists)
 	in.hasher.HashBool(val.Replace)
@@ -25786,7 +25786,7 @@ func (in *interner) InternCreateView(val *CreateViewExpr) *CreateViewExpr {
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*CreateViewExpr); ok {
 			if in.hasher.IsSchemaIDEqual(val.Schema, existing.Schema) &&
-				in.hasher.IsStringEqual(val.ViewName, existing.ViewName) &&
+				in.hasher.IsPointerEqual(unsafe.Pointer(val.ViewName), unsafe.Pointer(existing.ViewName)) &&
 				in.hasher.IsBoolEqual(val.Temporary, existing.Temporary) &&
 				in.hasher.IsBoolEqual(val.IfNotExists, existing.IfNotExists) &&
 				in.hasher.IsBoolEqual(val.Replace, existing.Replace) &&
