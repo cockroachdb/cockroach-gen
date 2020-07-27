@@ -9723,6 +9723,8 @@ func (_f *Factory) ConstructWith(
 // ConstructWithScan constructs an expression for the WithScan operator.
 // WithScan returns the results present in the With expression referenced
 // by ID.
+// Note that in order to contruct a WithScan, the WithID must have a bound
+// expression in the metadata.
 func (_f *Factory) ConstructWithScan(
 	withScanPrivate *memo.WithScanPrivate,
 ) memo.RelExpr {
@@ -9748,9 +9750,10 @@ func (_f *Factory) ConstructRecursiveCTE(
 }
 
 // ConstructFakeRel constructs an expression for the FakeRel operator.
-// FakeRel is a mock relational operator used for testing; its logical properties
-// are pre-determined and stored in the private. It can be used as the child of
-// an operator for which we are calculating properties or statistics.
+// FakeRel is a mock relational operator used for testing and as a dummy binding
+// relation for building cascades; its logical properties are pre-determined and
+// stored in the private. It can be used as the child of an operator for which we
+// are calculating properties or statistics.
 func (_f *Factory) ConstructFakeRel(
 	fakeRelPrivate *memo.FakeRelPrivate,
 ) memo.RelExpr {
@@ -16737,7 +16740,7 @@ func (_f *Factory) ConstructExport(
 // callback. The caller can continue traversing the expression tree within the
 // callback by recursively calling Replace. It can also return a replacement
 // expression; if it does, then Replace will rebuild the operator and its
-// ancestors via a calls to the corresponding factory Construct methods. Here
+// ancestors via a call to the corresponding factory Construct methods. Here
 // is example usage:
 //
 //   var replace func(e opt.Expr) opt.Expr
@@ -18288,29 +18291,45 @@ func (f *Factory) replaceScalarListExpr(list memo.ScalarListExpr, replace Replac
 func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst opt.Expr) {
 	switch t := src.(type) {
 	case *memo.InsertExpr:
+		input := f.invokeReplace(t.Input, replace).(memo.RelExpr)
+		if id := t.WithBindingID(); id != 0 {
+			f.Metadata().AddWithBinding(id, input)
+		}
 		return f.ConstructInsert(
-			f.invokeReplace(t.Input, replace).(memo.RelExpr),
+			input,
 			f.copyAndReplaceDefaultFKChecksExpr(t.Checks, replace),
 			&t.MutationPrivate,
 		)
 
 	case *memo.UpdateExpr:
+		input := f.invokeReplace(t.Input, replace).(memo.RelExpr)
+		if id := t.WithBindingID(); id != 0 {
+			f.Metadata().AddWithBinding(id, input)
+		}
 		return f.ConstructUpdate(
-			f.invokeReplace(t.Input, replace).(memo.RelExpr),
+			input,
 			f.copyAndReplaceDefaultFKChecksExpr(t.Checks, replace),
 			&t.MutationPrivate,
 		)
 
 	case *memo.UpsertExpr:
+		input := f.invokeReplace(t.Input, replace).(memo.RelExpr)
+		if id := t.WithBindingID(); id != 0 {
+			f.Metadata().AddWithBinding(id, input)
+		}
 		return f.ConstructUpsert(
-			f.invokeReplace(t.Input, replace).(memo.RelExpr),
+			input,
 			f.copyAndReplaceDefaultFKChecksExpr(t.Checks, replace),
 			&t.MutationPrivate,
 		)
 
 	case *memo.DeleteExpr:
+		input := f.invokeReplace(t.Input, replace).(memo.RelExpr)
+		if id := t.WithBindingID(); id != 0 {
+			f.Metadata().AddWithBinding(id, input)
+		}
 		return f.ConstructDelete(
-			f.invokeReplace(t.Input, replace).(memo.RelExpr),
+			input,
 			f.copyAndReplaceDefaultFKChecksExpr(t.Checks, replace),
 			&t.MutationPrivate,
 		)
@@ -18584,8 +18603,12 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 		)
 
 	case *memo.WithExpr:
+		binding := f.invokeReplace(t.Binding, replace).(memo.RelExpr)
+		if id := t.WithBindingID(); id != 0 {
+			f.Metadata().AddWithBinding(id, binding)
+		}
 		return f.ConstructWith(
-			f.invokeReplace(t.Binding, replace).(memo.RelExpr),
+			binding,
 			f.invokeReplace(t.Main, replace).(memo.RelExpr),
 			&t.WithPrivate,
 		)

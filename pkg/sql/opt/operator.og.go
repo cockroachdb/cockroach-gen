@@ -363,9 +363,10 @@ const (
 
 	FKChecksItemPrivateOp
 
-	// FakeRel is a mock relational operator used for testing; its logical properties
-	// are pre-determined and stored in the private. It can be used as the child of
-	// an operator for which we are calculating properties or statistics.
+	// FakeRel is a mock relational operator used for testing and as a dummy binding
+	// relation for building cascades; its logical properties are pre-determined and
+	// stored in the private. It can be used as the child of an operator for which we
+	// are calculating properties or statistics.
 	FakeRelOp
 
 	FakeRelPrivateOp
@@ -1140,6 +1141,8 @@ const (
 
 	// WithScan returns the results present in the With expression referenced
 	// by ID.
+	// Note that in order to contruct a WithScan, the WithID must have a bound
+	// expression in the metadata.
 	WithScanOp
 
 	WithScanPrivateOp
@@ -1343,6 +1346,23 @@ func IsMutationOp(e Expr) bool {
 	case AlterTableRelocateOp, AlterTableSplitOp, AlterTableUnsplitOp, AlterTableUnsplitAllOp,
 		CreateTableOp, CreateViewOp, DeleteOp, InsertOp, OpaqueDDLOp,
 		OpaqueMutationOp, UpdateOp, UpsertOp:
+		return true
+	}
+	return false
+}
+
+var WithBindingOperators = [...]Operator{
+	DeleteOp,
+	InsertOp,
+	UpdateOp,
+	UpsertOp,
+	WithOp,
+}
+
+func IsWithBindingOp(e Expr) bool {
+	switch e.Op() {
+	case DeleteOp, InsertOp, UpdateOp, UpsertOp,
+		WithOp:
 		return true
 	}
 	return false

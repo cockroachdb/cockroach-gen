@@ -6664,6 +6664,8 @@ type WithPrivate struct {
 
 // WithScanExpr returns the results present in the With expression referenced
 // by ID.
+// Note that in order to contruct a WithScan, the WithID must have a bound
+// expression in the metadata.
 type WithScanExpr struct {
 	WithScanPrivate
 
@@ -6778,9 +6780,6 @@ func (g *withScanGroup) bestProps() *bestProps {
 type WithScanPrivate struct {
 	// With identifies the CTE to scan.
 	With opt.WithID
-
-	// BindingProps stores the relational properties of the referenced expression.
-	BindingProps *props.Relational
 
 	// Name is used to identify the with being referenced for debugging purposes.
 	Name string
@@ -6963,9 +6962,10 @@ type RecursiveCTEPrivate struct {
 	OutCols opt.ColList
 }
 
-// FakeRelExpr is a mock relational operator used for testing; its logical properties
-// are pre-determined and stored in the private. It can be used as the child of
-// an operator for which we are calculating properties or statistics.
+// FakeRelExpr is a mock relational operator used for testing and as a dummy binding
+// relation for building cascades; its logical properties are pre-determined and
+// stored in the private. It can be used as the child of an operator for which we
+// are calculating properties or statistics.
 type FakeRelExpr struct {
 	FakeRelPrivate
 
@@ -23080,7 +23080,6 @@ func (in *interner) InternWithScan(val *WithScanExpr) *WithScanExpr {
 	in.hasher.Init()
 	in.hasher.HashOperator(opt.WithScanOp)
 	in.hasher.HashWithID(val.With)
-	in.hasher.HashPointer(unsafe.Pointer(val.BindingProps))
 	in.hasher.HashString(val.Name)
 	in.hasher.HashColList(val.InCols)
 	in.hasher.HashColList(val.OutCols)
@@ -23090,7 +23089,6 @@ func (in *interner) InternWithScan(val *WithScanExpr) *WithScanExpr {
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*WithScanExpr); ok {
 			if in.hasher.IsWithIDEqual(val.With, existing.With) &&
-				in.hasher.IsPointerEqual(unsafe.Pointer(val.BindingProps), unsafe.Pointer(existing.BindingProps)) &&
 				in.hasher.IsStringEqual(val.Name, existing.Name) &&
 				in.hasher.IsColListEqual(val.InCols, existing.InCols) &&
 				in.hasher.IsColListEqual(val.OutCols, existing.OutCols) &&
