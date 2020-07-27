@@ -320,6 +320,7 @@ var KeywordsCategories = map[string]string{
 	"savepoint":                 "U",
 	"scatter":                   "U",
 	"schedule":                  "U",
+	"schedules":                 "U",
 	"schema":                    "U",
 	"schemas":                   "U",
 	"scrub":                     "U",
@@ -743,6 +744,7 @@ var KeywordNames = []string{
 	"savepoint",
 	"scatter",
 	"schedule",
+	"schedules",
 	"schema",
 	"schemas",
 	"scrub",
@@ -1488,6 +1490,8 @@ func GetKeywordID(k string) int32 {
 		return SCATTER
 	case "schedule":
 		return SCHEDULE
+	case "schedules":
+		return SCHEDULES
 	case "schema":
 		return SCHEMA
 	case "schemas":

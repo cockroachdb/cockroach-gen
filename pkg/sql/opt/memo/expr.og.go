@@ -16133,6 +16133,136 @@ type ControlJobsPrivate struct {
 	Command tree.JobCommand
 }
 
+// ControlSchedulesExpr represents a `PAUSE/CANCEL/RESUME SCHEDULES` statement.
+type ControlSchedulesExpr struct {
+	// The input expression returns schedule IDs (as integers).
+	Input RelExpr
+	ControlSchedulesPrivate
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &ControlSchedulesExpr{}
+
+func (e *ControlSchedulesExpr) Op() opt.Operator {
+	return opt.ControlSchedulesOp
+}
+
+func (e *ControlSchedulesExpr) ChildCount() int {
+	return 1
+}
+
+func (e *ControlSchedulesExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *ControlSchedulesExpr) Private() interface{} {
+	return &e.ControlSchedulesPrivate
+}
+
+func (e *ControlSchedulesExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *ControlSchedulesExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(RelExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *ControlSchedulesExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *ControlSchedulesExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *ControlSchedulesExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *ControlSchedulesExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *ControlSchedulesExpr) RequiredPhysical() *physical.Required {
+	return e.grp.bestProps().required
+}
+
+func (e *ControlSchedulesExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
+func (e *ControlSchedulesExpr) Cost() Cost {
+	return e.grp.bestProps().cost
+}
+
+func (e *ControlSchedulesExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *ControlSchedulesExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
+}
+
+func (e *ControlSchedulesExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(errors.AssertionFailedf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *ControlSchedulesExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(errors.AssertionFailedf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type controlSchedulesGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	first ControlSchedulesExpr
+	best  bestProps
+}
+
+var _ exprGroup = &controlSchedulesGroup{}
+
+func (g *controlSchedulesGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *controlSchedulesGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *controlSchedulesGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *controlSchedulesGroup) bestProps() *bestProps {
+	return &g.best
+}
+
+type ControlSchedulesPrivate struct {
+	// Props stores the required physical properties for the input
+	// expression.
+	Props   *physical.Required
+	Command tree.ScheduleCommand
+}
+
 // CancelQueriesExpr represents a `CANCEL QUERIES` statement.
 type CancelQueriesExpr struct {
 	// The input expression returns query IDs (as strings).
@@ -20441,6 +20571,30 @@ func (m *Memo) MemoizeControlJobs(
 	return interned.FirstExpr()
 }
 
+func (m *Memo) MemoizeControlSchedules(
+	input RelExpr,
+	controlSchedulesPrivate *ControlSchedulesPrivate,
+) RelExpr {
+	const size = int64(unsafe.Sizeof(controlSchedulesGroup{}))
+	grp := &controlSchedulesGroup{mem: m, first: ControlSchedulesExpr{
+		Input:                   input,
+		ControlSchedulesPrivate: *controlSchedulesPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternControlSchedules(e)
+	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
+		m.logPropsBuilder.buildControlSchedulesProps(e, &grp.rel)
+		grp.rel.Populated = true
+		m.memEstimate += size
+		m.CheckExpr(e)
+	}
+	return interned.FirstExpr()
+}
+
 func (m *Memo) MemoizeCancelQueries(
 	input RelExpr,
 	cancelPrivate *CancelPrivate,
@@ -21351,6 +21505,20 @@ func (m *Memo) AddControlJobsToGroup(e *ControlJobsExpr, grp RelExpr) *ControlJo
 	return interned
 }
 
+func (m *Memo) AddControlSchedulesToGroup(e *ControlSchedulesExpr, grp RelExpr) *ControlSchedulesExpr {
+	const size = int64(unsafe.Sizeof(ControlSchedulesExpr{}))
+	interned := m.interner.InternControlSchedules(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.CheckExpr(e)
+	} else if interned.group() != grp.group() {
+		// This is a group collision, do nothing.
+		return nil
+	}
+	return interned
+}
+
 func (m *Memo) AddCancelQueriesToGroup(e *CancelQueriesExpr, grp RelExpr) *CancelQueriesExpr {
 	const size = int64(unsafe.Sizeof(CancelQueriesExpr{}))
 	interned := m.interner.InternCancelQueries(e)
@@ -21785,6 +21953,8 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternAlterTableRelocate(t)
 	case *ControlJobsExpr:
 		return in.InternControlJobs(t)
+	case *ControlSchedulesExpr:
+		return in.InternControlSchedules(t)
 	case *CancelQueriesExpr:
 		return in.InternCancelQueries(t)
 	case *CancelSessionsExpr:
@@ -26036,6 +26206,28 @@ func (in *interner) InternControlJobs(val *ControlJobsExpr) *ControlJobsExpr {
 	return val
 }
 
+func (in *interner) InternControlSchedules(val *ControlSchedulesExpr) *ControlSchedulesExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.ControlSchedulesOp)
+	in.hasher.HashRelExpr(val.Input)
+	in.hasher.HashPhysProps(val.Props)
+	in.hasher.HashScheduleCommand(val.Command)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*ControlSchedulesExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsPhysPropsEqual(val.Props, existing.Props) &&
+				in.hasher.IsScheduleCommandEqual(val.Command, existing.Command) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
 func (in *interner) InternCancelQueries(val *CancelQueriesExpr) *CancelQueriesExpr {
 	in.hasher.Init()
 	in.hasher.HashOperator(opt.CancelQueriesOp)
@@ -26228,6 +26420,8 @@ func (b *logicalPropsBuilder) buildProps(e RelExpr, rel *props.Relational) {
 		b.buildAlterTableRelocateProps(t, rel)
 	case *ControlJobsExpr:
 		b.buildControlJobsProps(t, rel)
+	case *ControlSchedulesExpr:
+		b.buildControlSchedulesProps(t, rel)
 	case *CancelQueriesExpr:
 		b.buildCancelQueriesProps(t, rel)
 	case *CancelSessionsExpr:

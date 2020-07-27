@@ -16703,6 +16703,16 @@ func (_f *Factory) ConstructControlJobs(
 	return _f.onConstructRelational(e)
 }
 
+// ConstructControlSchedules constructs an expression for the ControlSchedules operator.
+// ControlSchedules represents a `PAUSE/CANCEL/RESUME SCHEDULES` statement.
+func (_f *Factory) ConstructControlSchedules(
+	input memo.RelExpr,
+	controlSchedulesPrivate *memo.ControlSchedulesPrivate,
+) memo.RelExpr {
+	e := _f.mem.MemoizeControlSchedules(input, controlSchedulesPrivate)
+	return _f.onConstructRelational(e)
+}
+
 // ConstructCancelQueries constructs an expression for the CancelQueries operator.
 // CancelQueries represents a `CANCEL QUERIES` statement.
 func (_f *Factory) ConstructCancelQueries(
@@ -18089,6 +18099,13 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		}
 		return t
 
+	case *memo.ControlSchedulesExpr:
+		input := replace(t.Input).(memo.RelExpr)
+		if input != t.Input {
+			return f.ConstructControlSchedules(input, &t.ControlSchedulesPrivate)
+		}
+		return t
+
 	case *memo.CancelQueriesExpr:
 		input := replace(t.Input).(memo.RelExpr)
 		if input != t.Input {
@@ -19337,6 +19354,12 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 			&t.ControlJobsPrivate,
 		)
 
+	case *memo.ControlSchedulesExpr:
+		return f.ConstructControlSchedules(
+			f.invokeReplace(t.Input, replace).(memo.RelExpr),
+			&t.ControlSchedulesPrivate,
+		)
+
 	case *memo.CancelQueriesExpr:
 		return f.ConstructCancelQueries(
 			f.invokeReplace(t.Input, replace).(memo.RelExpr),
@@ -20337,6 +20360,11 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 		return f.ConstructControlJobs(
 			args[0].(memo.RelExpr),
 			args[1].(*memo.ControlJobsPrivate),
+		)
+	case opt.ControlSchedulesOp:
+		return f.ConstructControlSchedules(
+			args[0].(memo.RelExpr),
+			args[1].(*memo.ControlSchedulesPrivate),
 		)
 	case opt.CancelQueriesOp:
 		return f.ConstructCancelQueries(
