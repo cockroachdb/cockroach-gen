@@ -1060,7 +1060,7 @@ func (_f *Factory) ConstructProject(
 	// [EliminateJoinUnderProjectLeft]
 	{
 		join := input
-		if join.Op() == opt.InnerJoinOp || join.Op() == opt.LeftJoinOp || join.Op() == opt.SemiJoinOp {
+		if join.Op() == opt.InnerJoinOp || join.Op() == opt.LeftJoinOp {
 			left := join.Child(0).(memo.RelExpr)
 			right := join.Child(1).(memo.RelExpr)
 			if _f.funcs.JoinDoesNotDuplicateLeftRows(join) {
@@ -4517,15 +4517,13 @@ func (_f *Factory) ConstructSemiJoin(
 
 	// [EliminateSemiJoin]
 	{
-		if !_f.funcs.CanHaveZeroRows(right) {
-			if len(on) == 0 {
-				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateSemiJoin) {
-					_expr := left
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.EliminateSemiJoin, nil, _expr)
-					}
-					return _expr
+		if _f.funcs.JoinFiltersMatchAllLeftRows(left, right, on) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateSemiJoin) {
+				_expr := left
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.EliminateSemiJoin, nil, _expr)
 				}
+				return _expr
 			}
 		}
 	}
@@ -7143,15 +7141,13 @@ func (_f *Factory) ConstructSemiJoinApply(
 
 	// [EliminateSemiJoin]
 	{
-		if !_f.funcs.CanHaveZeroRows(right) {
-			if len(on) == 0 {
-				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateSemiJoin) {
-					_expr := left
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.EliminateSemiJoin, nil, _expr)
-					}
-					return _expr
+		if _f.funcs.JoinFiltersMatchAllLeftRows(left, right, on) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateSemiJoin) {
+				_expr := left
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.EliminateSemiJoin, nil, _expr)
 				}
+				return _expr
 			}
 		}
 	}
@@ -7755,7 +7751,7 @@ func (_f *Factory) ConstructGroupBy(
 
 	// [EliminateJoinUnderGroupByLeft]
 	{
-		if input.Op() == opt.InnerJoinOp || input.Op() == opt.LeftJoinOp || input.Op() == opt.SemiJoinOp {
+		if input.Op() == opt.InnerJoinOp || input.Op() == opt.LeftJoinOp {
 			left := input.Child(0).(memo.RelExpr)
 			aggs := aggregations
 			private := groupingPrivate
@@ -8057,7 +8053,7 @@ func (_f *Factory) ConstructScalarGroupBy(
 
 	// [EliminateJoinUnderGroupByLeft]
 	{
-		if input.Op() == opt.InnerJoinOp || input.Op() == opt.LeftJoinOp || input.Op() == opt.SemiJoinOp {
+		if input.Op() == opt.InnerJoinOp || input.Op() == opt.LeftJoinOp {
 			left := input.Child(0).(memo.RelExpr)
 			aggs := aggregations
 			private := groupingPrivate
@@ -8399,7 +8395,7 @@ func (_f *Factory) ConstructDistinctOn(
 
 	// [EliminateJoinUnderGroupByLeft]
 	{
-		if input.Op() == opt.InnerJoinOp || input.Op() == opt.LeftJoinOp || input.Op() == opt.SemiJoinOp {
+		if input.Op() == opt.InnerJoinOp || input.Op() == opt.LeftJoinOp {
 			left := input.Child(0).(memo.RelExpr)
 			aggs := aggregations
 			private := groupingPrivate
