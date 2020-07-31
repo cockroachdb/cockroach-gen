@@ -689,6 +689,27 @@ func (_e *explorer) exploreLeftJoin(
 ) (_fullyExplored bool) {
 	_fullyExplored = true
 
+	// [ReorderJoins]
+	{
+		if _rootOrd >= _rootState.start {
+			joinPrivate := &_root.JoinPrivate
+			if _e.funcs.NoJoinHints(joinPrivate) {
+				if _e.funcs.ShouldReorderJoins(_root) {
+					if _e.o.matchedRule == nil || _e.o.matchedRule(opt.ReorderJoins) {
+						var _last memo.RelExpr
+						if _e.o.appliedRule != nil {
+							_last = memo.LastGroupMember(_root)
+						}
+						_e.funcs.ReorderJoins(_root)
+						if _e.o.appliedRule != nil {
+							_e.o.appliedRule(opt.ReorderJoins, _root, _last.NextExpr())
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [CommuteLeftJoin]
 	{
 		if _rootOrd >= _rootState.start {
@@ -868,6 +889,27 @@ func (_e *explorer) exploreFullJoin(
 ) (_fullyExplored bool) {
 	_fullyExplored = true
 
+	// [ReorderJoins]
+	{
+		if _rootOrd >= _rootState.start {
+			joinPrivate := &_root.JoinPrivate
+			if _e.funcs.NoJoinHints(joinPrivate) {
+				if _e.funcs.ShouldReorderJoins(_root) {
+					if _e.o.matchedRule == nil || _e.o.matchedRule(opt.ReorderJoins) {
+						var _last memo.RelExpr
+						if _e.o.appliedRule != nil {
+							_last = memo.LastGroupMember(_root)
+						}
+						_e.funcs.ReorderJoins(_root)
+						if _e.o.appliedRule != nil {
+							_e.o.appliedRule(opt.ReorderJoins, _root, _last.NextExpr())
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [CommuteJoin]
 	{
 		if _rootOrd >= _rootState.start {
@@ -923,6 +965,27 @@ func (_e *explorer) exploreSemiJoin(
 	_rootOrd int,
 ) (_fullyExplored bool) {
 	_fullyExplored = true
+
+	// [ReorderJoins]
+	{
+		if _rootOrd >= _rootState.start {
+			joinPrivate := &_root.JoinPrivate
+			if _e.funcs.NoJoinHints(joinPrivate) {
+				if _e.funcs.ShouldReorderJoins(_root) {
+					if _e.o.matchedRule == nil || _e.o.matchedRule(opt.ReorderJoins) {
+						var _last memo.RelExpr
+						if _e.o.appliedRule != nil {
+							_last = memo.LastGroupMember(_root)
+						}
+						_e.funcs.ReorderJoins(_root)
+						if _e.o.appliedRule != nil {
+							_e.o.appliedRule(opt.ReorderJoins, _root, _last.NextExpr())
+						}
+					}
+				}
+			}
+		}
+	}
 
 	// [CommuteSemiJoin]
 	{
@@ -1137,6 +1200,27 @@ func (_e *explorer) exploreAntiJoin(
 	_rootOrd int,
 ) (_fullyExplored bool) {
 	_fullyExplored = true
+
+	// [ReorderJoins]
+	{
+		if _rootOrd >= _rootState.start {
+			joinPrivate := &_root.JoinPrivate
+			if _e.funcs.NoJoinHints(joinPrivate) {
+				if _e.funcs.ShouldReorderJoins(_root) {
+					if _e.o.matchedRule == nil || _e.o.matchedRule(opt.ReorderJoins) {
+						var _last memo.RelExpr
+						if _e.o.appliedRule != nil {
+							_last = memo.LastGroupMember(_root)
+						}
+						_e.funcs.ReorderJoins(_root)
+						if _e.o.appliedRule != nil {
+							_e.o.appliedRule(opt.ReorderJoins, _root, _last.NextExpr())
+						}
+					}
+				}
+			}
+		}
+	}
 
 	// [GenerateMergeJoins]
 	{
