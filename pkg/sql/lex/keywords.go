@@ -271,6 +271,7 @@ var KeywordsCategories = map[string]string{
 	"partitions":                "U",
 	"password":                  "U",
 	"pause":                     "U",
+	"paused":                    "U",
 	"physical":                  "U",
 	"placing":                   "R",
 	"plan":                      "U",
@@ -317,6 +318,7 @@ var KeywordsCategories = map[string]string{
 	"row":                       "C",
 	"rows":                      "U",
 	"rule":                      "U",
+	"running":                   "U",
 	"savepoint":                 "U",
 	"scatter":                   "U",
 	"schedule":                  "U",
@@ -695,6 +697,7 @@ var KeywordNames = []string{
 	"partitions",
 	"password",
 	"pause",
+	"paused",
 	"physical",
 	"placing",
 	"plan",
@@ -741,6 +744,7 @@ var KeywordNames = []string{
 	"row",
 	"rows",
 	"rule",
+	"running",
 	"savepoint",
 	"scatter",
 	"schedule",
@@ -1392,6 +1396,8 @@ func GetKeywordID(k string) int32 {
 		return PASSWORD
 	case "pause":
 		return PAUSE
+	case "paused":
+		return PAUSED
 	case "physical":
 		return PHYSICAL
 	case "placing":
@@ -1484,6 +1490,8 @@ func GetKeywordID(k string) int32 {
 		return ROWS
 	case "rule":
 		return RULE
+	case "running":
+		return RUNNING
 	case "savepoint":
 		return SAVEPOINT
 	case "scatter":

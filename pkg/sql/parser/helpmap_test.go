@@ -91,6 +91,7 @@ var expectedHelpStrings = []string{
 	"SHOW RANGES",
 	"SHOW ROLES",
 	"SHOW SAVEPOINT",
+	"SHOW SCHEDULES",
 	"SHOW SCHEMAS",
 	"SHOW SEQUENCES",
 	"SHOW SESSION",
