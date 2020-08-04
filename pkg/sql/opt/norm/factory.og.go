@@ -492,6 +492,51 @@ func (_f *Factory) ConstructSelect(
 		}
 	}
 
+	// [RejectNullsProject]
+	{
+		_project, _ := input.(*memo.ProjectExpr)
+		if _project != nil {
+			innerInput := _project.Input
+			projections := _project.Projections
+			projectionCols := _f.funcs.ProjectionCols(projections)
+			if !_f.funcs.ColsAreEmpty(projectionCols) {
+				passthrough := _project.Passthrough
+				rejectNullCols := _f.funcs.RejectNullCols(input)
+				if !_f.funcs.ColsAreEmpty(rejectNullCols) {
+					nullRejectedCols := _f.funcs.IntersectionCols(projectionCols, rejectNullCols)
+					if _f.funcs.HasNullRejectingFilter(filters, nullRejectedCols) {
+						if _f.matchedRule == nil || _f.matchedRule(opt.RejectNullsProject) {
+							_expr := _f.ConstructSelect(
+								_f.ConstructProject(
+									_f.ConstructSelect(
+										innerInput,
+										memo.FiltersExpr{
+											_f.ConstructFiltersItem(
+												_f.ConstructIsNot(
+													_f.funcs.NullRejectProjections(projections, nullRejectedCols, _f.funcs.RejectNullCols(innerInput)),
+													_f.ConstructNull(
+														_f.funcs.AnyType(),
+													),
+												),
+											),
+										},
+									),
+									projections,
+									passthrough,
+								),
+								filters,
+							)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.RejectNullsProject, nil, _expr)
+							}
+							return _expr
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [DetectSelectContradiction]
 	{
 		for i := range filters {

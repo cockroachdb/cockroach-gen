@@ -327,22 +327,36 @@ type Factory interface {
 	//
 	// ZigzagJoin performs a zigzag join.
 	//
-	// Each side of the join has two kinds of columns that form a prefix
-	// of the specified index: fixed columns (with values specified in
-	// fixedVals), and equal columns (with column ordinals specified in
-	// {left,right}EqCols). The lengths of leftEqCols and rightEqCols
-	// must match.
+	// Each side of the join has two kinds of columns: fixed columns and equal
+	// columns. The fixed columns correspond 1-to-1 to a prefix of the index columns.
+	// The fixed columns and the equal columns together also form a prefix of the
+	// index columns.
 	ConstructZigzagJoin(
+		// Left table and index.
 		leftTable cat.Table,
 		leftIndex cat.Index,
+		// leftCols are the columns that are scanned from the left index.
+		leftCols TableColumnOrdinalSet,
+		// leftFixedVals contains values for the fixed columns (a prefix of the
+		// index columns).
+		leftFixedVals []tree.TypedExpr,
+		// leftEqCols are the left table columns that have equality constraints,
+		// corresponding 1-1 to RightEqCols.
+		leftEqCols []TableColumnOrdinal,
+		// Right table and index.
 		rightTable cat.Table,
 		rightIndex cat.Index,
-		leftEqCols []NodeColumnOrdinal,
-		rightEqCols []NodeColumnOrdinal,
-		leftCols NodeColumnOrdinalSet,
-		rightCols NodeColumnOrdinalSet,
+		// rightCols are the columns that are scanned from the right index.
+		rightCols TableColumnOrdinalSet,
+		// rightFixedVals contains values for the fixed columns (a prefix of the
+		// index columns).
+		rightFixedVals []tree.TypedExpr,
+		// rightEqCols are the right table columns that have equality constraints,
+		// corresponding 1-1 to LeftEqCols.
+		rightEqCols []TableColumnOrdinal,
+		// onCond is an extra filter that is evaluated on the results.
+		// TODO(radu): remove this (it can be a separate Select).
 		onCond tree.TypedExpr,
-		fixedVals []Node,
 		reqOrdering OutputOrdering,
 	) (Node, error)
 
@@ -969,14 +983,15 @@ func (StubFactory) ConstructInvertedJoin(
 func (StubFactory) ConstructZigzagJoin(
 	leftTable cat.Table,
 	leftIndex cat.Index,
+	leftCols TableColumnOrdinalSet,
+	leftFixedVals []tree.TypedExpr,
+	leftEqCols []TableColumnOrdinal,
 	rightTable cat.Table,
 	rightIndex cat.Index,
-	leftEqCols []NodeColumnOrdinal,
-	rightEqCols []NodeColumnOrdinal,
-	leftCols NodeColumnOrdinalSet,
-	rightCols NodeColumnOrdinalSet,
+	rightCols TableColumnOrdinalSet,
+	rightFixedVals []tree.TypedExpr,
+	rightEqCols []TableColumnOrdinal,
 	onCond tree.TypedExpr,
-	fixedVals []Node,
 	reqOrdering OutputOrdering,
 ) (Node, error) {
 	return struct{}{}, nil

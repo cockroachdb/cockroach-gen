@@ -199,6 +199,7 @@ const (
 	RejectNullsGroupBy
 	RejectNullsUnderJoinLeft
 	RejectNullsUnderJoinRight
+	RejectNullsProject
 	CommuteVar
 	CommuteConst
 	EliminateCoalesce
