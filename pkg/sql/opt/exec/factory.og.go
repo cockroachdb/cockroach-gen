@@ -3,6 +3,7 @@
 package exec
 
 import (
+	"github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/cat"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/constraint"
@@ -128,7 +129,7 @@ type Factory interface {
 	//
 	// onCond is the join condition.
 	ConstructApplyJoin(
-		joinType sqlbase.JoinType,
+		joinType descpb.JoinType,
 		left Node,
 		rightColumns sqlbase.ResultColumns,
 		onCond tree.TypedExpr,
@@ -145,7 +146,7 @@ type Factory interface {
 	// The extraOnCond expression can refer to columns from both inputs using
 	// IndexedVars (first the left columns, then the right columns).
 	ConstructHashJoin(
-		joinType sqlbase.JoinType,
+		joinType descpb.JoinType,
 		left Node,
 		right Node,
 		leftEqCols []NodeColumnOrdinal,
@@ -162,7 +163,7 @@ type Factory interface {
 	// column in leftOrdering is constrained to equal the i-th column in
 	// rightOrdering. The directions must match between the two orderings.
 	ConstructMergeJoin(
-		joinType sqlbase.JoinType,
+		joinType descpb.JoinType,
 		left Node,
 		right Node,
 		onCond tree.TypedExpr,
@@ -189,7 +190,7 @@ type Factory interface {
 	// Locking clause for the ancestor is used.
 	//
 	ConstructInterleavedJoin(
-		joinType sqlbase.JoinType,
+		joinType descpb.JoinType,
 		leftTable cat.Table,
 		leftIndex cat.Index,
 		leftParams ScanParams,
@@ -304,7 +305,7 @@ type Factory interface {
 	// LeftSemiJoin or LeftAntiJoin) the lookupCols, ordered by ordinal. The ON
 	// condition can refer to these using IndexedVars.
 	ConstructLookupJoin(
-		joinType sqlbase.JoinType,
+		joinType descpb.JoinType,
 		input Node,
 		table cat.Table,
 		index cat.Index,
@@ -328,7 +329,7 @@ type Factory interface {
 	// condition can refer to these using IndexedVars. Note that lookupCols
 	// includes the inverted column.
 	ConstructInvertedJoin(
-		joinType sqlbase.JoinType,
+		joinType descpb.JoinType,
 		invertedExpr tree.TypedExpr,
 		input Node,
 		table cat.Table,
@@ -852,7 +853,7 @@ func (StubFactory) ConstructRender(
 }
 
 func (StubFactory) ConstructApplyJoin(
-	joinType sqlbase.JoinType,
+	joinType descpb.JoinType,
 	left Node,
 	rightColumns sqlbase.ResultColumns,
 	onCond tree.TypedExpr,
@@ -862,7 +863,7 @@ func (StubFactory) ConstructApplyJoin(
 }
 
 func (StubFactory) ConstructHashJoin(
-	joinType sqlbase.JoinType,
+	joinType descpb.JoinType,
 	left Node,
 	right Node,
 	leftEqCols []NodeColumnOrdinal,
@@ -875,7 +876,7 @@ func (StubFactory) ConstructHashJoin(
 }
 
 func (StubFactory) ConstructMergeJoin(
-	joinType sqlbase.JoinType,
+	joinType descpb.JoinType,
 	left Node,
 	right Node,
 	onCond tree.TypedExpr,
@@ -889,7 +890,7 @@ func (StubFactory) ConstructMergeJoin(
 }
 
 func (StubFactory) ConstructInterleavedJoin(
-	joinType sqlbase.JoinType,
+	joinType descpb.JoinType,
 	leftTable cat.Table,
 	leftIndex cat.Index,
 	leftParams ScanParams,
@@ -968,7 +969,7 @@ func (StubFactory) ConstructIndexJoin(
 }
 
 func (StubFactory) ConstructLookupJoin(
-	joinType sqlbase.JoinType,
+	joinType descpb.JoinType,
 	input Node,
 	table cat.Table,
 	index cat.Index,
@@ -982,7 +983,7 @@ func (StubFactory) ConstructLookupJoin(
 }
 
 func (StubFactory) ConstructInvertedJoin(
-	joinType sqlbase.JoinType,
+	joinType descpb.JoinType,
 	invertedExpr tree.TypedExpr,
 	input Node,
 	table cat.Table,
