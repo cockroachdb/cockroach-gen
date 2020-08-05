@@ -82,8 +82,24 @@ type Factory interface {
 	ConstructSimpleProject(
 		input Node,
 		cols []NodeColumnOrdinal,
-		colNames []string,
 		reqOrdering OutputOrdering,
+	) (Node, error)
+
+	// ConstructSerializingProject creates a node for a SerializingProject operation.
+	//
+	// SerializingProject is similar to SimpleProject, but it allows renaming of
+	// columns and forces distributed execution to serialize (merge) any parallel
+	// result streams into a single stream before the projection. This allows any
+	// required output ordering of the input node to be "materialized", which is
+	// important for cases where the projection no longer contains the ordering
+	// columns (e.g. SELECT a FROM t ORDER BY b).
+	//
+	// Typically used as the "root" (top-level) operator to ensure the correct
+	// ordering and naming of columns.
+	ConstructSerializingProject(
+		input Node,
+		cols []NodeColumnOrdinal,
+		colNames []string,
 	) (Node, error)
 
 	// ConstructRender creates a node for a Render operation.
@@ -396,14 +412,6 @@ type Factory interface {
 	ConstructWindow(
 		input Node,
 		window WindowInfo,
-	) (Node, error)
-
-	// ConstructRenameColumns creates a node for a RenameColumns operation.
-	//
-	// RenameColumns modifies the column names of a node.
-	ConstructRenameColumns(
-		input Node,
-		colNames []string,
 	) (Node, error)
 
 	// ConstructExplainOpt creates a node for a ExplainOpt operation.
@@ -821,8 +829,15 @@ func (StubFactory) ConstructInvertedFilter(
 func (StubFactory) ConstructSimpleProject(
 	input Node,
 	cols []NodeColumnOrdinal,
-	colNames []string,
 	reqOrdering OutputOrdering,
+) (Node, error) {
+	return struct{}{}, nil
+}
+
+func (StubFactory) ConstructSerializingProject(
+	input Node,
+	cols []NodeColumnOrdinal,
+	colNames []string,
 ) (Node, error) {
 	return struct{}{}, nil
 }
@@ -1024,13 +1039,6 @@ func (StubFactory) ConstructProjectSet(
 func (StubFactory) ConstructWindow(
 	input Node,
 	window WindowInfo,
-) (Node, error) {
-	return struct{}{}, nil
-}
-
-func (StubFactory) ConstructRenameColumns(
-	input Node,
-	colNames []string,
 ) (Node, error) {
 	return struct{}{}, nil
 }
