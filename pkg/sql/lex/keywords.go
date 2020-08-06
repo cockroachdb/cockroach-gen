@@ -197,6 +197,7 @@ var KeywordsCategories = map[string]string{
 	"language":                  "U",
 	"last":                      "U",
 	"lateral":                   "R",
+	"latest":                    "U",
 	"lc_collate":                "U",
 	"lc_ctype":                  "U",
 	"leading":                   "R",
@@ -624,6 +625,7 @@ var KeywordNames = []string{
 	"language",
 	"last",
 	"lateral",
+	"latest",
 	"lc_collate",
 	"lc_ctype",
 	"leading",
@@ -1250,6 +1252,8 @@ func GetKeywordID(k string) int32 {
 		return LAST
 	case "lateral":
 		return LATERAL
+	case "latest":
+		return LATEST
 	case "lc_collate":
 		return LC_COLLATE
 	case "lc_ctype":
