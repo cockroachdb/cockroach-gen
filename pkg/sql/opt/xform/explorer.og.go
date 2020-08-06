@@ -415,18 +415,15 @@ func (_e *explorer) exploreInnerJoin(
 	// [ReorderJoins]
 	{
 		if _rootOrd >= _rootState.start {
-			joinPrivate := &_root.JoinPrivate
-			if _e.funcs.NoJoinHints(joinPrivate) {
-				if _e.funcs.ShouldReorderJoins(_root) {
-					if _e.o.matchedRule == nil || _e.o.matchedRule(opt.ReorderJoins) {
-						var _last memo.RelExpr
-						if _e.o.appliedRule != nil {
-							_last = memo.LastGroupMember(_root)
-						}
-						_e.funcs.ReorderJoins(_root)
-						if _e.o.appliedRule != nil {
-							_e.o.appliedRule(opt.ReorderJoins, _root, _last.NextExpr())
-						}
+			if _e.funcs.ShouldReorderJoins(_root) {
+				if _e.o.matchedRule == nil || _e.o.matchedRule(opt.ReorderJoins) {
+					var _last memo.RelExpr
+					if _e.o.appliedRule != nil {
+						_last = memo.LastGroupMember(_root)
+					}
+					_e.funcs.ReorderJoins(_root)
+					if _e.o.appliedRule != nil {
+						_e.o.appliedRule(opt.ReorderJoins, _root, _last.NextExpr())
 					}
 				}
 			}
@@ -692,18 +689,15 @@ func (_e *explorer) exploreLeftJoin(
 	// [ReorderJoins]
 	{
 		if _rootOrd >= _rootState.start {
-			joinPrivate := &_root.JoinPrivate
-			if _e.funcs.NoJoinHints(joinPrivate) {
-				if _e.funcs.ShouldReorderJoins(_root) {
-					if _e.o.matchedRule == nil || _e.o.matchedRule(opt.ReorderJoins) {
-						var _last memo.RelExpr
-						if _e.o.appliedRule != nil {
-							_last = memo.LastGroupMember(_root)
-						}
-						_e.funcs.ReorderJoins(_root)
-						if _e.o.appliedRule != nil {
-							_e.o.appliedRule(opt.ReorderJoins, _root, _last.NextExpr())
-						}
+			if _e.funcs.ShouldReorderJoins(_root) {
+				if _e.o.matchedRule == nil || _e.o.matchedRule(opt.ReorderJoins) {
+					var _last memo.RelExpr
+					if _e.o.appliedRule != nil {
+						_last = memo.LastGroupMember(_root)
+					}
+					_e.funcs.ReorderJoins(_root)
+					if _e.o.appliedRule != nil {
+						_e.o.appliedRule(opt.ReorderJoins, _root, _last.NextExpr())
 					}
 				}
 			}
@@ -892,18 +886,15 @@ func (_e *explorer) exploreFullJoin(
 	// [ReorderJoins]
 	{
 		if _rootOrd >= _rootState.start {
-			joinPrivate := &_root.JoinPrivate
-			if _e.funcs.NoJoinHints(joinPrivate) {
-				if _e.funcs.ShouldReorderJoins(_root) {
-					if _e.o.matchedRule == nil || _e.o.matchedRule(opt.ReorderJoins) {
-						var _last memo.RelExpr
-						if _e.o.appliedRule != nil {
-							_last = memo.LastGroupMember(_root)
-						}
-						_e.funcs.ReorderJoins(_root)
-						if _e.o.appliedRule != nil {
-							_e.o.appliedRule(opt.ReorderJoins, _root, _last.NextExpr())
-						}
+			if _e.funcs.ShouldReorderJoins(_root) {
+				if _e.o.matchedRule == nil || _e.o.matchedRule(opt.ReorderJoins) {
+					var _last memo.RelExpr
+					if _e.o.appliedRule != nil {
+						_last = memo.LastGroupMember(_root)
+					}
+					_e.funcs.ReorderJoins(_root)
+					if _e.o.appliedRule != nil {
+						_e.o.appliedRule(opt.ReorderJoins, _root, _last.NextExpr())
 					}
 				}
 			}
@@ -969,18 +960,15 @@ func (_e *explorer) exploreSemiJoin(
 	// [ReorderJoins]
 	{
 		if _rootOrd >= _rootState.start {
-			joinPrivate := &_root.JoinPrivate
-			if _e.funcs.NoJoinHints(joinPrivate) {
-				if _e.funcs.ShouldReorderJoins(_root) {
-					if _e.o.matchedRule == nil || _e.o.matchedRule(opt.ReorderJoins) {
-						var _last memo.RelExpr
-						if _e.o.appliedRule != nil {
-							_last = memo.LastGroupMember(_root)
-						}
-						_e.funcs.ReorderJoins(_root)
-						if _e.o.appliedRule != nil {
-							_e.o.appliedRule(opt.ReorderJoins, _root, _last.NextExpr())
-						}
+			if _e.funcs.ShouldReorderJoins(_root) {
+				if _e.o.matchedRule == nil || _e.o.matchedRule(opt.ReorderJoins) {
+					var _last memo.RelExpr
+					if _e.o.appliedRule != nil {
+						_last = memo.LastGroupMember(_root)
+					}
+					_e.funcs.ReorderJoins(_root)
+					if _e.o.appliedRule != nil {
+						_e.o.appliedRule(opt.ReorderJoins, _root, _last.NextExpr())
 					}
 				}
 			}
@@ -1204,18 +1192,15 @@ func (_e *explorer) exploreAntiJoin(
 	// [ReorderJoins]
 	{
 		if _rootOrd >= _rootState.start {
-			joinPrivate := &_root.JoinPrivate
-			if _e.funcs.NoJoinHints(joinPrivate) {
-				if _e.funcs.ShouldReorderJoins(_root) {
-					if _e.o.matchedRule == nil || _e.o.matchedRule(opt.ReorderJoins) {
-						var _last memo.RelExpr
-						if _e.o.appliedRule != nil {
-							_last = memo.LastGroupMember(_root)
-						}
-						_e.funcs.ReorderJoins(_root)
-						if _e.o.appliedRule != nil {
-							_e.o.appliedRule(opt.ReorderJoins, _root, _last.NextExpr())
-						}
+			if _e.funcs.ShouldReorderJoins(_root) {
+				if _e.o.matchedRule == nil || _e.o.matchedRule(opt.ReorderJoins) {
+					var _last memo.RelExpr
+					if _e.o.appliedRule != nil {
+						_last = memo.LastGroupMember(_root)
+					}
+					_e.funcs.ReorderJoins(_root)
+					if _e.o.appliedRule != nil {
+						_e.o.appliedRule(opt.ReorderJoins, _root, _last.NextExpr())
 					}
 				}
 			}
