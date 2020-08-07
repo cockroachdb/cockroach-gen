@@ -3042,7 +3042,7 @@ type InvertedJoinPrivate struct {
 	JoinType opt.Operator
 
 	// InvertedExpr is the inverted join condition. It is used to get the keys
-	// to lookup in the inverted index based on the value of the input column.
+	// to lookup in the inverted index based on the values of the input columns.
 	InvertedExpr opt.ScalarExpr
 
 	// Table identifies the table do to lookups in.
@@ -3055,11 +3055,6 @@ type InvertedJoinPrivate struct {
 	// InvertedCol is the inverted column in the index that is referenced by
 	// InvertedExpr.
 	InvertedCol opt.ColumnID
-
-	// InputCol is the column (produced by the input) that will be bound to
-	// InvertedExpr and used to determine the keys to scan in the inverted
-	// index.
-	InputCol opt.ColumnID
 
 	// Cols is the set of columns produced by the inverted join. This set can
 	// contain columns from the input and columns from the index. Any columns
@@ -22556,7 +22551,6 @@ func (in *interner) InternInvertedJoin(val *InvertedJoinExpr) *InvertedJoinExpr 
 	in.hasher.HashTableID(val.Table)
 	in.hasher.HashIndexOrdinal(val.Index)
 	in.hasher.HashColumnID(val.InvertedCol)
-	in.hasher.HashColumnID(val.InputCol)
 	in.hasher.HashColSet(val.Cols)
 	in.hasher.HashJoinFlags(val.Flags)
 	in.hasher.HashBool(val.WasReordered)
@@ -22571,7 +22565,6 @@ func (in *interner) InternInvertedJoin(val *InvertedJoinExpr) *InvertedJoinExpr 
 				in.hasher.IsTableIDEqual(val.Table, existing.Table) &&
 				in.hasher.IsIndexOrdinalEqual(val.Index, existing.Index) &&
 				in.hasher.IsColumnIDEqual(val.InvertedCol, existing.InvertedCol) &&
-				in.hasher.IsColumnIDEqual(val.InputCol, existing.InputCol) &&
 				in.hasher.IsColSetEqual(val.Cols, existing.Cols) &&
 				in.hasher.IsJoinFlagsEqual(val.Flags, existing.Flags) &&
 				in.hasher.IsBoolEqual(val.WasReordered, existing.WasReordered) {

@@ -320,9 +320,8 @@ type Factory interface {
 	//
 	// InvertedJoin performs a lookup join into an inverted index.
 	//
-	// invertedExpr is used along with inputCol (a column from the input) to
-	// find the keys to look up in the index; lookupCols are ordinals for the
-	// table columns we are retrieving.
+	// invertedExpr is used to find the keys to look up in the index; lookupCols
+	// are ordinals for the table columns we are retrieving.
 	//
 	// The node produces the columns in the input and (unless join type is
 	// LeftSemiJoin or LeftAntiJoin) the lookupCols, ordered by ordinal. The ON
@@ -334,7 +333,6 @@ type Factory interface {
 		input Node,
 		table cat.Table,
 		index cat.Index,
-		inputCol NodeColumnOrdinal,
 		lookupCols TableColumnOrdinalSet,
 		onCond tree.TypedExpr,
 		reqOrdering OutputOrdering,
@@ -988,7 +986,6 @@ func (StubFactory) ConstructInvertedJoin(
 	input Node,
 	table cat.Table,
 	index cat.Index,
-	inputCol NodeColumnOrdinal,
 	lookupCols TableColumnOrdinalSet,
 	onCond tree.TypedExpr,
 	reqOrdering OutputOrdering,

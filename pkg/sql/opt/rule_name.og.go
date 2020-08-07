@@ -263,7 +263,8 @@ const (
 	CommuteSemiJoin
 	GenerateMergeJoins
 	GenerateLookupJoins
-	GenerateGeoLookupJoins
+	GenerateInvertedJoins
+	GenerateInvertedJoinsFromSelect
 	GenerateZigzagJoins
 	GenerateInvertedIndexZigzagJoins
 	GenerateLookupJoinsWithFilter
