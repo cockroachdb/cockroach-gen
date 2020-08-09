@@ -82,6 +82,7 @@ var expectedHelpStrings = []string{
 	"SHOW CONSTRAINTS",
 	"SHOW CREATE",
 	"SHOW DATABASES",
+	"SHOW ENUMS",
 	"SHOW GRANTS",
 	"SHOW HISTOGRAM",
 	"SHOW INDEXES",

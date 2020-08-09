@@ -108,6 +108,7 @@ var KeywordsCategories = map[string]string{
 	"encryption_passphrase":     "U",
 	"end":                       "R",
 	"enum":                      "U",
+	"enums":                     "U",
 	"escape":                    "U",
 	"except":                    "R",
 	"exclude":                   "U",
@@ -536,6 +537,7 @@ var KeywordNames = []string{
 	"encryption_passphrase",
 	"end",
 	"enum",
+	"enums",
 	"escape",
 	"except",
 	"exclude",
@@ -1074,6 +1076,8 @@ func GetKeywordID(k string) int32 {
 		return END
 	case "enum":
 		return ENUM
+	case "enums":
+		return ENUMS
 	case "escape":
 		return ESCAPE
 	case "except":
