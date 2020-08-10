@@ -30,6 +30,7 @@ var KeywordsCategories = map[string]string{
 	"begin":                     "U",
 	"between":                   "C",
 	"bigint":                    "C",
+	"binary":                    "U",
 	"bit":                       "C",
 	"boolean":                   "C",
 	"both":                      "R",
@@ -96,6 +97,7 @@ var KeywordsCategories = map[string]string{
 	"deferred":                  "U",
 	"delete":                    "U",
 	"desc":                      "R",
+	"destination":               "U",
 	"detached":                  "U",
 	"discard":                   "U",
 	"distinct":                  "R",
@@ -459,6 +461,7 @@ var KeywordNames = []string{
 	"begin",
 	"between",
 	"bigint",
+	"binary",
 	"bit",
 	"boolean",
 	"both",
@@ -525,6 +528,7 @@ var KeywordNames = []string{
 	"deferred",
 	"delete",
 	"desc",
+	"destination",
 	"detached",
 	"discard",
 	"distinct",
@@ -920,6 +924,8 @@ func GetKeywordID(k string) int32 {
 		return BETWEEN
 	case "bigint":
 		return BIGINT
+	case "binary":
+		return BINARY
 	case "bit":
 		return BIT
 	case "boolean":
@@ -1052,6 +1058,8 @@ func GetKeywordID(k string) int32 {
 		return DELETE
 	case "desc":
 		return DESC
+	case "destination":
+		return DESTINATION
 	case "detached":
 		return DETACHED
 	case "discard":
