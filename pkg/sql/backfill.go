@@ -56,7 +56,7 @@ const (
 	// per chunk during an index truncation. This value is larger than the
 	// other chunk constants because the operation involves only running a
 	// DeleteRange().
-	indexTruncateChunkSize = 600
+	indexTruncateChunkSize = row.TableTruncateChunkSize
 
 	// indexTxnBackfillChunkSize is the maximum number index entries backfilled
 	// per chunk during an index backfill done in a txn. The index backfill
@@ -1294,11 +1294,15 @@ func (sc *SchemaChanger) backfillIndexes(
 		fn()
 	}
 
-	expirationTime := sc.db.Clock().Now().Add(time.Hour.Nanoseconds(), 0)
-
-	for _, span := range addingSpans {
-		if err := sc.db.AdminSplit(ctx, span.Key, expirationTime); err != nil {
-			return err
+	// Split off a new range for each new index span. But only do so for the
+	// system tenant. Secondary tenants do not have mandatory split points
+	// between tables or indexes.
+	if sc.execCfg.Codec.ForSystemTenant() {
+		expirationTime := sc.db.Clock().Now().Add(time.Hour.Nanoseconds(), 0)
+		for _, span := range addingSpans {
+			if err := sc.db.AdminSplit(ctx, span.Key, expirationTime); err != nil {
+				return err
+			}
 		}
 	}
 

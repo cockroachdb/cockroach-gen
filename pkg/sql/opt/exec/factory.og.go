@@ -448,18 +448,17 @@ type Factory interface {
 	// of columns in the table into which values are inserted. All columns are
 	// expected to be present except delete-only mutation columns, since those do not
 	// need to participate in an insert operation.
-	//
-	// If allowAutoCommit is set, the operator is allowed to commit the
-	// transaction (if appropriate, i.e. if it is in an implicit transaction).
-	// This is false if there are multiple mutations in a statement, or the output
-	// of the mutation is processed through side-effecting expressions.
 	ConstructInsert(
 		input Node,
 		table cat.Table,
 		insertCols TableColumnOrdinalSet,
 		returnCols TableColumnOrdinalSet,
 		checkCols CheckOrdinalSet,
-		allowAutoCommit bool,
+		// If set, the operator will commit the transaction as part of its execution.
+		// This is false when executing inside an explicit transaction, or there are
+		// multiple mutations in a statement, or the output of the mutation is
+		// processed through side-effecting expressions.
+		autoCommit bool,
 	) (Node, error)
 
 	// ConstructInsertFastPath creates a node for a InsertFastPath operation.
@@ -469,8 +468,7 @@ type Factory interface {
 	//  - the input is Values with at most InsertFastPathMaxRows, and there are no
 	//    subqueries;
 	//  - there are no other mutations in the statement, and the output of the
-	//    insert is not processed through side-effecting expressions (see
-	//    allowAutoCommit flag for ConstructInsert);
+	//    insert is not processed through side-effecting expressions.
 	//  - there are no self-referencing foreign keys;
 	//  - all FK checks can be performed using direct lookups into unique indexes.
 	//
@@ -484,6 +482,9 @@ type Factory interface {
 		returnCols TableColumnOrdinalSet,
 		checkCols CheckOrdinalSet,
 		fkChecks []InsertFastPathFKCheck,
+		// If set, the operator will commit the transaction as part of its execution.
+		// This is false when executing inside an explicit transaction.
+		autoCommit bool,
 	) (Node, error)
 
 	// ConstructUpdate creates a node for a Update operation.
@@ -517,7 +518,8 @@ type Factory interface {
 		returnCols TableColumnOrdinalSet,
 		checks CheckOrdinalSet,
 		passthrough sqlbase.ResultColumns,
-		allowAutoCommit bool,
+		// If set, the operator will commit the transaction as part of its execution.
+		autoCommit bool,
 	) (Node, error)
 
 	// ConstructUpsert creates a node for a Upsert operation.
@@ -546,11 +548,6 @@ type Factory interface {
 	// columns {0, 1, 2} of the table. The next 3 columns contain the existing
 	// values of columns {0, 1, 2} of the table. The last column contains the
 	// new value for column {1} of the table.
-	//
-	// If allowAutoCommit is set, the operator is allowed to commit the
-	// transaction (if appropriate, i.e. if it is in an implicit transaction).
-	// This is false if there are multiple mutations in a statement, or the output
-	// of the mutation is processed through side-effecting expressions.
 	ConstructUpsert(
 		input Node,
 		table cat.Table,
@@ -560,7 +557,11 @@ type Factory interface {
 		updateCols TableColumnOrdinalSet,
 		returnCols TableColumnOrdinalSet,
 		checks CheckOrdinalSet,
-		allowAutoCommit bool,
+		// If set, the operator will commit the transaction as part of its execution.
+		// This is false when executing inside an explicit transaction, or there are
+		// multiple mutations in a statement, or the output of the mutation is
+		// processed through side-effecting expressions.
+		autoCommit bool,
 	) (Node, error)
 
 	// ConstructDelete creates a node for a Delete operation.
@@ -571,17 +572,16 @@ type Factory interface {
 	// The fetchCols set contains the ordinal positions of the fetch columns in
 	// the target table. The input must contain those columns in the same order
 	// as they appear in the table schema.
-	//
-	// If allowAutoCommit is set, the operator is allowed to commit the
-	// transaction (if appropriate, i.e. if it is in an implicit transaction).
-	// This is false if there are multiple mutations in a statement, or the output
-	// of the mutation is processed through side-effecting expressions.
 	ConstructDelete(
 		input Node,
 		table cat.Table,
 		fetchCols TableColumnOrdinalSet,
 		returnCols TableColumnOrdinalSet,
-		allowAutoCommit bool,
+		// If set, the operator will commit the transaction as part of its execution.
+		// This is false when executing inside an explicit transaction, or there are
+		// multiple mutations in a statement, or the output of the mutation is
+		// processed through side-effecting expressions.
+		autoCommit bool,
 	) (Node, error)
 
 	// ConstructDeleteRange creates a node for a DeleteRange operation.
@@ -608,8 +608,12 @@ type Factory interface {
 		needed TableColumnOrdinalSet,
 		indexConstraint *constraint.Constraint,
 		interleavedTables []cat.Table,
-		maxReturnedKeys int,
-		allowAutoCommit bool,
+		// If set, the operator will commit the transaction as part of its execution.
+		// This is false when executing inside an explicit transaction, or there are
+		// multiple mutations in a statement, or the output of the mutation is
+		// processed through side-effecting expressions, or the operation might
+		// process too many rows.
+		autoCommit bool,
 	) (Node, error)
 
 	// ConstructCreateTable creates a node for a CreateTable operation.
@@ -1069,7 +1073,7 @@ func (StubFactory) ConstructInsert(
 	insertCols TableColumnOrdinalSet,
 	returnCols TableColumnOrdinalSet,
 	checkCols CheckOrdinalSet,
-	allowAutoCommit bool,
+	autoCommit bool,
 ) (Node, error) {
 	return struct{}{}, nil
 }
@@ -1081,6 +1085,7 @@ func (StubFactory) ConstructInsertFastPath(
 	returnCols TableColumnOrdinalSet,
 	checkCols CheckOrdinalSet,
 	fkChecks []InsertFastPathFKCheck,
+	autoCommit bool,
 ) (Node, error) {
 	return struct{}{}, nil
 }
@@ -1093,7 +1098,7 @@ func (StubFactory) ConstructUpdate(
 	returnCols TableColumnOrdinalSet,
 	checks CheckOrdinalSet,
 	passthrough sqlbase.ResultColumns,
-	allowAutoCommit bool,
+	autoCommit bool,
 ) (Node, error) {
 	return struct{}{}, nil
 }
@@ -1107,7 +1112,7 @@ func (StubFactory) ConstructUpsert(
 	updateCols TableColumnOrdinalSet,
 	returnCols TableColumnOrdinalSet,
 	checks CheckOrdinalSet,
-	allowAutoCommit bool,
+	autoCommit bool,
 ) (Node, error) {
 	return struct{}{}, nil
 }
@@ -1117,7 +1122,7 @@ func (StubFactory) ConstructDelete(
 	table cat.Table,
 	fetchCols TableColumnOrdinalSet,
 	returnCols TableColumnOrdinalSet,
-	allowAutoCommit bool,
+	autoCommit bool,
 ) (Node, error) {
 	return struct{}{}, nil
 }
@@ -1127,8 +1132,7 @@ func (StubFactory) ConstructDeleteRange(
 	needed TableColumnOrdinalSet,
 	indexConstraint *constraint.Constraint,
 	interleavedTables []cat.Table,
-	maxReturnedKeys int,
-	allowAutoCommit bool,
+	autoCommit bool,
 ) (Node, error) {
 	return struct{}{}, nil
 }
