@@ -16478,6 +16478,14 @@ func (_f *Factory) ConstructStdDevPop(
 	return _f.onConstructScalar(e)
 }
 
+// ConstructSTMakeLine constructs an expression for the STMakeLine operator.
+func (_f *Factory) ConstructSTMakeLine(
+	input opt.ScalarExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeSTMakeLine(input)
+	return _f.onConstructScalar(e)
+}
+
 // ConstructXorAgg constructs an expression for the XorAgg operator.
 func (_f *Factory) ConstructXorAgg(
 	input opt.ScalarExpr,
@@ -18087,6 +18095,13 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		}
 		return t
 
+	case *memo.STMakeLineExpr:
+		input := replace(t.Input).(opt.ScalarExpr)
+		if input != t.Input {
+			return f.ConstructSTMakeLine(input)
+		}
+		return t
+
 	case *memo.XorAggExpr:
 		input := replace(t.Input).(opt.ScalarExpr)
 		if input != t.Input {
@@ -19410,6 +19425,11 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
 		)
 
+	case *memo.STMakeLineExpr:
+		return f.ConstructSTMakeLine(
+			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
+		)
+
 	case *memo.XorAggExpr:
 		return f.ConstructXorAgg(
 			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
@@ -20442,6 +20462,10 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 		)
 	case opt.StdDevPopOp:
 		return f.ConstructStdDevPop(
+			args[0].(opt.ScalarExpr),
+		)
+	case opt.STMakeLineOp:
+		return f.ConstructSTMakeLine(
 			args[0].(opt.ScalarExpr),
 		)
 	case opt.XorAggOp:

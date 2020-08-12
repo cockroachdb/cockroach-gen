@@ -12846,6 +12846,58 @@ func (e *StdDevPopExpr) DataType() *types.T {
 	return e.Typ
 }
 
+type STMakeLineExpr struct {
+	Input opt.ScalarExpr
+
+	Typ *types.T
+	id  opt.ScalarID
+}
+
+var _ opt.ScalarExpr = &STMakeLineExpr{}
+
+func (e *STMakeLineExpr) ID() opt.ScalarID {
+	return e.id
+}
+
+func (e *STMakeLineExpr) Op() opt.Operator {
+	return opt.STMakeLineOp
+}
+
+func (e *STMakeLineExpr) ChildCount() int {
+	return 1
+}
+
+func (e *STMakeLineExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *STMakeLineExpr) Private() interface{} {
+	return nil
+}
+
+func (e *STMakeLineExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *STMakeLineExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(opt.ScalarExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *STMakeLineExpr) DataType() *types.T {
+	return e.Typ
+}
+
 type XorAggExpr struct {
 	Input opt.ScalarExpr
 
@@ -19803,6 +19855,26 @@ func (m *Memo) MemoizeStdDevPop(
 	return interned
 }
 
+func (m *Memo) MemoizeSTMakeLine(
+	input opt.ScalarExpr,
+) *STMakeLineExpr {
+	const size = int64(unsafe.Sizeof(STMakeLineExpr{}))
+	e := &STMakeLineExpr{
+		Input: input,
+		id:    m.NextID(),
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternSTMakeLine(e)
+	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
+		m.memEstimate += size
+		m.CheckExpr(e)
+	}
+	return interned
+}
+
 func (m *Memo) MemoizeXorAgg(
 	input opt.ScalarExpr,
 ) *XorAggExpr {
@@ -21860,6 +21932,8 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternStdDev(t)
 	case *StdDevPopExpr:
 		return in.InternStdDevPop(t)
+	case *STMakeLineExpr:
+		return in.InternSTMakeLine(t)
 	case *XorAggExpr:
 		return in.InternXorAgg(t)
 	case *JsonAggExpr:
@@ -25304,6 +25378,24 @@ func (in *interner) InternStdDevPop(val *StdDevPopExpr) *StdDevPopExpr {
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*StdDevPopExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternSTMakeLine(val *STMakeLineExpr) *STMakeLineExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.STMakeLineOp)
+	in.hasher.HashScalarExpr(val.Input)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*STMakeLineExpr); ok {
 			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) {
 				return existing
 			}
