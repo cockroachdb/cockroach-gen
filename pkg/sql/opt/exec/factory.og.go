@@ -208,13 +208,15 @@ type Factory interface {
 	//
 	// GroupBy runs an aggregation. A set of aggregations is performed for each group
 	// of values on the groupCols.
-	//
-	// If the input is guaranteed to have an ordering on grouping columns, a
-	// "streaming" aggregation is performed (i.e. aggregation happens separately
-	// for each distinct set of values on the set of columns in the ordering).
+	// A row is produced for each set of distinct values on the group columns. The
+	// row contains the values of the grouping columns, followed by one value for
+	// each aggregation.
 	ConstructGroupBy(
 		input Node,
 		groupCols []NodeColumnOrdinal,
+		// If set, the input is guaranteed to have this ordering and a "streaming"
+		// aggregation is performed (i.e. aggregation happens separately for each
+		// distinct set of values on the set of columns in the ordering).
 		groupColOrdering sqlbase.ColumnOrdering,
 		aggregations []AggInfo,
 		reqOrdering OutputOrdering,
@@ -224,7 +226,8 @@ type Factory interface {
 	//
 	// ScalarGroupBy runs a scalar aggregation, i.e.  one which performs a set of
 	// aggregations on all the input rows (as a single group) and has exactly one
-	// result row (even when there are no input rows).
+	// result row (even when there are no input rows). The output row has one value
+	// for each aggregation.
 	ConstructScalarGroupBy(
 		input Node,
 		aggregations []AggInfo,
@@ -267,7 +270,7 @@ type Factory interface {
 	// ordering[:alreadyOrderedPrefix].
 	ConstructSort(
 		input Node,
-		ordering sqlbase.ColumnOrdering,
+		ordering OutputOrdering,
 		alreadyOrderedPrefix int,
 	) (Node, error)
 
@@ -428,6 +431,17 @@ type Factory interface {
 		options *tree.ExplainOptions,
 		stmtType tree.StatementType,
 		plan Plan,
+	) (Node, error)
+
+	// ConstructExplainPlan creates a node for a ExplainPlan operation.
+	//
+	// ExplainPlan implements EXPLAIN (PLAN).
+	//
+	// When the operator is created, it creates an ExplainFactory and calls BuildFn
+	// to construct the plan against that factory.
+	ConstructExplainPlan(
+		options *tree.ExplainOptions,
+		buildFn BuildPlanForExplainFn,
 	) (Node, error)
 
 	// ConstructShowTrace creates a node for a ShowTrace operation.
@@ -620,6 +634,14 @@ type Factory interface {
 	//
 	// CreateTable implements a CREATE TABLE statement.
 	ConstructCreateTable(
+		schema cat.Schema,
+		ct *tree.CreateTable,
+	) (Node, error)
+
+	// ConstructCreateTableAs creates a node for a CreateTableAs operation.
+	//
+	// CreateTableAs implements a CREATE TABLE AS statement.
+	ConstructCreateTableAs(
 		input Node,
 		schema cat.Schema,
 		ct *tree.CreateTable,
@@ -947,7 +969,7 @@ func (StubFactory) ConstructSetOp(
 
 func (StubFactory) ConstructSort(
 	input Node,
-	ordering sqlbase.ColumnOrdering,
+	ordering OutputOrdering,
 	alreadyOrderedPrefix int,
 ) (Node, error) {
 	return struct{}{}, nil
@@ -1060,6 +1082,13 @@ func (StubFactory) ConstructExplain(
 	return struct{}{}, nil
 }
 
+func (StubFactory) ConstructExplainPlan(
+	options *tree.ExplainOptions,
+	buildFn BuildPlanForExplainFn,
+) (Node, error) {
+	return struct{}{}, nil
+}
+
 func (StubFactory) ConstructShowTrace(
 	typ tree.ShowTraceType,
 	compact bool,
@@ -1138,6 +1167,13 @@ func (StubFactory) ConstructDeleteRange(
 }
 
 func (StubFactory) ConstructCreateTable(
+	schema cat.Schema,
+	ct *tree.CreateTable,
+) (Node, error) {
+	return struct{}{}, nil
+}
+
+func (StubFactory) ConstructCreateTableAs(
 	input Node,
 	schema cat.Schema,
 	ct *tree.CreateTable,
