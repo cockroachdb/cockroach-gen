@@ -303,6 +303,7 @@ var KeywordsCategories = map[string]string{
 	"recursive":                    "U",
 	"ref":                          "U",
 	"references":                   "R",
+	"refresh":                      "U",
 	"reindex":                      "U",
 	"release":                      "U",
 	"rename":                       "U",
@@ -739,6 +740,7 @@ var KeywordNames = []string{
 	"recursive",
 	"ref",
 	"references",
+	"refresh",
 	"reindex",
 	"release",
 	"rename",
@@ -1480,6 +1482,8 @@ func GetKeywordID(k string) int32 {
 		return REF
 	case "references":
 		return REFERENCES
+	case "refresh":
+		return REFRESH
 	case "reindex":
 		return REINDEX
 	case "release":

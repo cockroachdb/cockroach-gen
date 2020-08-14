@@ -14905,11 +14905,12 @@ func (g *createViewGroup) bestProps() *bestProps {
 
 type CreateViewPrivate struct {
 	// Schema is the ID of the catalog schema into which the new table goes.
-	Schema      opt.SchemaID
-	ViewName    *tree.TableName
-	Persistence tree.Persistence
-	IfNotExists bool
-	Replace     bool
+	Schema       opt.SchemaID
+	ViewName     *tree.TableName
+	Persistence  tree.Persistence
+	IfNotExists  bool
+	Replace      bool
+	Materialized bool
 
 	// ViewQuery contains the query for the view; data sources are always fully
 	// qualified.
@@ -26031,6 +26032,7 @@ func (in *interner) InternCreateView(val *CreateViewExpr) *CreateViewExpr {
 	in.hasher.HashPersistence(val.Persistence)
 	in.hasher.HashBool(val.IfNotExists)
 	in.hasher.HashBool(val.Replace)
+	in.hasher.HashBool(val.Materialized)
 	in.hasher.HashString(val.ViewQuery)
 	in.hasher.HashPresentation(val.Columns)
 	in.hasher.HashViewDeps(val.Deps)
@@ -26043,6 +26045,7 @@ func (in *interner) InternCreateView(val *CreateViewExpr) *CreateViewExpr {
 				in.hasher.IsPersistenceEqual(val.Persistence, existing.Persistence) &&
 				in.hasher.IsBoolEqual(val.IfNotExists, existing.IfNotExists) &&
 				in.hasher.IsBoolEqual(val.Replace, existing.Replace) &&
+				in.hasher.IsBoolEqual(val.Materialized, existing.Materialized) &&
 				in.hasher.IsStringEqual(val.ViewQuery, existing.ViewQuery) &&
 				in.hasher.IsPresentationEqual(val.Columns, existing.Columns) &&
 				in.hasher.IsViewDepsEqual(val.Deps, existing.Deps) {

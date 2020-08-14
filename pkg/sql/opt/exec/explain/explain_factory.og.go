@@ -1282,19 +1282,21 @@ func (f *Factory) ConstructCreateView(
 	ifNotExists bool,
 	replace bool,
 	persistence tree.Persistence,
+	materialized bool,
 	viewQuery string,
 	columns sqlbase.ResultColumns,
 	deps opt.ViewDeps,
 ) (exec.Node, error) {
 	args := &createViewArgs{
-		Schema:      schema,
-		ViewName:    viewName,
-		IfNotExists: ifNotExists,
-		Replace:     replace,
-		Persistence: persistence,
-		ViewQuery:   viewQuery,
-		Columns:     columns,
-		deps:        deps,
+		Schema:       schema,
+		ViewName:     viewName,
+		IfNotExists:  ifNotExists,
+		Replace:      replace,
+		Persistence:  persistence,
+		Materialized: materialized,
+		ViewQuery:    viewQuery,
+		Columns:      columns,
+		deps:         deps,
 	}
 	_n, err := f.newNode(createViewOp, args, nil /* ordering */)
 	if err != nil {
@@ -1307,6 +1309,7 @@ func (f *Factory) ConstructCreateView(
 		ifNotExists,
 		replace,
 		persistence,
+		materialized,
 		viewQuery,
 		columns,
 		deps,
@@ -2074,14 +2077,15 @@ type createTableAsArgs struct {
 }
 
 type createViewArgs struct {
-	Schema      cat.Schema
-	ViewName    *cat.DataSourceName
-	IfNotExists bool
-	Replace     bool
-	Persistence tree.Persistence
-	ViewQuery   string
-	Columns     sqlbase.ResultColumns
-	deps        opt.ViewDeps
+	Schema       cat.Schema
+	ViewName     *cat.DataSourceName
+	IfNotExists  bool
+	Replace      bool
+	Persistence  tree.Persistence
+	Materialized bool
+	ViewQuery    string
+	Columns      sqlbase.ResultColumns
+	deps         opt.ViewDeps
 }
 
 type sequenceSelectArgs struct {
