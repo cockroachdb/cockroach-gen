@@ -430,32 +430,6 @@ func (_e *explorer) exploreInnerJoin(
 		}
 	}
 
-	// [CommuteJoin]
-	{
-		if _rootOrd >= _rootState.start {
-			left := _root.Left
-			right := _root.Right
-			on := _root.On
-			private := &_root.JoinPrivate
-			if _e.o.matchedRule == nil || _e.o.matchedRule(opt.CommuteJoin) {
-				_expr := &memo.InnerJoinExpr{
-					Left:        right,
-					Right:       left,
-					On:          on,
-					JoinPrivate: *_e.funcs.CommuteJoinFlags(private),
-				}
-				_interned := _e.mem.AddInnerJoinToGroup(_expr, _root)
-				if _e.o.appliedRule != nil {
-					if _interned != _expr {
-						_e.o.appliedRule(opt.CommuteJoin, _root, nil)
-					} else {
-						_e.o.appliedRule(opt.CommuteJoin, _root, _interned)
-					}
-				}
-			}
-		}
-	}
-
 	// [GenerateMergeJoins]
 	{
 		if _rootOrd >= _rootState.start {
@@ -939,32 +913,6 @@ func (_e *explorer) exploreFullJoin(
 					_e.funcs.ReorderJoins(_root)
 					if _e.o.appliedRule != nil {
 						_e.o.appliedRule(opt.ReorderJoins, _root, _last.NextExpr())
-					}
-				}
-			}
-		}
-	}
-
-	// [CommuteJoin]
-	{
-		if _rootOrd >= _rootState.start {
-			left := _root.Left
-			right := _root.Right
-			on := _root.On
-			private := &_root.JoinPrivate
-			if _e.o.matchedRule == nil || _e.o.matchedRule(opt.CommuteJoin) {
-				_expr := &memo.FullJoinExpr{
-					Left:        right,
-					Right:       left,
-					On:          on,
-					JoinPrivate: *_e.funcs.CommuteJoinFlags(private),
-				}
-				_interned := _e.mem.AddFullJoinToGroup(_expr, _root)
-				if _e.o.appliedRule != nil {
-					if _interned != _expr {
-						_e.o.appliedRule(opt.CommuteJoin, _root, nil)
-					} else {
-						_e.o.appliedRule(opt.CommuteJoin, _root, _interned)
 					}
 				}
 			}

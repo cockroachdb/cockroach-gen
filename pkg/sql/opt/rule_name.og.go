@@ -258,7 +258,6 @@ const (
 	ReplaceMaxWithLimit
 	GenerateStreamingGroupBy
 	ReorderJoins
-	CommuteJoin
 	CommuteLeftJoin
 	CommuteSemiJoin
 	GenerateMergeJoins
