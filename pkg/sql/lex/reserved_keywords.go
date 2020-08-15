@@ -19,6 +19,7 @@ var reservedKeywords = map[string]struct{}{
 	"bit":                                {},
 	"boolean":                            {},
 	"both":                               {},
+	"box2d":                              {},
 	"case":                               {},
 	"cast":                               {},
 	"char":                               {},
