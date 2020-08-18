@@ -220,7 +220,7 @@ Attribute action:
 		Category: hMisc,
 		//line sql.y: 2059
 		Text: `
-REFRESH MATERIALIZED VIEW view_name
+REFRESH MATERIALIZED VIEW [CONCURRENTLY] view_name
 `,
 	},
 	//line sql.y: 2068
