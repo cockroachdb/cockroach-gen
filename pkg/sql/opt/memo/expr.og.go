@@ -11290,9 +11290,9 @@ func (e *IfErrExpr) DataType() *types.T {
 // returned.
 //
 // Note that the Whens list inside Case is used to represent all the WHEN
-// branches as well as the ELSE statement if it exists. It is of the form:
+// branches. It is of the form:
 //
-//   [(When <condval1> <expr1>),(When <condval2> <expr2>),...,<expr>]
+//   [(When <condval1> <expr1>),(When <condval2> <expr2>),...]
 //
 type CaseExpr struct {
 	Input  opt.ScalarExpr
