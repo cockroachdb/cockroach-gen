@@ -2237,17 +2237,19 @@ func (_f *Factory) ConstructInnerJoin(
 				item := &on[i]
 				if _f.funcs.ColsIntersect(_f.funcs.OuterCols(item), constCols) {
 					private := joinPrivate
-					if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsLeft) {
-						_expr := _f.ConstructInnerJoin(
-							left,
-							right,
-							_f.funcs.InlineFilterConstants(on, left, constCols),
-							private,
-						)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.InlineJoinConstantsLeft, nil, _expr)
+					if _f.funcs.NoJoinHints(private) {
+						if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsLeft) {
+							_expr := _f.ConstructInnerJoin(
+								left,
+								right,
+								_f.funcs.InlineFilterConstants(on, left, constCols),
+								private,
+							)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.InlineJoinConstantsLeft, nil, _expr)
+							}
+							return _expr
 						}
-						return _expr
 					}
 				}
 			}
@@ -2262,17 +2264,19 @@ func (_f *Factory) ConstructInnerJoin(
 				item := &on[i]
 				if _f.funcs.ColsIntersect(_f.funcs.OuterCols(item), constCols) {
 					private := joinPrivate
-					if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsRight) {
-						_expr := _f.ConstructInnerJoin(
-							left,
-							right,
-							_f.funcs.InlineFilterConstants(on, right, constCols),
-							private,
-						)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.InlineJoinConstantsRight, nil, _expr)
+					if _f.funcs.NoJoinHints(private) {
+						if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsRight) {
+							_expr := _f.ConstructInnerJoin(
+								left,
+								right,
+								_f.funcs.InlineFilterConstants(on, right, constCols),
+								private,
+							)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.InlineJoinConstantsRight, nil, _expr)
+							}
+							return _expr
 						}
-						return _expr
 					}
 				}
 			}
@@ -3204,17 +3208,19 @@ func (_f *Factory) ConstructLeftJoin(
 				item := &on[i]
 				if _f.funcs.ColsIntersect(_f.funcs.OuterCols(item), constCols) {
 					private := joinPrivate
-					if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsLeft) {
-						_expr := _f.ConstructLeftJoin(
-							left,
-							right,
-							_f.funcs.InlineFilterConstants(on, left, constCols),
-							private,
-						)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.InlineJoinConstantsLeft, nil, _expr)
+					if _f.funcs.NoJoinHints(private) {
+						if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsLeft) {
+							_expr := _f.ConstructLeftJoin(
+								left,
+								right,
+								_f.funcs.InlineFilterConstants(on, left, constCols),
+								private,
+							)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.InlineJoinConstantsLeft, nil, _expr)
+							}
+							return _expr
 						}
-						return _expr
 					}
 				}
 			}
@@ -3229,17 +3235,19 @@ func (_f *Factory) ConstructLeftJoin(
 				item := &on[i]
 				if _f.funcs.ColsIntersect(_f.funcs.OuterCols(item), constCols) {
 					private := joinPrivate
-					if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsRight) {
-						_expr := _f.ConstructLeftJoin(
-							left,
-							right,
-							_f.funcs.InlineFilterConstants(on, right, constCols),
-							private,
-						)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.InlineJoinConstantsRight, nil, _expr)
+					if _f.funcs.NoJoinHints(private) {
+						if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsRight) {
+							_expr := _f.ConstructLeftJoin(
+								left,
+								right,
+								_f.funcs.InlineFilterConstants(on, right, constCols),
+								private,
+							)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.InlineJoinConstantsRight, nil, _expr)
+							}
+							return _expr
 						}
-						return _expr
 					}
 				}
 			}
@@ -3694,17 +3702,19 @@ func (_f *Factory) ConstructRightJoin(
 				item := &on[i]
 				if _f.funcs.ColsIntersect(_f.funcs.OuterCols(item), constCols) {
 					private := joinPrivate
-					if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsLeft) {
-						_expr := _f.ConstructRightJoin(
-							left,
-							right,
-							_f.funcs.InlineFilterConstants(on, left, constCols),
-							private,
-						)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.InlineJoinConstantsLeft, nil, _expr)
+					if _f.funcs.NoJoinHints(private) {
+						if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsLeft) {
+							_expr := _f.ConstructRightJoin(
+								left,
+								right,
+								_f.funcs.InlineFilterConstants(on, left, constCols),
+								private,
+							)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.InlineJoinConstantsLeft, nil, _expr)
+							}
+							return _expr
 						}
-						return _expr
 					}
 				}
 			}
@@ -3719,17 +3729,19 @@ func (_f *Factory) ConstructRightJoin(
 				item := &on[i]
 				if _f.funcs.ColsIntersect(_f.funcs.OuterCols(item), constCols) {
 					private := joinPrivate
-					if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsRight) {
-						_expr := _f.ConstructRightJoin(
-							left,
-							right,
-							_f.funcs.InlineFilterConstants(on, right, constCols),
-							private,
-						)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.InlineJoinConstantsRight, nil, _expr)
+					if _f.funcs.NoJoinHints(private) {
+						if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsRight) {
+							_expr := _f.ConstructRightJoin(
+								left,
+								right,
+								_f.funcs.InlineFilterConstants(on, right, constCols),
+								private,
+							)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.InlineJoinConstantsRight, nil, _expr)
+							}
+							return _expr
 						}
-						return _expr
 					}
 				}
 			}
@@ -3959,17 +3971,19 @@ func (_f *Factory) ConstructFullJoin(
 				item := &on[i]
 				if _f.funcs.ColsIntersect(_f.funcs.OuterCols(item), constCols) {
 					private := joinPrivate
-					if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsLeft) {
-						_expr := _f.ConstructFullJoin(
-							left,
-							right,
-							_f.funcs.InlineFilterConstants(on, left, constCols),
-							private,
-						)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.InlineJoinConstantsLeft, nil, _expr)
+					if _f.funcs.NoJoinHints(private) {
+						if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsLeft) {
+							_expr := _f.ConstructFullJoin(
+								left,
+								right,
+								_f.funcs.InlineFilterConstants(on, left, constCols),
+								private,
+							)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.InlineJoinConstantsLeft, nil, _expr)
+							}
+							return _expr
 						}
-						return _expr
 					}
 				}
 			}
@@ -3984,17 +3998,19 @@ func (_f *Factory) ConstructFullJoin(
 				item := &on[i]
 				if _f.funcs.ColsIntersect(_f.funcs.OuterCols(item), constCols) {
 					private := joinPrivate
-					if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsRight) {
-						_expr := _f.ConstructFullJoin(
-							left,
-							right,
-							_f.funcs.InlineFilterConstants(on, right, constCols),
-							private,
-						)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.InlineJoinConstantsRight, nil, _expr)
+					if _f.funcs.NoJoinHints(private) {
+						if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsRight) {
+							_expr := _f.ConstructFullJoin(
+								left,
+								right,
+								_f.funcs.InlineFilterConstants(on, right, constCols),
+								private,
+							)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.InlineJoinConstantsRight, nil, _expr)
+							}
+							return _expr
 						}
-						return _expr
 					}
 				}
 			}
@@ -4346,17 +4362,19 @@ func (_f *Factory) ConstructSemiJoin(
 				item := &on[i]
 				if _f.funcs.ColsIntersect(_f.funcs.OuterCols(item), constCols) {
 					private := joinPrivate
-					if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsLeft) {
-						_expr := _f.ConstructSemiJoin(
-							left,
-							right,
-							_f.funcs.InlineFilterConstants(on, left, constCols),
-							private,
-						)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.InlineJoinConstantsLeft, nil, _expr)
+					if _f.funcs.NoJoinHints(private) {
+						if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsLeft) {
+							_expr := _f.ConstructSemiJoin(
+								left,
+								right,
+								_f.funcs.InlineFilterConstants(on, left, constCols),
+								private,
+							)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.InlineJoinConstantsLeft, nil, _expr)
+							}
+							return _expr
 						}
-						return _expr
 					}
 				}
 			}
@@ -4371,17 +4389,19 @@ func (_f *Factory) ConstructSemiJoin(
 				item := &on[i]
 				if _f.funcs.ColsIntersect(_f.funcs.OuterCols(item), constCols) {
 					private := joinPrivate
-					if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsRight) {
-						_expr := _f.ConstructSemiJoin(
-							left,
-							right,
-							_f.funcs.InlineFilterConstants(on, right, constCols),
-							private,
-						)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.InlineJoinConstantsRight, nil, _expr)
+					if _f.funcs.NoJoinHints(private) {
+						if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsRight) {
+							_expr := _f.ConstructSemiJoin(
+								left,
+								right,
+								_f.funcs.InlineFilterConstants(on, right, constCols),
+								private,
+							)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.InlineJoinConstantsRight, nil, _expr)
+							}
+							return _expr
 						}
-						return _expr
 					}
 				}
 			}
@@ -4981,17 +5001,19 @@ func (_f *Factory) ConstructAntiJoin(
 				item := &on[i]
 				if _f.funcs.ColsIntersect(_f.funcs.OuterCols(item), constCols) {
 					private := joinPrivate
-					if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsLeft) {
-						_expr := _f.ConstructAntiJoin(
-							left,
-							right,
-							_f.funcs.InlineFilterConstants(on, left, constCols),
-							private,
-						)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.InlineJoinConstantsLeft, nil, _expr)
+					if _f.funcs.NoJoinHints(private) {
+						if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsLeft) {
+							_expr := _f.ConstructAntiJoin(
+								left,
+								right,
+								_f.funcs.InlineFilterConstants(on, left, constCols),
+								private,
+							)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.InlineJoinConstantsLeft, nil, _expr)
+							}
+							return _expr
 						}
-						return _expr
 					}
 				}
 			}
@@ -5006,17 +5028,19 @@ func (_f *Factory) ConstructAntiJoin(
 				item := &on[i]
 				if _f.funcs.ColsIntersect(_f.funcs.OuterCols(item), constCols) {
 					private := joinPrivate
-					if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsRight) {
-						_expr := _f.ConstructAntiJoin(
-							left,
-							right,
-							_f.funcs.InlineFilterConstants(on, right, constCols),
-							private,
-						)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.InlineJoinConstantsRight, nil, _expr)
+					if _f.funcs.NoJoinHints(private) {
+						if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsRight) {
+							_expr := _f.ConstructAntiJoin(
+								left,
+								right,
+								_f.funcs.InlineFilterConstants(on, right, constCols),
+								private,
+							)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.InlineJoinConstantsRight, nil, _expr)
+							}
+							return _expr
 						}
-						return _expr
 					}
 				}
 			}
@@ -5834,17 +5858,19 @@ func (_f *Factory) ConstructInnerJoinApply(
 				item := &on[i]
 				if _f.funcs.ColsIntersect(_f.funcs.OuterCols(item), constCols) {
 					private := joinPrivate
-					if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsLeft) {
-						_expr := _f.ConstructInnerJoinApply(
-							left,
-							right,
-							_f.funcs.InlineFilterConstants(on, left, constCols),
-							private,
-						)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.InlineJoinConstantsLeft, nil, _expr)
+					if _f.funcs.NoJoinHints(private) {
+						if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsLeft) {
+							_expr := _f.ConstructInnerJoinApply(
+								left,
+								right,
+								_f.funcs.InlineFilterConstants(on, left, constCols),
+								private,
+							)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.InlineJoinConstantsLeft, nil, _expr)
+							}
+							return _expr
 						}
-						return _expr
 					}
 				}
 			}
@@ -5859,17 +5885,19 @@ func (_f *Factory) ConstructInnerJoinApply(
 				item := &on[i]
 				if _f.funcs.ColsIntersect(_f.funcs.OuterCols(item), constCols) {
 					private := joinPrivate
-					if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsRight) {
-						_expr := _f.ConstructInnerJoinApply(
-							left,
-							right,
-							_f.funcs.InlineFilterConstants(on, right, constCols),
-							private,
-						)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.InlineJoinConstantsRight, nil, _expr)
+					if _f.funcs.NoJoinHints(private) {
+						if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsRight) {
+							_expr := _f.ConstructInnerJoinApply(
+								left,
+								right,
+								_f.funcs.InlineFilterConstants(on, right, constCols),
+								private,
+							)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.InlineJoinConstantsRight, nil, _expr)
+							}
+							return _expr
 						}
-						return _expr
 					}
 				}
 			}
@@ -6604,17 +6632,19 @@ func (_f *Factory) ConstructLeftJoinApply(
 				item := &on[i]
 				if _f.funcs.ColsIntersect(_f.funcs.OuterCols(item), constCols) {
 					private := joinPrivate
-					if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsLeft) {
-						_expr := _f.ConstructLeftJoinApply(
-							left,
-							right,
-							_f.funcs.InlineFilterConstants(on, left, constCols),
-							private,
-						)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.InlineJoinConstantsLeft, nil, _expr)
+					if _f.funcs.NoJoinHints(private) {
+						if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsLeft) {
+							_expr := _f.ConstructLeftJoinApply(
+								left,
+								right,
+								_f.funcs.InlineFilterConstants(on, left, constCols),
+								private,
+							)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.InlineJoinConstantsLeft, nil, _expr)
+							}
+							return _expr
 						}
-						return _expr
 					}
 				}
 			}
@@ -6629,17 +6659,19 @@ func (_f *Factory) ConstructLeftJoinApply(
 				item := &on[i]
 				if _f.funcs.ColsIntersect(_f.funcs.OuterCols(item), constCols) {
 					private := joinPrivate
-					if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsRight) {
-						_expr := _f.ConstructLeftJoinApply(
-							left,
-							right,
-							_f.funcs.InlineFilterConstants(on, right, constCols),
-							private,
-						)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.InlineJoinConstantsRight, nil, _expr)
+					if _f.funcs.NoJoinHints(private) {
+						if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsRight) {
+							_expr := _f.ConstructLeftJoinApply(
+								left,
+								right,
+								_f.funcs.InlineFilterConstants(on, right, constCols),
+								private,
+							)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.InlineJoinConstantsRight, nil, _expr)
+							}
+							return _expr
 						}
-						return _expr
 					}
 				}
 			}
@@ -7133,17 +7165,19 @@ func (_f *Factory) ConstructSemiJoinApply(
 				item := &on[i]
 				if _f.funcs.ColsIntersect(_f.funcs.OuterCols(item), constCols) {
 					private := joinPrivate
-					if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsLeft) {
-						_expr := _f.ConstructSemiJoinApply(
-							left,
-							right,
-							_f.funcs.InlineFilterConstants(on, left, constCols),
-							private,
-						)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.InlineJoinConstantsLeft, nil, _expr)
+					if _f.funcs.NoJoinHints(private) {
+						if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsLeft) {
+							_expr := _f.ConstructSemiJoinApply(
+								left,
+								right,
+								_f.funcs.InlineFilterConstants(on, left, constCols),
+								private,
+							)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.InlineJoinConstantsLeft, nil, _expr)
+							}
+							return _expr
 						}
-						return _expr
 					}
 				}
 			}
@@ -7158,17 +7192,19 @@ func (_f *Factory) ConstructSemiJoinApply(
 				item := &on[i]
 				if _f.funcs.ColsIntersect(_f.funcs.OuterCols(item), constCols) {
 					private := joinPrivate
-					if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsRight) {
-						_expr := _f.ConstructSemiJoinApply(
-							left,
-							right,
-							_f.funcs.InlineFilterConstants(on, right, constCols),
-							private,
-						)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.InlineJoinConstantsRight, nil, _expr)
+					if _f.funcs.NoJoinHints(private) {
+						if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsRight) {
+							_expr := _f.ConstructSemiJoinApply(
+								left,
+								right,
+								_f.funcs.InlineFilterConstants(on, right, constCols),
+								private,
+							)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.InlineJoinConstantsRight, nil, _expr)
+							}
+							return _expr
 						}
-						return _expr
 					}
 				}
 			}
@@ -7676,17 +7712,19 @@ func (_f *Factory) ConstructAntiJoinApply(
 				item := &on[i]
 				if _f.funcs.ColsIntersect(_f.funcs.OuterCols(item), constCols) {
 					private := joinPrivate
-					if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsLeft) {
-						_expr := _f.ConstructAntiJoinApply(
-							left,
-							right,
-							_f.funcs.InlineFilterConstants(on, left, constCols),
-							private,
-						)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.InlineJoinConstantsLeft, nil, _expr)
+					if _f.funcs.NoJoinHints(private) {
+						if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsLeft) {
+							_expr := _f.ConstructAntiJoinApply(
+								left,
+								right,
+								_f.funcs.InlineFilterConstants(on, left, constCols),
+								private,
+							)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.InlineJoinConstantsLeft, nil, _expr)
+							}
+							return _expr
 						}
-						return _expr
 					}
 				}
 			}
@@ -7701,17 +7739,19 @@ func (_f *Factory) ConstructAntiJoinApply(
 				item := &on[i]
 				if _f.funcs.ColsIntersect(_f.funcs.OuterCols(item), constCols) {
 					private := joinPrivate
-					if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsRight) {
-						_expr := _f.ConstructAntiJoinApply(
-							left,
-							right,
-							_f.funcs.InlineFilterConstants(on, right, constCols),
-							private,
-						)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.InlineJoinConstantsRight, nil, _expr)
+					if _f.funcs.NoJoinHints(private) {
+						if _f.matchedRule == nil || _f.matchedRule(opt.InlineJoinConstantsRight) {
+							_expr := _f.ConstructAntiJoinApply(
+								left,
+								right,
+								_f.funcs.InlineFilterConstants(on, right, constCols),
+								private,
+							)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.InlineJoinConstantsRight, nil, _expr)
+							}
+							return _expr
 						}
-						return _expr
 					}
 				}
 			}
