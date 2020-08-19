@@ -69,6 +69,7 @@ var KeywordsCategories = map[string]string{
 	"conflict":                     "U",
 	"constraint":                   "R",
 	"constraints":                  "U",
+	"controljob":                   "U",
 	"conversion":                   "U",
 	"copy":                         "U",
 	"covering":                     "U",
@@ -239,6 +240,7 @@ var KeywordsCategories = map[string]string{
 	"never":                        "U",
 	"next":                         "U",
 	"no":                           "U",
+	"nocontroljob":                 "U",
 	"nocreaterole":                 "U",
 	"nologin":                      "U",
 	"none":                         "T",
@@ -508,6 +510,7 @@ var KeywordNames = []string{
 	"conflict",
 	"constraint",
 	"constraints",
+	"controljob",
 	"conversion",
 	"copy",
 	"covering",
@@ -678,6 +681,7 @@ var KeywordNames = []string{
 	"never",
 	"next",
 	"no",
+	"nocontroljob",
 	"nocreaterole",
 	"nologin",
 	"none",
@@ -1018,6 +1022,8 @@ func GetKeywordID(k string) int32 {
 		return CONSTRAINT
 	case "constraints":
 		return CONSTRAINTS
+	case "controljob":
+		return CONTROLJOB
 	case "conversion":
 		return CONVERSION
 	case "copy":
@@ -1358,6 +1364,8 @@ func GetKeywordID(k string) int32 {
 		return NEXT
 	case "no":
 		return NO
+	case "nocontroljob":
+		return NOCONTROLJOB
 	case "nocreaterole":
 		return NOCREATEROLE
 	case "nologin":
