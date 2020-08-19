@@ -26,6 +26,7 @@ var KeywordsCategories = map[string]string{
 	"authorization":                "U",
 	"automatic":                    "U",
 	"backup":                       "U",
+	"backups":                      "U",
 	"before":                       "U",
 	"begin":                        "U",
 	"between":                      "C",
@@ -464,6 +465,7 @@ var KeywordNames = []string{
 	"authorization",
 	"automatic",
 	"backup",
+	"backups",
 	"before",
 	"begin",
 	"between",
@@ -930,6 +932,8 @@ func GetKeywordID(k string) int32 {
 		return AUTOMATIC
 	case "backup":
 		return BACKUP
+	case "backups":
+		return BACKUPS
 	case "before":
 		return BEFORE
 	case "begin":
