@@ -16526,6 +16526,14 @@ func (_f *Factory) ConstructSTMakeLine(
 	return _f.onConstructScalar(e)
 }
 
+// ConstructSTExtent constructs an expression for the STExtent operator.
+func (_f *Factory) ConstructSTExtent(
+	input opt.ScalarExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeSTExtent(input)
+	return _f.onConstructScalar(e)
+}
+
 // ConstructXorAgg constructs an expression for the XorAgg operator.
 func (_f *Factory) ConstructXorAgg(
 	input opt.ScalarExpr,
@@ -18142,6 +18150,13 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		}
 		return t
 
+	case *memo.STExtentExpr:
+		input := replace(t.Input).(opt.ScalarExpr)
+		if input != t.Input {
+			return f.ConstructSTExtent(input)
+		}
+		return t
+
 	case *memo.XorAggExpr:
 		input := replace(t.Input).(opt.ScalarExpr)
 		if input != t.Input {
@@ -19470,6 +19485,11 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
 		)
 
+	case *memo.STExtentExpr:
+		return f.ConstructSTExtent(
+			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
+		)
+
 	case *memo.XorAggExpr:
 		return f.ConstructXorAgg(
 			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
@@ -20506,6 +20526,10 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 		)
 	case opt.STMakeLineOp:
 		return f.ConstructSTMakeLine(
+			args[0].(opt.ScalarExpr),
+		)
+	case opt.STExtentOp:
+		return f.ConstructSTExtent(
 			args[0].(opt.ScalarExpr),
 		)
 	case opt.XorAggOp:

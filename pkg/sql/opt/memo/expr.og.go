@@ -12898,6 +12898,58 @@ func (e *STMakeLineExpr) DataType() *types.T {
 	return e.Typ
 }
 
+type STExtentExpr struct {
+	Input opt.ScalarExpr
+
+	Typ *types.T
+	id  opt.ScalarID
+}
+
+var _ opt.ScalarExpr = &STExtentExpr{}
+
+func (e *STExtentExpr) ID() opt.ScalarID {
+	return e.id
+}
+
+func (e *STExtentExpr) Op() opt.Operator {
+	return opt.STExtentOp
+}
+
+func (e *STExtentExpr) ChildCount() int {
+	return 1
+}
+
+func (e *STExtentExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *STExtentExpr) Private() interface{} {
+	return nil
+}
+
+func (e *STExtentExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *STExtentExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(opt.ScalarExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *STExtentExpr) DataType() *types.T {
+	return e.Typ
+}
+
 type XorAggExpr struct {
 	Input opt.ScalarExpr
 
@@ -19876,6 +19928,26 @@ func (m *Memo) MemoizeSTMakeLine(
 	return interned
 }
 
+func (m *Memo) MemoizeSTExtent(
+	input opt.ScalarExpr,
+) *STExtentExpr {
+	const size = int64(unsafe.Sizeof(STExtentExpr{}))
+	e := &STExtentExpr{
+		Input: input,
+		id:    m.NextID(),
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternSTExtent(e)
+	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
+		m.memEstimate += size
+		m.CheckExpr(e)
+	}
+	return interned
+}
+
 func (m *Memo) MemoizeXorAgg(
 	input opt.ScalarExpr,
 ) *XorAggExpr {
@@ -21935,6 +22007,8 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternStdDevPop(t)
 	case *STMakeLineExpr:
 		return in.InternSTMakeLine(t)
+	case *STExtentExpr:
+		return in.InternSTExtent(t)
 	case *XorAggExpr:
 		return in.InternXorAgg(t)
 	case *JsonAggExpr:
@@ -25397,6 +25471,24 @@ func (in *interner) InternSTMakeLine(val *STMakeLineExpr) *STMakeLineExpr {
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*STMakeLineExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternSTExtent(val *STExtentExpr) *STExtentExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.STExtentOp)
+	in.hasher.HashScalarExpr(val.Input)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*STExtentExpr); ok {
 			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) {
 				return existing
 			}
