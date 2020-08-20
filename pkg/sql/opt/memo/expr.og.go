@@ -9879,6 +9879,124 @@ func (e *OverlapsExpr) DataType() *types.T {
 	return types.Bool
 }
 
+// BBoxCoversExpr is the ~ operator when used with geometry or bounding box
+// operands. It maps to tree.RegMatch.
+type BBoxCoversExpr struct {
+	Left  opt.ScalarExpr
+	Right opt.ScalarExpr
+
+	id opt.ScalarID
+}
+
+var _ opt.ScalarExpr = &BBoxCoversExpr{}
+
+func (e *BBoxCoversExpr) ID() opt.ScalarID {
+	return e.id
+}
+
+func (e *BBoxCoversExpr) Op() opt.Operator {
+	return opt.BBoxCoversOp
+}
+
+func (e *BBoxCoversExpr) ChildCount() int {
+	return 2
+}
+
+func (e *BBoxCoversExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *BBoxCoversExpr) Private() interface{} {
+	return nil
+}
+
+func (e *BBoxCoversExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *BBoxCoversExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Right = child.(opt.ScalarExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *BBoxCoversExpr) DataType() *types.T {
+	return types.Bool
+}
+
+// BBoxIntersectsExpr is the && operator when used with geometry or bounding box
+// operands. It maps to tree.Overlaps.
+type BBoxIntersectsExpr struct {
+	Left  opt.ScalarExpr
+	Right opt.ScalarExpr
+
+	id opt.ScalarID
+}
+
+var _ opt.ScalarExpr = &BBoxIntersectsExpr{}
+
+func (e *BBoxIntersectsExpr) ID() opt.ScalarID {
+	return e.id
+}
+
+func (e *BBoxIntersectsExpr) Op() opt.Operator {
+	return opt.BBoxIntersectsOp
+}
+
+func (e *BBoxIntersectsExpr) ChildCount() int {
+	return 2
+}
+
+func (e *BBoxIntersectsExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *BBoxIntersectsExpr) Private() interface{} {
+	return nil
+}
+
+func (e *BBoxIntersectsExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *BBoxIntersectsExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Right = child.(opt.ScalarExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *BBoxIntersectsExpr) DataType() *types.T {
+	return types.Bool
+}
+
 // AnyScalarExpr is the form of ANY which refers to an ANY operation on a
 // tuple or array, as opposed to Any which operates on a subquery.
 type AnyScalarExpr struct {
@@ -18804,6 +18922,48 @@ func (m *Memo) MemoizeOverlaps(
 	return interned
 }
 
+func (m *Memo) MemoizeBBoxCovers(
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) *BBoxCoversExpr {
+	const size = int64(unsafe.Sizeof(BBoxCoversExpr{}))
+	e := &BBoxCoversExpr{
+		Left:  left,
+		Right: right,
+		id:    m.NextID(),
+	}
+	interned := m.interner.InternBBoxCovers(e)
+	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
+		m.memEstimate += size
+		m.CheckExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeBBoxIntersects(
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) *BBoxIntersectsExpr {
+	const size = int64(unsafe.Sizeof(BBoxIntersectsExpr{}))
+	e := &BBoxIntersectsExpr{
+		Left:  left,
+		Right: right,
+		id:    m.NextID(),
+	}
+	interned := m.interner.InternBBoxIntersects(e)
+	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
+		m.memEstimate += size
+		m.CheckExpr(e)
+	}
+	return interned
+}
+
 func (m *Memo) MemoizeAnyScalar(
 	left opt.ScalarExpr,
 	right opt.ScalarExpr,
@@ -21899,6 +22059,10 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternJsonSomeExists(t)
 	case *OverlapsExpr:
 		return in.InternOverlaps(t)
+	case *BBoxCoversExpr:
+		return in.InternBBoxCovers(t)
+	case *BBoxIntersectsExpr:
+		return in.InternBBoxIntersects(t)
 	case *AnyScalarExpr:
 		return in.InternAnyScalar(t)
 	case *BitandExpr:
@@ -24423,6 +24587,46 @@ func (in *interner) InternOverlaps(val *OverlapsExpr) *OverlapsExpr {
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*OverlapsExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsScalarExprEqual(val.Right, existing.Right) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternBBoxCovers(val *BBoxCoversExpr) *BBoxCoversExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.BBoxCoversOp)
+	in.hasher.HashScalarExpr(val.Left)
+	in.hasher.HashScalarExpr(val.Right)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*BBoxCoversExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsScalarExprEqual(val.Right, existing.Right) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternBBoxIntersects(val *BBoxIntersectsExpr) *BBoxIntersectsExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.BBoxIntersectsOp)
+	in.hasher.HashScalarExpr(val.Left)
+	in.hasher.HashScalarExpr(val.Right)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*BBoxIntersectsExpr); ok {
 			if in.hasher.IsScalarExprEqual(val.Left, existing.Left) &&
 				in.hasher.IsScalarExprEqual(val.Right, existing.Right) {
 				return existing

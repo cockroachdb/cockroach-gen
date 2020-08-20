@@ -617,6 +617,7 @@ func (f *Factory) ConstructLookupJoin(
 	lookupCols exec.TableColumnOrdinalSet,
 	onCond tree.TypedExpr,
 	reqOrdering exec.OutputOrdering,
+	locking *tree.LockingItem,
 ) (exec.Node, error) {
 	inputNode := input.(*Node)
 	args := &lookupJoinArgs{
@@ -629,6 +630,7 @@ func (f *Factory) ConstructLookupJoin(
 		LookupCols:   lookupCols,
 		OnCond:       onCond,
 		ReqOrdering:  reqOrdering,
+		Locking:      locking,
 	}
 	_n, err := f.newNode(lookupJoinOp, args, reqOrdering, inputNode)
 	if err != nil {
@@ -645,6 +647,7 @@ func (f *Factory) ConstructLookupJoin(
 		lookupCols,
 		onCond,
 		reqOrdering,
+		locking,
 	)
 	if err != nil {
 		return nil, err
@@ -1935,6 +1938,7 @@ type lookupJoinArgs struct {
 	LookupCols   exec.TableColumnOrdinalSet
 	OnCond       tree.TypedExpr
 	ReqOrdering  exec.OutputOrdering
+	Locking      *tree.LockingItem
 }
 
 type invertedJoinArgs struct {

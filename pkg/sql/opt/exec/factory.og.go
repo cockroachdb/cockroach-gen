@@ -317,6 +317,7 @@ type Factory interface {
 		lookupCols TableColumnOrdinalSet,
 		onCond tree.TypedExpr,
 		reqOrdering OutputOrdering,
+		locking *tree.LockingItem,
 	) (Node, error)
 
 	// ConstructInvertedJoin creates a node for a InvertedJoin operation.
@@ -1003,6 +1004,7 @@ func (StubFactory) ConstructLookupJoin(
 	lookupCols TableColumnOrdinalSet,
 	onCond tree.TypedExpr,
 	reqOrdering OutputOrdering,
+	locking *tree.LockingItem,
 ) (Node, error) {
 	return struct{}{}, nil
 }

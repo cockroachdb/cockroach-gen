@@ -14395,6 +14395,110 @@ func (_f *Factory) ConstructOverlaps(
 	return _f.onConstructScalar(e)
 }
 
+// ConstructBBoxCovers constructs an expression for the BBoxCovers operator.
+// BBoxCovers is the ~ operator when used with geometry or bounding box
+// operands. It maps to tree.RegMatch.
+func (_f *Factory) ConstructBBoxCovers(
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) opt.ScalarExpr {
+	// [FoldComparison]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldComparison(opt.BBoxCoversOp, left, right)
+				if _f.funcs.Succeeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
+						_expr := result.(opt.ScalarExpr)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldComparison, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
+	// [UnifyComparisonTypes]
+	{
+		_variable, _ := left.(*memo.VariableExpr)
+		if _variable != nil {
+			_const, _ := right.(*memo.ConstExpr)
+			if _const != nil {
+				result := _f.funcs.UnifyComparison(left, right)
+				if _f.funcs.Succeeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
+						_expr := _f.ConstructBBoxCovers(
+							left,
+							result,
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.UnifyComparisonTypes, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
+	e := _f.mem.MemoizeBBoxCovers(left, right)
+	return _f.onConstructScalar(e)
+}
+
+// ConstructBBoxIntersects constructs an expression for the BBoxIntersects operator.
+// BBoxIntersects is the && operator when used with geometry or bounding box
+// operands. It maps to tree.Overlaps.
+func (_f *Factory) ConstructBBoxIntersects(
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) opt.ScalarExpr {
+	// [FoldComparison]
+	{
+		if _f.funcs.IsConstValueOrTuple(left) {
+			if _f.funcs.IsConstValueOrTuple(right) {
+				result := _f.funcs.FoldComparison(opt.BBoxIntersectsOp, left, right)
+				if _f.funcs.Succeeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
+						_expr := result.(opt.ScalarExpr)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldComparison, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
+	// [UnifyComparisonTypes]
+	{
+		_variable, _ := left.(*memo.VariableExpr)
+		if _variable != nil {
+			_const, _ := right.(*memo.ConstExpr)
+			if _const != nil {
+				result := _f.funcs.UnifyComparison(left, right)
+				if _f.funcs.Succeeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
+						_expr := _f.ConstructBBoxIntersects(
+							left,
+							result,
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.UnifyComparisonTypes, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
+	e := _f.mem.MemoizeBBoxIntersects(left, right)
+	return _f.onConstructScalar(e)
+}
+
 // ConstructAnyScalar constructs an expression for the AnyScalar operator.
 // AnyScalar is the form of ANY which refers to an ANY operation on a
 // tuple or array, as opposed to Any which operates on a subquery.
@@ -17781,6 +17885,22 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		}
 		return t
 
+	case *memo.BBoxCoversExpr:
+		left := replace(t.Left).(opt.ScalarExpr)
+		right := replace(t.Right).(opt.ScalarExpr)
+		if left != t.Left || right != t.Right {
+			return f.ConstructBBoxCovers(left, right)
+		}
+		return t
+
+	case *memo.BBoxIntersectsExpr:
+		left := replace(t.Left).(opt.ScalarExpr)
+		right := replace(t.Right).(opt.ScalarExpr)
+		if left != t.Left || right != t.Right {
+			return f.ConstructBBoxIntersects(left, right)
+		}
+		return t
+
 	case *memo.AnyScalarExpr:
 		left := replace(t.Left).(opt.ScalarExpr)
 		right := replace(t.Right).(opt.ScalarExpr)
@@ -19213,6 +19333,18 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 			f.invokeReplace(t.Right, replace).(opt.ScalarExpr),
 		)
 
+	case *memo.BBoxCoversExpr:
+		return f.ConstructBBoxCovers(
+			f.invokeReplace(t.Left, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Right, replace).(opt.ScalarExpr),
+		)
+
+	case *memo.BBoxIntersectsExpr:
+		return f.ConstructBBoxIntersects(
+			f.invokeReplace(t.Left, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Right, replace).(opt.ScalarExpr),
+		)
+
 	case *memo.AnyScalarExpr:
 		return f.ConstructAnyScalar(
 			f.invokeReplace(t.Left, replace).(opt.ScalarExpr),
@@ -20305,6 +20437,16 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 		)
 	case opt.OverlapsOp:
 		return f.ConstructOverlaps(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.BBoxCoversOp:
+		return f.ConstructBBoxCovers(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.BBoxIntersectsOp:
+		return f.ConstructBBoxIntersects(
 			args[0].(opt.ScalarExpr),
 			args[1].(opt.ScalarExpr),
 		)
