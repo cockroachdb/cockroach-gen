@@ -47,6 +47,7 @@ const (
 	CommuteNullIs
 	NormalizeCmpTimeZoneFunction
 	NormalizeCmpTimeZoneFunctionTZ
+	FoldEqZeroSTDistance
 	DecorrelateJoin
 	DecorrelateProjectSet
 	TryDecorrelateSelect

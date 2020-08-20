@@ -11093,6 +11093,32 @@ func (_f *Factory) ConstructEq(
 		}
 	}
 
+	// [FoldEqZeroSTDistance]
+	{
+		_function, _ := left.(*memo.FunctionExpr)
+		if _function != nil {
+			args := _function.Args
+			private := &_function.FunctionPrivate
+			if _f.funcs.EqualsString(private.Name, "st_distance") {
+				_const, _ := right.(*memo.ConstExpr)
+				if _const != nil {
+					value := _const.Value
+					if _f.funcs.IsFloatDatum(value) {
+						if _f.funcs.DatumsEqual(value, tree.NewDInt(0)) {
+							if _f.matchedRule == nil || _f.matchedRule(opt.FoldEqZeroSTDistance) {
+								_expr := _f.funcs.MakeIntersectionFunction(args).(opt.ScalarExpr)
+								if _f.appliedRule != nil {
+									_f.appliedRule(opt.FoldEqZeroSTDistance, nil, _expr)
+								}
+								return _expr
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [FoldComparison]
 	{
 		if _f.funcs.IsConstValueOrTuple(left) {
