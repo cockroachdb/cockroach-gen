@@ -71,6 +71,7 @@ var KeywordsCategories = map[string]string{
 	"constraints":                  "U",
 	"controljob":                   "U",
 	"conversion":                   "U",
+	"convert":                      "U",
 	"copy":                         "U",
 	"covering":                     "U",
 	"create":                       "R",
@@ -512,6 +513,7 @@ var KeywordNames = []string{
 	"constraints",
 	"controljob",
 	"conversion",
+	"convert",
 	"copy",
 	"covering",
 	"create",
@@ -1026,6 +1028,8 @@ func GetKeywordID(k string) int32 {
 		return CONTROLJOB
 	case "conversion":
 		return CONVERSION
+	case "convert":
+		return CONVERT
 	case "copy":
 		return COPY
 	case "covering":
