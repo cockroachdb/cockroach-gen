@@ -11479,6 +11479,42 @@ func (_f *Factory) ConstructLt(
 		}
 	}
 
+	// [FoldCmpSTDistanceLeft]
+	{
+		_function, _ := left.(*memo.FunctionExpr)
+		if _function != nil {
+			args := _function.Args
+			private := &_function.FunctionPrivate
+			if _f.funcs.EqualsString(private.Name, "st_distance") {
+				if _f.matchedRule == nil || _f.matchedRule(opt.FoldCmpSTDistanceLeft) {
+					_expr := _f.funcs.MakeSTDWithinLeft(opt.LtOp, args, right).(opt.ScalarExpr)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.FoldCmpSTDistanceLeft, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
+	// [FoldCmpSTDistanceRight]
+	{
+		_function, _ := right.(*memo.FunctionExpr)
+		if _function != nil {
+			args := _function.Args
+			private := &_function.FunctionPrivate
+			if _f.funcs.EqualsString(private.Name, "st_distance") {
+				if _f.matchedRule == nil || _f.matchedRule(opt.FoldCmpSTDistanceRight) {
+					_expr := _f.funcs.MakeSTDWithinRight(opt.LtOp, args, left).(opt.ScalarExpr)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.FoldCmpSTDistanceRight, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
 	// [FoldComparison]
 	{
 		if _f.funcs.IsConstValueOrTuple(left) {
@@ -11767,6 +11803,42 @@ func (_f *Factory) ConstructGt(
 							}
 						}
 					}
+				}
+			}
+		}
+	}
+
+	// [FoldCmpSTDistanceLeft]
+	{
+		_function, _ := left.(*memo.FunctionExpr)
+		if _function != nil {
+			args := _function.Args
+			private := &_function.FunctionPrivate
+			if _f.funcs.EqualsString(private.Name, "st_distance") {
+				if _f.matchedRule == nil || _f.matchedRule(opt.FoldCmpSTDistanceLeft) {
+					_expr := _f.funcs.MakeSTDWithinLeft(opt.GtOp, args, right).(opt.ScalarExpr)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.FoldCmpSTDistanceLeft, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
+	// [FoldCmpSTDistanceRight]
+	{
+		_function, _ := right.(*memo.FunctionExpr)
+		if _function != nil {
+			args := _function.Args
+			private := &_function.FunctionPrivate
+			if _f.funcs.EqualsString(private.Name, "st_distance") {
+				if _f.matchedRule == nil || _f.matchedRule(opt.FoldCmpSTDistanceRight) {
+					_expr := _f.funcs.MakeSTDWithinRight(opt.GtOp, args, left).(opt.ScalarExpr)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.FoldCmpSTDistanceRight, nil, _expr)
+					}
+					return _expr
 				}
 			}
 		}
@@ -12065,6 +12137,42 @@ func (_f *Factory) ConstructLe(
 		}
 	}
 
+	// [FoldCmpSTDistanceLeft]
+	{
+		_function, _ := left.(*memo.FunctionExpr)
+		if _function != nil {
+			args := _function.Args
+			private := &_function.FunctionPrivate
+			if _f.funcs.EqualsString(private.Name, "st_distance") {
+				if _f.matchedRule == nil || _f.matchedRule(opt.FoldCmpSTDistanceLeft) {
+					_expr := _f.funcs.MakeSTDWithinLeft(opt.LeOp, args, right).(opt.ScalarExpr)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.FoldCmpSTDistanceLeft, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
+	// [FoldCmpSTDistanceRight]
+	{
+		_function, _ := right.(*memo.FunctionExpr)
+		if _function != nil {
+			args := _function.Args
+			private := &_function.FunctionPrivate
+			if _f.funcs.EqualsString(private.Name, "st_distance") {
+				if _f.matchedRule == nil || _f.matchedRule(opt.FoldCmpSTDistanceRight) {
+					_expr := _f.funcs.MakeSTDWithinRight(opt.LeOp, args, left).(opt.ScalarExpr)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.FoldCmpSTDistanceRight, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
 	// [FoldComparison]
 	{
 		if _f.funcs.IsConstValueOrTuple(left) {
@@ -12353,6 +12461,42 @@ func (_f *Factory) ConstructGe(
 							}
 						}
 					}
+				}
+			}
+		}
+	}
+
+	// [FoldCmpSTDistanceLeft]
+	{
+		_function, _ := left.(*memo.FunctionExpr)
+		if _function != nil {
+			args := _function.Args
+			private := &_function.FunctionPrivate
+			if _f.funcs.EqualsString(private.Name, "st_distance") {
+				if _f.matchedRule == nil || _f.matchedRule(opt.FoldCmpSTDistanceLeft) {
+					_expr := _f.funcs.MakeSTDWithinLeft(opt.GeOp, args, right).(opt.ScalarExpr)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.FoldCmpSTDistanceLeft, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
+	// [FoldCmpSTDistanceRight]
+	{
+		_function, _ := right.(*memo.FunctionExpr)
+		if _function != nil {
+			args := _function.Args
+			private := &_function.FunctionPrivate
+			if _f.funcs.EqualsString(private.Name, "st_distance") {
+				if _f.matchedRule == nil || _f.matchedRule(opt.FoldCmpSTDistanceRight) {
+					_expr := _f.funcs.MakeSTDWithinRight(opt.GeOp, args, left).(opt.ScalarExpr)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.FoldCmpSTDistanceRight, nil, _expr)
+					}
+					return _expr
 				}
 			}
 		}

@@ -48,6 +48,8 @@ const (
 	NormalizeCmpTimeZoneFunction
 	NormalizeCmpTimeZoneFunctionTZ
 	FoldEqZeroSTDistance
+	FoldCmpSTDistanceLeft
+	FoldCmpSTDistanceRight
 	DecorrelateJoin
 	DecorrelateProjectSet
 	TryDecorrelateSelect
