@@ -18132,7 +18132,7 @@ sqldefault:
 //line sql-gen.y:2283
 		{
 			sqlVAL.union.val = &tree.ScheduledBackup{
-				ScheduleName:    sqlDollar[3].union.expr(),
+				ScheduleLabel:   sqlDollar[3].union.expr(),
 				Recurrence:      sqlDollar[10].union.expr(),
 				FullBackup:      sqlDollar[11].union.fullBackupClause(),
 				To:              sqlDollar[8].union.stringOrPlaceholderOptList(),
