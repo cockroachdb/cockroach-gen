@@ -3,13 +3,13 @@
 package exec
 
 import (
+	"github.com/cockroachdb/cockroach/pkg/sql/catalog/colinfo"
 	"github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/cat"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/constraint"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/invertedexpr"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
-	"github.com/cockroachdb/cockroach/pkg/sql/sqlbase"
 )
 
 // Factory defines the interface for building an execution plan, which consists
@@ -51,7 +51,7 @@ type Factory interface {
 	// ConstructValues creates a node for a Values operation.
 	ConstructValues(
 		rows [][]tree.TypedExpr,
-		columns sqlbase.ResultColumns,
+		columns colinfo.ResultColumns,
 	) (Node, error)
 
 	// ConstructFilter creates a node for a Filter operation.
@@ -110,7 +110,7 @@ type Factory interface {
 	// modified.
 	ConstructRender(
 		input Node,
-		columns sqlbase.ResultColumns,
+		columns colinfo.ResultColumns,
 		exprs tree.TypedExprs,
 		reqOrdering OutputOrdering,
 	) (Node, error)
@@ -131,7 +131,7 @@ type Factory interface {
 	ConstructApplyJoin(
 		joinType descpb.JoinType,
 		left Node,
-		rightColumns sqlbase.ResultColumns,
+		rightColumns colinfo.ResultColumns,
 		onCond tree.TypedExpr,
 		planRightSideFn ApplyJoinPlanRightSideFn,
 	) (Node, error)
@@ -167,8 +167,8 @@ type Factory interface {
 		left Node,
 		right Node,
 		onCond tree.TypedExpr,
-		leftOrdering sqlbase.ColumnOrdering,
-		rightOrdering sqlbase.ColumnOrdering,
+		leftOrdering colinfo.ColumnOrdering,
+		rightOrdering colinfo.ColumnOrdering,
 		reqOrdering OutputOrdering,
 		leftEqColsAreKey bool,
 		rightEqColsAreKey bool,
@@ -217,7 +217,7 @@ type Factory interface {
 		// If set, the input is guaranteed to have this ordering and a "streaming"
 		// aggregation is performed (i.e. aggregation happens separately for each
 		// distinct set of values on the set of columns in the ordering).
-		groupColOrdering sqlbase.ColumnOrdering,
+		groupColOrdering colinfo.ColumnOrdering,
 		aggregations []AggInfo,
 		reqOrdering OutputOrdering,
 	) (Node, error)
@@ -405,7 +405,7 @@ type Factory interface {
 	ConstructProjectSet(
 		input Node,
 		exprs tree.TypedExprs,
-		zipCols sqlbase.ResultColumns,
+		zipCols colinfo.ResultColumns,
 		numColsPerGen []int,
 	) (Node, error)
 
@@ -532,7 +532,7 @@ type Factory interface {
 		updateCols TableColumnOrdinalSet,
 		returnCols TableColumnOrdinalSet,
 		checks CheckOrdinalSet,
-		passthrough sqlbase.ResultColumns,
+		passthrough colinfo.ResultColumns,
 		// If set, the operator will commit the transaction as part of its execution.
 		autoCommit bool,
 	) (Node, error)
@@ -659,7 +659,7 @@ type Factory interface {
 		persistence tree.Persistence,
 		materialized bool,
 		viewQuery string,
-		columns sqlbase.ResultColumns,
+		columns colinfo.ResultColumns,
 		deps opt.ViewDeps,
 	) (Node, error)
 
@@ -832,7 +832,7 @@ func (StubFactory) ConstructScan(
 
 func (StubFactory) ConstructValues(
 	rows [][]tree.TypedExpr,
-	columns sqlbase.ResultColumns,
+	columns colinfo.ResultColumns,
 ) (Node, error) {
 	return struct{}{}, nil
 }
@@ -871,7 +871,7 @@ func (StubFactory) ConstructSerializingProject(
 
 func (StubFactory) ConstructRender(
 	input Node,
-	columns sqlbase.ResultColumns,
+	columns colinfo.ResultColumns,
 	exprs tree.TypedExprs,
 	reqOrdering OutputOrdering,
 ) (Node, error) {
@@ -881,7 +881,7 @@ func (StubFactory) ConstructRender(
 func (StubFactory) ConstructApplyJoin(
 	joinType descpb.JoinType,
 	left Node,
-	rightColumns sqlbase.ResultColumns,
+	rightColumns colinfo.ResultColumns,
 	onCond tree.TypedExpr,
 	planRightSideFn ApplyJoinPlanRightSideFn,
 ) (Node, error) {
@@ -906,8 +906,8 @@ func (StubFactory) ConstructMergeJoin(
 	left Node,
 	right Node,
 	onCond tree.TypedExpr,
-	leftOrdering sqlbase.ColumnOrdering,
-	rightOrdering sqlbase.ColumnOrdering,
+	leftOrdering colinfo.ColumnOrdering,
+	rightOrdering colinfo.ColumnOrdering,
 	reqOrdering OutputOrdering,
 	leftEqColsAreKey bool,
 	rightEqColsAreKey bool,
@@ -935,7 +935,7 @@ func (StubFactory) ConstructInterleavedJoin(
 func (StubFactory) ConstructGroupBy(
 	input Node,
 	groupCols []NodeColumnOrdinal,
-	groupColOrdering sqlbase.ColumnOrdering,
+	groupColOrdering colinfo.ColumnOrdering,
 	aggregations []AggInfo,
 	reqOrdering OutputOrdering,
 ) (Node, error) {
@@ -1057,7 +1057,7 @@ func (StubFactory) ConstructMax1Row(
 func (StubFactory) ConstructProjectSet(
 	input Node,
 	exprs tree.TypedExprs,
-	zipCols sqlbase.ResultColumns,
+	zipCols colinfo.ResultColumns,
 	numColsPerGen []int,
 ) (Node, error) {
 	return struct{}{}, nil
@@ -1129,7 +1129,7 @@ func (StubFactory) ConstructUpdate(
 	updateCols TableColumnOrdinalSet,
 	returnCols TableColumnOrdinalSet,
 	checks CheckOrdinalSet,
-	passthrough sqlbase.ResultColumns,
+	passthrough colinfo.ResultColumns,
 	autoCommit bool,
 ) (Node, error) {
 	return struct{}{}, nil
@@ -1192,7 +1192,7 @@ func (StubFactory) ConstructCreateView(
 	persistence tree.Persistence,
 	materialized bool,
 	viewQuery string,
-	columns sqlbase.ResultColumns,
+	columns colinfo.ResultColumns,
 	deps opt.ViewDeps,
 ) (Node, error) {
 	return struct{}{}, nil

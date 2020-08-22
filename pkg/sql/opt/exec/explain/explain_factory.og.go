@@ -3,6 +3,7 @@
 package explain
 
 import (
+	"github.com/cockroachdb/cockroach/pkg/sql/catalog/colinfo"
 	"github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/cat"
@@ -10,7 +11,6 @@ import (
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/exec"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/invertedexpr"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
-	"github.com/cockroachdb/cockroach/pkg/sql/sqlbase"
 )
 
 func (f *Factory) ConstructScan(
@@ -45,7 +45,7 @@ func (f *Factory) ConstructScan(
 
 func (f *Factory) ConstructValues(
 	rows [][]tree.TypedExpr,
-	columns sqlbase.ResultColumns,
+	columns colinfo.ResultColumns,
 ) (exec.Node, error) {
 	args := &valuesArgs{
 		Rows:    rows,
@@ -181,7 +181,7 @@ func (f *Factory) ConstructSerializingProject(
 
 func (f *Factory) ConstructRender(
 	input exec.Node,
-	columns sqlbase.ResultColumns,
+	columns colinfo.ResultColumns,
 	exprs tree.TypedExprs,
 	reqOrdering exec.OutputOrdering,
 ) (exec.Node, error) {
@@ -213,7 +213,7 @@ func (f *Factory) ConstructRender(
 func (f *Factory) ConstructApplyJoin(
 	joinType descpb.JoinType,
 	left exec.Node,
-	rightColumns sqlbase.ResultColumns,
+	rightColumns colinfo.ResultColumns,
 	onCond tree.TypedExpr,
 	planRightSideFn exec.ApplyJoinPlanRightSideFn,
 ) (exec.Node, error) {
@@ -293,8 +293,8 @@ func (f *Factory) ConstructMergeJoin(
 	left exec.Node,
 	right exec.Node,
 	onCond tree.TypedExpr,
-	leftOrdering sqlbase.ColumnOrdering,
-	rightOrdering sqlbase.ColumnOrdering,
+	leftOrdering colinfo.ColumnOrdering,
+	rightOrdering colinfo.ColumnOrdering,
 	reqOrdering exec.OutputOrdering,
 	leftEqColsAreKey bool,
 	rightEqColsAreKey bool,
@@ -395,7 +395,7 @@ func (f *Factory) ConstructGroupBy(
 	// If set, the input is guaranteed to have this ordering and a "streaming"
 	// aggregation is performed (i.e. aggregation happens separately for each
 	// distinct set of values on the set of columns in the ordering).
-	groupColOrdering sqlbase.ColumnOrdering,
+	groupColOrdering colinfo.ColumnOrdering,
 	aggregations []exec.AggInfo,
 	reqOrdering exec.OutputOrdering,
 ) (exec.Node, error) {
@@ -823,7 +823,7 @@ func (f *Factory) ConstructMax1Row(
 func (f *Factory) ConstructProjectSet(
 	input exec.Node,
 	exprs tree.TypedExprs,
-	zipCols sqlbase.ResultColumns,
+	zipCols colinfo.ResultColumns,
 	numColsPerGen []int,
 ) (exec.Node, error) {
 	inputNode := input.(*Node)
@@ -1064,7 +1064,7 @@ func (f *Factory) ConstructUpdate(
 	updateCols exec.TableColumnOrdinalSet,
 	returnCols exec.TableColumnOrdinalSet,
 	checks exec.CheckOrdinalSet,
-	passthrough sqlbase.ResultColumns,
+	passthrough colinfo.ResultColumns,
 	// If set, the operator will commit the transaction as part of its execution.
 	autoCommit bool,
 ) (exec.Node, error) {
@@ -1287,7 +1287,7 @@ func (f *Factory) ConstructCreateView(
 	persistence tree.Persistence,
 	materialized bool,
 	viewQuery string,
-	columns sqlbase.ResultColumns,
+	columns colinfo.ResultColumns,
 	deps opt.ViewDeps,
 ) (exec.Node, error) {
 	args := &createViewArgs{
@@ -1800,7 +1800,7 @@ type scanArgs struct {
 
 type valuesArgs struct {
 	Rows    [][]tree.TypedExpr
-	Columns sqlbase.ResultColumns
+	Columns colinfo.ResultColumns
 }
 
 type filterArgs struct {
@@ -1829,7 +1829,7 @@ type serializingProjectArgs struct {
 
 type renderArgs struct {
 	Input       *Node
-	Columns     sqlbase.ResultColumns
+	Columns     colinfo.ResultColumns
 	Exprs       tree.TypedExprs
 	ReqOrdering exec.OutputOrdering
 }
@@ -1837,7 +1837,7 @@ type renderArgs struct {
 type applyJoinArgs struct {
 	JoinType        descpb.JoinType
 	Left            *Node
-	RightColumns    sqlbase.ResultColumns
+	RightColumns    colinfo.ResultColumns
 	OnCond          tree.TypedExpr
 	PlanRightSideFn exec.ApplyJoinPlanRightSideFn
 }
@@ -1858,8 +1858,8 @@ type mergeJoinArgs struct {
 	Left              *Node
 	Right             *Node
 	OnCond            tree.TypedExpr
-	LeftOrdering      sqlbase.ColumnOrdering
-	RightOrdering     sqlbase.ColumnOrdering
+	LeftOrdering      colinfo.ColumnOrdering
+	RightOrdering     colinfo.ColumnOrdering
 	ReqOrdering       exec.OutputOrdering
 	LeftEqColsAreKey  bool
 	RightEqColsAreKey bool
@@ -1883,7 +1883,7 @@ type interleavedJoinArgs struct {
 type groupByArgs struct {
 	Input            *Node
 	GroupCols        []exec.NodeColumnOrdinal
-	GroupColOrdering sqlbase.ColumnOrdering
+	GroupColOrdering colinfo.ColumnOrdering
 	Aggregations     []exec.AggInfo
 	ReqOrdering      exec.OutputOrdering
 }
@@ -1981,7 +1981,7 @@ type max1RowArgs struct {
 type projectSetArgs struct {
 	Input         *Node
 	Exprs         tree.TypedExprs
-	ZipCols       sqlbase.ResultColumns
+	ZipCols       colinfo.ResultColumns
 	NumColsPerGen []int
 }
 
@@ -2037,7 +2037,7 @@ type updateArgs struct {
 	UpdateCols  exec.TableColumnOrdinalSet
 	ReturnCols  exec.TableColumnOrdinalSet
 	Checks      exec.CheckOrdinalSet
-	Passthrough sqlbase.ResultColumns
+	Passthrough colinfo.ResultColumns
 	AutoCommit  bool
 }
 
@@ -2088,7 +2088,7 @@ type createViewArgs struct {
 	Persistence  tree.Persistence
 	Materialized bool
 	ViewQuery    string
-	Columns      sqlbase.ResultColumns
+	Columns      colinfo.ResultColumns
 	deps         opt.ViewDeps
 }
 
