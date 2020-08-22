@@ -13068,6 +13068,58 @@ func (e *STExtentExpr) DataType() *types.T {
 	return e.Typ
 }
 
+type STUnionExpr struct {
+	Input opt.ScalarExpr
+
+	Typ *types.T
+	id  opt.ScalarID
+}
+
+var _ opt.ScalarExpr = &STUnionExpr{}
+
+func (e *STUnionExpr) ID() opt.ScalarID {
+	return e.id
+}
+
+func (e *STUnionExpr) Op() opt.Operator {
+	return opt.STUnionOp
+}
+
+func (e *STUnionExpr) ChildCount() int {
+	return 1
+}
+
+func (e *STUnionExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *STUnionExpr) Private() interface{} {
+	return nil
+}
+
+func (e *STUnionExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *STUnionExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(opt.ScalarExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *STUnionExpr) DataType() *types.T {
+	return e.Typ
+}
+
 type XorAggExpr struct {
 	Input opt.ScalarExpr
 
@@ -20108,6 +20160,26 @@ func (m *Memo) MemoizeSTExtent(
 	return interned
 }
 
+func (m *Memo) MemoizeSTUnion(
+	input opt.ScalarExpr,
+) *STUnionExpr {
+	const size = int64(unsafe.Sizeof(STUnionExpr{}))
+	e := &STUnionExpr{
+		Input: input,
+		id:    m.NextID(),
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternSTUnion(e)
+	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
+		m.memEstimate += size
+		m.CheckExpr(e)
+	}
+	return interned
+}
+
 func (m *Memo) MemoizeXorAgg(
 	input opt.ScalarExpr,
 ) *XorAggExpr {
@@ -22173,6 +22245,8 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternSTMakeLine(t)
 	case *STExtentExpr:
 		return in.InternSTExtent(t)
+	case *STUnionExpr:
+		return in.InternSTUnion(t)
 	case *XorAggExpr:
 		return in.InternXorAgg(t)
 	case *JsonAggExpr:
@@ -25693,6 +25767,24 @@ func (in *interner) InternSTExtent(val *STExtentExpr) *STExtentExpr {
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*STExtentExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternSTUnion(val *STUnionExpr) *STUnionExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.STUnionOp)
+	in.hasher.HashScalarExpr(val.Input)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*STUnionExpr); ok {
 			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) {
 				return existing
 			}

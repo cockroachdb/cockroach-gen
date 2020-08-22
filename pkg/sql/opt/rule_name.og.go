@@ -141,6 +141,7 @@ const (
 	LeftAssociateJoinsRight
 	RightAssociateJoinsLeft
 	RightAssociateJoinsRight
+	RemoveJoinNotNullCondition
 	EliminateLimit
 	EliminateOffset
 	PushLimitIntoProject

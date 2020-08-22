@@ -3517,6 +3517,38 @@ func (_f *Factory) ConstructLeftJoin(
 		}
 	}
 
+	// [RemoveJoinNotNullCondition]
+	{
+		for i := range on {
+			item := &on[i]
+			_isNot, _ := item.Condition.(*memo.IsNotExpr)
+			if _isNot != nil {
+				_variable, _ := _isNot.Left.(*memo.VariableExpr)
+				if _variable != nil {
+					col := _variable.Col
+					if _f.funcs.IsColNotNull2(col, left, right) {
+						_null, _ := _isNot.Right.(*memo.NullExpr)
+						if _null != nil {
+							private := joinPrivate
+							if _f.matchedRule == nil || _f.matchedRule(opt.RemoveJoinNotNullCondition) {
+								_expr := _f.ConstructLeftJoin(
+									left,
+									right,
+									_f.funcs.RemoveFiltersItem(on, item),
+									private,
+								)
+								if _f.appliedRule != nil {
+									_f.appliedRule(opt.RemoveJoinNotNullCondition, nil, _expr)
+								}
+								return _expr
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [HoistJoinSubquery]
 	{
 		for i := range on {
@@ -4140,6 +4172,38 @@ func (_f *Factory) ConstructFullJoin(
 										return _expr
 									}
 								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [RemoveJoinNotNullCondition]
+	{
+		for i := range on {
+			item := &on[i]
+			_isNot, _ := item.Condition.(*memo.IsNotExpr)
+			if _isNot != nil {
+				_variable, _ := _isNot.Left.(*memo.VariableExpr)
+				if _variable != nil {
+					col := _variable.Col
+					if _f.funcs.IsColNotNull2(col, left, right) {
+						_null, _ := _isNot.Right.(*memo.NullExpr)
+						if _null != nil {
+							private := joinPrivate
+							if _f.matchedRule == nil || _f.matchedRule(opt.RemoveJoinNotNullCondition) {
+								_expr := _f.ConstructFullJoin(
+									left,
+									right,
+									_f.funcs.RemoveFiltersItem(on, item),
+									private,
+								)
+								if _f.appliedRule != nil {
+									_f.appliedRule(opt.RemoveJoinNotNullCondition, nil, _expr)
+								}
+								return _expr
 							}
 						}
 					}
@@ -16808,6 +16872,14 @@ func (_f *Factory) ConstructSTExtent(
 	return _f.onConstructScalar(e)
 }
 
+// ConstructSTUnion constructs an expression for the STUnion operator.
+func (_f *Factory) ConstructSTUnion(
+	input opt.ScalarExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeSTUnion(input)
+	return _f.onConstructScalar(e)
+}
+
 // ConstructXorAgg constructs an expression for the XorAgg operator.
 func (_f *Factory) ConstructXorAgg(
 	input opt.ScalarExpr,
@@ -18447,6 +18519,13 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		}
 		return t
 
+	case *memo.STUnionExpr:
+		input := replace(t.Input).(opt.ScalarExpr)
+		if input != t.Input {
+			return f.ConstructSTUnion(input)
+		}
+		return t
+
 	case *memo.XorAggExpr:
 		input := replace(t.Input).(opt.ScalarExpr)
 		if input != t.Input {
@@ -19792,6 +19871,11 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
 		)
 
+	case *memo.STUnionExpr:
+		return f.ConstructSTUnion(
+			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
+		)
+
 	case *memo.XorAggExpr:
 		return f.ConstructXorAgg(
 			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
@@ -20842,6 +20926,10 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 		)
 	case opt.STExtentOp:
 		return f.ConstructSTExtent(
+			args[0].(opt.ScalarExpr),
+		)
+	case opt.STUnionOp:
+		return f.ConstructSTUnion(
 			args[0].(opt.ScalarExpr),
 		)
 	case opt.XorAggOp:
