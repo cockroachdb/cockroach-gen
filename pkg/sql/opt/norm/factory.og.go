@@ -11579,6 +11579,42 @@ func (_f *Factory) ConstructLt(
 		}
 	}
 
+	// [FoldCmpSTMaxDistanceLeft]
+	{
+		_function, _ := left.(*memo.FunctionExpr)
+		if _function != nil {
+			args := _function.Args
+			private := &_function.FunctionPrivate
+			if _f.funcs.EqualsString(private.Name, "st_maxdistance") {
+				if _f.matchedRule == nil || _f.matchedRule(opt.FoldCmpSTMaxDistanceLeft) {
+					_expr := _f.funcs.MakeSTDFullyWithinLeft(opt.LtOp, args, right).(opt.ScalarExpr)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.FoldCmpSTMaxDistanceLeft, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
+	// [FoldCmpSTMaxDistanceRight]
+	{
+		_function, _ := right.(*memo.FunctionExpr)
+		if _function != nil {
+			args := _function.Args
+			private := &_function.FunctionPrivate
+			if _f.funcs.EqualsString(private.Name, "st_maxdistance") {
+				if _f.matchedRule == nil || _f.matchedRule(opt.FoldCmpSTMaxDistanceRight) {
+					_expr := _f.funcs.MakeSTDFullyWithinRight(opt.LtOp, args, left).(opt.ScalarExpr)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.FoldCmpSTMaxDistanceRight, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
 	// [FoldComparison]
 	{
 		if _f.funcs.IsConstValueOrTuple(left) {
@@ -11901,6 +11937,42 @@ func (_f *Factory) ConstructGt(
 					_expr := _f.funcs.MakeSTDWithinRight(opt.GtOp, args, left).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldCmpSTDistanceRight, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
+	// [FoldCmpSTMaxDistanceLeft]
+	{
+		_function, _ := left.(*memo.FunctionExpr)
+		if _function != nil {
+			args := _function.Args
+			private := &_function.FunctionPrivate
+			if _f.funcs.EqualsString(private.Name, "st_maxdistance") {
+				if _f.matchedRule == nil || _f.matchedRule(opt.FoldCmpSTMaxDistanceLeft) {
+					_expr := _f.funcs.MakeSTDFullyWithinLeft(opt.GtOp, args, right).(opt.ScalarExpr)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.FoldCmpSTMaxDistanceLeft, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
+	// [FoldCmpSTMaxDistanceRight]
+	{
+		_function, _ := right.(*memo.FunctionExpr)
+		if _function != nil {
+			args := _function.Args
+			private := &_function.FunctionPrivate
+			if _f.funcs.EqualsString(private.Name, "st_maxdistance") {
+				if _f.matchedRule == nil || _f.matchedRule(opt.FoldCmpSTMaxDistanceRight) {
+					_expr := _f.funcs.MakeSTDFullyWithinRight(opt.GtOp, args, left).(opt.ScalarExpr)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.FoldCmpSTMaxDistanceRight, nil, _expr)
 					}
 					return _expr
 				}
@@ -12237,6 +12309,42 @@ func (_f *Factory) ConstructLe(
 		}
 	}
 
+	// [FoldCmpSTMaxDistanceLeft]
+	{
+		_function, _ := left.(*memo.FunctionExpr)
+		if _function != nil {
+			args := _function.Args
+			private := &_function.FunctionPrivate
+			if _f.funcs.EqualsString(private.Name, "st_maxdistance") {
+				if _f.matchedRule == nil || _f.matchedRule(opt.FoldCmpSTMaxDistanceLeft) {
+					_expr := _f.funcs.MakeSTDFullyWithinLeft(opt.LeOp, args, right).(opt.ScalarExpr)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.FoldCmpSTMaxDistanceLeft, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
+	// [FoldCmpSTMaxDistanceRight]
+	{
+		_function, _ := right.(*memo.FunctionExpr)
+		if _function != nil {
+			args := _function.Args
+			private := &_function.FunctionPrivate
+			if _f.funcs.EqualsString(private.Name, "st_maxdistance") {
+				if _f.matchedRule == nil || _f.matchedRule(opt.FoldCmpSTMaxDistanceRight) {
+					_expr := _f.funcs.MakeSTDFullyWithinRight(opt.LeOp, args, left).(opt.ScalarExpr)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.FoldCmpSTMaxDistanceRight, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
 	// [FoldComparison]
 	{
 		if _f.funcs.IsConstValueOrTuple(left) {
@@ -12559,6 +12667,42 @@ func (_f *Factory) ConstructGe(
 					_expr := _f.funcs.MakeSTDWithinRight(opt.GeOp, args, left).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldCmpSTDistanceRight, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
+	// [FoldCmpSTMaxDistanceLeft]
+	{
+		_function, _ := left.(*memo.FunctionExpr)
+		if _function != nil {
+			args := _function.Args
+			private := &_function.FunctionPrivate
+			if _f.funcs.EqualsString(private.Name, "st_maxdistance") {
+				if _f.matchedRule == nil || _f.matchedRule(opt.FoldCmpSTMaxDistanceLeft) {
+					_expr := _f.funcs.MakeSTDFullyWithinLeft(opt.GeOp, args, right).(opt.ScalarExpr)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.FoldCmpSTMaxDistanceLeft, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
+	// [FoldCmpSTMaxDistanceRight]
+	{
+		_function, _ := right.(*memo.FunctionExpr)
+		if _function != nil {
+			args := _function.Args
+			private := &_function.FunctionPrivate
+			if _f.funcs.EqualsString(private.Name, "st_maxdistance") {
+				if _f.matchedRule == nil || _f.matchedRule(opt.FoldCmpSTMaxDistanceRight) {
+					_expr := _f.funcs.MakeSTDFullyWithinRight(opt.GeOp, args, left).(opt.ScalarExpr)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.FoldCmpSTMaxDistanceRight, nil, _expr)
 					}
 					return _expr
 				}
