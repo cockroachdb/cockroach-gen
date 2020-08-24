@@ -41,6 +41,7 @@ var KeywordsCategories = map[string]string{
 	"by":                           "U",
 	"cache":                        "U",
 	"cancel":                       "U",
+	"cancelquery":                  "U",
 	"cascade":                      "U",
 	"case":                         "R",
 	"cast":                         "R",
@@ -244,6 +245,7 @@ var KeywordsCategories = map[string]string{
 	"never":                        "U",
 	"next":                         "U",
 	"no":                           "U",
+	"nocancelquery":                "U",
 	"nocontrolchangefeed":          "U",
 	"nocontroljob":                 "U",
 	"nocreatedb":                   "U",
@@ -255,6 +257,7 @@ var KeywordsCategories = map[string]string{
 	"not":                          "R",
 	"nothing":                      "R",
 	"notnull":                      "T",
+	"noviewactivity":               "U",
 	"nowait":                       "U",
 	"no_index_join":                "U",
 	"null":                         "R",
@@ -435,6 +438,7 @@ var KeywordsCategories = map[string]string{
 	"variadic":                     "R",
 	"varying":                      "U",
 	"view":                         "U",
+	"viewactivity":                 "U",
 	"virtual":                      "C",
 	"when":                         "R",
 	"where":                        "R",
@@ -489,6 +493,7 @@ var KeywordNames = []string{
 	"by",
 	"cache",
 	"cancel",
+	"cancelquery",
 	"cascade",
 	"case",
 	"cast",
@@ -692,6 +697,7 @@ var KeywordNames = []string{
 	"never",
 	"next",
 	"no",
+	"nocancelquery",
 	"nocontrolchangefeed",
 	"nocontroljob",
 	"nocreatedb",
@@ -703,6 +709,7 @@ var KeywordNames = []string{
 	"not",
 	"nothing",
 	"notnull",
+	"noviewactivity",
 	"nowait",
 	"no_index_join",
 	"null",
@@ -883,6 +890,7 @@ var KeywordNames = []string{
 	"variadic",
 	"varying",
 	"view",
+	"viewactivity",
 	"virtual",
 	"when",
 	"where",
@@ -980,6 +988,8 @@ func GetKeywordID(k string) int32 {
 		return CACHE
 	case "cancel":
 		return CANCEL
+	case "cancelquery":
+		return CANCELQUERY
 	case "cascade":
 		return CASCADE
 	case "case":
@@ -1386,6 +1396,8 @@ func GetKeywordID(k string) int32 {
 		return NEXT
 	case "no":
 		return NO
+	case "nocancelquery":
+		return NOCANCELQUERY
 	case "nocontrolchangefeed":
 		return NOCONTROLCHANGEFEED
 	case "nocontroljob":
@@ -1408,6 +1420,8 @@ func GetKeywordID(k string) int32 {
 		return NOTHING
 	case "notnull":
 		return NOTNULL
+	case "noviewactivity":
+		return NOVIEWACTIVITY
 	case "nowait":
 		return NOWAIT
 	case "no_index_join":
@@ -1768,6 +1782,8 @@ func GetKeywordID(k string) int32 {
 		return VARYING
 	case "view":
 		return VIEW
+	case "viewactivity":
+		return VIEWACTIVITY
 	case "virtual":
 		return VIRTUAL
 	case "when":
