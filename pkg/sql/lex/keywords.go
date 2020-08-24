@@ -76,6 +76,7 @@ var KeywordsCategories = map[string]string{
 	"copy":                         "U",
 	"covering":                     "U",
 	"create":                       "R",
+	"createdb":                     "U",
 	"createrole":                   "U",
 	"cross":                        "T",
 	"cube":                         "U",
@@ -244,6 +245,7 @@ var KeywordsCategories = map[string]string{
 	"no":                           "U",
 	"nocontrolchangefeed":          "U",
 	"nocontroljob":                 "U",
+	"nocreatedb":                   "U",
 	"nocreaterole":                 "U",
 	"nologin":                      "U",
 	"none":                         "T",
@@ -520,6 +522,7 @@ var KeywordNames = []string{
 	"copy",
 	"covering",
 	"create",
+	"createdb",
 	"createrole",
 	"cross",
 	"cube",
@@ -688,6 +691,7 @@ var KeywordNames = []string{
 	"no",
 	"nocontrolchangefeed",
 	"nocontroljob",
+	"nocreatedb",
 	"nocreaterole",
 	"nologin",
 	"none",
@@ -1042,6 +1046,8 @@ func GetKeywordID(k string) int32 {
 		return COVERING
 	case "create":
 		return CREATE
+	case "createdb":
+		return CREATEDB
 	case "createrole":
 		return CREATEROLE
 	case "cross":
@@ -1378,6 +1384,8 @@ func GetKeywordID(k string) int32 {
 		return NOCONTROLCHANGEFEED
 	case "nocontroljob":
 		return NOCONTROLJOB
+	case "nocreatedb":
+		return NOCREATEDB
 	case "nocreaterole":
 		return NOCREATEROLE
 	case "nologin":
