@@ -415,6 +415,7 @@ var KeywordsCategories = map[string]string{
 	"truncate":                     "U",
 	"trusted":                      "U",
 	"type":                         "U",
+	"types":                        "U",
 	"unbounded":                    "U",
 	"uncommitted":                  "U",
 	"union":                        "R",
@@ -867,6 +868,7 @@ var KeywordNames = []string{
 	"truncate",
 	"trusted",
 	"type",
+	"types",
 	"unbounded",
 	"uncommitted",
 	"union",
@@ -1736,6 +1738,8 @@ func GetKeywordID(k string) int32 {
 		return TRUSTED
 	case "type":
 		return TYPE
+	case "types":
+		return TYPES
 	case "unbounded":
 		return UNBOUNDED
 	case "uncommitted":
