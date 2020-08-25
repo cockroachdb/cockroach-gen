@@ -1005,6 +1005,45 @@ func (_e *explorer) exploreSemiJoin(
 		}
 	}
 
+	// [ConvertSemiToInnerJoin]
+	{
+		if _rootOrd >= _rootState.start {
+			left := _root.Left
+			right := _root.Right
+			on := _root.On
+			if !_e.funcs.IsSimpleEquality(on) {
+				private := &_root.JoinPrivate
+				if _e.funcs.NoJoinHints(private) {
+					if _e.o.matchedRule == nil || _e.o.matchedRule(opt.ConvertSemiToInnerJoin) {
+						newLeft := _e.funcs.EnsureKey(left)
+						_expr := &memo.ProjectExpr{
+							Input: _e.f.ConstructDistinctOn(
+								_e.f.ConstructInnerJoin(
+									newLeft,
+									right,
+									on,
+									private,
+								),
+								_e.funcs.MakeAggCols(opt.ConstAggOp, _e.funcs.NonKeyCols(newLeft)),
+								_e.funcs.MakeGrouping(_e.funcs.KeyCols(newLeft), _e.funcs.EmptyOrdering()),
+							),
+							Projections: memo.EmptyProjectionsExpr,
+							Passthrough: _e.funcs.OutputCols(left),
+						}
+						_interned := _e.mem.AddProjectToGroup(_expr, _root)
+						if _e.o.appliedRule != nil {
+							if _interned != _expr {
+								_e.o.appliedRule(opt.ConvertSemiToInnerJoin, _root, nil)
+							} else {
+								_e.o.appliedRule(opt.ConvertSemiToInnerJoin, _root, _interned)
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [GenerateMergeJoins]
 	{
 		if _rootOrd >= _rootState.start {
