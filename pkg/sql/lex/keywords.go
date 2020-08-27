@@ -408,6 +408,7 @@ var KeywordsCategories = map[string]string{
 	"trace":                        "U",
 	"trailing":                     "R",
 	"transaction":                  "U",
+	"transactions":                 "U",
 	"treat":                        "C",
 	"trigger":                      "U",
 	"trim":                         "C",
@@ -861,6 +862,7 @@ var KeywordNames = []string{
 	"trace",
 	"trailing",
 	"transaction",
+	"transactions",
 	"treat",
 	"trigger",
 	"trim",
@@ -1724,6 +1726,8 @@ func GetKeywordID(k string) int32 {
 		return TRAILING
 	case "transaction":
 		return TRANSACTION
+	case "transactions":
+		return TRANSACTIONS
 	case "treat":
 		return TREAT
 	case "trigger":

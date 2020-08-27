@@ -105,6 +105,7 @@ var expectedHelpStrings = []string{
 	"SHOW TABLES",
 	"SHOW TRACE",
 	"SHOW TRANSACTION",
+	"SHOW TRANSACTIONS",
 	"SHOW TYPES",
 	"SHOW USERS",
 	"SHOW",
