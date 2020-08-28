@@ -276,7 +276,7 @@ const (
 	GenerateLookupJoinsWithFilter
 	PushJoinIntoIndexJoin
 	GenerateLimitedScans
-	PushLimitIntoConstrainedScan
+	PushLimitIntoFilteredScan
 	PushLimitIntoIndexJoin
 	SplitScanIntoUnionScans
 	GenerateIndexScans

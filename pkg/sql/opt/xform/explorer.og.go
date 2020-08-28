@@ -1851,7 +1851,7 @@ func (_e *explorer) exploreLimit(
 		}
 	}
 
-	// [PushLimitIntoConstrainedScan]
+	// [PushLimitIntoFilteredScan]
 	{
 		_partlyExplored := _rootOrd < _rootState.start
 		_state := _e.lookupExploreState(_root.Input)
@@ -1874,17 +1874,17 @@ func (_e *explorer) exploreLimit(
 						limit := _const.Value
 						if _e.funcs.IsPositiveInt(limit) {
 							ordering := _root.Ordering
-							if _e.funcs.CanLimitConstrainedScan(scanPrivate, ordering) {
-								if _e.o.matchedRule == nil || _e.o.matchedRule(opt.PushLimitIntoConstrainedScan) {
+							if _e.funcs.CanLimitFilteredScan(scanPrivate, ordering) {
+								if _e.o.matchedRule == nil || _e.o.matchedRule(opt.PushLimitIntoFilteredScan) {
 									_expr := &memo.ScanExpr{
 										ScanPrivate: *_e.funcs.LimitScanPrivate(scanPrivate, limit, ordering),
 									}
 									_interned := _e.mem.AddScanToGroup(_expr, _root)
 									if _e.o.appliedRule != nil {
 										if _interned != _expr {
-											_e.o.appliedRule(opt.PushLimitIntoConstrainedScan, _root, nil)
+											_e.o.appliedRule(opt.PushLimitIntoFilteredScan, _root, nil)
 										} else {
-											_e.o.appliedRule(opt.PushLimitIntoConstrainedScan, _root, _interned)
+											_e.o.appliedRule(opt.PushLimitIntoFilteredScan, _root, _interned)
 										}
 									}
 								}
