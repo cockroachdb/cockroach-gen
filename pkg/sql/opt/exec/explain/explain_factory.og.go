@@ -978,6 +978,7 @@ func (f *Factory) ConstructShowTrace(
 func (f *Factory) ConstructInsert(
 	input exec.Node,
 	table cat.Table,
+	arbiters cat.IndexOrdinals,
 	insertCols exec.TableColumnOrdinalSet,
 	returnCols exec.TableColumnOrdinalSet,
 	checkCols exec.CheckOrdinalSet,
@@ -991,6 +992,7 @@ func (f *Factory) ConstructInsert(
 	args := &insertArgs{
 		Input:      inputNode,
 		Table:      table,
+		Arbiters:   arbiters,
 		InsertCols: insertCols,
 		ReturnCols: returnCols,
 		CheckCols:  checkCols,
@@ -1004,6 +1006,7 @@ func (f *Factory) ConstructInsert(
 	wrapped, err := f.wrappedFactory.ConstructInsert(
 		inputNode.WrappedNode(),
 		table,
+		arbiters,
 		insertCols,
 		returnCols,
 		checkCols,
@@ -1104,6 +1107,7 @@ func (f *Factory) ConstructUpdate(
 func (f *Factory) ConstructUpsert(
 	input exec.Node,
 	table cat.Table,
+	arbiters cat.IndexOrdinals,
 	canaryCol exec.NodeColumnOrdinal,
 	insertCols exec.TableColumnOrdinalSet,
 	fetchCols exec.TableColumnOrdinalSet,
@@ -1120,6 +1124,7 @@ func (f *Factory) ConstructUpsert(
 	args := &upsertArgs{
 		Input:      inputNode,
 		Table:      table,
+		Arbiters:   arbiters,
 		CanaryCol:  canaryCol,
 		InsertCols: insertCols,
 		FetchCols:  fetchCols,
@@ -1136,6 +1141,7 @@ func (f *Factory) ConstructUpsert(
 	wrapped, err := f.wrappedFactory.ConstructUpsert(
 		inputNode.WrappedNode(),
 		table,
+		arbiters,
 		canaryCol,
 		insertCols,
 		fetchCols,
@@ -2014,6 +2020,7 @@ type showTraceArgs struct {
 type insertArgs struct {
 	Input      *Node
 	Table      cat.Table
+	Arbiters   cat.IndexOrdinals
 	InsertCols exec.TableColumnOrdinalSet
 	ReturnCols exec.TableColumnOrdinalSet
 	CheckCols  exec.CheckOrdinalSet
@@ -2044,6 +2051,7 @@ type updateArgs struct {
 type upsertArgs struct {
 	Input      *Node
 	Table      cat.Table
+	Arbiters   cat.IndexOrdinals
 	CanaryCol  exec.NodeColumnOrdinal
 	InsertCols exec.TableColumnOrdinalSet
 	FetchCols  exec.TableColumnOrdinalSet

@@ -369,6 +369,11 @@ type MutationPrivate struct {
 	// overwrites an existing row.
 	CanaryCol opt.ColumnID
 
+	// Arbiters is used only with the Insert and Upsert operators. It identifies
+	// the unique indexes used to detect conflicts for UPSERT and INSERT ON
+	// CONFLICT statements.
+	Arbiters cat.IndexOrdinals
+
 	// ReturnCols are the set of columns returned by the mutation operator when
 	// the RETURNING clause has been specified. By default, the return columns
 	// include all columns in the table, including hidden columns, but not
@@ -22435,6 +22440,7 @@ func (in *interner) InternInsert(val *InsertExpr) *InsertExpr {
 	in.hasher.HashColList(val.PartialIndexPutCols)
 	in.hasher.HashColList(val.PartialIndexDelCols)
 	in.hasher.HashColumnID(val.CanaryCol)
+	in.hasher.HashIndexOrdinals(val.Arbiters)
 	in.hasher.HashColList(val.ReturnCols)
 	in.hasher.HashColList(val.PassthroughCols)
 	in.hasher.HashWithID(val.WithID)
@@ -22453,6 +22459,7 @@ func (in *interner) InternInsert(val *InsertExpr) *InsertExpr {
 				in.hasher.IsColListEqual(val.PartialIndexPutCols, existing.PartialIndexPutCols) &&
 				in.hasher.IsColListEqual(val.PartialIndexDelCols, existing.PartialIndexDelCols) &&
 				in.hasher.IsColumnIDEqual(val.CanaryCol, existing.CanaryCol) &&
+				in.hasher.IsIndexOrdinalsEqual(val.Arbiters, existing.Arbiters) &&
 				in.hasher.IsColListEqual(val.ReturnCols, existing.ReturnCols) &&
 				in.hasher.IsColListEqual(val.PassthroughCols, existing.PassthroughCols) &&
 				in.hasher.IsWithIDEqual(val.WithID, existing.WithID) &&
@@ -22479,6 +22486,7 @@ func (in *interner) InternUpdate(val *UpdateExpr) *UpdateExpr {
 	in.hasher.HashColList(val.PartialIndexPutCols)
 	in.hasher.HashColList(val.PartialIndexDelCols)
 	in.hasher.HashColumnID(val.CanaryCol)
+	in.hasher.HashIndexOrdinals(val.Arbiters)
 	in.hasher.HashColList(val.ReturnCols)
 	in.hasher.HashColList(val.PassthroughCols)
 	in.hasher.HashWithID(val.WithID)
@@ -22497,6 +22505,7 @@ func (in *interner) InternUpdate(val *UpdateExpr) *UpdateExpr {
 				in.hasher.IsColListEqual(val.PartialIndexPutCols, existing.PartialIndexPutCols) &&
 				in.hasher.IsColListEqual(val.PartialIndexDelCols, existing.PartialIndexDelCols) &&
 				in.hasher.IsColumnIDEqual(val.CanaryCol, existing.CanaryCol) &&
+				in.hasher.IsIndexOrdinalsEqual(val.Arbiters, existing.Arbiters) &&
 				in.hasher.IsColListEqual(val.ReturnCols, existing.ReturnCols) &&
 				in.hasher.IsColListEqual(val.PassthroughCols, existing.PassthroughCols) &&
 				in.hasher.IsWithIDEqual(val.WithID, existing.WithID) &&
@@ -22523,6 +22532,7 @@ func (in *interner) InternUpsert(val *UpsertExpr) *UpsertExpr {
 	in.hasher.HashColList(val.PartialIndexPutCols)
 	in.hasher.HashColList(val.PartialIndexDelCols)
 	in.hasher.HashColumnID(val.CanaryCol)
+	in.hasher.HashIndexOrdinals(val.Arbiters)
 	in.hasher.HashColList(val.ReturnCols)
 	in.hasher.HashColList(val.PassthroughCols)
 	in.hasher.HashWithID(val.WithID)
@@ -22541,6 +22551,7 @@ func (in *interner) InternUpsert(val *UpsertExpr) *UpsertExpr {
 				in.hasher.IsColListEqual(val.PartialIndexPutCols, existing.PartialIndexPutCols) &&
 				in.hasher.IsColListEqual(val.PartialIndexDelCols, existing.PartialIndexDelCols) &&
 				in.hasher.IsColumnIDEqual(val.CanaryCol, existing.CanaryCol) &&
+				in.hasher.IsIndexOrdinalsEqual(val.Arbiters, existing.Arbiters) &&
 				in.hasher.IsColListEqual(val.ReturnCols, existing.ReturnCols) &&
 				in.hasher.IsColListEqual(val.PassthroughCols, existing.PassthroughCols) &&
 				in.hasher.IsWithIDEqual(val.WithID, existing.WithID) &&
@@ -22567,6 +22578,7 @@ func (in *interner) InternDelete(val *DeleteExpr) *DeleteExpr {
 	in.hasher.HashColList(val.PartialIndexPutCols)
 	in.hasher.HashColList(val.PartialIndexDelCols)
 	in.hasher.HashColumnID(val.CanaryCol)
+	in.hasher.HashIndexOrdinals(val.Arbiters)
 	in.hasher.HashColList(val.ReturnCols)
 	in.hasher.HashColList(val.PassthroughCols)
 	in.hasher.HashWithID(val.WithID)
@@ -22585,6 +22597,7 @@ func (in *interner) InternDelete(val *DeleteExpr) *DeleteExpr {
 				in.hasher.IsColListEqual(val.PartialIndexPutCols, existing.PartialIndexPutCols) &&
 				in.hasher.IsColListEqual(val.PartialIndexDelCols, existing.PartialIndexDelCols) &&
 				in.hasher.IsColumnIDEqual(val.CanaryCol, existing.CanaryCol) &&
+				in.hasher.IsIndexOrdinalsEqual(val.Arbiters, existing.Arbiters) &&
 				in.hasher.IsColListEqual(val.ReturnCols, existing.ReturnCols) &&
 				in.hasher.IsColListEqual(val.PassthroughCols, existing.PassthroughCols) &&
 				in.hasher.IsWithIDEqual(val.WithID, existing.WithID) &&
