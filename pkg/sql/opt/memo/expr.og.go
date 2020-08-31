@@ -13120,6 +13120,58 @@ func (e *STUnionExpr) DataType() *types.T {
 	return e.Typ
 }
 
+type STCollectExpr struct {
+	Input opt.ScalarExpr
+
+	Typ *types.T
+	id  opt.ScalarID
+}
+
+var _ opt.ScalarExpr = &STCollectExpr{}
+
+func (e *STCollectExpr) ID() opt.ScalarID {
+	return e.id
+}
+
+func (e *STCollectExpr) Op() opt.Operator {
+	return opt.STCollectOp
+}
+
+func (e *STCollectExpr) ChildCount() int {
+	return 1
+}
+
+func (e *STCollectExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *STCollectExpr) Private() interface{} {
+	return nil
+}
+
+func (e *STCollectExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *STCollectExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(opt.ScalarExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *STCollectExpr) DataType() *types.T {
+	return e.Typ
+}
+
 type XorAggExpr struct {
 	Input opt.ScalarExpr
 
@@ -20180,6 +20232,26 @@ func (m *Memo) MemoizeSTUnion(
 	return interned
 }
 
+func (m *Memo) MemoizeSTCollect(
+	input opt.ScalarExpr,
+) *STCollectExpr {
+	const size = int64(unsafe.Sizeof(STCollectExpr{}))
+	e := &STCollectExpr{
+		Input: input,
+		id:    m.NextID(),
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternSTCollect(e)
+	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
+		m.memEstimate += size
+		m.CheckExpr(e)
+	}
+	return interned
+}
+
 func (m *Memo) MemoizeXorAgg(
 	input opt.ScalarExpr,
 ) *XorAggExpr {
@@ -22247,6 +22319,8 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternSTExtent(t)
 	case *STUnionExpr:
 		return in.InternSTUnion(t)
+	case *STCollectExpr:
+		return in.InternSTCollect(t)
 	case *XorAggExpr:
 		return in.InternXorAgg(t)
 	case *JsonAggExpr:
@@ -25785,6 +25859,24 @@ func (in *interner) InternSTUnion(val *STUnionExpr) *STUnionExpr {
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*STUnionExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternSTCollect(val *STCollectExpr) *STCollectExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.STCollectOp)
+	in.hasher.HashScalarExpr(val.Input)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*STCollectExpr); ok {
 			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) {
 				return existing
 			}

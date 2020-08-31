@@ -17024,6 +17024,14 @@ func (_f *Factory) ConstructSTUnion(
 	return _f.onConstructScalar(e)
 }
 
+// ConstructSTCollect constructs an expression for the STCollect operator.
+func (_f *Factory) ConstructSTCollect(
+	input opt.ScalarExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeSTCollect(input)
+	return _f.onConstructScalar(e)
+}
+
 // ConstructXorAgg constructs an expression for the XorAgg operator.
 func (_f *Factory) ConstructXorAgg(
 	input opt.ScalarExpr,
@@ -18670,6 +18678,13 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		}
 		return t
 
+	case *memo.STCollectExpr:
+		input := replace(t.Input).(opt.ScalarExpr)
+		if input != t.Input {
+			return f.ConstructSTCollect(input)
+		}
+		return t
+
 	case *memo.XorAggExpr:
 		input := replace(t.Input).(opt.ScalarExpr)
 		if input != t.Input {
@@ -20020,6 +20035,11 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
 		)
 
+	case *memo.STCollectExpr:
+		return f.ConstructSTCollect(
+			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
+		)
+
 	case *memo.XorAggExpr:
 		return f.ConstructXorAgg(
 			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
@@ -21074,6 +21094,10 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 		)
 	case opt.STUnionOp:
 		return f.ConstructSTUnion(
+			args[0].(opt.ScalarExpr),
+		)
+	case opt.STCollectOp:
+		return f.ConstructSTCollect(
 			args[0].(opt.ScalarExpr),
 		)
 	case opt.XorAggOp:
