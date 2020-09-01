@@ -14,6 +14,7 @@ var reservedKeywords = map[string]struct{}{
 	"as":                                 {},
 	"asc":                                {},
 	"asymmetric":                         {},
+	"authorization":                      {},
 	"between":                            {},
 	"bigint":                             {},
 	"bit":                                {},

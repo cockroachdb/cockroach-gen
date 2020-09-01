@@ -23,7 +23,7 @@ var KeywordsCategories = map[string]string{
 	"asymmetric":                   "R",
 	"at":                           "U",
 	"attribute":                    "U",
-	"authorization":                "U",
+	"authorization":                "T",
 	"automatic":                    "U",
 	"backup":                       "U",
 	"backups":                      "U",
