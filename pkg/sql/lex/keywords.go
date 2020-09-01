@@ -155,6 +155,12 @@ var KeywordsCategories = map[string]string{
 	"geography":                    "C",
 	"geometry":                     "C",
 	"geometrycollection":           "U",
+	"geometrycollectionm":          "U",
+	"geometrycollectionz":          "U",
+	"geometrycollectionzm":         "U",
+	"geometrym":                    "U",
+	"geometryz":                    "U",
+	"geometryzm":                   "U",
 	"global":                       "U",
 	"grant":                        "R",
 	"grants":                       "U",
@@ -237,8 +243,17 @@ var KeywordsCategories = map[string]string{
 	"minvalue":                     "U",
 	"month":                        "U",
 	"multilinestring":              "U",
+	"multilinestringm":             "U",
+	"multilinestringz":             "U",
+	"multilinestringzm":            "U",
 	"multipoint":                   "U",
+	"multipointm":                  "U",
+	"multipointz":                  "U",
+	"multipointzm":                 "U",
 	"multipolygon":                 "U",
+	"multipolygonm":                "U",
+	"multipolygonz":                "U",
+	"multipolygonzm":               "U",
 	"names":                        "U",
 	"nan":                          "U",
 	"natural":                      "T",
@@ -297,7 +312,13 @@ var KeywordsCategories = map[string]string{
 	"plan":                         "U",
 	"plans":                        "U",
 	"point":                        "C",
+	"pointm":                       "U",
+	"pointz":                       "U",
+	"pointzm":                      "U",
 	"polygon":                      "C",
+	"polygonm":                     "U",
+	"polygonz":                     "U",
+	"polygonzm":                    "U",
 	"position":                     "C",
 	"preceding":                    "U",
 	"precision":                    "C",
@@ -609,6 +630,12 @@ var KeywordNames = []string{
 	"geography",
 	"geometry",
 	"geometrycollection",
+	"geometrycollectionm",
+	"geometrycollectionz",
+	"geometrycollectionzm",
+	"geometrym",
+	"geometryz",
+	"geometryzm",
 	"global",
 	"grant",
 	"grants",
@@ -691,8 +718,17 @@ var KeywordNames = []string{
 	"minvalue",
 	"month",
 	"multilinestring",
+	"multilinestringm",
+	"multilinestringz",
+	"multilinestringzm",
 	"multipoint",
+	"multipointm",
+	"multipointz",
+	"multipointzm",
 	"multipolygon",
+	"multipolygonm",
+	"multipolygonz",
+	"multipolygonzm",
 	"names",
 	"nan",
 	"natural",
@@ -751,7 +787,13 @@ var KeywordNames = []string{
 	"plan",
 	"plans",
 	"point",
+	"pointm",
+	"pointz",
+	"pointzm",
 	"polygon",
+	"polygonm",
+	"polygonz",
+	"polygonzm",
 	"position",
 	"preceding",
 	"precision",
@@ -1220,6 +1262,18 @@ func GetKeywordID(k string) int32 {
 		return GEOMETRY
 	case "geometrycollection":
 		return GEOMETRYCOLLECTION
+	case "geometrycollectionm":
+		return GEOMETRYCOLLECTIONM
+	case "geometrycollectionz":
+		return GEOMETRYCOLLECTIONZ
+	case "geometrycollectionzm":
+		return GEOMETRYCOLLECTIONZM
+	case "geometrym":
+		return GEOMETRYM
+	case "geometryz":
+		return GEOMETRYZ
+	case "geometryzm":
+		return GEOMETRYZM
 	case "global":
 		return GLOBAL
 	case "grant":
@@ -1384,10 +1438,28 @@ func GetKeywordID(k string) int32 {
 		return MONTH
 	case "multilinestring":
 		return MULTILINESTRING
+	case "multilinestringm":
+		return MULTILINESTRINGM
+	case "multilinestringz":
+		return MULTILINESTRINGZ
+	case "multilinestringzm":
+		return MULTILINESTRINGZM
 	case "multipoint":
 		return MULTIPOINT
+	case "multipointm":
+		return MULTIPOINTM
+	case "multipointz":
+		return MULTIPOINTZ
+	case "multipointzm":
+		return MULTIPOINTZM
 	case "multipolygon":
 		return MULTIPOLYGON
+	case "multipolygonm":
+		return MULTIPOLYGONM
+	case "multipolygonz":
+		return MULTIPOLYGONZ
+	case "multipolygonzm":
+		return MULTIPOLYGONZM
 	case "names":
 		return NAMES
 	case "nan":
@@ -1504,8 +1576,20 @@ func GetKeywordID(k string) int32 {
 		return PLANS
 	case "point":
 		return POINT
+	case "pointm":
+		return POINTM
+	case "pointz":
+		return POINTZ
+	case "pointzm":
+		return POINTZM
 	case "polygon":
 		return POLYGON
+	case "polygonm":
+		return POLYGONM
+	case "polygonz":
+		return POLYGONZ
+	case "polygonzm":
+		return POLYGONZM
 	case "position":
 		return POSITION
 	case "preceding":
