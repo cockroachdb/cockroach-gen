@@ -279,6 +279,7 @@ const (
 	PushLimitIntoFilteredScan
 	PushLimitIntoIndexJoin
 	SplitScanIntoUnionScans
+	EliminateIndexJoinInsideProject
 	GenerateIndexScans
 	GeneratePartialIndexScans
 	GenerateConstrainedScans

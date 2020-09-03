@@ -18,6 +18,8 @@ func (_e *explorer) exploreGroupMember(
 		return _e.exploreScan(state, t, ordinal)
 	case *memo.SelectExpr:
 		return _e.exploreSelect(state, t, ordinal)
+	case *memo.ProjectExpr:
+		return _e.exploreProject(state, t, ordinal)
 	case *memo.InnerJoinExpr:
 		return _e.exploreInnerJoin(state, t, ordinal)
 	case *memo.LeftJoinExpr:
@@ -393,6 +395,58 @@ func (_e *explorer) exploreSelect(
 											_e.o.appliedRule(opt.SplitDisjunctionAddKey, _root, _interned)
 										}
 									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return _fullyExplored
+}
+
+func (_e *explorer) exploreProject(
+	_rootState *exploreState,
+	_root *memo.ProjectExpr,
+	_rootOrd int,
+) (_fullyExplored bool) {
+	_fullyExplored = true
+
+	// [EliminateIndexJoinInsideProject]
+	{
+		_partlyExplored := _rootOrd < _rootState.start
+		_state := _e.lookupExploreState(_root.Input)
+		if !_state.fullyExplored {
+			_fullyExplored = false
+		}
+		var _member memo.RelExpr
+		for _ord := 0; _ord < _state.end; _ord++ {
+			if _member == nil {
+				_member = _root.Input.FirstExpr()
+			} else {
+				_member = _member.NextExpr()
+			}
+			if !_partlyExplored || _ord >= _state.start {
+				_indexJoin, _ := _member.(*memo.IndexJoinExpr)
+				if _indexJoin != nil {
+					input := _indexJoin.Input
+					projections := _root.Projections
+					passthrough := _root.Passthrough
+					if _e.funcs.ColsAreSubset(_e.funcs.UnionCols(_e.funcs.ProjectionOuterCols(projections), passthrough), _e.funcs.OutputCols(input)) {
+						if _e.o.matchedRule == nil || _e.o.matchedRule(opt.EliminateIndexJoinInsideProject) {
+							_expr := &memo.ProjectExpr{
+								Input:       input,
+								Projections: projections,
+								Passthrough: passthrough,
+							}
+							_interned := _e.mem.AddProjectToGroup(_expr, _root)
+							if _e.o.appliedRule != nil {
+								if _interned != _expr {
+									_e.o.appliedRule(opt.EliminateIndexJoinInsideProject, _root, nil)
+								} else {
+									_e.o.appliedRule(opt.EliminateIndexJoinInsideProject, _root, _interned)
 								}
 							}
 						}
