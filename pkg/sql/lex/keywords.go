@@ -241,6 +241,7 @@ var KeywordsCategories = map[string]string{
 	"merge":                        "U",
 	"minute":                       "U",
 	"minvalue":                     "U",
+	"modifyclustersetting":         "U",
 	"month":                        "U",
 	"multilinestring":              "U",
 	"multilinestringm":             "U",
@@ -267,6 +268,7 @@ var KeywordsCategories = map[string]string{
 	"nocreatelogin":                "U",
 	"nocreaterole":                 "U",
 	"nologin":                      "U",
+	"nomodifyclustersetting":       "U",
 	"none":                         "T",
 	"normal":                       "U",
 	"not":                          "R",
@@ -716,6 +718,7 @@ var KeywordNames = []string{
 	"merge",
 	"minute",
 	"minvalue",
+	"modifyclustersetting",
 	"month",
 	"multilinestring",
 	"multilinestringm",
@@ -742,6 +745,7 @@ var KeywordNames = []string{
 	"nocreatelogin",
 	"nocreaterole",
 	"nologin",
+	"nomodifyclustersetting",
 	"none",
 	"normal",
 	"not",
@@ -1434,6 +1438,8 @@ func GetKeywordID(k string) int32 {
 		return MINUTE
 	case "minvalue":
 		return MINVALUE
+	case "modifyclustersetting":
+		return MODIFYCLUSTERSETTING
 	case "month":
 		return MONTH
 	case "multilinestring":
@@ -1486,6 +1492,8 @@ func GetKeywordID(k string) int32 {
 		return NOCREATEROLE
 	case "nologin":
 		return NOLOGIN
+	case "nomodifyclustersetting":
+		return NOMODIFYCLUSTERSETTING
 	case "none":
 		return NONE
 	case "normal":
