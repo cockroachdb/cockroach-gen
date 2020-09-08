@@ -6803,7 +6803,18 @@ type WithScanPrivate struct {
 //      WithID) is evaluated; the results are emitted and also saved into a new
 //      "working table" for the next iteration.
 type RecursiveCTEExpr struct {
-	Initial   RelExpr
+	// Binding is a dummy relational expression that is associated with the
+	// WithID; its logical properties are used by WithScan.
+	// TODO(radu): this is a little hacky; investigate other ways to fill out the
+	// WithScan properties in this case.
+	Binding RelExpr
+
+	// Initial is the expression that is executed once and returns the initial
+	// set of rows for the "working table".
+	Initial RelExpr
+
+	// Recursive is the expression that is executed repeatedly; it reads the
+	// "working table" using WithScan.
 	Recursive RelExpr
 	RecursiveCTEPrivate
 
@@ -6818,14 +6829,16 @@ func (e *RecursiveCTEExpr) Op() opt.Operator {
 }
 
 func (e *RecursiveCTEExpr) ChildCount() int {
-	return 2
+	return 3
 }
 
 func (e *RecursiveCTEExpr) Child(nth int) opt.Expr {
 	switch nth {
 	case 0:
-		return e.Initial
+		return e.Binding
 	case 1:
+		return e.Initial
+	case 2:
 		return e.Recursive
 	}
 	panic(errors.AssertionFailedf("child index out of range"))
@@ -6844,9 +6857,12 @@ func (e *RecursiveCTEExpr) String() string {
 func (e *RecursiveCTEExpr) SetChild(nth int, child opt.Expr) {
 	switch nth {
 	case 0:
-		e.Initial = child.(RelExpr)
+		e.Binding = child.(RelExpr)
 		return
 	case 1:
+		e.Initial = child.(RelExpr)
+		return
+	case 2:
 		e.Recursive = child.(RelExpr)
 		return
 	}
@@ -18158,12 +18174,14 @@ func (m *Memo) MemoizeWithScan(
 }
 
 func (m *Memo) MemoizeRecursiveCTE(
+	binding RelExpr,
 	initial RelExpr,
 	recursive RelExpr,
 	recursiveCTEPrivate *RecursiveCTEPrivate,
 ) RelExpr {
 	const size = int64(unsafe.Sizeof(recursiveCTEGroup{}))
 	grp := &recursiveCTEGroup{mem: m, first: RecursiveCTEExpr{
+		Binding:             binding,
 		Initial:             initial,
 		Recursive:           recursive,
 		RecursiveCTEPrivate: *recursiveCTEPrivate,
@@ -23732,6 +23750,7 @@ func (in *interner) InternWithScan(val *WithScanExpr) *WithScanExpr {
 func (in *interner) InternRecursiveCTE(val *RecursiveCTEExpr) *RecursiveCTEExpr {
 	in.hasher.Init()
 	in.hasher.HashOperator(opt.RecursiveCTEOp)
+	in.hasher.HashRelExpr(val.Binding)
 	in.hasher.HashRelExpr(val.Initial)
 	in.hasher.HashRelExpr(val.Recursive)
 	in.hasher.HashString(val.Name)
@@ -23743,7 +23762,8 @@ func (in *interner) InternRecursiveCTE(val *RecursiveCTEExpr) *RecursiveCTEExpr 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*RecursiveCTEExpr); ok {
-			if in.hasher.IsRelExprEqual(val.Initial, existing.Initial) &&
+			if in.hasher.IsRelExprEqual(val.Binding, existing.Binding) &&
+				in.hasher.IsRelExprEqual(val.Initial, existing.Initial) &&
 				in.hasher.IsRelExprEqual(val.Recursive, existing.Recursive) &&
 				in.hasher.IsStringEqual(val.Name, existing.Name) &&
 				in.hasher.IsWithIDEqual(val.WithID, existing.WithID) &&

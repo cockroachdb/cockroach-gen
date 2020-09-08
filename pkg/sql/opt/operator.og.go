@@ -1376,6 +1376,7 @@ func IsMutationOp(e Expr) bool {
 var WithBindingOperators = [...]Operator{
 	DeleteOp,
 	InsertOp,
+	RecursiveCTEOp,
 	UpdateOp,
 	UpsertOp,
 	WithOp,
@@ -1383,8 +1384,8 @@ var WithBindingOperators = [...]Operator{
 
 func IsWithBindingOp(e Expr) bool {
 	switch e.Op() {
-	case DeleteOp, InsertOp, UpdateOp, UpsertOp,
-		WithOp:
+	case DeleteOp, InsertOp, RecursiveCTEOp, UpdateOp,
+		UpsertOp, WithOp:
 		return true
 	}
 	return false
