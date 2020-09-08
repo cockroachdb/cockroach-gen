@@ -8541,11 +8541,12 @@ func (_f *Factory) ConstructWithScan(
 //      WithID) is evaluated; the results are emitted and also saved into a new
 //      "working table" for the next iteration.
 func (_f *Factory) ConstructRecursiveCTE(
+	binding memo.RelExpr,
 	initial memo.RelExpr,
 	recursive memo.RelExpr,
 	recursiveCTEPrivate *memo.RecursiveCTEPrivate,
 ) memo.RelExpr {
-	e := _f.mem.MemoizeRecursiveCTE(initial, recursive, recursiveCTEPrivate)
+	e := _f.mem.MemoizeRecursiveCTE(binding, initial, recursive, recursiveCTEPrivate)
 	return _f.onConstructRelational(e)
 }
 
@@ -15154,10 +15155,11 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		return t
 
 	case *memo.RecursiveCTEExpr:
+		binding := replace(t.Binding).(memo.RelExpr)
 		initial := replace(t.Initial).(memo.RelExpr)
 		recursive := replace(t.Recursive).(memo.RelExpr)
-		if initial != t.Initial || recursive != t.Recursive {
-			return f.ConstructRecursiveCTE(initial, recursive, &t.RecursiveCTEPrivate)
+		if binding != t.Binding || initial != t.Initial || recursive != t.Recursive {
+			return f.ConstructRecursiveCTE(binding, initial, recursive, &t.RecursiveCTEPrivate)
 		}
 		return t
 
@@ -16558,7 +16560,12 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 		return f.mem.MemoizeWithScan(&t.WithScanPrivate)
 
 	case *memo.RecursiveCTEExpr:
+		binding := f.invokeReplace(t.Binding, replace).(memo.RelExpr)
+		if id := t.WithBindingID(); id != 0 {
+			f.Metadata().AddWithBinding(id, binding)
+		}
 		return f.ConstructRecursiveCTE(
+			binding,
 			f.invokeReplace(t.Initial, replace).(memo.RelExpr),
 			f.invokeReplace(t.Recursive, replace).(memo.RelExpr),
 			&t.RecursiveCTEPrivate,
@@ -17599,7 +17606,8 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 		return f.ConstructRecursiveCTE(
 			args[0].(memo.RelExpr),
 			args[1].(memo.RelExpr),
-			args[2].(*memo.RecursiveCTEPrivate),
+			args[2].(memo.RelExpr),
+			args[3].(*memo.RecursiveCTEPrivate),
 		)
 	case opt.FakeRelOp:
 		return f.ConstructFakeRel(
