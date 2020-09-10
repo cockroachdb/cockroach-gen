@@ -8475,16 +8475,18 @@ func (_f *Factory) ConstructWindow(
 		fn := windows
 		private := windowPrivate
 		if _f.funcs.CanSimplifyWindowOrdering(input, private) {
-			if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyWindowOrdering) {
-				_expr := _f.ConstructWindow(
-					input,
-					fn,
-					_f.funcs.SimplifyWindowOrdering(input, private),
-				)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.SimplifyWindowOrdering, nil, _expr)
+			if !_f.funcs.HasRangeFrameWithOffset(fn) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyWindowOrdering) {
+					_expr := _f.ConstructWindow(
+						input,
+						fn,
+						_f.funcs.SimplifyWindowOrdering(input, private),
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.SimplifyWindowOrdering, nil, _expr)
+					}
+					return _expr
 				}
-				return _expr
 			}
 		}
 	}
