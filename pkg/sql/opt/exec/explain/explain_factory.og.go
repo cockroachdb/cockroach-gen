@@ -335,60 +335,6 @@ func (f *Factory) ConstructMergeJoin(
 	return _n, nil
 }
 
-func (f *Factory) ConstructInterleavedJoin(
-	joinType descpb.JoinType,
-	leftTable cat.Table,
-	leftIndex cat.Index,
-	leftParams exec.ScanParams,
-	leftFilter tree.TypedExpr,
-	rightTable cat.Table,
-	rightIndex cat.Index,
-	rightParams exec.ScanParams,
-	rightFilter tree.TypedExpr,
-	leftIsAncestor bool,
-	onCond tree.TypedExpr,
-	reqOrdering exec.OutputOrdering,
-) (exec.Node, error) {
-	args := &interleavedJoinArgs{
-		JoinType:       joinType,
-		LeftTable:      leftTable,
-		LeftIndex:      leftIndex,
-		LeftParams:     leftParams,
-		LeftFilter:     leftFilter,
-		RightTable:     rightTable,
-		RightIndex:     rightIndex,
-		RightParams:    rightParams,
-		RightFilter:    rightFilter,
-		LeftIsAncestor: leftIsAncestor,
-		OnCond:         onCond,
-		ReqOrdering:    reqOrdering,
-	}
-	_n, err := f.newNode(interleavedJoinOp, args, reqOrdering)
-	if err != nil {
-		return nil, err
-	}
-	// Build the "real" node.
-	wrapped, err := f.wrappedFactory.ConstructInterleavedJoin(
-		joinType,
-		leftTable,
-		leftIndex,
-		leftParams,
-		leftFilter,
-		rightTable,
-		rightIndex,
-		rightParams,
-		rightFilter,
-		leftIsAncestor,
-		onCond,
-		reqOrdering,
-	)
-	if err != nil {
-		return nil, err
-	}
-	_n.wrappedNode = wrapped
-	return _n, nil
-}
-
 func (f *Factory) ConstructGroupBy(
 	input exec.Node,
 	groupCols []exec.NodeColumnOrdinal,
@@ -1751,7 +1697,6 @@ const (
 	applyJoinOp
 	hashJoinOp
 	mergeJoinOp
-	interleavedJoinOp
 	groupByOp
 	scalarGroupByOp
 	distinctOp
@@ -1869,21 +1814,6 @@ type mergeJoinArgs struct {
 	ReqOrdering       exec.OutputOrdering
 	LeftEqColsAreKey  bool
 	RightEqColsAreKey bool
-}
-
-type interleavedJoinArgs struct {
-	JoinType       descpb.JoinType
-	LeftTable      cat.Table
-	LeftIndex      cat.Index
-	LeftParams     exec.ScanParams
-	LeftFilter     tree.TypedExpr
-	RightTable     cat.Table
-	RightIndex     cat.Index
-	RightParams    exec.ScanParams
-	RightFilter    tree.TypedExpr
-	LeftIsAncestor bool
-	OnCond         tree.TypedExpr
-	ReqOrdering    exec.OutputOrdering
 }
 
 type groupByArgs struct {

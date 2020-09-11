@@ -174,36 +174,6 @@ type Factory interface {
 		rightEqColsAreKey bool,
 	) (Node, error)
 
-	// ConstructInterleavedJoin creates a node for a InterleavedJoin operation.
-	//
-	// InterleavedJoin runs a join between two interleaved tables. One table is the
-	// ancestor of the other in the interleaving hierarchy (as per leftIsAncestor).
-	//
-	// Semantically, the join is identical to a merge-join between these two
-	// tables, where the equality columns are all the index column of the ancestor
-	// index.
-	//
-	// The two scans are guaranteed to have the same direction, and to not have
-	// any hard limits.
-	//
-	// Since the interleaved joiner does a single scan for both tables, only the
-	// Locking clause for the ancestor is used.
-	//
-	ConstructInterleavedJoin(
-		joinType descpb.JoinType,
-		leftTable cat.Table,
-		leftIndex cat.Index,
-		leftParams ScanParams,
-		leftFilter tree.TypedExpr,
-		rightTable cat.Table,
-		rightIndex cat.Index,
-		rightParams ScanParams,
-		rightFilter tree.TypedExpr,
-		leftIsAncestor bool,
-		onCond tree.TypedExpr,
-		reqOrdering OutputOrdering,
-	) (Node, error)
-
 	// ConstructGroupBy creates a node for a GroupBy operation.
 	//
 	// GroupBy runs an aggregation. A set of aggregations is performed for each group
@@ -913,23 +883,6 @@ func (StubFactory) ConstructMergeJoin(
 	reqOrdering OutputOrdering,
 	leftEqColsAreKey bool,
 	rightEqColsAreKey bool,
-) (Node, error) {
-	return struct{}{}, nil
-}
-
-func (StubFactory) ConstructInterleavedJoin(
-	joinType descpb.JoinType,
-	leftTable cat.Table,
-	leftIndex cat.Index,
-	leftParams ScanParams,
-	leftFilter tree.TypedExpr,
-	rightTable cat.Table,
-	rightIndex cat.Index,
-	rightParams ScanParams,
-	rightFilter tree.TypedExpr,
-	leftIsAncestor bool,
-	onCond tree.TypedExpr,
-	reqOrdering OutputOrdering,
 ) (Node, error) {
 	return struct{}{}, nil
 }
