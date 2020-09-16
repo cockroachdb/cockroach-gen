@@ -802,6 +802,54 @@ func (_e *explorer) exploreLeftJoin(
 		}
 	}
 
+	// [ConvertLeftToInnerJoin]
+	{
+		if _rootOrd >= _rootState.start {
+			left := _root.Left
+			right := _root.Right
+			on := _root.On
+			if _e.funcs.CanGenerateInvertedJoin(right, on) {
+				private := &_root.JoinPrivate
+				if _e.funcs.NoJoinHints(private) {
+					if _e.o.matchedRule == nil || _e.o.matchedRule(opt.ConvertLeftToInnerJoin) {
+						newLeft := _e.funcs.EnsureKey(left)
+						bindingExpr := _e.funcs.ReplaceOutputCols(newLeft)
+						id := _e.funcs.AddWithBinding(bindingExpr)
+						outerLeft := _e.funcs.MakeWithScanUsingCols(id, _e.funcs.OutputCols(newLeft))
+						innerLeft := _e.funcs.MakeWithScan(id)
+						_expr := &memo.WithExpr{
+							Binding: bindingExpr,
+							Main: _e.f.ConstructProject(
+								_e.f.ConstructLeftJoin(
+									outerLeft,
+									_e.f.ConstructInnerJoin(
+										innerLeft,
+										right,
+										_e.funcs.MapFilterCols(on, _e.funcs.OutputCols(newLeft), _e.funcs.OutputCols(innerLeft)),
+										_e.funcs.EmptyJoinPrivate(),
+									),
+									_e.funcs.MakeWithScanKeyEqualityFilters(outerLeft, innerLeft),
+									private,
+								),
+								memo.EmptyProjectionsExpr,
+								_e.funcs.OutputCols2(left, right),
+							),
+							WithPrivate: *_e.funcs.MakeWithPrivate(id),
+						}
+						_interned := _e.mem.AddWithToGroup(_expr, _root)
+						if _e.o.appliedRule != nil {
+							if _interned != _expr {
+								_e.o.appliedRule(opt.ConvertLeftToInnerJoin, _root, nil)
+							} else {
+								_e.o.appliedRule(opt.ConvertLeftToInnerJoin, _root, _interned)
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [GenerateMergeJoins]
 	{
 		if _rootOrd >= _rootState.start {
