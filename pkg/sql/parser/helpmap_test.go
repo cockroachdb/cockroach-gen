@@ -59,6 +59,7 @@ var expectedHelpStrings = []string{
 	"PAUSE SCHEDULES",
 	"PAUSE",
 	"PREPARE",
+	"REASSIGN OWNED BY",
 	"REFRESH",
 	"RELEASE",
 	"RESET CLUSTER SETTING",
