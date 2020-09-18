@@ -11,6 +11,7 @@ import (
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/exec"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/invertedexpr"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
+	"github.com/cockroachdb/cockroach/pkg/sql/types"
 )
 
 func (f *Factory) ConstructScan(
@@ -98,13 +99,17 @@ func (f *Factory) ConstructFilter(
 func (f *Factory) ConstructInvertedFilter(
 	input exec.Node,
 	invFilter *invertedexpr.SpanExpression,
+	preFiltererExpr tree.TypedExpr,
+	preFiltererType *types.T,
 	invColumn exec.NodeColumnOrdinal,
 ) (exec.Node, error) {
 	inputNode := input.(*Node)
 	args := &invertedFilterArgs{
-		Input:     inputNode,
-		InvFilter: invFilter,
-		InvColumn: invColumn,
+		Input:           inputNode,
+		InvFilter:       invFilter,
+		PreFiltererExpr: preFiltererExpr,
+		PreFiltererType: preFiltererType,
+		InvColumn:       invColumn,
 	}
 	_n, err := f.newNode(invertedFilterOp, args, nil /* ordering */, inputNode)
 	if err != nil {
@@ -114,6 +119,8 @@ func (f *Factory) ConstructInvertedFilter(
 	wrapped, err := f.wrappedFactory.ConstructInvertedFilter(
 		inputNode.WrappedNode(),
 		invFilter,
+		preFiltererExpr,
+		preFiltererType,
 		invColumn,
 	)
 	if err != nil {
@@ -1761,9 +1768,11 @@ type filterArgs struct {
 }
 
 type invertedFilterArgs struct {
-	Input     *Node
-	InvFilter *invertedexpr.SpanExpression
-	InvColumn exec.NodeColumnOrdinal
+	Input           *Node
+	InvFilter       *invertedexpr.SpanExpression
+	PreFiltererExpr tree.TypedExpr
+	PreFiltererType *types.T
+	InvColumn       exec.NodeColumnOrdinal
 }
 
 type simpleProjectArgs struct {

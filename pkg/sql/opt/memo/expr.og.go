@@ -1763,6 +1763,9 @@ type InvertedFilterPrivate struct {
 	// further by applying set operations on the primary key columns.
 	InvertedExpression *invertedexpr.SpanExpression
 
+	// PreFiltererState represents the optional pre-filtering state.
+	PreFiltererState *invertedexpr.PreFiltererStateForInvertedFilterer
+
 	// The InvertedColumn is the id of the inverted column in the input. It is
 	// used during execution to map rows from the input to their corresponding
 	// spans in the SpanExpression.
@@ -22792,6 +22795,7 @@ func (in *interner) InternInvertedFilter(val *InvertedFilterExpr) *InvertedFilte
 	in.hasher.HashOperator(opt.InvertedFilterOp)
 	in.hasher.HashRelExpr(val.Input)
 	in.hasher.HashPointer(unsafe.Pointer(val.InvertedExpression))
+	in.hasher.HashPointer(unsafe.Pointer(val.PreFiltererState))
 	in.hasher.HashColumnID(val.InvertedColumn)
 
 	in.cache.Start(in.hasher.hash)
@@ -22799,6 +22803,7 @@ func (in *interner) InternInvertedFilter(val *InvertedFilterExpr) *InvertedFilte
 		if existing, ok := in.cache.Item().(*InvertedFilterExpr); ok {
 			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
 				in.hasher.IsPointerEqual(unsafe.Pointer(val.InvertedExpression), unsafe.Pointer(existing.InvertedExpression)) &&
+				in.hasher.IsPointerEqual(unsafe.Pointer(val.PreFiltererState), unsafe.Pointer(existing.PreFiltererState)) &&
 				in.hasher.IsColumnIDEqual(val.InvertedColumn, existing.InvertedColumn) {
 				return existing
 			}

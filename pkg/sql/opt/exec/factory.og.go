@@ -10,6 +10,7 @@ import (
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/constraint"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/invertedexpr"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
+	"github.com/cockroachdb/cockroach/pkg/sql/types"
 )
 
 // Factory defines the interface for building an execution plan, which consists
@@ -70,6 +71,8 @@ type Factory interface {
 	ConstructInvertedFilter(
 		input Node,
 		invFilter *invertedexpr.SpanExpression,
+		preFiltererExpr tree.TypedExpr,
+		preFiltererType *types.T,
 		invColumn NodeColumnOrdinal,
 	) (Node, error)
 
@@ -820,6 +823,8 @@ func (StubFactory) ConstructFilter(
 func (StubFactory) ConstructInvertedFilter(
 	input Node,
 	invFilter *invertedexpr.SpanExpression,
+	preFiltererExpr tree.TypedExpr,
+	preFiltererType *types.T,
 	invColumn NodeColumnOrdinal,
 ) (Node, error) {
 	return struct{}{}, nil
