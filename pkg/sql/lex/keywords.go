@@ -385,6 +385,7 @@ var KeywordsCategories = map[string]string{
 	"sessions":                     "U",
 	"session_user":                 "R",
 	"set":                          "U",
+	"sets":                         "U",
 	"setting":                      "U",
 	"settings":                     "U",
 	"share":                        "U",
@@ -866,6 +867,7 @@ var KeywordNames = []string{
 	"sessions",
 	"session_user",
 	"set",
+	"sets",
 	"setting",
 	"settings",
 	"share",
@@ -1734,6 +1736,8 @@ func GetKeywordID(k string) int32 {
 		return SESSION_USER
 	case "set":
 		return SET
+	case "sets":
+		return SETS
 	case "setting":
 		return SETTING
 	case "settings":
