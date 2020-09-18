@@ -26,6 +26,7 @@ var expectedHelpStrings = []string{
 	"CANCEL",
 	"COMMIT",
 	"CREATE DATABASE",
+	"CREATE EXTENSION",
 	"CREATE INDEX",
 	"CREATE ROLE",
 	"CREATE SCHEDULE FOR BACKUP",
