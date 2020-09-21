@@ -4,6 +4,7 @@ package lex
 
 var KeywordsCategories = map[string]string{
 	"abort":                        "U",
+	"access":                       "U",
 	"action":                       "U",
 	"add":                          "U",
 	"admin":                        "U",
@@ -240,6 +241,7 @@ var KeywordsCategories = map[string]string{
 	"materialized":                 "U",
 	"maxvalue":                     "U",
 	"merge":                        "U",
+	"method":                       "U",
 	"minute":                       "U",
 	"minvalue":                     "U",
 	"modifyclustersetting":         "U",
@@ -382,6 +384,7 @@ var KeywordsCategories = map[string]string{
 	"sessions":                     "U",
 	"session_user":                 "R",
 	"set":                          "U",
+	"sets":                         "U",
 	"setting":                      "U",
 	"settings":                     "U",
 	"share":                        "U",
@@ -482,6 +485,7 @@ var KeywordsCategories = map[string]string{
 // deterministic results.
 var KeywordNames = []string{
 	"abort",
+	"access",
 	"action",
 	"add",
 	"admin",
@@ -718,6 +722,7 @@ var KeywordNames = []string{
 	"materialized",
 	"maxvalue",
 	"merge",
+	"method",
 	"minute",
 	"minvalue",
 	"modifyclustersetting",
@@ -860,6 +865,7 @@ var KeywordNames = []string{
 	"sessions",
 	"session_user",
 	"set",
+	"sets",
 	"setting",
 	"settings",
 	"share",
@@ -966,6 +972,8 @@ func GetKeywordID(k string) int32 {
 	switch k {
 	case "abort":
 		return ABORT
+	case "access":
+		return ACCESS
 	case "action":
 		return ACTION
 	case "add":
@@ -1438,6 +1446,8 @@ func GetKeywordID(k string) int32 {
 		return MAXVALUE
 	case "merge":
 		return MERGE
+	case "method":
+		return METHOD
 	case "minute":
 		return MINUTE
 	case "minvalue":
@@ -1722,6 +1732,8 @@ func GetKeywordID(k string) int32 {
 		return SESSION_USER
 	case "set":
 		return SET
+	case "sets":
+		return SETS
 	case "setting":
 		return SETTING
 	case "settings":
