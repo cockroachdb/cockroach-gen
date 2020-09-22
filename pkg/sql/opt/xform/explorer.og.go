@@ -296,7 +296,7 @@ func (_e *explorer) exploreSelect(
 				if _scan != nil {
 					scanPrivate := &_scan.ScanPrivate
 					if _e.funcs.IsCanonicalScan(scanPrivate) {
-						if _e.funcs.HasStrictKey(input) {
+						if _e.funcs.HasStrictKey(_scan) {
 							filters := _root.Filters
 							pair := _e.funcs.ExprPairForSplitDisjunction(scanPrivate, filters)
 							if _e.funcs.ExprPairSucceeded(pair) {
@@ -305,7 +305,7 @@ func (_e *explorer) exploreSelect(
 									_expr := &memo.DistinctOnExpr{
 										Input: _e.f.ConstructUnionAll(
 											_e.f.ConstructSelect(
-												input,
+												_scan,
 												_e.funcs.ReplaceFiltersItem(filters, _e.funcs.ExprPairFiltersItemToReplace(pair), _e.funcs.ExprPairLeft(pair)),
 											),
 											_e.f.ConstructSelect(
@@ -316,8 +316,8 @@ func (_e *explorer) exploreSelect(
 											),
 											_e.funcs.MakeSetPrivateForSplitDisjunction(scanPrivate, rightScanPrivate),
 										),
-										Aggregations:    _e.funcs.MakeAggCols(opt.ConstAggOp, _e.funcs.NonKeyCols(input)),
-										GroupingPrivate: *_e.funcs.MakeGrouping(_e.funcs.KeyCols(input), _e.funcs.EmptyOrdering()),
+										Aggregations:    _e.funcs.MakeAggCols(opt.ConstAggOp, _e.funcs.NonKeyCols(_scan)),
+										GroupingPrivate: *_e.funcs.MakeGrouping(_e.funcs.KeyCols(_scan), _e.funcs.EmptyOrdering()),
 									}
 									_interned := _e.mem.AddDistinctOnToGroup(_expr, _root)
 									if _e.o.appliedRule != nil {
@@ -356,7 +356,7 @@ func (_e *explorer) exploreSelect(
 				if _scan != nil {
 					scanPrivate := &_scan.ScanPrivate
 					if _e.funcs.IsCanonicalScan(scanPrivate) {
-						if !_e.funcs.HasStrictKey(input) {
+						if !_e.funcs.HasStrictKey(_scan) {
 							filters := _root.Filters
 							pair := _e.funcs.ExprPairForSplitDisjunction(scanPrivate, filters)
 							if _e.funcs.ExprPairSucceeded(pair) {
@@ -385,7 +385,7 @@ func (_e *explorer) exploreSelect(
 											_e.funcs.MakeGrouping(_e.funcs.KeyCols(leftScan), _e.funcs.EmptyOrdering()),
 										),
 										Projections: memo.EmptyProjectionsExpr,
-										Passthrough: _e.funcs.OutputCols(input),
+										Passthrough: _e.funcs.OutputCols(_scan),
 									}
 									_interned := _e.mem.AddProjectToGroup(_expr, _root)
 									if _e.o.appliedRule != nil {
@@ -729,7 +729,7 @@ func (_e *explorer) exploreInnerJoin(
 											joinPrivate,
 										),
 										On:                memo.EmptyFiltersExpr,
-										LookupJoinPrivate: *_e.funcs.ConvertIndexToLookupJoinPrivate(indexPrivate, _e.funcs.OutputCols2(left, right)),
+										LookupJoinPrivate: *_e.funcs.ConvertIndexToLookupJoinPrivate(indexPrivate, _e.funcs.OutputCols2(_indexJoin, right)),
 									}
 									_interned := _e.mem.AddLookupJoinToGroup(_expr, _root)
 									if _e.o.appliedRule != nil {
@@ -1596,7 +1596,7 @@ func (_e *explorer) exploreScalarGroupBy(
 											memo.FiltersExpr{
 												_e.f.ConstructFiltersItem(
 													_e.f.ConstructIsNot(
-														variable,
+														_variable,
 														_e.f.ConstructNull(
 															_e.funcs.AnyType(),
 														),
@@ -1610,7 +1610,7 @@ func (_e *explorer) exploreScalarGroupBy(
 									Aggregations: memo.AggregationsExpr{
 										_e.f.ConstructAggregationsItem(
 											_e.f.ConstructConstAgg(
-												variable,
+												_variable,
 											),
 											aggPrivate,
 										),
@@ -1885,7 +1885,7 @@ func (_e *explorer) exploreLimit(
 									_expr := &memo.IndexJoinExpr{
 										Input: _e.f.ConstructLimit(
 											input,
-											limitExpr,
+											_const,
 											_e.funcs.PruneOrdering(ordering, cols),
 										),
 										IndexJoinPrivate: *indexJoinPrivate,
@@ -1934,12 +1934,12 @@ func (_e *explorer) exploreLimit(
 								limit := _const.Value
 								if _e.funcs.IsPositiveInt(limit) {
 									ordering := _root.Ordering
-									unionScans := _e.funcs.SplitScanIntoUnionScans(ordering, scan, scanPrivate, limit)
+									unionScans := _e.funcs.SplitScanIntoUnionScans(ordering, _scan, scanPrivate, limit)
 									if _e.funcs.Succeeded(unionScans) {
 										if _e.o.matchedRule == nil || _e.o.matchedRule(opt.SplitScanIntoUnionScans) {
 											_expr := &memo.LimitExpr{
 												Input:    unionScans,
-												Limit:    limitExpr,
+												Limit:    _const,
 												Ordering: ordering,
 											}
 											_interned := _e.mem.AddLimitToGroup(_expr, _root)

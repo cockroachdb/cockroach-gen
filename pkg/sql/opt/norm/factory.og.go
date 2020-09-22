@@ -501,7 +501,7 @@ func (_f *Factory) ConstructSelect(
 			projectionCols := _f.funcs.ProjectionCols(projections)
 			if !_f.funcs.ColsAreEmpty(projectionCols) {
 				passthrough := _project.Passthrough
-				rejectNullCols := _f.funcs.RejectNullCols(input)
+				rejectNullCols := _f.funcs.RejectNullCols(_project)
 				if !_f.funcs.ColsAreEmpty(rejectNullCols) {
 					nullRejectedCols := _f.funcs.IntersectionCols(projectionCols, rejectNullCols)
 					if _f.funcs.HasNullRejectingFilter(filters, nullRejectedCols) {
@@ -1138,8 +1138,8 @@ func (_f *Factory) ConstructProject(
 		if _innerJoin != nil {
 			left := _innerJoin.Left
 			right := _innerJoin.Right
-			if _f.funcs.JoinDoesNotDuplicateRightRows(join) {
-				if _f.funcs.JoinPreservesRightRows(join) {
+			if _f.funcs.JoinDoesNotDuplicateRightRows(_innerJoin) {
+				if _f.funcs.JoinPreservesRightRows(_innerJoin) {
 					leftCols := _f.funcs.OutputCols(left)
 					if !_f.funcs.AreProjectionsCorrelated(projections, leftCols) {
 						if !_f.funcs.ColsIntersect(passthrough, leftCols) {
@@ -1203,9 +1203,9 @@ func (_f *Factory) ConstructProject(
 		_values, _ := input.(*memo.ValuesExpr)
 		if _values != nil {
 			if len(_values.Rows) == 1 {
-				if !_f.funcs.AreProjectionsCorrelated(projections, _f.funcs.OutputCols(input)) {
+				if !_f.funcs.AreProjectionsCorrelated(projections, _f.funcs.OutputCols(_values)) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.MergeProjectWithValues) {
-						_expr := _f.funcs.MergeProjectWithValues(projections, passthrough, input).(memo.RelExpr)
+						_expr := _f.funcs.MergeProjectWithValues(projections, passthrough, _values).(memo.RelExpr)
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.MergeProjectWithValues, nil, _expr)
 						}
@@ -1220,9 +1220,9 @@ func (_f *Factory) ConstructProject(
 	{
 		_values, _ := input.(*memo.ValuesExpr)
 		if _values != nil {
-			if _f.funcs.CanPushColumnRemappingIntoValues(projections, passthrough, input) {
+			if _f.funcs.CanPushColumnRemappingIntoValues(projections, passthrough, _values) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.PushColumnRemappingIntoValues) {
-					_expr := _f.funcs.PushColumnRemappingIntoValues(input, projections, passthrough).(memo.RelExpr)
+					_expr := _f.funcs.PushColumnRemappingIntoValues(_values, projections, passthrough).(memo.RelExpr)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.PushColumnRemappingIntoValues, nil, _expr)
 					}
@@ -1237,15 +1237,15 @@ func (_f *Factory) ConstructProject(
 		_values, _ := input.(*memo.ValuesExpr)
 		if _values != nil {
 			if len(_values.Rows) > 0 {
-				if _f.funcs.ColsAreLenOne(_f.funcs.OutputCols(input)) {
-					if _f.funcs.CanUnnestTuplesFromValues(input) {
-						col := _f.funcs.SingleColFromSet(_f.funcs.OutputCols(input))
+				if _f.funcs.ColsAreLenOne(_f.funcs.OutputCols(_values)) {
+					if _f.funcs.CanUnnestTuplesFromValues(_values) {
+						col := _f.funcs.SingleColFromSet(_f.funcs.OutputCols(_values))
 						if _f.funcs.HasNoDirectTupleReferences(projections, col) {
 							if _f.funcs.ColsAreEmpty(passthrough) {
 								if _f.matchedRule == nil || _f.matchedRule(opt.FoldTupleAccessIntoValues) {
 									tupleCols := _f.funcs.MakeColsForUnnestTuples(col)
 									_expr := _f.ConstructProject(
-										_f.funcs.UnnestTuplesFromValues(input, tupleCols),
+										_f.funcs.UnnestTuplesFromValues(_values, tupleCols),
 										_f.funcs.FoldTupleColumnAccess(projections, tupleCols, col),
 										passthrough,
 									)
@@ -1267,15 +1267,15 @@ func (_f *Factory) ConstructProject(
 		_values, _ := input.(*memo.ValuesExpr)
 		if _values != nil {
 			if len(_values.Rows) > 0 {
-				if _f.funcs.ColsAreLenOne(_f.funcs.OutputCols(input)) {
-					col := _f.funcs.SingleColFromSet(_f.funcs.OutputCols(input))
-					if _f.funcs.CanUnnestJSONFromValues(input, projections, col) {
+				if _f.funcs.ColsAreLenOne(_f.funcs.OutputCols(_values)) {
+					col := _f.funcs.SingleColFromSet(_f.funcs.OutputCols(_values))
+					if _f.funcs.CanUnnestJSONFromValues(_values, projections, col) {
 						if _f.funcs.ColsAreEmpty(passthrough) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.FoldJSONAccessIntoValues) {
-								jsonCols := _f.funcs.MakeColsForUnnestJSON(input, col)
+								jsonCols := _f.funcs.MakeColsForUnnestJSON(_values, col)
 								_expr := _f.ConstructProject(
-									_f.funcs.UnnestJSONFromValues(input, jsonCols),
-									_f.funcs.FoldJSONFieldAccess(projections, jsonCols, col, input),
+									_f.funcs.UnnestJSONFromValues(_values, jsonCols),
+									_f.funcs.FoldJSONFieldAccess(projections, jsonCols, col, _values),
 									passthrough,
 								)
 								if _f.appliedRule != nil {
@@ -1296,10 +1296,10 @@ func (_f *Factory) ConstructProject(
 		_project, _ := project.(*memo.ProjectExpr)
 		if _project != nil {
 			needed := _f.funcs.UnionCols(_f.funcs.ProjectionOuterCols(projections), passthrough)
-			if _f.funcs.CanPruneCols(project, needed) {
+			if _f.funcs.CanPruneCols(_project, needed) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.PruneProjectCols) {
 					_expr := _f.ConstructProject(
-						_f.funcs.PruneCols(project, needed),
+						_f.funcs.PruneCols(_project, needed),
 						projections,
 						passthrough,
 					)
@@ -1317,10 +1317,10 @@ func (_f *Factory) ConstructProject(
 		_scan, _ := input.(*memo.ScanExpr)
 		if _scan != nil {
 			needed := _f.funcs.UnionCols(_f.funcs.ProjectionOuterCols(projections), passthrough)
-			if _f.funcs.CanPruneCols(input, needed) {
+			if _f.funcs.CanPruneCols(_scan, needed) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.PruneScanCols) {
 					_expr := _f.ConstructProject(
-						_f.funcs.PruneCols(input, needed),
+						_f.funcs.PruneCols(_scan, needed),
 						projections,
 						passthrough,
 					)
@@ -1511,10 +1511,10 @@ func (_f *Factory) ConstructProject(
 		_values, _ := input.(*memo.ValuesExpr)
 		if _values != nil {
 			needed := _f.funcs.UnionCols(_f.funcs.ProjectionOuterCols(projections), passthrough)
-			if _f.funcs.CanPruneCols(input, needed) {
+			if _f.funcs.CanPruneCols(_values, needed) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.PruneValuesCols) {
 					_expr := _f.ConstructProject(
-						_f.funcs.PruneCols(input, needed),
+						_f.funcs.PruneCols(_values, needed),
 						projections,
 						passthrough,
 					)
@@ -1560,7 +1560,7 @@ func (_f *Factory) ConstructProject(
 			innerInput := _projectSet.Input
 			zip := _projectSet.Zip
 			needed := _f.funcs.UnionCols3(_f.funcs.ZipOuterCols(zip), _f.funcs.ProjectionOuterCols(projections), passthrough)
-			if _f.funcs.CanPruneCols(input, needed) {
+			if _f.funcs.CanPruneCols(_projectSet, needed) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.PruneProjectSetCols) {
 					_expr := _f.ConstructProject(
 						_f.ConstructProjectSet(
@@ -1615,7 +1615,7 @@ func (_f *Factory) ConstructProject(
 			fn := _window.Windows
 			private := &_window.WindowPrivate
 			needed := _f.funcs.UnionCols3(_f.funcs.NeededWindowCols(fn, private), _f.funcs.ProjectionOuterCols(projections), passthrough)
-			if _f.funcs.CanPruneCols(input, needed) {
+			if _f.funcs.CanPruneCols(_window, needed) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.PruneWindowInputCols) {
 					_expr := _f.ConstructProject(
 						_f.ConstructWindow(
@@ -1669,10 +1669,10 @@ func (_f *Factory) ConstructProject(
 		_withScan, _ := input.(*memo.WithScanExpr)
 		if _withScan != nil {
 			needed := _f.funcs.UnionCols(_f.funcs.ProjectionOuterCols(projections), passthrough)
-			if _f.funcs.CanPruneCols(input, needed) {
+			if _f.funcs.CanPruneCols(_withScan, needed) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.PruneWithScanCols) {
 					_expr := _f.ConstructProject(
-						_f.funcs.PruneCols(input, needed),
+						_f.funcs.PruneCols(_withScan, needed),
 						projections,
 						passthrough,
 					)
@@ -1719,7 +1719,7 @@ func (_f *Factory) ConstructProject(
 			right := _unionAll.Right
 			colmap := &_unionAll.SetPrivate
 			needed := _f.funcs.UnionCols(_f.funcs.ProjectionOuterCols(projections), passthrough)
-			if _f.funcs.CanPruneCols(union, needed) {
+			if _f.funcs.CanPruneCols(_unionAll, needed) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.PruneUnionAllCols) {
 					_expr := _f.ConstructProject(
 						_f.ConstructUnionAll(
@@ -1770,7 +1770,7 @@ func (_f *Factory) ConstructProject(
 			innerProjections := _project.Projections
 			if !_f.funcs.HasDuplicateRefs(projections, passthrough, _f.funcs.ProjectionCols(innerProjections)) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.InlineProjectInProject) {
-					_expr := _f.funcs.InlineProjectProject(input, projections, passthrough).(memo.RelExpr)
+					_expr := _f.funcs.InlineProjectProject(_project, projections, passthrough).(memo.RelExpr)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.InlineProjectInProject, nil, _expr)
 					}
@@ -2026,7 +2026,7 @@ func (_f *Factory) ConstructInnerJoin(
 									_f.funcs.MakeGrouping(_f.funcs.KeyCols(leftWithKey), _f.funcs.ExtractGroupingOrdering(groupingPrivate)),
 								), translatedAggs, rightWithCanary, aggregations, canaryCol),
 								memo.EmptyProjectionsExpr,
-								_f.funcs.OutputCols2(left, right),
+								_f.funcs.OutputCols2(left, _scalarGroupBy),
 							),
 							on,
 						)
@@ -2065,7 +2065,7 @@ func (_f *Factory) ConstructInnerJoin(
 									_f.funcs.MakeGrouping(_f.funcs.KeyCols(newLeft), ordering),
 								),
 								memo.EmptyProjectionsExpr,
-								_f.funcs.OutputCols2(left, right),
+								_f.funcs.OutputCols2(left, _limit),
 							)
 							if _f.appliedRule != nil {
 								_f.appliedRule(opt.TryDecorrelateLimitOne, nil, _expr)
@@ -2085,7 +2085,7 @@ func (_f *Factory) ConstructInnerJoin(
 			input := _window.Input
 			windows := _window.Windows
 			private := &_window.WindowPrivate
-			if _f.funcs.HasOuterCols(right) {
+			if _f.funcs.HasOuterCols(_window) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateWindow) {
 					newLeft := _f.funcs.EnsureKey(left)
 					_expr := _f.ConstructProject(
@@ -2103,7 +2103,7 @@ func (_f *Factory) ConstructInnerJoin(
 							on,
 						),
 						memo.EmptyProjectionsExpr,
-						_f.funcs.OutputCols2(left, right),
+						_f.funcs.OutputCols2(left, _window),
 					)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.TryDecorrelateWindow, nil, _expr)
@@ -2137,7 +2137,7 @@ func (_f *Factory) ConstructInnerJoin(
 								_f.funcs.MakeErrorOnDupGrouping(_f.funcs.KeyCols(newLeft), _f.funcs.EmptyOrdering(), errorText),
 							),
 							memo.EmptyProjectionsExpr,
-							_f.funcs.OutputCols2(left, right),
+							_f.funcs.OutputCols2(left, _max1Row),
 						)
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.TryDecorrelateMax1Row, nil, _expr)
@@ -2586,7 +2586,7 @@ func (_f *Factory) ConstructInnerJoin(
 							private,
 						),
 						projections,
-						_f.funcs.OutputCols2(left, right),
+						_f.funcs.OutputCols2(left, _project),
 					)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.HoistJoinProjectRight, nil, _expr)
@@ -2614,7 +2614,7 @@ func (_f *Factory) ConstructInnerJoin(
 							private,
 						),
 						projections,
-						_f.funcs.OutputCols2(left, right),
+						_f.funcs.OutputCols2(_project, right),
 					)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.HoistJoinProjectLeft, nil, _expr)
@@ -2649,7 +2649,7 @@ func (_f *Factory) ConstructInnerJoin(
 											_expr := _f.ConstructInnerJoin(
 												left,
 												right,
-												_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.SimplifyNotNullEquality(eq, condition.Op(), cnst.Op())),
+												_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.SimplifyNotNullEquality(_eq, condition.Op(), cnst.Op())),
 												private,
 											)
 											if _f.appliedRule != nil {
@@ -3072,7 +3072,7 @@ func (_f *Factory) ConstructLeftJoin(
 									_f.funcs.MakeGrouping(_f.funcs.KeyCols(newLeft), ordering),
 								),
 								memo.EmptyProjectionsExpr,
-								_f.funcs.OutputCols2(left, right),
+								_f.funcs.OutputCols2(left, _limit),
 							)
 							if _f.appliedRule != nil {
 								_f.appliedRule(opt.TryDecorrelateLimitOne, nil, _expr)
@@ -3108,7 +3108,7 @@ func (_f *Factory) ConstructLeftJoin(
 								_f.funcs.MakeErrorOnDupGrouping(_f.funcs.KeyCols(newLeft), _f.funcs.EmptyOrdering(), errorText),
 							),
 							memo.EmptyProjectionsExpr,
-							_f.funcs.OutputCols2(left, right),
+							_f.funcs.OutputCols2(left, _max1Row),
 						)
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.TryDecorrelateMax1Row, nil, _expr)
@@ -3406,7 +3406,7 @@ func (_f *Factory) ConstructLeftJoin(
 							private,
 						),
 						projections,
-						_f.funcs.OutputCols2(left, right),
+						_f.funcs.OutputCols2(left, _project),
 					)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.HoistJoinProjectRight, nil, _expr)
@@ -3434,7 +3434,7 @@ func (_f *Factory) ConstructLeftJoin(
 							private,
 						),
 						projections,
-						_f.funcs.OutputCols2(left, right),
+						_f.funcs.OutputCols2(_project, right),
 					)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.HoistJoinProjectLeft, nil, _expr)
@@ -3469,7 +3469,7 @@ func (_f *Factory) ConstructLeftJoin(
 											_expr := _f.ConstructLeftJoin(
 												left,
 												right,
-												_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.SimplifyNotNullEquality(eq, condition.Op(), cnst.Op())),
+												_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.SimplifyNotNullEquality(_eq, condition.Op(), cnst.Op())),
 												private,
 											)
 											if _f.appliedRule != nil {
@@ -3830,7 +3830,7 @@ func (_f *Factory) ConstructRightJoin(
 											_expr := _f.ConstructRightJoin(
 												left,
 												right,
-												_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.SimplifyNotNullEquality(eq, condition.Op(), cnst.Op())),
+												_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.SimplifyNotNullEquality(_eq, condition.Op(), cnst.Op())),
 												private,
 											)
 											if _f.appliedRule != nil {
@@ -4132,7 +4132,7 @@ func (_f *Factory) ConstructFullJoin(
 											_expr := _f.ConstructFullJoin(
 												left,
 												right,
-												_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.SimplifyNotNullEquality(eq, condition.Op(), cnst.Op())),
+												_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.SimplifyNotNullEquality(_eq, condition.Op(), cnst.Op())),
 												private,
 											)
 											if _f.appliedRule != nil {
@@ -4772,7 +4772,7 @@ func (_f *Factory) ConstructSemiJoin(
 											_expr := _f.ConstructSemiJoin(
 												left,
 												right,
-												_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.SimplifyNotNullEquality(eq, condition.Op(), cnst.Op())),
+												_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.SimplifyNotNullEquality(_eq, condition.Op(), cnst.Op())),
 												private,
 											)
 											if _f.appliedRule != nil {
@@ -5284,7 +5284,7 @@ func (_f *Factory) ConstructAntiJoin(
 											_expr := _f.ConstructAntiJoin(
 												left,
 												right,
-												_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.SimplifyNotNullEquality(eq, condition.Op(), cnst.Op())),
+												_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.SimplifyNotNullEquality(_eq, condition.Op(), cnst.Op())),
 												private,
 											)
 											if _f.appliedRule != nil {
@@ -5683,7 +5683,7 @@ func (_f *Factory) ConstructInnerJoinApply(
 									_f.funcs.MakeGrouping(_f.funcs.KeyCols(leftWithKey), _f.funcs.ExtractGroupingOrdering(groupingPrivate)),
 								), translatedAggs, rightWithCanary, aggregations, canaryCol),
 								memo.EmptyProjectionsExpr,
-								_f.funcs.OutputCols2(left, right),
+								_f.funcs.OutputCols2(left, _scalarGroupBy),
 							),
 							on,
 						)
@@ -5722,7 +5722,7 @@ func (_f *Factory) ConstructInnerJoinApply(
 									_f.funcs.MakeGrouping(_f.funcs.KeyCols(newLeft), ordering),
 								),
 								memo.EmptyProjectionsExpr,
-								_f.funcs.OutputCols2(left, right),
+								_f.funcs.OutputCols2(left, _limit),
 							)
 							if _f.appliedRule != nil {
 								_f.appliedRule(opt.TryDecorrelateLimitOne, nil, _expr)
@@ -5770,7 +5770,7 @@ func (_f *Factory) ConstructInnerJoinApply(
 			input := _window.Input
 			windows := _window.Windows
 			private := &_window.WindowPrivate
-			if _f.funcs.HasOuterCols(right) {
+			if _f.funcs.HasOuterCols(_window) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateWindow) {
 					newLeft := _f.funcs.EnsureKey(left)
 					_expr := _f.ConstructProject(
@@ -5788,7 +5788,7 @@ func (_f *Factory) ConstructInnerJoinApply(
 							on,
 						),
 						memo.EmptyProjectionsExpr,
-						_f.funcs.OutputCols2(left, right),
+						_f.funcs.OutputCols2(left, _window),
 					)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.TryDecorrelateWindow, nil, _expr)
@@ -5822,7 +5822,7 @@ func (_f *Factory) ConstructInnerJoinApply(
 								_f.funcs.MakeErrorOnDupGrouping(_f.funcs.KeyCols(newLeft), _f.funcs.EmptyOrdering(), errorText),
 							),
 							memo.EmptyProjectionsExpr,
-							_f.funcs.OutputCols2(left, right),
+							_f.funcs.OutputCols2(left, _max1Row),
 						)
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.TryDecorrelateMax1Row, nil, _expr)
@@ -6212,7 +6212,7 @@ func (_f *Factory) ConstructInnerJoinApply(
 							private,
 						),
 						projections,
-						_f.funcs.OutputCols2(left, right),
+						_f.funcs.OutputCols2(left, _project),
 					)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.HoistJoinProjectRight, nil, _expr)
@@ -6240,7 +6240,7 @@ func (_f *Factory) ConstructInnerJoinApply(
 							private,
 						),
 						projections,
-						_f.funcs.OutputCols2(left, right),
+						_f.funcs.OutputCols2(_project, right),
 					)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.HoistJoinProjectLeft, nil, _expr)
@@ -6275,7 +6275,7 @@ func (_f *Factory) ConstructInnerJoinApply(
 											_expr := _f.ConstructInnerJoinApply(
 												left,
 												right,
-												_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.SimplifyNotNullEquality(eq, condition.Op(), cnst.Op())),
+												_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.SimplifyNotNullEquality(_eq, condition.Op(), cnst.Op())),
 												private,
 											)
 											if _f.appliedRule != nil {
@@ -6389,7 +6389,7 @@ func (_f *Factory) ConstructLeftJoinApply(
 								private,
 							),
 							memo.EmptyProjectionsExpr,
-							_f.funcs.OutputCols2(left, right),
+							_f.funcs.OutputCols2(left, _project),
 						)
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.TryDecorrelateProjectInnerJoin, nil, _expr)
@@ -6490,7 +6490,7 @@ func (_f *Factory) ConstructLeftJoinApply(
 								private,
 							),
 							memo.EmptyProjectionsExpr,
-							_f.funcs.OutputCols2(left, right),
+							_f.funcs.OutputCols2(left, _project),
 						)
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.TryDecorrelateProjectSelect, nil, _expr)
@@ -6560,7 +6560,7 @@ func (_f *Factory) ConstructLeftJoinApply(
 									_f.funcs.MakeGrouping(_f.funcs.KeyCols(newLeft), ordering),
 								),
 								memo.EmptyProjectionsExpr,
-								_f.funcs.OutputCols2(left, right),
+								_f.funcs.OutputCols2(left, _limit),
 							)
 							if _f.appliedRule != nil {
 								_f.appliedRule(opt.TryDecorrelateLimitOne, nil, _expr)
@@ -6596,7 +6596,7 @@ func (_f *Factory) ConstructLeftJoinApply(
 								_f.funcs.MakeErrorOnDupGrouping(_f.funcs.KeyCols(newLeft), _f.funcs.EmptyOrdering(), errorText),
 							),
 							memo.EmptyProjectionsExpr,
-							_f.funcs.OutputCols2(left, right),
+							_f.funcs.OutputCols2(left, _max1Row),
 						)
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.TryDecorrelateMax1Row, nil, _expr)
@@ -6894,7 +6894,7 @@ func (_f *Factory) ConstructLeftJoinApply(
 							private,
 						),
 						projections,
-						_f.funcs.OutputCols2(left, right),
+						_f.funcs.OutputCols2(left, _project),
 					)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.HoistJoinProjectRight, nil, _expr)
@@ -6922,7 +6922,7 @@ func (_f *Factory) ConstructLeftJoinApply(
 							private,
 						),
 						projections,
-						_f.funcs.OutputCols2(left, right),
+						_f.funcs.OutputCols2(_project, right),
 					)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.HoistJoinProjectLeft, nil, _expr)
@@ -6957,7 +6957,7 @@ func (_f *Factory) ConstructLeftJoinApply(
 											_expr := _f.ConstructLeftJoinApply(
 												left,
 												right,
-												_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.SimplifyNotNullEquality(eq, condition.Op(), cnst.Op())),
+												_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.SimplifyNotNullEquality(_eq, condition.Op(), cnst.Op())),
 												private,
 											)
 											if _f.appliedRule != nil {
@@ -7516,7 +7516,7 @@ func (_f *Factory) ConstructSemiJoinApply(
 											_expr := _f.ConstructSemiJoinApply(
 												left,
 												right,
-												_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.SimplifyNotNullEquality(eq, condition.Op(), cnst.Op())),
+												_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.SimplifyNotNullEquality(_eq, condition.Op(), cnst.Op())),
 												private,
 											)
 											if _f.appliedRule != nil {
@@ -7995,7 +7995,7 @@ func (_f *Factory) ConstructAntiJoinApply(
 											_expr := _f.ConstructAntiJoinApply(
 												left,
 												right,
-												_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.SimplifyNotNullEquality(eq, condition.Op(), cnst.Op())),
+												_f.funcs.ReplaceFiltersItem(on, item, _f.funcs.SimplifyNotNullEquality(_eq, condition.Op(), cnst.Op())),
 												private,
 											)
 											if _f.appliedRule != nil {
@@ -8090,7 +8090,7 @@ func (_f *Factory) ConstructGroupBy(
 		_project, _ := input.(*memo.ProjectExpr)
 		if _project != nil {
 			innerInput := _project.Input
-			if _f.funcs.ColsAreSubset(_f.funcs.OutputCols(input), _f.funcs.OutputCols(innerInput)) {
+			if _f.funcs.ColsAreSubset(_f.funcs.OutputCols(_project), _f.funcs.OutputCols(innerInput)) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateGroupByProject) {
 					_expr := _f.ConstructGroupBy(
 						innerInput,
@@ -8147,7 +8147,7 @@ func (_f *Factory) ConstructGroupBy(
 			rightCols := _f.funcs.OutputCols(right)
 			if _f.funcs.OrderingCanProjectCols(ordering, rightCols) {
 				if _f.funcs.ColsAreSubset(_f.funcs.UnionCols(groupingCols, _f.funcs.AggregationOuterCols(aggs)), rightCols) {
-					if _f.funcs.CanEliminateJoinUnderGroupByRight(input, aggs) {
+					if _f.funcs.CanEliminateJoinUnderGroupByRight(_innerJoin, aggs) {
 						if _f.matchedRule == nil || _f.matchedRule(opt.EliminateJoinUnderGroupByRight) {
 							_expr := _f.ConstructGroupBy(
 								right,
@@ -8392,7 +8392,7 @@ func (_f *Factory) ConstructScalarGroupBy(
 		_project, _ := input.(*memo.ProjectExpr)
 		if _project != nil {
 			innerInput := _project.Input
-			if _f.funcs.ColsAreSubset(_f.funcs.OutputCols(input), _f.funcs.OutputCols(innerInput)) {
+			if _f.funcs.ColsAreSubset(_f.funcs.OutputCols(_project), _f.funcs.OutputCols(innerInput)) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateGroupByProject) {
 					_expr := _f.ConstructScalarGroupBy(
 						innerInput,
@@ -8449,7 +8449,7 @@ func (_f *Factory) ConstructScalarGroupBy(
 			rightCols := _f.funcs.OutputCols(right)
 			if _f.funcs.OrderingCanProjectCols(ordering, rightCols) {
 				if _f.funcs.ColsAreSubset(_f.funcs.UnionCols(groupingCols, _f.funcs.AggregationOuterCols(aggs)), rightCols) {
-					if _f.funcs.CanEliminateJoinUnderGroupByRight(input, aggs) {
+					if _f.funcs.CanEliminateJoinUnderGroupByRight(_innerJoin, aggs) {
 						if _f.matchedRule == nil || _f.matchedRule(opt.EliminateJoinUnderGroupByRight) {
 							_expr := _f.ConstructScalarGroupBy(
 								right,
@@ -8734,7 +8734,7 @@ func (_f *Factory) ConstructDistinctOn(
 		_project, _ := input.(*memo.ProjectExpr)
 		if _project != nil {
 			innerInput := _project.Input
-			if _f.funcs.ColsAreSubset(_f.funcs.OutputCols(input), _f.funcs.OutputCols(innerInput)) {
+			if _f.funcs.ColsAreSubset(_f.funcs.OutputCols(_project), _f.funcs.OutputCols(innerInput)) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateGroupByProject) {
 					_expr := _f.ConstructDistinctOn(
 						innerInput,
@@ -8791,7 +8791,7 @@ func (_f *Factory) ConstructDistinctOn(
 			rightCols := _f.funcs.OutputCols(right)
 			if _f.funcs.OrderingCanProjectCols(ordering, rightCols) {
 				if _f.funcs.ColsAreSubset(_f.funcs.UnionCols(groupingCols, _f.funcs.AggregationOuterCols(aggs)), rightCols) {
-					if _f.funcs.CanEliminateJoinUnderGroupByRight(input, aggs) {
+					if _f.funcs.CanEliminateJoinUnderGroupByRight(_innerJoin, aggs) {
 						if _f.matchedRule == nil || _f.matchedRule(opt.EliminateJoinUnderGroupByRight) {
 							_expr := _f.ConstructDistinctOn(
 								right,
@@ -8937,7 +8937,7 @@ func (_f *Factory) ConstructEnsureDistinctOn(
 		_project, _ := input.(*memo.ProjectExpr)
 		if _project != nil {
 			innerInput := _project.Input
-			if _f.funcs.ColsAreSubset(_f.funcs.OutputCols(input), _f.funcs.OutputCols(innerInput)) {
+			if _f.funcs.ColsAreSubset(_f.funcs.OutputCols(_project), _f.funcs.OutputCols(innerInput)) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateGroupByProject) {
 					_expr := _f.ConstructEnsureDistinctOn(
 						innerInput,
@@ -9030,7 +9030,7 @@ func (_f *Factory) ConstructUpsertDistinctOn(
 		_project, _ := input.(*memo.ProjectExpr)
 		if _project != nil {
 			innerInput := _project.Input
-			if _f.funcs.ColsAreSubset(_f.funcs.OutputCols(input), _f.funcs.OutputCols(innerInput)) {
+			if _f.funcs.ColsAreSubset(_f.funcs.OutputCols(_project), _f.funcs.OutputCols(innerInput)) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateGroupByProject) {
 					_expr := _f.ConstructUpsertDistinctOn(
 						innerInput,
@@ -9123,7 +9123,7 @@ func (_f *Factory) ConstructEnsureUpsertDistinctOn(
 		_project, _ := input.(*memo.ProjectExpr)
 		if _project != nil {
 			innerInput := _project.Input
-			if _f.funcs.ColsAreSubset(_f.funcs.OutputCols(input), _f.funcs.OutputCols(innerInput)) {
+			if _f.funcs.ColsAreSubset(_f.funcs.OutputCols(_project), _f.funcs.OutputCols(innerInput)) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateGroupByProject) {
 					_expr := _f.ConstructEnsureUpsertDistinctOn(
 						innerInput,
@@ -9438,7 +9438,7 @@ func (_f *Factory) ConstructLimit(
 												_f.funcs.AddConstInts(offset, limit),
 												limitOrdering,
 											),
-											offsetExpr,
+											_const,
 											offsetOrdering,
 										)
 										if _f.appliedRule != nil {
@@ -9507,14 +9507,14 @@ func (_f *Factory) ConstructLimit(
 												input.Op(),
 												_f.ConstructLimit(
 													left,
-													limitExpr,
+													_const,
 													_f.funcs.PruneOrdering(ordering, cols),
 												),
 												right,
 												&on,
 												private,
 											).(memo.RelExpr),
-											limitExpr,
+											_const,
 											ordering,
 										)
 										if _f.appliedRule != nil {
@@ -9540,7 +9540,7 @@ func (_f *Factory) ConstructLimit(
 			if !_f.funcs.HasOuterCols(right) {
 				on := _innerJoin.On
 				private := &_innerJoin.JoinPrivate
-				if _f.funcs.JoinPreservesRightRows(input) {
+				if _f.funcs.JoinPreservesRightRows(_innerJoin) {
 					limitExpr := limit
 					_const, _ := limitExpr.(*memo.ConstExpr)
 					if _const != nil {
@@ -9555,13 +9555,13 @@ func (_f *Factory) ConstructLimit(
 												left,
 												_f.ConstructLimit(
 													right,
-													limitExpr,
+													_const,
 													_f.funcs.PruneOrdering(ordering, cols),
 												),
 												on,
 												private,
 											),
-											limitExpr,
+											_const,
 											ordering,
 										)
 										if _f.appliedRule != nil {
@@ -9598,7 +9598,7 @@ func (_f *Factory) ConstructLimit(
 							if _f.matchedRule == nil || _f.matchedRule(opt.FoldLimits) {
 								_expr := _f.ConstructLimit(
 									innerInput,
-									outerLimitExpr,
+									_const2,
 									innerOrdering,
 								)
 								if _f.appliedRule != nil {
@@ -9678,7 +9678,7 @@ func (_f *Factory) ConstructLimit(
 					if !_f.funcs.ColsIntersect(_f.funcs.FilterOuterCols(outsideOn), _f.funcs.OutputCols(insideRight)) {
 						outsidePrivate := &_innerJoin.JoinPrivate
 						if _f.funcs.NoJoinHints(outsidePrivate) {
-							if !_f.funcs.JoinPreservesLeftRows(limitInput) {
+							if !_f.funcs.JoinPreservesLeftRows(_innerJoin) {
 								limitValue := limit
 								limitOrdering := ordering
 								if _f.matchedRule == nil || _f.matchedRule(opt.AssociateLimitJoinsLeft) {
@@ -9728,7 +9728,7 @@ func (_f *Factory) ConstructLimit(
 					if !_f.funcs.ColsIntersect(_f.funcs.FilterOuterCols(outsideOn), _f.funcs.OutputCols(insideRight)) {
 						outsidePrivate := &_innerJoin.JoinPrivate
 						if _f.funcs.NoJoinHints(outsidePrivate) {
-							if !_f.funcs.JoinPreservesRightRows(limitInput) {
+							if !_f.funcs.JoinPreservesRightRows(_innerJoin) {
 								limitValue := limit
 								limitOrdering := ordering
 								if _f.matchedRule == nil || _f.matchedRule(opt.AssociateLimitJoinsRight) {
@@ -10178,7 +10178,7 @@ func (_f *Factory) ConstructAny(
 			if _f.matchedRule == nil || _f.matchedRule(opt.InlineAnyValuesSingleCol) {
 				_expr := _f.ConstructAnyScalar(
 					scalar,
-					_f.funcs.InlineValues(values),
+					_f.funcs.InlineValues(_values),
 					_f.funcs.SubqueryCmp(private),
 				)
 				if _f.appliedRule != nil {
@@ -10202,14 +10202,14 @@ func (_f *Factory) ConstructAny(
 					tuple := _item.Element
 					_tuple, _ := tuple.(*memo.TupleExpr)
 					if _tuple != nil {
-						if _f.funcs.IsTupleOfVars(tuple, _f.funcs.ValuesCols(valuesPrivate)) {
+						if _f.funcs.IsTupleOfVars(_tuple, _f.funcs.ValuesCols(valuesPrivate)) {
 							passthrough := _project.Passthrough
 							if _f.funcs.ColsAreEmpty(passthrough) {
 								private := subqueryPrivate
 								if _f.matchedRule == nil || _f.matchedRule(opt.InlineAnyValuesMultiCol) {
 									_expr := _f.ConstructAnyScalar(
 										scalar,
-										_f.funcs.InlineValues(values),
+										_f.funcs.InlineValues(_values),
 										_f.funcs.SubqueryCmp(private),
 									)
 									if _f.appliedRule != nil {
@@ -10555,7 +10555,7 @@ func (_f *Factory) ConstructAnd(
 		_false, _ := left.(*memo.FalseExpr)
 		if _false != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyFalseAnd) {
-				_expr := left
+				_expr := _false
 				if _f.appliedRule != nil {
 					_f.appliedRule(opt.SimplifyFalseAnd, nil, _expr)
 				}
@@ -10569,7 +10569,7 @@ func (_f *Factory) ConstructAnd(
 		_false, _ := right.(*memo.FalseExpr)
 		if _false != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyAndFalse) {
-				_expr := right
+				_expr := _false
 				if _f.appliedRule != nil {
 					_f.appliedRule(opt.SimplifyAndFalse, nil, _expr)
 				}
@@ -10613,7 +10613,7 @@ func (_f *Factory) ConstructOr(
 		_true, _ := left.(*memo.TrueExpr)
 		if _true != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyTrueOr) {
-				_expr := left
+				_expr := _true
 				if _f.appliedRule != nil {
 					_f.appliedRule(opt.SimplifyTrueOr, nil, _expr)
 				}
@@ -10627,7 +10627,7 @@ func (_f *Factory) ConstructOr(
 		_true, _ := right.(*memo.TrueExpr)
 		if _true != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyOrTrue) {
-				_expr := right
+				_expr := _true
 				if _f.appliedRule != nil {
 					_f.appliedRule(opt.SimplifyOrTrue, nil, _expr)
 				}
@@ -10880,7 +10880,7 @@ func (_f *Factory) ConstructIsTupleNull(
 	{
 		_tuple, _ := input.(*memo.TupleExpr)
 		if _tuple != nil {
-			if _f.funcs.HasAllNullElements(input) {
+			if _f.funcs.HasAllNullElements(_tuple) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullTupleIsTupleNull) {
 					_expr := _f.ConstructTrue()
 					if _f.appliedRule != nil {
@@ -10896,7 +10896,7 @@ func (_f *Factory) ConstructIsTupleNull(
 	{
 		_tuple, _ := input.(*memo.TupleExpr)
 		if _tuple != nil {
-			if _f.funcs.HasNonNullElement(input) {
+			if _f.funcs.HasNonNullElement(_tuple) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNonNullTupleIsTupleNull) {
 					_expr := _f.ConstructFalse()
 					if _f.appliedRule != nil {
@@ -10922,7 +10922,7 @@ func (_f *Factory) ConstructIsTupleNotNull(
 	{
 		_tuple, _ := input.(*memo.TupleExpr)
 		if _tuple != nil {
-			if _f.funcs.HasAllNonNullElements(input) {
+			if _f.funcs.HasAllNonNullElements(_tuple) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNonNullTupleIsTupleNotNull) {
 					_expr := _f.ConstructTrue()
 					if _f.appliedRule != nil {
@@ -10938,7 +10938,7 @@ func (_f *Factory) ConstructIsTupleNotNull(
 	{
 		_tuple, _ := input.(*memo.TupleExpr)
 		if _tuple != nil {
-			if _f.funcs.HasNullElement(input) {
+			if _f.funcs.HasNullElement(_tuple) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullTupleIsTupleNotNull) {
 					_expr := _f.ConstructFalse()
 					if _f.appliedRule != nil {
@@ -11212,7 +11212,7 @@ func (_f *Factory) ConstructEq(
 			if _variable2 != nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.CommuteVar) {
 					_expr := _f.ConstructEq(
-						right,
+						_variable2,
 						left,
 					)
 					if _f.appliedRule != nil {
@@ -11248,11 +11248,11 @@ func (_f *Factory) ConstructEq(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(left, right)
+				result := _f.funcs.UnifyComparison(_variable, _const)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructEq(
-							left,
+							_variable,
 							result,
 						)
 						if _f.appliedRule != nil {
@@ -11273,14 +11273,14 @@ func (_f *Factory) ConstructEq(
 			key := _fetchVal.Index
 			_const, _ := key.(*memo.ConstExpr)
 			if _const != nil {
-				if _f.funcs.IsString(key) {
+				if _f.funcs.IsString(_const) {
 					_const2, _ := right.(*memo.ConstExpr)
 					if _const2 != nil {
-						if _f.funcs.IsJSONScalar(right) {
+						if _f.funcs.IsJSONScalar(_const2) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeJSONFieldAccess) {
 								_expr := _f.ConstructContains(
 									val,
-									_f.funcs.MakeSingleKeyJSONObject(key, right),
+									_f.funcs.MakeSingleKeyJSONObject(_const, _const2),
 								)
 								if _f.appliedRule != nil {
 									_f.appliedRule(opt.NormalizeJSONFieldAccess, nil, _expr)
@@ -11300,13 +11300,13 @@ func (_f *Factory) ConstructEq(
 		if _variable != nil {
 			_variable2, _ := right.(*memo.VariableExpr)
 			if _variable2 != nil {
-				if _f.funcs.VarsAreSame(left, right) {
+				if _f.funcs.VarsAreSame(_variable, _variable2) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.SimplifySameVarEqualities) {
 						_expr := _f.ConstructOr(
 							_f.ConstructIsNot(
-								left,
+								_variable,
 								_f.ConstructNull(
-									_f.funcs.TypeOf(left),
+									_f.funcs.TypeOf(_variable),
 								),
 							),
 							_f.ConstructNull(
@@ -11339,7 +11339,7 @@ func (_f *Factory) ConstructLt(
 			_variable2, _ := right.(*memo.VariableExpr)
 			if _variable2 != nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.CommuteVarInequality) {
-					_expr := _f.funcs.CommuteInequality(opt.LtOp, left, right).(opt.ScalarExpr)
+					_expr := _f.funcs.CommuteInequality(opt.LtOp, left, _variable2).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.CommuteVarInequality, nil, _expr)
 					}
@@ -11642,11 +11642,11 @@ func (_f *Factory) ConstructLt(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(left, right)
+				result := _f.funcs.UnifyComparison(_variable, _const)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructLt(
-							left,
+							_variable,
 							result,
 						)
 						if _f.appliedRule != nil {
@@ -11665,13 +11665,13 @@ func (_f *Factory) ConstructLt(
 		if _variable != nil {
 			_variable2, _ := right.(*memo.VariableExpr)
 			if _variable2 != nil {
-				if _f.funcs.VarsAreSame(left, right) {
+				if _f.funcs.VarsAreSame(_variable, _variable2) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.SimplifySameVarInequalities) {
 						_expr := _f.ConstructAnd(
 							_f.ConstructIs(
-								left,
+								_variable,
 								_f.ConstructNull(
-									_f.funcs.TypeOf(left),
+									_f.funcs.TypeOf(_variable),
 								),
 							),
 							_f.ConstructNull(
@@ -11704,7 +11704,7 @@ func (_f *Factory) ConstructGt(
 			_variable2, _ := right.(*memo.VariableExpr)
 			if _variable2 != nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.CommuteVarInequality) {
-					_expr := _f.funcs.CommuteInequality(opt.GtOp, left, right).(opt.ScalarExpr)
+					_expr := _f.funcs.CommuteInequality(opt.GtOp, left, _variable2).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.CommuteVarInequality, nil, _expr)
 					}
@@ -12007,11 +12007,11 @@ func (_f *Factory) ConstructGt(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(left, right)
+				result := _f.funcs.UnifyComparison(_variable, _const)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructGt(
-							left,
+							_variable,
 							result,
 						)
 						if _f.appliedRule != nil {
@@ -12030,13 +12030,13 @@ func (_f *Factory) ConstructGt(
 		if _variable != nil {
 			_variable2, _ := right.(*memo.VariableExpr)
 			if _variable2 != nil {
-				if _f.funcs.VarsAreSame(left, right) {
+				if _f.funcs.VarsAreSame(_variable, _variable2) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.SimplifySameVarInequalities) {
 						_expr := _f.ConstructAnd(
 							_f.ConstructIs(
-								left,
+								_variable,
 								_f.ConstructNull(
-									_f.funcs.TypeOf(left),
+									_f.funcs.TypeOf(_variable),
 								),
 							),
 							_f.ConstructNull(
@@ -12069,7 +12069,7 @@ func (_f *Factory) ConstructLe(
 			_variable2, _ := right.(*memo.VariableExpr)
 			if _variable2 != nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.CommuteVarInequality) {
-					_expr := _f.funcs.CommuteInequality(opt.LeOp, left, right).(opt.ScalarExpr)
+					_expr := _f.funcs.CommuteInequality(opt.LeOp, left, _variable2).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.CommuteVarInequality, nil, _expr)
 					}
@@ -12372,11 +12372,11 @@ func (_f *Factory) ConstructLe(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(left, right)
+				result := _f.funcs.UnifyComparison(_variable, _const)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructLe(
-							left,
+							_variable,
 							result,
 						)
 						if _f.appliedRule != nil {
@@ -12395,13 +12395,13 @@ func (_f *Factory) ConstructLe(
 		if _variable != nil {
 			_variable2, _ := right.(*memo.VariableExpr)
 			if _variable2 != nil {
-				if _f.funcs.VarsAreSame(left, right) {
+				if _f.funcs.VarsAreSame(_variable, _variable2) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.SimplifySameVarEqualities) {
 						_expr := _f.ConstructOr(
 							_f.ConstructIsNot(
-								left,
+								_variable,
 								_f.ConstructNull(
-									_f.funcs.TypeOf(left),
+									_f.funcs.TypeOf(_variable),
 								),
 							),
 							_f.ConstructNull(
@@ -12434,7 +12434,7 @@ func (_f *Factory) ConstructGe(
 			_variable2, _ := right.(*memo.VariableExpr)
 			if _variable2 != nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.CommuteVarInequality) {
-					_expr := _f.funcs.CommuteInequality(opt.GeOp, left, right).(opt.ScalarExpr)
+					_expr := _f.funcs.CommuteInequality(opt.GeOp, left, _variable2).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.CommuteVarInequality, nil, _expr)
 					}
@@ -12737,11 +12737,11 @@ func (_f *Factory) ConstructGe(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(left, right)
+				result := _f.funcs.UnifyComparison(_variable, _const)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructGe(
-							left,
+							_variable,
 							result,
 						)
 						if _f.appliedRule != nil {
@@ -12760,13 +12760,13 @@ func (_f *Factory) ConstructGe(
 		if _variable != nil {
 			_variable2, _ := right.(*memo.VariableExpr)
 			if _variable2 != nil {
-				if _f.funcs.VarsAreSame(left, right) {
+				if _f.funcs.VarsAreSame(_variable, _variable2) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.SimplifySameVarEqualities) {
 						_expr := _f.ConstructOr(
 							_f.ConstructIsNot(
-								left,
+								_variable,
 								_f.ConstructNull(
-									_f.funcs.TypeOf(left),
+									_f.funcs.TypeOf(_variable),
 								),
 							),
 							_f.ConstructNull(
@@ -12850,7 +12850,7 @@ func (_f *Factory) ConstructNe(
 			if _variable2 != nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.CommuteVar) {
 					_expr := _f.ConstructNe(
-						right,
+						_variable2,
 						left,
 					)
 					if _f.appliedRule != nil {
@@ -12886,11 +12886,11 @@ func (_f *Factory) ConstructNe(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(left, right)
+				result := _f.funcs.UnifyComparison(_variable, _const)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructNe(
-							left,
+							_variable,
 							result,
 						)
 						if _f.appliedRule != nil {
@@ -12909,13 +12909,13 @@ func (_f *Factory) ConstructNe(
 		if _variable != nil {
 			_variable2, _ := right.(*memo.VariableExpr)
 			if _variable2 != nil {
-				if _f.funcs.VarsAreSame(left, right) {
+				if _f.funcs.VarsAreSame(_variable, _variable2) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.SimplifySameVarInequalities) {
 						_expr := _f.ConstructAnd(
 							_f.ConstructIs(
-								left,
+								_variable,
 								_f.ConstructNull(
-									_f.funcs.TypeOf(left),
+									_f.funcs.TypeOf(_variable),
 								),
 							),
 							_f.ConstructNull(
@@ -13046,11 +13046,11 @@ func (_f *Factory) ConstructIn(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(left, right)
+				result := _f.funcs.UnifyComparison(_variable, _const)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructIn(
-							left,
+							_variable,
 							result,
 						)
 						if _f.appliedRule != nil {
@@ -13177,11 +13177,11 @@ func (_f *Factory) ConstructNotIn(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(left, right)
+				result := _f.funcs.UnifyComparison(_variable, _const)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructNotIn(
-							left,
+							_variable,
 							result,
 						)
 						if _f.appliedRule != nil {
@@ -13259,11 +13259,11 @@ func (_f *Factory) ConstructLike(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(left, right)
+				result := _f.funcs.UnifyComparison(_variable, _const)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructLike(
-							left,
+							_variable,
 							result,
 						)
 						if _f.appliedRule != nil {
@@ -13341,11 +13341,11 @@ func (_f *Factory) ConstructNotLike(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(left, right)
+				result := _f.funcs.UnifyComparison(_variable, _const)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructNotLike(
-							left,
+							_variable,
 							result,
 						)
 						if _f.appliedRule != nil {
@@ -13423,11 +13423,11 @@ func (_f *Factory) ConstructILike(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(left, right)
+				result := _f.funcs.UnifyComparison(_variable, _const)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructILike(
-							left,
+							_variable,
 							result,
 						)
 						if _f.appliedRule != nil {
@@ -13505,11 +13505,11 @@ func (_f *Factory) ConstructNotILike(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(left, right)
+				result := _f.funcs.UnifyComparison(_variable, _const)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructNotILike(
-							left,
+							_variable,
 							result,
 						)
 						if _f.appliedRule != nil {
@@ -13587,11 +13587,11 @@ func (_f *Factory) ConstructSimilarTo(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(left, right)
+				result := _f.funcs.UnifyComparison(_variable, _const)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructSimilarTo(
-							left,
+							_variable,
 							result,
 						)
 						if _f.appliedRule != nil {
@@ -13669,11 +13669,11 @@ func (_f *Factory) ConstructNotSimilarTo(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(left, right)
+				result := _f.funcs.UnifyComparison(_variable, _const)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructNotSimilarTo(
-							left,
+							_variable,
 							result,
 						)
 						if _f.appliedRule != nil {
@@ -13751,11 +13751,11 @@ func (_f *Factory) ConstructRegMatch(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(left, right)
+				result := _f.funcs.UnifyComparison(_variable, _const)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructRegMatch(
-							left,
+							_variable,
 							result,
 						)
 						if _f.appliedRule != nil {
@@ -13833,11 +13833,11 @@ func (_f *Factory) ConstructNotRegMatch(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(left, right)
+				result := _f.funcs.UnifyComparison(_variable, _const)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructNotRegMatch(
-							left,
+							_variable,
 							result,
 						)
 						if _f.appliedRule != nil {
@@ -13915,11 +13915,11 @@ func (_f *Factory) ConstructRegIMatch(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(left, right)
+				result := _f.funcs.UnifyComparison(_variable, _const)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructRegIMatch(
-							left,
+							_variable,
 							result,
 						)
 						if _f.appliedRule != nil {
@@ -13997,11 +13997,11 @@ func (_f *Factory) ConstructNotRegIMatch(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(left, right)
+				result := _f.funcs.UnifyComparison(_variable, _const)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructNotRegIMatch(
-							left,
+							_variable,
 							result,
 						)
 						if _f.appliedRule != nil {
@@ -14070,7 +14070,7 @@ func (_f *Factory) ConstructIs(
 				if _f.matchedRule == nil || _f.matchedRule(opt.CommuteNullIs) {
 					_expr := _f.ConstructIs(
 						right,
-						left,
+						_null,
 					)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.CommuteNullIs, nil, _expr)
@@ -14107,7 +14107,7 @@ func (_f *Factory) ConstructIs(
 			if _variable2 != nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.CommuteVar) {
 					_expr := _f.ConstructIs(
-						right,
+						_variable2,
 						left,
 					)
 					if _f.appliedRule != nil {
@@ -14143,11 +14143,11 @@ func (_f *Factory) ConstructIs(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(left, right)
+				result := _f.funcs.UnifyComparison(_variable, _const)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructIs(
-							left,
+							_variable,
 							result,
 						)
 						if _f.appliedRule != nil {
@@ -14217,7 +14217,7 @@ func (_f *Factory) ConstructIsNot(
 				if _f.matchedRule == nil || _f.matchedRule(opt.CommuteNullIs) {
 					_expr := _f.ConstructIsNot(
 						right,
-						left,
+						_null,
 					)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.CommuteNullIs, nil, _expr)
@@ -14254,7 +14254,7 @@ func (_f *Factory) ConstructIsNot(
 			if _variable2 != nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.CommuteVar) {
 					_expr := _f.ConstructIsNot(
-						right,
+						_variable2,
 						left,
 					)
 					if _f.appliedRule != nil {
@@ -14290,11 +14290,11 @@ func (_f *Factory) ConstructIsNot(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(left, right)
+				result := _f.funcs.UnifyComparison(_variable, _const)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructIsNot(
-							left,
+							_variable,
 							result,
 						)
 						if _f.appliedRule != nil {
@@ -14372,11 +14372,11 @@ func (_f *Factory) ConstructContains(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(left, right)
+				result := _f.funcs.UnifyComparison(_variable, _const)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructContains(
-							left,
+							_variable,
 							result,
 						)
 						if _f.appliedRule != nil {
@@ -14397,14 +14397,14 @@ func (_f *Factory) ConstructContains(
 			key := _fetchVal.Index
 			_const, _ := key.(*memo.ConstExpr)
 			if _const != nil {
-				if _f.funcs.IsString(key) {
+				if _f.funcs.IsString(_const) {
 					_const2, _ := right.(*memo.ConstExpr)
 					if _const2 != nil {
-						if !_f.funcs.IsJSONScalar(right) {
+						if !_f.funcs.IsJSONScalar(_const2) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeJSONContains) {
 								_expr := _f.ConstructContains(
 									val,
-									_f.funcs.MakeSingleKeyJSONObject(key, right),
+									_f.funcs.MakeSingleKeyJSONObject(_const, _const2),
 								)
 								if _f.appliedRule != nil {
 									_f.appliedRule(opt.NormalizeJSONContains, nil, _expr)
@@ -14483,11 +14483,11 @@ func (_f *Factory) ConstructJsonExists(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(left, right)
+				result := _f.funcs.UnifyComparison(_variable, _const)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructJsonExists(
-							left,
+							_variable,
 							result,
 						)
 						if _f.appliedRule != nil {
@@ -14565,11 +14565,11 @@ func (_f *Factory) ConstructJsonAllExists(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(left, right)
+				result := _f.funcs.UnifyComparison(_variable, _const)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructJsonAllExists(
-							left,
+							_variable,
 							result,
 						)
 						if _f.appliedRule != nil {
@@ -14647,11 +14647,11 @@ func (_f *Factory) ConstructJsonSomeExists(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(left, right)
+				result := _f.funcs.UnifyComparison(_variable, _const)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructJsonSomeExists(
-							left,
+							_variable,
 							result,
 						)
 						if _f.appliedRule != nil {
@@ -14729,11 +14729,11 @@ func (_f *Factory) ConstructOverlaps(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(left, right)
+				result := _f.funcs.UnifyComparison(_variable, _const)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructOverlaps(
-							left,
+							_variable,
 							result,
 						)
 						if _f.appliedRule != nil {
@@ -14781,11 +14781,11 @@ func (_f *Factory) ConstructBBoxCovers(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(left, right)
+				result := _f.funcs.UnifyComparison(_variable, _const)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructBBoxCovers(
-							left,
+							_variable,
 							result,
 						)
 						if _f.appliedRule != nil {
@@ -14833,11 +14833,11 @@ func (_f *Factory) ConstructBBoxIntersects(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(left, right)
+				result := _f.funcs.UnifyComparison(_variable, _const)
 				if _f.funcs.Succeeded(result) {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructBBoxIntersects(
-							left,
+							_variable,
 							result,
 						)
 						if _f.appliedRule != nil {
@@ -14888,7 +14888,7 @@ func (_f *Factory) ConstructAnyScalar(
 				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyEqualsAnyTuple) {
 					_expr := _f.ConstructIn(
 						input,
-						tuple,
+						_tuple,
 					)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.SimplifyEqualsAnyTuple, nil, _expr)
@@ -14905,11 +14905,11 @@ func (_f *Factory) ConstructAnyScalar(
 		ary := right
 		_const, _ := ary.(*memo.ConstExpr)
 		if _const != nil {
-			if _f.funcs.IsConstArray(ary) {
+			if _f.funcs.IsConstArray(_const) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyAnyScalarArray) {
 					_expr := _f.ConstructAnyScalar(
 						input,
-						_f.funcs.ConvertConstArrayToTuple(ary),
+						_f.funcs.ConvertConstArrayToTuple(_const),
 						cmp,
 					)
 					if _f.appliedRule != nil {
@@ -14934,9 +14934,9 @@ func (_f *Factory) ConstructBitand(
 	{
 		_null, _ := left.(*memo.NullExpr)
 		if _null != nil {
-			if !_f.funcs.AllowNullArgs(opt.BitandOp, left, right) {
+			if !_f.funcs.AllowNullArgs(opt.BitandOp, _null, right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryLeft) {
-					_expr := _f.funcs.FoldNullBinary(opt.BitandOp, left, right).(opt.ScalarExpr)
+					_expr := _f.funcs.FoldNullBinary(opt.BitandOp, _null, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldNullBinaryLeft, nil, _expr)
 					}
@@ -14950,9 +14950,9 @@ func (_f *Factory) ConstructBitand(
 	{
 		_null, _ := right.(*memo.NullExpr)
 		if _null != nil {
-			if !_f.funcs.AllowNullArgs(opt.BitandOp, left, right) {
+			if !_f.funcs.AllowNullArgs(opt.BitandOp, left, _null) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryRight) {
-					_expr := _f.funcs.FoldNullBinary(opt.BitandOp, left, right).(opt.ScalarExpr)
+					_expr := _f.funcs.FoldNullBinary(opt.BitandOp, left, _null).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldNullBinaryRight, nil, _expr)
 					}
@@ -14988,7 +14988,7 @@ func (_f *Factory) ConstructBitand(
 			if _variable2 != nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.CommuteVar) {
 					_expr := _f.ConstructBitand(
-						right,
+						_variable2,
 						left,
 					)
 					if _f.appliedRule != nil {
@@ -15031,9 +15031,9 @@ func (_f *Factory) ConstructBitor(
 	{
 		_null, _ := left.(*memo.NullExpr)
 		if _null != nil {
-			if !_f.funcs.AllowNullArgs(opt.BitorOp, left, right) {
+			if !_f.funcs.AllowNullArgs(opt.BitorOp, _null, right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryLeft) {
-					_expr := _f.funcs.FoldNullBinary(opt.BitorOp, left, right).(opt.ScalarExpr)
+					_expr := _f.funcs.FoldNullBinary(opt.BitorOp, _null, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldNullBinaryLeft, nil, _expr)
 					}
@@ -15047,9 +15047,9 @@ func (_f *Factory) ConstructBitor(
 	{
 		_null, _ := right.(*memo.NullExpr)
 		if _null != nil {
-			if !_f.funcs.AllowNullArgs(opt.BitorOp, left, right) {
+			if !_f.funcs.AllowNullArgs(opt.BitorOp, left, _null) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryRight) {
-					_expr := _f.funcs.FoldNullBinary(opt.BitorOp, left, right).(opt.ScalarExpr)
+					_expr := _f.funcs.FoldNullBinary(opt.BitorOp, left, _null).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldNullBinaryRight, nil, _expr)
 					}
@@ -15085,7 +15085,7 @@ func (_f *Factory) ConstructBitor(
 			if _variable2 != nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.CommuteVar) {
 					_expr := _f.ConstructBitor(
-						right,
+						_variable2,
 						left,
 					)
 					if _f.appliedRule != nil {
@@ -15128,9 +15128,9 @@ func (_f *Factory) ConstructBitxor(
 	{
 		_null, _ := left.(*memo.NullExpr)
 		if _null != nil {
-			if !_f.funcs.AllowNullArgs(opt.BitxorOp, left, right) {
+			if !_f.funcs.AllowNullArgs(opt.BitxorOp, _null, right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryLeft) {
-					_expr := _f.funcs.FoldNullBinary(opt.BitxorOp, left, right).(opt.ScalarExpr)
+					_expr := _f.funcs.FoldNullBinary(opt.BitxorOp, _null, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldNullBinaryLeft, nil, _expr)
 					}
@@ -15144,9 +15144,9 @@ func (_f *Factory) ConstructBitxor(
 	{
 		_null, _ := right.(*memo.NullExpr)
 		if _null != nil {
-			if !_f.funcs.AllowNullArgs(opt.BitxorOp, left, right) {
+			if !_f.funcs.AllowNullArgs(opt.BitxorOp, left, _null) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryRight) {
-					_expr := _f.funcs.FoldNullBinary(opt.BitxorOp, left, right).(opt.ScalarExpr)
+					_expr := _f.funcs.FoldNullBinary(opt.BitxorOp, left, _null).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldNullBinaryRight, nil, _expr)
 					}
@@ -15182,7 +15182,7 @@ func (_f *Factory) ConstructBitxor(
 			if _variable2 != nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.CommuteVar) {
 					_expr := _f.ConstructBitxor(
-						right,
+						_variable2,
 						left,
 					)
 					if _f.appliedRule != nil {
@@ -15225,9 +15225,9 @@ func (_f *Factory) ConstructPlus(
 	{
 		_null, _ := left.(*memo.NullExpr)
 		if _null != nil {
-			if !_f.funcs.AllowNullArgs(opt.PlusOp, left, right) {
+			if !_f.funcs.AllowNullArgs(opt.PlusOp, _null, right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryLeft) {
-					_expr := _f.funcs.FoldNullBinary(opt.PlusOp, left, right).(opt.ScalarExpr)
+					_expr := _f.funcs.FoldNullBinary(opt.PlusOp, _null, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldNullBinaryLeft, nil, _expr)
 					}
@@ -15241,9 +15241,9 @@ func (_f *Factory) ConstructPlus(
 	{
 		_null, _ := right.(*memo.NullExpr)
 		if _null != nil {
-			if !_f.funcs.AllowNullArgs(opt.PlusOp, left, right) {
+			if !_f.funcs.AllowNullArgs(opt.PlusOp, left, _null) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryRight) {
-					_expr := _f.funcs.FoldNullBinary(opt.PlusOp, left, right).(opt.ScalarExpr)
+					_expr := _f.funcs.FoldNullBinary(opt.PlusOp, left, _null).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldNullBinaryRight, nil, _expr)
 					}
@@ -15279,7 +15279,7 @@ func (_f *Factory) ConstructPlus(
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldPlusZero) {
 					_expr := _f.ConstructCast(
 						left,
-						_f.funcs.BinaryType(opt.PlusOp, left, right),
+						_f.funcs.BinaryType(opt.PlusOp, left, _const),
 					)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldPlusZero, nil, _expr)
@@ -15298,7 +15298,7 @@ func (_f *Factory) ConstructPlus(
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldZeroPlus) {
 					_expr := _f.ConstructCast(
 						right,
-						_f.funcs.BinaryType(opt.PlusOp, left, right),
+						_f.funcs.BinaryType(opt.PlusOp, _const, right),
 					)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldZeroPlus, nil, _expr)
@@ -15317,7 +15317,7 @@ func (_f *Factory) ConstructPlus(
 			if _variable2 != nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.CommuteVar) {
 					_expr := _f.ConstructPlus(
-						right,
+						_variable2,
 						left,
 					)
 					if _f.appliedRule != nil {
@@ -15360,9 +15360,9 @@ func (_f *Factory) ConstructMinus(
 	{
 		_null, _ := left.(*memo.NullExpr)
 		if _null != nil {
-			if !_f.funcs.AllowNullArgs(opt.MinusOp, left, right) {
+			if !_f.funcs.AllowNullArgs(opt.MinusOp, _null, right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryLeft) {
-					_expr := _f.funcs.FoldNullBinary(opt.MinusOp, left, right).(opt.ScalarExpr)
+					_expr := _f.funcs.FoldNullBinary(opt.MinusOp, _null, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldNullBinaryLeft, nil, _expr)
 					}
@@ -15376,9 +15376,9 @@ func (_f *Factory) ConstructMinus(
 	{
 		_null, _ := right.(*memo.NullExpr)
 		if _null != nil {
-			if !_f.funcs.AllowNullArgs(opt.MinusOp, left, right) {
+			if !_f.funcs.AllowNullArgs(opt.MinusOp, left, _null) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryRight) {
-					_expr := _f.funcs.FoldNullBinary(opt.MinusOp, left, right).(opt.ScalarExpr)
+					_expr := _f.funcs.FoldNullBinary(opt.MinusOp, left, _null).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldNullBinaryRight, nil, _expr)
 					}
@@ -15415,7 +15415,7 @@ func (_f *Factory) ConstructMinus(
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldMinusZero) {
 						_expr := _f.ConstructCast(
 							left,
-							_f.funcs.BinaryType(opt.MinusOp, left, right),
+							_f.funcs.BinaryType(opt.MinusOp, left, _const),
 						)
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.FoldMinusZero, nil, _expr)
@@ -15440,9 +15440,9 @@ func (_f *Factory) ConstructMult(
 	{
 		_null, _ := left.(*memo.NullExpr)
 		if _null != nil {
-			if !_f.funcs.AllowNullArgs(opt.MultOp, left, right) {
+			if !_f.funcs.AllowNullArgs(opt.MultOp, _null, right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryLeft) {
-					_expr := _f.funcs.FoldNullBinary(opt.MultOp, left, right).(opt.ScalarExpr)
+					_expr := _f.funcs.FoldNullBinary(opt.MultOp, _null, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldNullBinaryLeft, nil, _expr)
 					}
@@ -15456,9 +15456,9 @@ func (_f *Factory) ConstructMult(
 	{
 		_null, _ := right.(*memo.NullExpr)
 		if _null != nil {
-			if !_f.funcs.AllowNullArgs(opt.MultOp, left, right) {
+			if !_f.funcs.AllowNullArgs(opt.MultOp, left, _null) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryRight) {
-					_expr := _f.funcs.FoldNullBinary(opt.MultOp, left, right).(opt.ScalarExpr)
+					_expr := _f.funcs.FoldNullBinary(opt.MultOp, left, _null).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldNullBinaryRight, nil, _expr)
 					}
@@ -15494,7 +15494,7 @@ func (_f *Factory) ConstructMult(
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldMultOne) {
 					_expr := _f.ConstructCast(
 						left,
-						_f.funcs.BinaryType(opt.MultOp, left, right),
+						_f.funcs.BinaryType(opt.MultOp, left, _const),
 					)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldMultOne, nil, _expr)
@@ -15513,7 +15513,7 @@ func (_f *Factory) ConstructMult(
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldOneMult) {
 					_expr := _f.ConstructCast(
 						right,
-						_f.funcs.BinaryType(opt.MultOp, left, right),
+						_f.funcs.BinaryType(opt.MultOp, _const, right),
 					)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldOneMult, nil, _expr)
@@ -15532,7 +15532,7 @@ func (_f *Factory) ConstructMult(
 			if _variable2 != nil {
 				if _f.matchedRule == nil || _f.matchedRule(opt.CommuteVar) {
 					_expr := _f.ConstructMult(
-						right,
+						_variable2,
 						left,
 					)
 					if _f.appliedRule != nil {
@@ -15575,9 +15575,9 @@ func (_f *Factory) ConstructDiv(
 	{
 		_null, _ := left.(*memo.NullExpr)
 		if _null != nil {
-			if !_f.funcs.AllowNullArgs(opt.DivOp, left, right) {
+			if !_f.funcs.AllowNullArgs(opt.DivOp, _null, right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryLeft) {
-					_expr := _f.funcs.FoldNullBinary(opt.DivOp, left, right).(opt.ScalarExpr)
+					_expr := _f.funcs.FoldNullBinary(opt.DivOp, _null, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldNullBinaryLeft, nil, _expr)
 					}
@@ -15591,9 +15591,9 @@ func (_f *Factory) ConstructDiv(
 	{
 		_null, _ := right.(*memo.NullExpr)
 		if _null != nil {
-			if !_f.funcs.AllowNullArgs(opt.DivOp, left, right) {
+			if !_f.funcs.AllowNullArgs(opt.DivOp, left, _null) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryRight) {
-					_expr := _f.funcs.FoldNullBinary(opt.DivOp, left, right).(opt.ScalarExpr)
+					_expr := _f.funcs.FoldNullBinary(opt.DivOp, left, _null).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldNullBinaryRight, nil, _expr)
 					}
@@ -15629,7 +15629,7 @@ func (_f *Factory) ConstructDiv(
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldDivOne) {
 					_expr := _f.ConstructCast(
 						left,
-						_f.funcs.BinaryType(opt.DivOp, left, right),
+						_f.funcs.BinaryType(opt.DivOp, left, _const),
 					)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldDivOne, nil, _expr)
@@ -15653,9 +15653,9 @@ func (_f *Factory) ConstructFloorDiv(
 	{
 		_null, _ := left.(*memo.NullExpr)
 		if _null != nil {
-			if !_f.funcs.AllowNullArgs(opt.FloorDivOp, left, right) {
+			if !_f.funcs.AllowNullArgs(opt.FloorDivOp, _null, right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryLeft) {
-					_expr := _f.funcs.FoldNullBinary(opt.FloorDivOp, left, right).(opt.ScalarExpr)
+					_expr := _f.funcs.FoldNullBinary(opt.FloorDivOp, _null, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldNullBinaryLeft, nil, _expr)
 					}
@@ -15669,9 +15669,9 @@ func (_f *Factory) ConstructFloorDiv(
 	{
 		_null, _ := right.(*memo.NullExpr)
 		if _null != nil {
-			if !_f.funcs.AllowNullArgs(opt.FloorDivOp, left, right) {
+			if !_f.funcs.AllowNullArgs(opt.FloorDivOp, left, _null) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryRight) {
-					_expr := _f.funcs.FoldNullBinary(opt.FloorDivOp, left, right).(opt.ScalarExpr)
+					_expr := _f.funcs.FoldNullBinary(opt.FloorDivOp, left, _null).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldNullBinaryRight, nil, _expr)
 					}
@@ -15707,7 +15707,7 @@ func (_f *Factory) ConstructFloorDiv(
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldDivOne) {
 					_expr := _f.ConstructCast(
 						left,
-						_f.funcs.BinaryType(opt.FloorDivOp, left, right),
+						_f.funcs.BinaryType(opt.FloorDivOp, left, _const),
 					)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldDivOne, nil, _expr)
@@ -15731,9 +15731,9 @@ func (_f *Factory) ConstructMod(
 	{
 		_null, _ := left.(*memo.NullExpr)
 		if _null != nil {
-			if !_f.funcs.AllowNullArgs(opt.ModOp, left, right) {
+			if !_f.funcs.AllowNullArgs(opt.ModOp, _null, right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryLeft) {
-					_expr := _f.funcs.FoldNullBinary(opt.ModOp, left, right).(opt.ScalarExpr)
+					_expr := _f.funcs.FoldNullBinary(opt.ModOp, _null, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldNullBinaryLeft, nil, _expr)
 					}
@@ -15747,9 +15747,9 @@ func (_f *Factory) ConstructMod(
 	{
 		_null, _ := right.(*memo.NullExpr)
 		if _null != nil {
-			if !_f.funcs.AllowNullArgs(opt.ModOp, left, right) {
+			if !_f.funcs.AllowNullArgs(opt.ModOp, left, _null) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryRight) {
-					_expr := _f.funcs.FoldNullBinary(opt.ModOp, left, right).(opt.ScalarExpr)
+					_expr := _f.funcs.FoldNullBinary(opt.ModOp, left, _null).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldNullBinaryRight, nil, _expr)
 					}
@@ -15790,9 +15790,9 @@ func (_f *Factory) ConstructPow(
 	{
 		_null, _ := left.(*memo.NullExpr)
 		if _null != nil {
-			if !_f.funcs.AllowNullArgs(opt.PowOp, left, right) {
+			if !_f.funcs.AllowNullArgs(opt.PowOp, _null, right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryLeft) {
-					_expr := _f.funcs.FoldNullBinary(opt.PowOp, left, right).(opt.ScalarExpr)
+					_expr := _f.funcs.FoldNullBinary(opt.PowOp, _null, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldNullBinaryLeft, nil, _expr)
 					}
@@ -15806,9 +15806,9 @@ func (_f *Factory) ConstructPow(
 	{
 		_null, _ := right.(*memo.NullExpr)
 		if _null != nil {
-			if !_f.funcs.AllowNullArgs(opt.PowOp, left, right) {
+			if !_f.funcs.AllowNullArgs(opt.PowOp, left, _null) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryRight) {
-					_expr := _f.funcs.FoldNullBinary(opt.PowOp, left, right).(opt.ScalarExpr)
+					_expr := _f.funcs.FoldNullBinary(opt.PowOp, left, _null).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldNullBinaryRight, nil, _expr)
 					}
@@ -15849,9 +15849,9 @@ func (_f *Factory) ConstructConcat(
 	{
 		_null, _ := left.(*memo.NullExpr)
 		if _null != nil {
-			if !_f.funcs.AllowNullArgs(opt.ConcatOp, left, right) {
+			if !_f.funcs.AllowNullArgs(opt.ConcatOp, _null, right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryLeft) {
-					_expr := _f.funcs.FoldNullBinary(opt.ConcatOp, left, right).(opt.ScalarExpr)
+					_expr := _f.funcs.FoldNullBinary(opt.ConcatOp, _null, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldNullBinaryLeft, nil, _expr)
 					}
@@ -15865,9 +15865,9 @@ func (_f *Factory) ConstructConcat(
 	{
 		_null, _ := right.(*memo.NullExpr)
 		if _null != nil {
-			if !_f.funcs.AllowNullArgs(opt.ConcatOp, left, right) {
+			if !_f.funcs.AllowNullArgs(opt.ConcatOp, left, _null) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryRight) {
-					_expr := _f.funcs.FoldNullBinary(opt.ConcatOp, left, right).(opt.ScalarExpr)
+					_expr := _f.funcs.FoldNullBinary(opt.ConcatOp, left, _null).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldNullBinaryRight, nil, _expr)
 					}
@@ -15908,9 +15908,9 @@ func (_f *Factory) ConstructLShift(
 	{
 		_null, _ := left.(*memo.NullExpr)
 		if _null != nil {
-			if !_f.funcs.AllowNullArgs(opt.LShiftOp, left, right) {
+			if !_f.funcs.AllowNullArgs(opt.LShiftOp, _null, right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryLeft) {
-					_expr := _f.funcs.FoldNullBinary(opt.LShiftOp, left, right).(opt.ScalarExpr)
+					_expr := _f.funcs.FoldNullBinary(opt.LShiftOp, _null, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldNullBinaryLeft, nil, _expr)
 					}
@@ -15924,9 +15924,9 @@ func (_f *Factory) ConstructLShift(
 	{
 		_null, _ := right.(*memo.NullExpr)
 		if _null != nil {
-			if !_f.funcs.AllowNullArgs(opt.LShiftOp, left, right) {
+			if !_f.funcs.AllowNullArgs(opt.LShiftOp, left, _null) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryRight) {
-					_expr := _f.funcs.FoldNullBinary(opt.LShiftOp, left, right).(opt.ScalarExpr)
+					_expr := _f.funcs.FoldNullBinary(opt.LShiftOp, left, _null).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldNullBinaryRight, nil, _expr)
 					}
@@ -15967,9 +15967,9 @@ func (_f *Factory) ConstructRShift(
 	{
 		_null, _ := left.(*memo.NullExpr)
 		if _null != nil {
-			if !_f.funcs.AllowNullArgs(opt.RShiftOp, left, right) {
+			if !_f.funcs.AllowNullArgs(opt.RShiftOp, _null, right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryLeft) {
-					_expr := _f.funcs.FoldNullBinary(opt.RShiftOp, left, right).(opt.ScalarExpr)
+					_expr := _f.funcs.FoldNullBinary(opt.RShiftOp, _null, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldNullBinaryLeft, nil, _expr)
 					}
@@ -15983,9 +15983,9 @@ func (_f *Factory) ConstructRShift(
 	{
 		_null, _ := right.(*memo.NullExpr)
 		if _null != nil {
-			if !_f.funcs.AllowNullArgs(opt.RShiftOp, left, right) {
+			if !_f.funcs.AllowNullArgs(opt.RShiftOp, left, _null) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryRight) {
-					_expr := _f.funcs.FoldNullBinary(opt.RShiftOp, left, right).(opt.ScalarExpr)
+					_expr := _f.funcs.FoldNullBinary(opt.RShiftOp, left, _null).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldNullBinaryRight, nil, _expr)
 					}
@@ -16028,9 +16028,9 @@ func (_f *Factory) ConstructFetchVal(
 		_null, _ := left.(*memo.NullExpr)
 		if _null != nil {
 			right := index
-			if !_f.funcs.AllowNullArgs(opt.FetchValOp, left, right) {
+			if !_f.funcs.AllowNullArgs(opt.FetchValOp, _null, right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryLeft) {
-					_expr := _f.funcs.FoldNullBinary(opt.FetchValOp, left, right).(opt.ScalarExpr)
+					_expr := _f.funcs.FoldNullBinary(opt.FetchValOp, _null, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldNullBinaryLeft, nil, _expr)
 					}
@@ -16046,9 +16046,9 @@ func (_f *Factory) ConstructFetchVal(
 		right := index
 		_null, _ := right.(*memo.NullExpr)
 		if _null != nil {
-			if !_f.funcs.AllowNullArgs(opt.FetchValOp, left, right) {
+			if !_f.funcs.AllowNullArgs(opt.FetchValOp, left, _null) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryRight) {
-					_expr := _f.funcs.FoldNullBinary(opt.FetchValOp, left, right).(opt.ScalarExpr)
+					_expr := _f.funcs.FoldNullBinary(opt.FetchValOp, left, _null).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldNullBinaryRight, nil, _expr)
 					}
@@ -16093,9 +16093,9 @@ func (_f *Factory) ConstructFetchText(
 		_null, _ := left.(*memo.NullExpr)
 		if _null != nil {
 			right := index
-			if !_f.funcs.AllowNullArgs(opt.FetchTextOp, left, right) {
+			if !_f.funcs.AllowNullArgs(opt.FetchTextOp, _null, right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryLeft) {
-					_expr := _f.funcs.FoldNullBinary(opt.FetchTextOp, left, right).(opt.ScalarExpr)
+					_expr := _f.funcs.FoldNullBinary(opt.FetchTextOp, _null, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldNullBinaryLeft, nil, _expr)
 					}
@@ -16111,9 +16111,9 @@ func (_f *Factory) ConstructFetchText(
 		right := index
 		_null, _ := right.(*memo.NullExpr)
 		if _null != nil {
-			if !_f.funcs.AllowNullArgs(opt.FetchTextOp, left, right) {
+			if !_f.funcs.AllowNullArgs(opt.FetchTextOp, left, _null) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryRight) {
-					_expr := _f.funcs.FoldNullBinary(opt.FetchTextOp, left, right).(opt.ScalarExpr)
+					_expr := _f.funcs.FoldNullBinary(opt.FetchTextOp, left, _null).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldNullBinaryRight, nil, _expr)
 					}
@@ -16158,9 +16158,9 @@ func (_f *Factory) ConstructFetchValPath(
 		_null, _ := left.(*memo.NullExpr)
 		if _null != nil {
 			right := path
-			if !_f.funcs.AllowNullArgs(opt.FetchValPathOp, left, right) {
+			if !_f.funcs.AllowNullArgs(opt.FetchValPathOp, _null, right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryLeft) {
-					_expr := _f.funcs.FoldNullBinary(opt.FetchValPathOp, left, right).(opt.ScalarExpr)
+					_expr := _f.funcs.FoldNullBinary(opt.FetchValPathOp, _null, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldNullBinaryLeft, nil, _expr)
 					}
@@ -16176,9 +16176,9 @@ func (_f *Factory) ConstructFetchValPath(
 		right := path
 		_null, _ := right.(*memo.NullExpr)
 		if _null != nil {
-			if !_f.funcs.AllowNullArgs(opt.FetchValPathOp, left, right) {
+			if !_f.funcs.AllowNullArgs(opt.FetchValPathOp, left, _null) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryRight) {
-					_expr := _f.funcs.FoldNullBinary(opt.FetchValPathOp, left, right).(opt.ScalarExpr)
+					_expr := _f.funcs.FoldNullBinary(opt.FetchValPathOp, left, _null).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldNullBinaryRight, nil, _expr)
 					}
@@ -16223,9 +16223,9 @@ func (_f *Factory) ConstructFetchTextPath(
 		_null, _ := left.(*memo.NullExpr)
 		if _null != nil {
 			right := path
-			if !_f.funcs.AllowNullArgs(opt.FetchTextPathOp, left, right) {
+			if !_f.funcs.AllowNullArgs(opt.FetchTextPathOp, _null, right) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryLeft) {
-					_expr := _f.funcs.FoldNullBinary(opt.FetchTextPathOp, left, right).(opt.ScalarExpr)
+					_expr := _f.funcs.FoldNullBinary(opt.FetchTextPathOp, _null, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldNullBinaryLeft, nil, _expr)
 					}
@@ -16241,9 +16241,9 @@ func (_f *Factory) ConstructFetchTextPath(
 		right := path
 		_null, _ := right.(*memo.NullExpr)
 		if _null != nil {
-			if !_f.funcs.AllowNullArgs(opt.FetchTextPathOp, left, right) {
+			if !_f.funcs.AllowNullArgs(opt.FetchTextPathOp, left, _null) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullBinaryRight) {
-					_expr := _f.funcs.FoldNullBinary(opt.FetchTextPathOp, left, right).(opt.ScalarExpr)
+					_expr := _f.funcs.FoldNullBinary(opt.FetchTextPathOp, left, _null).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldNullBinaryRight, nil, _expr)
 					}
@@ -16286,7 +16286,7 @@ func (_f *Factory) ConstructUnaryMinus(
 		_null, _ := input.(*memo.NullExpr)
 		if _null != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullUnary) {
-				_expr := _f.funcs.FoldNullUnary(opt.UnaryMinusOp, input).(opt.ScalarExpr)
+				_expr := _f.funcs.FoldNullUnary(opt.UnaryMinusOp, _null).(opt.ScalarExpr)
 				if _f.appliedRule != nil {
 					_f.appliedRule(opt.FoldNullUnary, nil, _expr)
 				}
@@ -16360,7 +16360,7 @@ func (_f *Factory) ConstructUnaryComplement(
 		_null, _ := input.(*memo.NullExpr)
 		if _null != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullUnary) {
-				_expr := _f.funcs.FoldNullUnary(opt.UnaryComplementOp, input).(opt.ScalarExpr)
+				_expr := _f.funcs.FoldNullUnary(opt.UnaryComplementOp, _null).(opt.ScalarExpr)
 				if _f.appliedRule != nil {
 					_f.appliedRule(opt.FoldNullUnary, nil, _expr)
 				}
@@ -16398,7 +16398,7 @@ func (_f *Factory) ConstructUnarySqrt(
 		_null, _ := input.(*memo.NullExpr)
 		if _null != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullUnary) {
-				_expr := _f.funcs.FoldNullUnary(opt.UnarySqrtOp, input).(opt.ScalarExpr)
+				_expr := _f.funcs.FoldNullUnary(opt.UnarySqrtOp, _null).(opt.ScalarExpr)
 				if _f.appliedRule != nil {
 					_f.appliedRule(opt.FoldNullUnary, nil, _expr)
 				}
@@ -16436,7 +16436,7 @@ func (_f *Factory) ConstructUnaryCbrt(
 		_null, _ := input.(*memo.NullExpr)
 		if _null != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullUnary) {
-				_expr := _f.funcs.FoldNullUnary(opt.UnaryCbrtOp, input).(opt.ScalarExpr)
+				_expr := _f.funcs.FoldNullUnary(opt.UnaryCbrtOp, _null).(opt.ScalarExpr)
 				if _f.appliedRule != nil {
 					_f.appliedRule(opt.FoldNullUnary, nil, _expr)
 				}
@@ -16765,7 +16765,7 @@ func (_f *Factory) ConstructCollate(
 		_const, _ := input.(*memo.ConstExpr)
 		if _const != nil {
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldCollate) {
-				_expr := _f.funcs.CastToCollatedString(input, locale).(opt.ScalarExpr)
+				_expr := _f.funcs.CastToCollatedString(_const, locale).(opt.ScalarExpr)
 				if _f.appliedRule != nil {
 					_f.appliedRule(opt.FoldCollate, nil, _expr)
 				}
