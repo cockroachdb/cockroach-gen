@@ -537,22 +537,6 @@ func (_f *Factory) ConstructSelect(
 		}
 	}
 
-	// [DetectSelectContradiction]
-	{
-		for i := range filters {
-			item := &filters[i]
-			if _f.funcs.IsContradiction(item) {
-				if _f.matchedRule == nil || _f.matchedRule(opt.DetectSelectContradiction) {
-					_expr := _f.funcs.ConstructEmptyValues(_f.funcs.OutputCols(input)).(memo.RelExpr)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.DetectSelectContradiction, nil, _expr)
-					}
-					return _expr
-				}
-			}
-		}
-	}
-
 	// [EliminateSelect]
 	{
 		if len(filters) == 0 {
@@ -2288,22 +2272,24 @@ func (_f *Factory) ConstructInnerJoin(
 		for i := range on {
 			item := &on[i]
 			if _f.funcs.IsContradiction(item) {
-				private := joinPrivate
-				if _f.matchedRule == nil || _f.matchedRule(opt.DetectJoinContradiction) {
-					_expr := _f.ConstructInnerJoin(
-						left,
-						right,
-						memo.FiltersExpr{
-							_f.ConstructFiltersItem(
-								_f.ConstructFalse(),
-							),
-						},
-						private,
-					)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.DetectJoinContradiction, nil, _expr)
+				if !_f.funcs.IsFilterFalse(on) {
+					private := joinPrivate
+					if _f.matchedRule == nil || _f.matchedRule(opt.DetectJoinContradiction) {
+						_expr := _f.ConstructInnerJoin(
+							left,
+							right,
+							memo.FiltersExpr{
+								_f.ConstructFiltersItem(
+									_f.ConstructFalse(),
+								),
+							},
+							private,
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.DetectJoinContradiction, nil, _expr)
+						}
+						return _expr
 					}
-					return _expr
 				}
 			}
 		}
@@ -3259,22 +3245,24 @@ func (_f *Factory) ConstructLeftJoin(
 		for i := range on {
 			item := &on[i]
 			if _f.funcs.IsContradiction(item) {
-				private := joinPrivate
-				if _f.matchedRule == nil || _f.matchedRule(opt.DetectJoinContradiction) {
-					_expr := _f.ConstructLeftJoin(
-						left,
-						right,
-						memo.FiltersExpr{
-							_f.ConstructFiltersItem(
-								_f.ConstructFalse(),
-							),
-						},
-						private,
-					)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.DetectJoinContradiction, nil, _expr)
+				if !_f.funcs.IsFilterFalse(on) {
+					private := joinPrivate
+					if _f.matchedRule == nil || _f.matchedRule(opt.DetectJoinContradiction) {
+						_expr := _f.ConstructLeftJoin(
+							left,
+							right,
+							memo.FiltersExpr{
+								_f.ConstructFiltersItem(
+									_f.ConstructFalse(),
+								),
+							},
+							private,
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.DetectJoinContradiction, nil, _expr)
+						}
+						return _expr
 					}
-					return _expr
 				}
 			}
 		}
@@ -3785,22 +3773,24 @@ func (_f *Factory) ConstructRightJoin(
 		for i := range on {
 			item := &on[i]
 			if _f.funcs.IsContradiction(item) {
-				private := joinPrivate
-				if _f.matchedRule == nil || _f.matchedRule(opt.DetectJoinContradiction) {
-					_expr := _f.ConstructRightJoin(
-						left,
-						right,
-						memo.FiltersExpr{
-							_f.ConstructFiltersItem(
-								_f.ConstructFalse(),
-							),
-						},
-						private,
-					)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.DetectJoinContradiction, nil, _expr)
+				if !_f.funcs.IsFilterFalse(on) {
+					private := joinPrivate
+					if _f.matchedRule == nil || _f.matchedRule(opt.DetectJoinContradiction) {
+						_expr := _f.ConstructRightJoin(
+							left,
+							right,
+							memo.FiltersExpr{
+								_f.ConstructFiltersItem(
+									_f.ConstructFalse(),
+								),
+							},
+							private,
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.DetectJoinContradiction, nil, _expr)
+						}
+						return _expr
 					}
-					return _expr
 				}
 			}
 		}
@@ -4054,22 +4044,24 @@ func (_f *Factory) ConstructFullJoin(
 		for i := range on {
 			item := &on[i]
 			if _f.funcs.IsContradiction(item) {
-				private := joinPrivate
-				if _f.matchedRule == nil || _f.matchedRule(opt.DetectJoinContradiction) {
-					_expr := _f.ConstructFullJoin(
-						left,
-						right,
-						memo.FiltersExpr{
-							_f.ConstructFiltersItem(
-								_f.ConstructFalse(),
-							),
-						},
-						private,
-					)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.DetectJoinContradiction, nil, _expr)
+				if !_f.funcs.IsFilterFalse(on) {
+					private := joinPrivate
+					if _f.matchedRule == nil || _f.matchedRule(opt.DetectJoinContradiction) {
+						_expr := _f.ConstructFullJoin(
+							left,
+							right,
+							memo.FiltersExpr{
+								_f.ConstructFiltersItem(
+									_f.ConstructFalse(),
+								),
+							},
+							private,
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.DetectJoinContradiction, nil, _expr)
+						}
+						return _expr
 					}
-					return _expr
 				}
 			}
 		}
@@ -4477,22 +4469,24 @@ func (_f *Factory) ConstructSemiJoin(
 		for i := range on {
 			item := &on[i]
 			if _f.funcs.IsContradiction(item) {
-				private := joinPrivate
-				if _f.matchedRule == nil || _f.matchedRule(opt.DetectJoinContradiction) {
-					_expr := _f.ConstructSemiJoin(
-						left,
-						right,
-						memo.FiltersExpr{
-							_f.ConstructFiltersItem(
-								_f.ConstructFalse(),
-							),
-						},
-						private,
-					)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.DetectJoinContradiction, nil, _expr)
+				if !_f.funcs.IsFilterFalse(on) {
+					private := joinPrivate
+					if _f.matchedRule == nil || _f.matchedRule(opt.DetectJoinContradiction) {
+						_expr := _f.ConstructSemiJoin(
+							left,
+							right,
+							memo.FiltersExpr{
+								_f.ConstructFiltersItem(
+									_f.ConstructFalse(),
+								),
+							},
+							private,
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.DetectJoinContradiction, nil, _expr)
+						}
+						return _expr
 					}
-					return _expr
 				}
 			}
 		}
@@ -5116,22 +5110,24 @@ func (_f *Factory) ConstructAntiJoin(
 		for i := range on {
 			item := &on[i]
 			if _f.funcs.IsContradiction(item) {
-				private := joinPrivate
-				if _f.matchedRule == nil || _f.matchedRule(opt.DetectJoinContradiction) {
-					_expr := _f.ConstructAntiJoin(
-						left,
-						right,
-						memo.FiltersExpr{
-							_f.ConstructFiltersItem(
-								_f.ConstructFalse(),
-							),
-						},
-						private,
-					)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.DetectJoinContradiction, nil, _expr)
+				if !_f.funcs.IsFilterFalse(on) {
+					private := joinPrivate
+					if _f.matchedRule == nil || _f.matchedRule(opt.DetectJoinContradiction) {
+						_expr := _f.ConstructAntiJoin(
+							left,
+							right,
+							memo.FiltersExpr{
+								_f.ConstructFiltersItem(
+									_f.ConstructFalse(),
+								),
+							},
+							private,
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.DetectJoinContradiction, nil, _expr)
+						}
+						return _expr
 					}
-					return _expr
 				}
 			}
 		}
@@ -5973,22 +5969,24 @@ func (_f *Factory) ConstructInnerJoinApply(
 		for i := range on {
 			item := &on[i]
 			if _f.funcs.IsContradiction(item) {
-				private := joinPrivate
-				if _f.matchedRule == nil || _f.matchedRule(opt.DetectJoinContradiction) {
-					_expr := _f.ConstructInnerJoinApply(
-						left,
-						right,
-						memo.FiltersExpr{
-							_f.ConstructFiltersItem(
-								_f.ConstructFalse(),
-							),
-						},
-						private,
-					)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.DetectJoinContradiction, nil, _expr)
+				if !_f.funcs.IsFilterFalse(on) {
+					private := joinPrivate
+					if _f.matchedRule == nil || _f.matchedRule(opt.DetectJoinContradiction) {
+						_expr := _f.ConstructInnerJoinApply(
+							left,
+							right,
+							memo.FiltersExpr{
+								_f.ConstructFiltersItem(
+									_f.ConstructFalse(),
+								),
+							},
+							private,
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.DetectJoinContradiction, nil, _expr)
+						}
+						return _expr
 					}
-					return _expr
 				}
 			}
 		}
@@ -6747,22 +6745,24 @@ func (_f *Factory) ConstructLeftJoinApply(
 		for i := range on {
 			item := &on[i]
 			if _f.funcs.IsContradiction(item) {
-				private := joinPrivate
-				if _f.matchedRule == nil || _f.matchedRule(opt.DetectJoinContradiction) {
-					_expr := _f.ConstructLeftJoinApply(
-						left,
-						right,
-						memo.FiltersExpr{
-							_f.ConstructFiltersItem(
-								_f.ConstructFalse(),
-							),
-						},
-						private,
-					)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.DetectJoinContradiction, nil, _expr)
+				if !_f.funcs.IsFilterFalse(on) {
+					private := joinPrivate
+					if _f.matchedRule == nil || _f.matchedRule(opt.DetectJoinContradiction) {
+						_expr := _f.ConstructLeftJoinApply(
+							left,
+							right,
+							memo.FiltersExpr{
+								_f.ConstructFiltersItem(
+									_f.ConstructFalse(),
+								),
+							},
+							private,
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.DetectJoinContradiction, nil, _expr)
+						}
+						return _expr
 					}
-					return _expr
 				}
 			}
 		}
@@ -7280,22 +7280,24 @@ func (_f *Factory) ConstructSemiJoinApply(
 		for i := range on {
 			item := &on[i]
 			if _f.funcs.IsContradiction(item) {
-				private := joinPrivate
-				if _f.matchedRule == nil || _f.matchedRule(opt.DetectJoinContradiction) {
-					_expr := _f.ConstructSemiJoinApply(
-						left,
-						right,
-						memo.FiltersExpr{
-							_f.ConstructFiltersItem(
-								_f.ConstructFalse(),
-							),
-						},
-						private,
-					)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.DetectJoinContradiction, nil, _expr)
+				if !_f.funcs.IsFilterFalse(on) {
+					private := joinPrivate
+					if _f.matchedRule == nil || _f.matchedRule(opt.DetectJoinContradiction) {
+						_expr := _f.ConstructSemiJoinApply(
+							left,
+							right,
+							memo.FiltersExpr{
+								_f.ConstructFiltersItem(
+									_f.ConstructFalse(),
+								),
+							},
+							private,
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.DetectJoinContradiction, nil, _expr)
+						}
+						return _expr
 					}
-					return _expr
 				}
 			}
 		}
@@ -7827,22 +7829,24 @@ func (_f *Factory) ConstructAntiJoinApply(
 		for i := range on {
 			item := &on[i]
 			if _f.funcs.IsContradiction(item) {
-				private := joinPrivate
-				if _f.matchedRule == nil || _f.matchedRule(opt.DetectJoinContradiction) {
-					_expr := _f.ConstructAntiJoinApply(
-						left,
-						right,
-						memo.FiltersExpr{
-							_f.ConstructFiltersItem(
-								_f.ConstructFalse(),
-							),
-						},
-						private,
-					)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.DetectJoinContradiction, nil, _expr)
+				if !_f.funcs.IsFilterFalse(on) {
+					private := joinPrivate
+					if _f.matchedRule == nil || _f.matchedRule(opt.DetectJoinContradiction) {
+						_expr := _f.ConstructAntiJoinApply(
+							left,
+							right,
+							memo.FiltersExpr{
+								_f.ConstructFiltersItem(
+									_f.ConstructFalse(),
+								),
+							},
+							private,
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.DetectJoinContradiction, nil, _expr)
+						}
+						return _expr
 					}
-					return _expr
 				}
 			}
 		}

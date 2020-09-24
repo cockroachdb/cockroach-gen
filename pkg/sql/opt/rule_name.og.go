@@ -232,7 +232,6 @@ const (
 	SimplifySameVarInequalities
 	SimplifySelectFilters
 	ConsolidateSelectFilters
-	DetectSelectContradiction
 	EliminateSelect
 	MergeSelects
 	PushSelectIntoProject
