@@ -1561,7 +1561,7 @@ RESUME SCHEDULES <jobid>
 DROP SCHEDULES <selectclause>
  selectclause: select statement returning schedule IDs to resume.
 
-DROP SCHEDULE <jobid>
+DROP SCHEDULE <scheduleid>
 
 `,
 		//line sql.y: 7073
