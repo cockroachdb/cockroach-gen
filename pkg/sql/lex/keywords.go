@@ -190,6 +190,7 @@ var KeywordsCategories = map[string]string{
 	"incremental":                  "U",
 	"index":                        "R",
 	"indexes":                      "U",
+	"inherits":                     "U",
 	"initially":                    "R",
 	"inject":                       "U",
 	"inner":                        "T",
@@ -419,6 +420,7 @@ var KeywordsCategories = map[string]string{
 	"system":                       "U",
 	"table":                        "R",
 	"tables":                       "U",
+	"tablespace":                   "U",
 	"temp":                         "U",
 	"template":                     "U",
 	"temporary":                    "U",
@@ -672,6 +674,7 @@ var KeywordNames = []string{
 	"incremental",
 	"index",
 	"indexes",
+	"inherits",
 	"initially",
 	"inject",
 	"inner",
@@ -901,6 +904,7 @@ var KeywordNames = []string{
 	"system",
 	"table",
 	"tables",
+	"tablespace",
 	"temp",
 	"template",
 	"temporary",
@@ -1346,6 +1350,8 @@ func GetKeywordID(k string) int32 {
 		return INDEX
 	case "indexes":
 		return INDEXES
+	case "inherits":
+		return INHERITS
 	case "initially":
 		return INITIALLY
 	case "inject":
@@ -1804,6 +1810,8 @@ func GetKeywordID(k string) int32 {
 		return TABLE
 	case "tables":
 		return TABLES
+	case "tablespace":
+		return TABLESPACE
 	case "temp":
 		return TEMP
 	case "template":
