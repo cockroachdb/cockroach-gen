@@ -1813,6 +1813,43 @@ func IsBoolOp(e Expr) bool {
 	return false
 }
 
+var CompositeInsensitiveOperators = [...]Operator{
+	ContainsOp,
+	DivOp,
+	EqOp,
+	FloorDivOp,
+	GeOp,
+	GtOp,
+	InOp,
+	IsOp,
+	IsNotOp,
+	LeOp,
+	LtOp,
+	MinusOp,
+	ModOp,
+	MultOp,
+	NeOp,
+	NotInOp,
+	PlusOp,
+	PowOp,
+	UnaryCbrtOp,
+	UnaryMinusOp,
+	UnarySqrtOp,
+	VariableOp,
+}
+
+func IsCompositeInsensitiveOp(e Expr) bool {
+	switch e.Op() {
+	case ContainsOp, DivOp, EqOp, FloorDivOp,
+		GeOp, GtOp, InOp, IsOp, IsNotOp,
+		LeOp, LtOp, MinusOp, ModOp, MultOp,
+		NeOp, NotInOp, PlusOp, PowOp, UnaryCbrtOp,
+		UnaryMinusOp, UnarySqrtOp, VariableOp:
+		return true
+	}
+	return false
+}
+
 var ConstValueOperators = [...]Operator{
 	ConstOp,
 	FalseOp,
