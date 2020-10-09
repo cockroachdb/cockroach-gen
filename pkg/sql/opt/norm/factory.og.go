@@ -11289,35 +11289,6 @@ func (_f *Factory) ConstructEq(
 		}
 	}
 
-	// [NormalizeJSONFieldAccess]
-	{
-		_fetchVal, _ := left.(*memo.FetchValExpr)
-		if _fetchVal != nil {
-			val := _fetchVal.Json
-			key := _fetchVal.Index
-			_const, _ := key.(*memo.ConstExpr)
-			if _const != nil {
-				if _f.funcs.IsString(_const) {
-					_const2, _ := right.(*memo.ConstExpr)
-					if _const2 != nil {
-						if _f.funcs.IsJSONScalar(_const2) {
-							if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeJSONFieldAccess) {
-								_expr := _f.ConstructContains(
-									val,
-									_f.funcs.MakeSingleKeyJSONObject(_const, _const2),
-								)
-								if _f.appliedRule != nil {
-									_f.appliedRule(opt.NormalizeJSONFieldAccess, nil, _expr)
-								}
-								return _expr
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
 	// [SimplifySameVarEqualities]
 	{
 		_variable, _ := left.(*memo.VariableExpr)
@@ -14407,35 +14378,6 @@ func (_f *Factory) ConstructContains(
 							_f.appliedRule(opt.UnifyComparisonTypes, nil, _expr)
 						}
 						return _expr
-					}
-				}
-			}
-		}
-	}
-
-	// [NormalizeJSONContains]
-	{
-		_fetchVal, _ := left.(*memo.FetchValExpr)
-		if _fetchVal != nil {
-			val := _fetchVal.Json
-			key := _fetchVal.Index
-			_const, _ := key.(*memo.ConstExpr)
-			if _const != nil {
-				if _f.funcs.IsString(_const) {
-					_const2, _ := right.(*memo.ConstExpr)
-					if _const2 != nil {
-						if !_f.funcs.IsJSONScalar(_const2) {
-							if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeJSONContains) {
-								_expr := _f.ConstructContains(
-									val,
-									_f.funcs.MakeSingleKeyJSONObject(_const, _const2),
-								)
-								if _f.appliedRule != nil {
-									_f.appliedRule(opt.NormalizeJSONContains, nil, _expr)
-								}
-								return _expr
-							}
-						}
 					}
 				}
 			}
