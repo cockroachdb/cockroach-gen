@@ -2901,6 +2901,10 @@ type LookupJoinPrivate struct {
 	// table (and thus each left row matches with at most one table row).
 	LookupColsAreTableKey bool
 
+	// IsSecondJoinInPairedJoiner is true if this is the second join of a
+	// paired-joiner used for left joins.
+	IsSecondJoinInPairedJoiner bool
+
 	// ConstFilters contains the constant filters that are represented as equality
 	// conditions on the KeyCols. These filters are needed by the statistics code to
 	// correctly estimate selectivity.
@@ -3063,6 +3067,14 @@ type InvertedJoinPrivate struct {
 	// InvertedCol is the inverted column in the index that is referenced by
 	// InvertedExpr.
 	InvertedCol opt.ColumnID
+
+	// IsFirstJoinInPairedJoiner is true if this is the first join of a
+	// paired-joiner used for left joins.
+	IsFirstJoinInPairedJoiner bool
+
+	// ContinuationCol is the column ID of the continuation column when
+	// IsFirstJoinInPairedJoiner is true.
+	ContinuationCol opt.ColumnID
 
 	// Cols is the set of columns produced by the inverted join. This set can
 	// contain columns from the input and columns from the index. Any columns
@@ -23003,6 +23015,7 @@ func (in *interner) InternLookupJoin(val *LookupJoinExpr) *LookupJoinExpr {
 	in.hasher.HashColList(val.KeyCols)
 	in.hasher.HashColSet(val.Cols)
 	in.hasher.HashBool(val.LookupColsAreTableKey)
+	in.hasher.HashBool(val.IsSecondJoinInPairedJoiner)
 	in.hasher.HashFiltersExpr(val.ConstFilters)
 	in.hasher.HashJoinFlags(val.Flags)
 	in.hasher.HashBool(val.WasReordered)
@@ -23018,6 +23031,7 @@ func (in *interner) InternLookupJoin(val *LookupJoinExpr) *LookupJoinExpr {
 				in.hasher.IsColListEqual(val.KeyCols, existing.KeyCols) &&
 				in.hasher.IsColSetEqual(val.Cols, existing.Cols) &&
 				in.hasher.IsBoolEqual(val.LookupColsAreTableKey, existing.LookupColsAreTableKey) &&
+				in.hasher.IsBoolEqual(val.IsSecondJoinInPairedJoiner, existing.IsSecondJoinInPairedJoiner) &&
 				in.hasher.IsFiltersExprEqual(val.ConstFilters, existing.ConstFilters) &&
 				in.hasher.IsJoinFlagsEqual(val.Flags, existing.Flags) &&
 				in.hasher.IsBoolEqual(val.WasReordered, existing.WasReordered) {
@@ -23040,6 +23054,8 @@ func (in *interner) InternInvertedJoin(val *InvertedJoinExpr) *InvertedJoinExpr 
 	in.hasher.HashTableID(val.Table)
 	in.hasher.HashIndexOrdinal(val.Index)
 	in.hasher.HashColumnID(val.InvertedCol)
+	in.hasher.HashBool(val.IsFirstJoinInPairedJoiner)
+	in.hasher.HashColumnID(val.ContinuationCol)
 	in.hasher.HashColSet(val.Cols)
 	in.hasher.HashJoinFlags(val.Flags)
 	in.hasher.HashBool(val.WasReordered)
@@ -23054,6 +23070,8 @@ func (in *interner) InternInvertedJoin(val *InvertedJoinExpr) *InvertedJoinExpr 
 				in.hasher.IsTableIDEqual(val.Table, existing.Table) &&
 				in.hasher.IsIndexOrdinalEqual(val.Index, existing.Index) &&
 				in.hasher.IsColumnIDEqual(val.InvertedCol, existing.InvertedCol) &&
+				in.hasher.IsBoolEqual(val.IsFirstJoinInPairedJoiner, existing.IsFirstJoinInPairedJoiner) &&
+				in.hasher.IsColumnIDEqual(val.ContinuationCol, existing.ContinuationCol) &&
 				in.hasher.IsColSetEqual(val.Cols, existing.Cols) &&
 				in.hasher.IsJoinFlagsEqual(val.Flags, existing.Flags) &&
 				in.hasher.IsBoolEqual(val.WasReordered, existing.WasReordered) {

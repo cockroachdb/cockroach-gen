@@ -289,6 +289,7 @@ type Factory interface {
 		eqColsAreKey bool,
 		lookupCols TableColumnOrdinalSet,
 		onCond tree.TypedExpr,
+		isSecondJoinInPairedJoiner bool,
 		reqOrdering OutputOrdering,
 		locking *tree.LockingItem,
 	) (Node, error)
@@ -312,6 +313,7 @@ type Factory interface {
 		index cat.Index,
 		lookupCols TableColumnOrdinalSet,
 		onCond tree.TypedExpr,
+		isFirstJoinInPairedJoiner bool,
 		reqOrdering OutputOrdering,
 	) (Node, error)
 
@@ -963,6 +965,7 @@ func (StubFactory) ConstructLookupJoin(
 	eqColsAreKey bool,
 	lookupCols TableColumnOrdinalSet,
 	onCond tree.TypedExpr,
+	isSecondJoinInPairedJoiner bool,
 	reqOrdering OutputOrdering,
 	locking *tree.LockingItem,
 ) (Node, error) {
@@ -977,6 +980,7 @@ func (StubFactory) ConstructInvertedJoin(
 	index cat.Index,
 	lookupCols TableColumnOrdinalSet,
 	onCond tree.TypedExpr,
+	isFirstJoinInPairedJoiner bool,
 	reqOrdering OutputOrdering,
 ) (Node, error) {
 	return struct{}{}, nil

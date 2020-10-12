@@ -569,21 +569,23 @@ func (f *Factory) ConstructLookupJoin(
 	eqColsAreKey bool,
 	lookupCols exec.TableColumnOrdinalSet,
 	onCond tree.TypedExpr,
+	isSecondJoinInPairedJoiner bool,
 	reqOrdering exec.OutputOrdering,
 	locking *tree.LockingItem,
 ) (exec.Node, error) {
 	inputNode := input.(*Node)
 	args := &lookupJoinArgs{
-		JoinType:     joinType,
-		Input:        inputNode,
-		Table:        table,
-		Index:        index,
-		EqCols:       eqCols,
-		EqColsAreKey: eqColsAreKey,
-		LookupCols:   lookupCols,
-		OnCond:       onCond,
-		ReqOrdering:  reqOrdering,
-		Locking:      locking,
+		JoinType:                   joinType,
+		Input:                      inputNode,
+		Table:                      table,
+		Index:                      index,
+		EqCols:                     eqCols,
+		EqColsAreKey:               eqColsAreKey,
+		LookupCols:                 lookupCols,
+		OnCond:                     onCond,
+		IsSecondJoinInPairedJoiner: isSecondJoinInPairedJoiner,
+		ReqOrdering:                reqOrdering,
+		Locking:                    locking,
 	}
 	_n, err := f.newNode(lookupJoinOp, args, reqOrdering, inputNode)
 	if err != nil {
@@ -599,6 +601,7 @@ func (f *Factory) ConstructLookupJoin(
 		eqColsAreKey,
 		lookupCols,
 		onCond,
+		isSecondJoinInPairedJoiner,
 		reqOrdering,
 		locking,
 	)
@@ -617,18 +620,20 @@ func (f *Factory) ConstructInvertedJoin(
 	index cat.Index,
 	lookupCols exec.TableColumnOrdinalSet,
 	onCond tree.TypedExpr,
+	isFirstJoinInPairedJoiner bool,
 	reqOrdering exec.OutputOrdering,
 ) (exec.Node, error) {
 	inputNode := input.(*Node)
 	args := &invertedJoinArgs{
-		JoinType:     joinType,
-		InvertedExpr: invertedExpr,
-		Input:        inputNode,
-		Table:        table,
-		Index:        index,
-		LookupCols:   lookupCols,
-		OnCond:       onCond,
-		ReqOrdering:  reqOrdering,
+		JoinType:                  joinType,
+		InvertedExpr:              invertedExpr,
+		Input:                     inputNode,
+		Table:                     table,
+		Index:                     index,
+		LookupCols:                lookupCols,
+		OnCond:                    onCond,
+		IsFirstJoinInPairedJoiner: isFirstJoinInPairedJoiner,
+		ReqOrdering:               reqOrdering,
 	}
 	_n, err := f.newNode(invertedJoinOp, args, reqOrdering, inputNode)
 	if err != nil {
@@ -643,6 +648,7 @@ func (f *Factory) ConstructInvertedJoin(
 		index,
 		lookupCols,
 		onCond,
+		isFirstJoinInPairedJoiner,
 		reqOrdering,
 	)
 	if err != nil {
@@ -1874,27 +1880,29 @@ type indexJoinArgs struct {
 }
 
 type lookupJoinArgs struct {
-	JoinType     descpb.JoinType
-	Input        *Node
-	Table        cat.Table
-	Index        cat.Index
-	EqCols       []exec.NodeColumnOrdinal
-	EqColsAreKey bool
-	LookupCols   exec.TableColumnOrdinalSet
-	OnCond       tree.TypedExpr
-	ReqOrdering  exec.OutputOrdering
-	Locking      *tree.LockingItem
+	JoinType                   descpb.JoinType
+	Input                      *Node
+	Table                      cat.Table
+	Index                      cat.Index
+	EqCols                     []exec.NodeColumnOrdinal
+	EqColsAreKey               bool
+	LookupCols                 exec.TableColumnOrdinalSet
+	OnCond                     tree.TypedExpr
+	IsSecondJoinInPairedJoiner bool
+	ReqOrdering                exec.OutputOrdering
+	Locking                    *tree.LockingItem
 }
 
 type invertedJoinArgs struct {
-	JoinType     descpb.JoinType
-	InvertedExpr tree.TypedExpr
-	Input        *Node
-	Table        cat.Table
-	Index        cat.Index
-	LookupCols   exec.TableColumnOrdinalSet
-	OnCond       tree.TypedExpr
-	ReqOrdering  exec.OutputOrdering
+	JoinType                  descpb.JoinType
+	InvertedExpr              tree.TypedExpr
+	Input                     *Node
+	Table                     cat.Table
+	Index                     cat.Index
+	LookupCols                exec.TableColumnOrdinalSet
+	OnCond                    tree.TypedExpr
+	IsFirstJoinInPairedJoiner bool
+	ReqOrdering               exec.OutputOrdering
 }
 
 type zigzagJoinArgs struct {

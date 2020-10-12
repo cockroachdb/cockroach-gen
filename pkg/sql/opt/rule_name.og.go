@@ -264,7 +264,6 @@ const (
 	CommuteLeftJoin
 	CommuteSemiJoin
 	ConvertSemiToInnerJoin
-	ConvertLeftToInnerJoin
 	ConvertAntiToLeftJoin
 	GenerateMergeJoins
 	GenerateLookupJoins
