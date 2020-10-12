@@ -20234,8 +20234,41 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 			&t.ExportPrivate,
 		)
 
+	case *memo.FKChecksExpr:
+		newVal := f.copyAndReplaceDefaultFKChecksExpr(*t, replace)
+		return &newVal
+
+	case *memo.ProjectionsExpr:
+		newVal := f.copyAndReplaceDefaultProjectionsExpr(*t, replace)
+		return &newVal
+
+	case *memo.AggregationsExpr:
+		newVal := f.copyAndReplaceDefaultAggregationsExpr(*t, replace)
+		return &newVal
+
+	case *memo.FiltersExpr:
+		newVal := f.copyAndReplaceDefaultFiltersExpr(*t, replace)
+		return &newVal
+
+	case *memo.ZipExpr:
+		newVal := f.copyAndReplaceDefaultZipExpr(*t, replace)
+		return &newVal
+
+	case *memo.WindowsExpr:
+		newVal := f.copyAndReplaceDefaultWindowsExpr(*t, replace)
+		return &newVal
+
+	case *memo.KVOptionsExpr:
+		newVal := f.copyAndReplaceDefaultKVOptionsExpr(*t, replace)
+		return &newVal
+
+	case *memo.ScalarListExpr:
+		newVal := f.copyAndReplaceDefaultScalarListExpr(*t, replace)
+		return &newVal
+
+	default:
+		panic(errors.AssertionFailedf("unhandled op %s", errors.Safe(src.Op())))
 	}
-	panic(errors.AssertionFailedf("unhandled op %s", errors.Safe(src.Op())))
 }
 
 func (f *Factory) copyAndReplaceDefaultFKChecksExpr(src memo.FKChecksExpr, replace ReplaceFunc) (dst memo.FKChecksExpr) {
