@@ -419,6 +419,7 @@ func (a *minBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Bytes(), vec.Nulls()
+	oldCurAggSize := len(a.curAgg)
 	a.allocator.PerformOperation(
 		[]coldata.Vec{a.vec},
 		func() {
@@ -597,6 +598,7 @@ func (a *minBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 			}
 		},
 	)
+	a.allocator.AdjustMemoryUsage(int64(len(a.curAgg) - oldCurAggSize))
 }
 
 func (a *minBytesAgg) HandleEmptyInputScalar() {
@@ -3020,6 +3022,7 @@ func (a *maxBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Bytes(), vec.Nulls()
+	oldCurAggSize := len(a.curAgg)
 	a.allocator.PerformOperation(
 		[]coldata.Vec{a.vec},
 		func() {
@@ -3198,6 +3201,7 @@ func (a *maxBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 			}
 		},
 	)
+	a.allocator.AdjustMemoryUsage(int64(len(a.curAgg) - oldCurAggSize))
 }
 
 func (a *maxBytesAgg) HandleEmptyInputScalar() {

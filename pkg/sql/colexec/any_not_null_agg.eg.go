@@ -109,7 +109,12 @@ func (a *anyNotNullBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		if !a.foundNonNullForCurrentGroup {
 			a.nulls.SetNull(a.curIdx)
 		} else {
-			a.col[a.curIdx] = a.curAgg
+			a.allocator.PerformOperation(
+				[]coldata.Vec{a.vec},
+				func() {
+					a.col[a.curIdx] = a.curAgg
+				},
+			)
 		}
 		a.curIdx++
 		a.done = true
@@ -117,7 +122,6 @@ func (a *anyNotNullBoolAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Bool(), vec.Nulls()
-
 	a.allocator.PerformOperation(
 		[]coldata.Vec{a.vec},
 		func() {
@@ -305,7 +309,12 @@ func (a *anyNotNullBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		if !a.foundNonNullForCurrentGroup {
 			a.nulls.SetNull(a.curIdx)
 		} else {
-			a.col.Set(a.curIdx, a.curAgg)
+			a.allocator.PerformOperation(
+				[]coldata.Vec{a.vec},
+				func() {
+					a.col.Set(a.curIdx, a.curAgg)
+				},
+			)
 		}
 		a.curIdx++
 		a.done = true
@@ -313,7 +322,7 @@ func (a *anyNotNullBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Bytes(), vec.Nulls()
-
+	oldCurAggSize := len(a.curAgg)
 	a.allocator.PerformOperation(
 		[]coldata.Vec{a.vec},
 		func() {
@@ -444,6 +453,7 @@ func (a *anyNotNullBytesAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 			}
 		},
 	)
+	a.allocator.AdjustMemoryUsage(int64(len(a.curAgg) - oldCurAggSize))
 }
 
 func (a *anyNotNullBytesAgg) HandleEmptyInputScalar() {
@@ -505,7 +515,12 @@ func (a *anyNotNullDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		if !a.foundNonNullForCurrentGroup {
 			a.nulls.SetNull(a.curIdx)
 		} else {
-			a.col[a.curIdx].Set(&a.curAgg)
+			a.allocator.PerformOperation(
+				[]coldata.Vec{a.vec},
+				func() {
+					a.col[a.curIdx].Set(&a.curAgg)
+				},
+			)
 		}
 		a.curIdx++
 		a.done = true
@@ -513,7 +528,6 @@ func (a *anyNotNullDecimalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Decimal(), vec.Nulls()
-
 	a.allocator.PerformOperation(
 		[]coldata.Vec{a.vec},
 		func() {
@@ -701,7 +715,12 @@ func (a *anyNotNullInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		if !a.foundNonNullForCurrentGroup {
 			a.nulls.SetNull(a.curIdx)
 		} else {
-			a.col[a.curIdx] = a.curAgg
+			a.allocator.PerformOperation(
+				[]coldata.Vec{a.vec},
+				func() {
+					a.col[a.curIdx] = a.curAgg
+				},
+			)
 		}
 		a.curIdx++
 		a.done = true
@@ -709,7 +728,6 @@ func (a *anyNotNullInt16Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Int16(), vec.Nulls()
-
 	a.allocator.PerformOperation(
 		[]coldata.Vec{a.vec},
 		func() {
@@ -897,7 +915,12 @@ func (a *anyNotNullInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		if !a.foundNonNullForCurrentGroup {
 			a.nulls.SetNull(a.curIdx)
 		} else {
-			a.col[a.curIdx] = a.curAgg
+			a.allocator.PerformOperation(
+				[]coldata.Vec{a.vec},
+				func() {
+					a.col[a.curIdx] = a.curAgg
+				},
+			)
 		}
 		a.curIdx++
 		a.done = true
@@ -905,7 +928,6 @@ func (a *anyNotNullInt32Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Int32(), vec.Nulls()
-
 	a.allocator.PerformOperation(
 		[]coldata.Vec{a.vec},
 		func() {
@@ -1093,7 +1115,12 @@ func (a *anyNotNullInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		if !a.foundNonNullForCurrentGroup {
 			a.nulls.SetNull(a.curIdx)
 		} else {
-			a.col[a.curIdx] = a.curAgg
+			a.allocator.PerformOperation(
+				[]coldata.Vec{a.vec},
+				func() {
+					a.col[a.curIdx] = a.curAgg
+				},
+			)
 		}
 		a.curIdx++
 		a.done = true
@@ -1101,7 +1128,6 @@ func (a *anyNotNullInt64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Int64(), vec.Nulls()
-
 	a.allocator.PerformOperation(
 		[]coldata.Vec{a.vec},
 		func() {
@@ -1289,7 +1315,12 @@ func (a *anyNotNullFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		if !a.foundNonNullForCurrentGroup {
 			a.nulls.SetNull(a.curIdx)
 		} else {
-			a.col[a.curIdx] = a.curAgg
+			a.allocator.PerformOperation(
+				[]coldata.Vec{a.vec},
+				func() {
+					a.col[a.curIdx] = a.curAgg
+				},
+			)
 		}
 		a.curIdx++
 		a.done = true
@@ -1297,7 +1328,6 @@ func (a *anyNotNullFloat64Agg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Float64(), vec.Nulls()
-
 	a.allocator.PerformOperation(
 		[]coldata.Vec{a.vec},
 		func() {
@@ -1485,7 +1515,12 @@ func (a *anyNotNullTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		if !a.foundNonNullForCurrentGroup {
 			a.nulls.SetNull(a.curIdx)
 		} else {
-			a.col[a.curIdx] = a.curAgg
+			a.allocator.PerformOperation(
+				[]coldata.Vec{a.vec},
+				func() {
+					a.col[a.curIdx] = a.curAgg
+				},
+			)
 		}
 		a.curIdx++
 		a.done = true
@@ -1493,7 +1528,6 @@ func (a *anyNotNullTimestampAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Timestamp(), vec.Nulls()
-
 	a.allocator.PerformOperation(
 		[]coldata.Vec{a.vec},
 		func() {
@@ -1681,7 +1715,12 @@ func (a *anyNotNullIntervalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 		if !a.foundNonNullForCurrentGroup {
 			a.nulls.SetNull(a.curIdx)
 		} else {
-			a.col[a.curIdx] = a.curAgg
+			a.allocator.PerformOperation(
+				[]coldata.Vec{a.vec},
+				func() {
+					a.col[a.curIdx] = a.curAgg
+				},
+			)
 		}
 		a.curIdx++
 		a.done = true
@@ -1689,7 +1728,6 @@ func (a *anyNotNullIntervalAgg) Compute(b coldata.Batch, inputIdxs []uint32) {
 	}
 	vec, sel := b.ColVec(int(inputIdxs[0])), b.Selection()
 	col, nulls := vec.Interval(), vec.Nulls()
-
 	a.allocator.PerformOperation(
 		[]coldata.Vec{a.vec},
 		func() {
