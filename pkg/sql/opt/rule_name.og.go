@@ -269,8 +269,6 @@ const (
 	GenerateLookupJoins
 	GenerateInvertedJoins
 	GenerateInvertedJoinsFromSelect
-	GenerateZigzagJoins
-	GenerateInvertedIndexZigzagJoins
 	GenerateLookupJoinsWithFilter
 	PushJoinIntoIndexJoin
 	GenerateLimitedScans
@@ -282,6 +280,8 @@ const (
 	GeneratePartialIndexScans
 	GenerateConstrainedScans
 	GenerateInvertedIndexScans
+	GenerateZigzagJoins
+	GenerateInvertedIndexZigzagJoins
 	SplitDisjunction
 	SplitDisjunctionAddKey
 
