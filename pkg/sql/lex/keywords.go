@@ -26,6 +26,7 @@ var KeywordsCategories = map[string]string{
 	"attribute":                    "U",
 	"authorization":                "T",
 	"automatic":                    "U",
+	"availability":                 "U",
 	"backup":                       "U",
 	"backups":                      "U",
 	"before":                       "U",
@@ -139,6 +140,7 @@ var KeywordsCategories = map[string]string{
 	"extension":                    "U",
 	"extract":                      "C",
 	"extract_duration":             "C",
+	"failure":                      "U",
 	"false":                        "R",
 	"family":                       "T",
 	"fetch":                        "R",
@@ -347,6 +349,8 @@ var KeywordsCategories = map[string]string{
 	"ref":                          "U",
 	"references":                   "R",
 	"refresh":                      "U",
+	"region":                       "U",
+	"regions":                      "U",
 	"reindex":                      "U",
 	"release":                      "U",
 	"rename":                       "U",
@@ -416,6 +420,7 @@ var KeywordsCategories = map[string]string{
 	"string":                       "C",
 	"subscription":                 "U",
 	"substring":                    "C",
+	"survive":                      "U",
 	"symmetric":                    "R",
 	"syntax":                       "U",
 	"system":                       "U",
@@ -511,6 +516,7 @@ var KeywordNames = []string{
 	"attribute",
 	"authorization",
 	"automatic",
+	"availability",
 	"backup",
 	"backups",
 	"before",
@@ -624,6 +630,7 @@ var KeywordNames = []string{
 	"extension",
 	"extract",
 	"extract_duration",
+	"failure",
 	"false",
 	"family",
 	"fetch",
@@ -832,6 +839,8 @@ var KeywordNames = []string{
 	"ref",
 	"references",
 	"refresh",
+	"region",
+	"regions",
 	"reindex",
 	"release",
 	"rename",
@@ -901,6 +910,7 @@ var KeywordNames = []string{
 	"string",
 	"subscription",
 	"substring",
+	"survive",
 	"symmetric",
 	"syntax",
 	"system",
@@ -1024,6 +1034,8 @@ func GetKeywordID(k string) int32 {
 		return AUTHORIZATION
 	case "automatic":
 		return AUTOMATIC
+	case "availability":
+		return AVAILABILITY
 	case "backup":
 		return BACKUP
 	case "backups":
@@ -1250,6 +1262,8 @@ func GetKeywordID(k string) int32 {
 		return EXTRACT
 	case "extract_duration":
 		return EXTRACT_DURATION
+	case "failure":
+		return FAILURE
 	case "false":
 		return FALSE
 	case "family":
@@ -1666,6 +1680,10 @@ func GetKeywordID(k string) int32 {
 		return REFERENCES
 	case "refresh":
 		return REFRESH
+	case "region":
+		return REGION
+	case "regions":
+		return REGIONS
 	case "reindex":
 		return REINDEX
 	case "release":
@@ -1804,6 +1822,8 @@ func GetKeywordID(k string) int32 {
 		return SUBSCRIPTION
 	case "substring":
 		return SUBSTRING
+	case "survive":
+		return SURVIVE
 	case "symmetric":
 		return SYMMETRIC
 	case "syntax":
