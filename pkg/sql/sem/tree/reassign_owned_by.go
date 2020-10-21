@@ -16,6 +16,8 @@ type ReassignOwnedBy struct {
 	NewRole  string
 }
 
+var _ Statement = &ReassignOwnedBy{}
+
 // Format implements the NodeFormatter interface.
 func (node *ReassignOwnedBy) Format(ctx *FmtCtx) {
 	ctx.WriteString("REASSIGN OWNED BY ")
