@@ -8,6 +8,7 @@ var KeywordsCategories = map[string]string{
 	"action":                       "U",
 	"add":                          "U",
 	"admin":                        "U",
+	"affinity":                     "U",
 	"after":                        "U",
 	"aggregate":                    "U",
 	"all":                          "R",
@@ -234,6 +235,7 @@ var KeywordsCategories = map[string]string{
 	"linestring":                   "U",
 	"list":                         "U",
 	"local":                        "U",
+	"locality":                     "U",
 	"localtime":                    "R",
 	"localtimestamp":               "R",
 	"locked":                       "U",
@@ -350,6 +352,7 @@ var KeywordsCategories = map[string]string{
 	"references":                   "R",
 	"refresh":                      "U",
 	"region":                       "U",
+	"regional":                     "U",
 	"regions":                      "U",
 	"reindex":                      "U",
 	"release":                      "U",
@@ -498,6 +501,7 @@ var KeywordNames = []string{
 	"action",
 	"add",
 	"admin",
+	"affinity",
 	"after",
 	"aggregate",
 	"all",
@@ -724,6 +728,7 @@ var KeywordNames = []string{
 	"linestring",
 	"list",
 	"local",
+	"locality",
 	"localtime",
 	"localtimestamp",
 	"locked",
@@ -840,6 +845,7 @@ var KeywordNames = []string{
 	"references",
 	"refresh",
 	"region",
+	"regional",
 	"regions",
 	"reindex",
 	"release",
@@ -998,6 +1004,8 @@ func GetKeywordID(k string) int32 {
 		return ADD
 	case "admin":
 		return ADMIN
+	case "affinity":
+		return AFFINITY
 	case "after":
 		return AFTER
 	case "aggregate":
@@ -1450,6 +1458,8 @@ func GetKeywordID(k string) int32 {
 		return LIST
 	case "local":
 		return LOCAL
+	case "locality":
+		return LOCALITY
 	case "localtime":
 		return LOCALTIME
 	case "localtimestamp":
@@ -1682,6 +1692,8 @@ func GetKeywordID(k string) int32 {
 		return REFRESH
 	case "region":
 		return REGION
+	case "regional":
+		return REGIONAL
 	case "regions":
 		return REGIONS
 	case "reindex":
