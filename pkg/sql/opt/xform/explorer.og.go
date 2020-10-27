@@ -1253,6 +1253,103 @@ func (_e *explorer) exploreSemiJoin(
 		}
 	}
 
+	// [GenerateInvertedJoins]
+	{
+		_partlyExplored := _rootOrd < _rootState.start
+		left := _root.Left
+		_state := _e.lookupExploreState(_root.Right)
+		if !_state.fullyExplored {
+			_fullyExplored = false
+		}
+		var _member memo.RelExpr
+		for _ord := 0; _ord < _state.end; _ord++ {
+			if _member == nil {
+				_member = _root.Right.FirstExpr()
+			} else {
+				_member = _member.NextExpr()
+			}
+			if !_partlyExplored || _ord >= _state.start {
+				_scan, _ := _member.(*memo.ScanExpr)
+				if _scan != nil {
+					scanPrivate := &_scan.ScanPrivate
+					if _e.funcs.IsCanonicalScan(scanPrivate) {
+						if _e.funcs.HasInvertedIndexes(scanPrivate) {
+							on := _root.On
+							private := &_root.JoinPrivate
+							if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateInvertedJoins) {
+								var _last memo.RelExpr
+								if _e.o.appliedRule != nil {
+									_last = memo.LastGroupMember(_root)
+								}
+								_e.funcs.GenerateInvertedJoins(_root, opt.SemiJoinOp, left, scanPrivate, on, private)
+								if _e.o.appliedRule != nil {
+									_e.o.appliedRule(opt.GenerateInvertedJoins, _root, _last.NextExpr())
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [GenerateInvertedJoinsFromSelect]
+	{
+		_partlyExplored := _rootOrd < _rootState.start
+		left := _root.Left
+		_state := _e.lookupExploreState(_root.Right)
+		if !_state.fullyExplored {
+			_fullyExplored = false
+		}
+		var _member memo.RelExpr
+		for _ord := 0; _ord < _state.end; _ord++ {
+			if _member == nil {
+				_member = _root.Right.FirstExpr()
+			} else {
+				_member = _member.NextExpr()
+			}
+			_partlyExplored := _partlyExplored && _ord < _state.start
+			_select, _ := _member.(*memo.SelectExpr)
+			if _select != nil {
+				_state := _e.lookupExploreState(_select.Input)
+				if !_state.fullyExplored {
+					_fullyExplored = false
+				}
+				var _member memo.RelExpr
+				for _ord := 0; _ord < _state.end; _ord++ {
+					if _member == nil {
+						_member = _select.Input.FirstExpr()
+					} else {
+						_member = _member.NextExpr()
+					}
+					if !_partlyExplored || _ord >= _state.start {
+						_scan, _ := _member.(*memo.ScanExpr)
+						if _scan != nil {
+							scanPrivate := &_scan.ScanPrivate
+							if _e.funcs.IsCanonicalScan(scanPrivate) {
+								if _e.funcs.HasInvertedIndexes(scanPrivate) {
+									filters := _select.Filters
+									on := _root.On
+									private := &_root.JoinPrivate
+									if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateInvertedJoinsFromSelect) {
+										var _last memo.RelExpr
+										if _e.o.appliedRule != nil {
+											_last = memo.LastGroupMember(_root)
+										}
+										_e.funcs.GenerateInvertedJoins(_root, opt.SemiJoinOp, left, scanPrivate, _e.funcs.ConcatFilters(on, filters), private)
+										if _e.o.appliedRule != nil {
+											_e.o.appliedRule(opt.GenerateInvertedJoinsFromSelect, _root, _last.NextExpr())
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [GenerateLookupJoinsWithFilter]
 	{
 		_partlyExplored := _rootOrd < _rootState.start
