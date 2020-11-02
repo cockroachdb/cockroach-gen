@@ -219,8 +219,6 @@ const (
 	EliminateExistsGroupBy
 	IntroduceExistsLimit
 	EliminateExistsLimit
-	NormalizeJSONFieldAccess
-	NormalizeJSONContains
 	SimplifyCaseWhenConstValue
 	InlineAnyValuesSingleCol
 	InlineAnyValuesMultiCol
