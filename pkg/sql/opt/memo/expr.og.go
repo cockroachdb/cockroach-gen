@@ -1061,7 +1061,8 @@ type ScanPrivate struct {
 	Cols opt.ColSet
 
 	// If set, the scan is a constrained scan; the constraint contains the spans
-	// that need to be scanned.
+	// that need to be scanned. If InvertedConstraint is also set, Constraint
+	// contains non-ranging spans that constrain the non-inverted prefix columns.
 	Constraint *constraint.Constraint
 
 	// If set, the scan is a constrained scan of an inverted index; the
