@@ -16891,6 +16891,24 @@ func (_f *Factory) ConstructCountRows() opt.ScalarExpr {
 	return _f.onConstructScalar(e)
 }
 
+// ConstructCovarPop constructs an expression for the CovarPop operator.
+func (_f *Factory) ConstructCovarPop(
+	y opt.ScalarExpr,
+	x opt.ScalarExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeCovarPop(y, x)
+	return _f.onConstructScalar(e)
+}
+
+// ConstructCovarSamp constructs an expression for the CovarSamp operator.
+func (_f *Factory) ConstructCovarSamp(
+	y opt.ScalarExpr,
+	x opt.ScalarExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeCovarSamp(y, x)
+	return _f.onConstructScalar(e)
+}
+
 // ConstructMax constructs an expression for the Max operator.
 func (_f *Factory) ConstructMax(
 	input opt.ScalarExpr,
@@ -18558,6 +18576,22 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 	case *memo.CountRowsExpr:
 		return t
 
+	case *memo.CovarPopExpr:
+		y := replace(t.Y).(opt.ScalarExpr)
+		x := replace(t.X).(opt.ScalarExpr)
+		if y != t.Y || x != t.X {
+			return f.ConstructCovarPop(y, x)
+		}
+		return t
+
+	case *memo.CovarSampExpr:
+		y := replace(t.Y).(opt.ScalarExpr)
+		x := replace(t.X).(opt.ScalarExpr)
+		if y != t.Y || x != t.X {
+			return f.ConstructCovarSamp(y, x)
+		}
+		return t
+
 	case *memo.MaxExpr:
 		input := replace(t.Input).(opt.ScalarExpr)
 		if input != t.Input {
@@ -19944,6 +19978,18 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 	case *memo.CountRowsExpr:
 		return t
 
+	case *memo.CovarPopExpr:
+		return f.ConstructCovarPop(
+			f.invokeReplace(t.Y, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.X, replace).(opt.ScalarExpr),
+		)
+
+	case *memo.CovarSampExpr:
+		return f.ConstructCovarSamp(
+			f.invokeReplace(t.Y, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.X, replace).(opt.ScalarExpr),
+		)
+
 	case *memo.MaxExpr:
 		return f.ConstructMax(
 			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
@@ -21051,6 +21097,16 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 		)
 	case opt.CountRowsOp:
 		return f.ConstructCountRows()
+	case opt.CovarPopOp:
+		return f.ConstructCovarPop(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.CovarSampOp:
+		return f.ConstructCovarSamp(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
 	case opt.MaxOp:
 		return f.ConstructMax(
 			args[0].(opt.ScalarExpr),

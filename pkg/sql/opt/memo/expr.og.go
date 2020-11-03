@@ -12525,6 +12525,122 @@ func (e *CountRowsExpr) DataType() *types.T {
 	return types.Int
 }
 
+type CovarPopExpr struct {
+	Y opt.ScalarExpr
+	X opt.ScalarExpr
+
+	Typ *types.T
+	id  opt.ScalarID
+}
+
+var _ opt.ScalarExpr = &CovarPopExpr{}
+
+func (e *CovarPopExpr) ID() opt.ScalarID {
+	return e.id
+}
+
+func (e *CovarPopExpr) Op() opt.Operator {
+	return opt.CovarPopOp
+}
+
+func (e *CovarPopExpr) ChildCount() int {
+	return 2
+}
+
+func (e *CovarPopExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Y
+	case 1:
+		return e.X
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *CovarPopExpr) Private() interface{} {
+	return nil
+}
+
+func (e *CovarPopExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *CovarPopExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Y = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.X = child.(opt.ScalarExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *CovarPopExpr) DataType() *types.T {
+	return e.Typ
+}
+
+type CovarSampExpr struct {
+	Y opt.ScalarExpr
+	X opt.ScalarExpr
+
+	Typ *types.T
+	id  opt.ScalarID
+}
+
+var _ opt.ScalarExpr = &CovarSampExpr{}
+
+func (e *CovarSampExpr) ID() opt.ScalarID {
+	return e.id
+}
+
+func (e *CovarSampExpr) Op() opt.Operator {
+	return opt.CovarSampOp
+}
+
+func (e *CovarSampExpr) ChildCount() int {
+	return 2
+}
+
+func (e *CovarSampExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Y
+	case 1:
+		return e.X
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *CovarSampExpr) Private() interface{} {
+	return nil
+}
+
+func (e *CovarSampExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *CovarSampExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Y = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.X = child.(opt.ScalarExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *CovarSampExpr) DataType() *types.T {
+	return e.Typ
+}
+
 type MaxExpr struct {
 	Input opt.ScalarExpr
 
@@ -20023,6 +20139,50 @@ func (m *Memo) MemoizeCountRows() *CountRowsExpr {
 	return CountRowsSingleton
 }
 
+func (m *Memo) MemoizeCovarPop(
+	y opt.ScalarExpr,
+	x opt.ScalarExpr,
+) *CovarPopExpr {
+	const size = int64(unsafe.Sizeof(CovarPopExpr{}))
+	e := &CovarPopExpr{
+		Y:  y,
+		X:  x,
+		id: m.NextID(),
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternCovarPop(e)
+	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
+		m.memEstimate += size
+		m.CheckExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeCovarSamp(
+	y opt.ScalarExpr,
+	x opt.ScalarExpr,
+) *CovarSampExpr {
+	const size = int64(unsafe.Sizeof(CovarSampExpr{}))
+	e := &CovarSampExpr{
+		Y:  y,
+		X:  x,
+		id: m.NextID(),
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternCovarSamp(e)
+	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
+		m.memEstimate += size
+		m.CheckExpr(e)
+	}
+	return interned
+}
+
 func (m *Memo) MemoizeMax(
 	input opt.ScalarExpr,
 ) *MaxExpr {
@@ -22326,6 +22486,10 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternCount(t)
 	case *CountRowsExpr:
 		return in.InternCountRows(t)
+	case *CovarPopExpr:
+		return in.InternCovarPop(t)
+	case *CovarSampExpr:
+		return in.InternCovarSamp(t)
 	case *MaxExpr:
 		return in.InternMax(t)
 	case *MinExpr:
@@ -25693,6 +25857,46 @@ func (in *interner) InternCountRows(val *CountRowsExpr) *CountRowsExpr {
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*CountRowsExpr); ok {
 			return existing
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternCovarPop(val *CovarPopExpr) *CovarPopExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.CovarPopOp)
+	in.hasher.HashScalarExpr(val.Y)
+	in.hasher.HashScalarExpr(val.X)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*CovarPopExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Y, existing.Y) &&
+				in.hasher.IsScalarExprEqual(val.X, existing.X) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternCovarSamp(val *CovarSampExpr) *CovarSampExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.CovarSampOp)
+	in.hasher.HashScalarExpr(val.Y)
+	in.hasher.HashScalarExpr(val.X)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*CovarSampExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Y, existing.Y) &&
+				in.hasher.IsScalarExprEqual(val.X, existing.X) {
+				return existing
+			}
 		}
 	}
 
