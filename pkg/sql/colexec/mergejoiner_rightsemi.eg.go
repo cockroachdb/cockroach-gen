@@ -37,13 +37,13 @@ var (
 	_ tree.AggType
 )
 
-type mergeJoinLeftAntiOp struct {
+type mergeJoinRightSemiOp struct {
 	*mergeJoinBase
 }
 
-var _ InternalMemoryOperator = &mergeJoinLeftAntiOp{}
+var _ InternalMemoryOperator = &mergeJoinRightSemiOp{}
 
-func (o *mergeJoinLeftAntiOp) probeBodyLSeltrueRSeltrue(ctx context.Context) {
+func (o *mergeJoinRightSemiOp) probeBodyLSeltrueRSeltrue(ctx context.Context) {
 	lSel := o.proberState.lBatch.Selection()
 	rSel := o.proberState.rBatch.Selection()
 EqLoop:
@@ -78,17 +78,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -99,7 +88,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -218,8 +206,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -230,37 +217,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
-												break
-											}
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												if !newLVal && lVal {
-													cmpResult = -1
-												} else if newLVal && !lVal {
-													cmpResult = 1
-												} else {
-													cmpResult = 0
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -268,16 +224,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -305,17 +251,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -326,7 +261,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -422,8 +356,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -434,29 +367,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
-												break
-											}
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-												cmpResult = bytes.Compare(newLVal, lVal)
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -464,16 +374,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -501,17 +401,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -522,7 +411,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -618,8 +506,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -630,29 +517,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
-												break
-											}
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-												cmpResult = tree.CompareDecimals(&newLVal, &lVal)
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -660,16 +524,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -696,17 +550,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -717,7 +560,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -845,8 +687,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -857,40 +698,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
-												break
-											}
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -898,16 +705,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -931,17 +728,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -952,7 +738,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -1080,8 +865,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -1092,40 +876,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
-												break
-											}
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -1133,16 +883,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -1167,17 +907,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -1188,7 +917,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -1316,8 +1044,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -1328,40 +1055,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
-												break
-											}
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -1369,16 +1062,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -1406,17 +1089,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -1427,7 +1099,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -1579,8 +1250,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -1591,48 +1261,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
-												break
-											}
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := float64(newLVal), float64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else if a == b {
-														cmpResult = 0
-													} else if math.IsNaN(a) {
-														if math.IsNaN(b) {
-															cmpResult = 0
-														} else {
-															cmpResult = -1
-														}
-													} else {
-														cmpResult = 1
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -1640,16 +1268,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -1677,17 +1295,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -1698,7 +1305,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -1815,8 +1421,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -1827,36 +1432,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
-												break
-											}
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												if newLVal.Before(lVal) {
-													cmpResult = -1
-												} else if lVal.Before(newLVal) {
-													cmpResult = 1
-												} else {
-													cmpResult = 0
-												}
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -1864,16 +1439,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -1901,17 +1466,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -1922,7 +1476,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -2018,8 +1571,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -2030,29 +1582,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
-												break
-											}
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-												cmpResult = newLVal.Compare(lVal)
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -2060,16 +1589,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -2097,17 +1616,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -2118,7 +1626,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -2219,8 +1726,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -2231,31 +1737,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
-												break
-											}
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												cmpResult = newLVal.(*coldataext.Datum).CompareDatum(lKeys, lVal)
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -2263,16 +1744,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -2306,17 +1777,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -2326,7 +1786,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -2436,8 +1895,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -2448,37 +1906,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
-												break
-											}
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												if !newLVal && lVal {
-													cmpResult = -1
-												} else if newLVal && !lVal {
-													cmpResult = 1
-												} else {
-													cmpResult = 0
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -2486,16 +1913,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -2523,17 +1940,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -2543,7 +1949,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -2630,8 +2035,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -2642,29 +2046,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
-												break
-											}
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-												cmpResult = bytes.Compare(newLVal, lVal)
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -2672,16 +2053,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -2709,17 +2080,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -2729,7 +2089,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -2816,8 +2175,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -2828,29 +2186,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
-												break
-											}
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-												cmpResult = tree.CompareDecimals(&newLVal, &lVal)
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -2858,16 +2193,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -2894,17 +2219,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -2914,7 +2228,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -3033,8 +2346,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -3045,40 +2357,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
-												break
-											}
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -3086,16 +2364,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -3119,17 +2387,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -3139,7 +2396,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -3258,8 +2514,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -3270,40 +2525,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
-												break
-											}
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -3311,16 +2532,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -3345,17 +2556,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -3365,7 +2565,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -3484,8 +2683,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -3496,40 +2694,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
-												break
-											}
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -3537,16 +2701,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -3574,17 +2728,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -3594,7 +2737,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -3737,8 +2879,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -3749,48 +2890,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
-												break
-											}
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := float64(newLVal), float64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else if a == b {
-														cmpResult = 0
-													} else if math.IsNaN(a) {
-														if math.IsNaN(b) {
-															cmpResult = 0
-														} else {
-															cmpResult = -1
-														}
-													} else {
-														cmpResult = 1
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -3798,16 +2897,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -3835,17 +2924,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -3855,7 +2933,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -3963,8 +3040,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -3975,36 +3051,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
-												break
-											}
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												if newLVal.Before(lVal) {
-													cmpResult = -1
-												} else if lVal.Before(newLVal) {
-													cmpResult = 1
-												} else {
-													cmpResult = 0
-												}
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -4012,16 +3058,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -4049,17 +3085,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -4069,7 +3094,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -4156,8 +3180,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -4168,29 +3191,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
-												break
-											}
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-												cmpResult = newLVal.Compare(lVal)
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -4198,16 +3198,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -4235,17 +3225,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -4255,7 +3234,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -4347,8 +3325,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -4359,31 +3336,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
-												break
-											}
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												cmpResult = newLVal.(*coldataext.Datum).CompareDatum(lKeys, lVal)
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -4391,16 +3343,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -4436,17 +3378,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -4565,8 +3496,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -4577,34 +3507,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												if !newLVal && lVal {
-													cmpResult = -1
-												} else if newLVal && !lVal {
-													cmpResult = 1
-												} else {
-													cmpResult = 0
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -4612,16 +3514,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -4648,17 +3540,6 @@ EqLoop:
 							curLEndIdx := lGroup.rowEndIdx
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
-
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
 
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
@@ -4755,8 +3636,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -4767,26 +3647,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-												cmpResult = bytes.Compare(newLVal, lVal)
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -4794,16 +3654,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -4830,17 +3680,6 @@ EqLoop:
 							curLEndIdx := lGroup.rowEndIdx
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
-
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
 
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
@@ -4937,8 +3776,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -4949,26 +3787,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-												cmpResult = tree.CompareDecimals(&newLVal, &lVal)
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -4976,16 +3794,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -5012,17 +3820,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -5150,8 +3947,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -5162,37 +3958,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -5200,16 +3965,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -5233,17 +3988,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -5371,8 +4115,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -5383,37 +4126,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -5421,16 +4133,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -5455,17 +4157,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -5593,8 +4284,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -5605,37 +4295,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -5643,16 +4302,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -5679,17 +4328,6 @@ EqLoop:
 							curLEndIdx := lGroup.rowEndIdx
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
-
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
 
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
@@ -5842,8 +4480,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -5854,45 +4491,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := float64(newLVal), float64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else if a == b {
-														cmpResult = 0
-													} else if math.IsNaN(a) {
-														if math.IsNaN(b) {
-															cmpResult = 0
-														} else {
-															cmpResult = -1
-														}
-													} else {
-														cmpResult = 1
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -5900,16 +4498,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -5936,17 +4524,6 @@ EqLoop:
 							curLEndIdx := lGroup.rowEndIdx
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
-
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
 
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
@@ -6064,8 +4641,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -6076,33 +4652,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												if newLVal.Before(lVal) {
-													cmpResult = -1
-												} else if lVal.Before(newLVal) {
-													cmpResult = 1
-												} else {
-													cmpResult = 0
-												}
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -6110,16 +4659,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -6146,17 +4685,6 @@ EqLoop:
 							curLEndIdx := lGroup.rowEndIdx
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
-
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
 
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
@@ -6253,8 +4781,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -6265,26 +4792,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-												cmpResult = newLVal.Compare(lVal)
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -6292,16 +4799,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -6328,17 +4825,6 @@ EqLoop:
 							curLEndIdx := lGroup.rowEndIdx
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
-
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
 
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
@@ -6440,8 +4926,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -6452,28 +4937,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												cmpResult = newLVal.(*coldataext.Datum).CompareDatum(lKeys, lVal)
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -6481,16 +4944,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -6524,17 +4977,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -6643,8 +5085,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -6655,34 +5096,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												if !newLVal && lVal {
-													cmpResult = -1
-												} else if newLVal && !lVal {
-													cmpResult = 1
-												} else {
-													cmpResult = 0
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -6690,16 +5103,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -6726,17 +5129,6 @@ EqLoop:
 							curLEndIdx := lGroup.rowEndIdx
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
-
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
 
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
@@ -6823,8 +5215,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -6835,26 +5226,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-												cmpResult = bytes.Compare(newLVal, lVal)
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -6862,16 +5233,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -6898,17 +5259,6 @@ EqLoop:
 							curLEndIdx := lGroup.rowEndIdx
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
-
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
 
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
@@ -6995,8 +5345,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -7007,26 +5356,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-												cmpResult = tree.CompareDecimals(&newLVal, &lVal)
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -7034,16 +5363,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -7070,17 +5389,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -7198,8 +5506,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -7210,37 +5517,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -7248,16 +5524,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -7281,17 +5547,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -7409,8 +5664,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -7421,37 +5675,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -7459,16 +5682,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -7493,17 +5706,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -7621,8 +5823,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -7633,37 +5834,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -7671,16 +5841,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -7707,17 +5867,6 @@ EqLoop:
 							curLEndIdx := lGroup.rowEndIdx
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
-
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
 
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
@@ -7860,8 +6009,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -7872,45 +6020,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := float64(newLVal), float64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else if a == b {
-														cmpResult = 0
-													} else if math.IsNaN(a) {
-														if math.IsNaN(b) {
-															cmpResult = 0
-														} else {
-															cmpResult = -1
-														}
-													} else {
-														cmpResult = 1
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -7918,16 +6027,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -7954,17 +6053,6 @@ EqLoop:
 							curLEndIdx := lGroup.rowEndIdx
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
-
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
 
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
@@ -8072,8 +6160,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -8084,33 +6171,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												if newLVal.Before(lVal) {
-													cmpResult = -1
-												} else if lVal.Before(newLVal) {
-													cmpResult = 1
-												} else {
-													cmpResult = 0
-												}
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -8118,16 +6178,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -8154,17 +6204,6 @@ EqLoop:
 							curLEndIdx := lGroup.rowEndIdx
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
-
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
 
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
@@ -8251,8 +6290,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -8263,26 +6301,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-												cmpResult = newLVal.Compare(lVal)
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -8290,16 +6308,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -8326,17 +6334,6 @@ EqLoop:
 							curLEndIdx := lGroup.rowEndIdx
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
-
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
 
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
@@ -8428,8 +6425,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -8440,28 +6436,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												cmpResult = newLVal.(*coldataext.Datum).CompareDatum(lKeys, lVal)
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -8469,16 +6443,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -8496,7 +6460,7 @@ EqLoop:
 	}
 }
 
-func (o *mergeJoinLeftAntiOp) probeBodyLSeltrueRSelfalse(ctx context.Context) {
+func (o *mergeJoinRightSemiOp) probeBodyLSeltrueRSelfalse(ctx context.Context) {
 	lSel := o.proberState.lBatch.Selection()
 	rSel := o.proberState.rBatch.Selection()
 EqLoop:
@@ -8531,17 +6495,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -8552,7 +6505,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -8671,8 +6623,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -8683,37 +6634,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
-												break
-											}
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												if !newLVal && lVal {
-													cmpResult = -1
-												} else if newLVal && !lVal {
-													cmpResult = 1
-												} else {
-													cmpResult = 0
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -8721,16 +6641,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -8758,17 +6668,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -8779,7 +6678,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -8875,8 +6773,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -8887,29 +6784,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
-												break
-											}
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-												cmpResult = bytes.Compare(newLVal, lVal)
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -8917,16 +6791,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -8954,17 +6818,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -8975,7 +6828,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -9071,8 +6923,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -9083,29 +6934,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
-												break
-											}
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-												cmpResult = tree.CompareDecimals(&newLVal, &lVal)
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -9113,16 +6941,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -9149,17 +6967,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -9170,7 +6977,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -9298,8 +7104,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -9310,40 +7115,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
-												break
-											}
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -9351,16 +7122,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -9384,17 +7145,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -9405,7 +7155,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -9533,8 +7282,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -9545,40 +7293,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
-												break
-											}
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -9586,16 +7300,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -9620,17 +7324,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -9641,7 +7334,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -9769,8 +7461,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -9781,40 +7472,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
-												break
-											}
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -9822,16 +7479,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -9859,17 +7506,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -9880,7 +7516,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -10032,8 +7667,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -10044,48 +7678,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
-												break
-											}
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := float64(newLVal), float64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else if a == b {
-														cmpResult = 0
-													} else if math.IsNaN(a) {
-														if math.IsNaN(b) {
-															cmpResult = 0
-														} else {
-															cmpResult = -1
-														}
-													} else {
-														cmpResult = 1
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -10093,16 +7685,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -10130,17 +7712,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -10151,7 +7722,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -10268,8 +7838,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -10280,36 +7849,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
-												break
-											}
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												if newLVal.Before(lVal) {
-													cmpResult = -1
-												} else if lVal.Before(newLVal) {
-													cmpResult = 1
-												} else {
-													cmpResult = 0
-												}
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -10317,16 +7856,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -10354,17 +7883,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -10375,7 +7893,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -10471,8 +7988,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -10483,29 +7999,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
-												break
-											}
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-												cmpResult = newLVal.Compare(lVal)
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -10513,16 +8006,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -10550,17 +8033,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -10571,7 +8043,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -10672,8 +8143,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -10684,31 +8154,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
-												break
-											}
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												cmpResult = newLVal.(*coldataext.Datum).CompareDatum(lKeys, lVal)
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -10716,16 +8161,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -10759,17 +8194,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -10779,7 +8203,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -10889,8 +8312,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -10901,37 +8323,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
-												break
-											}
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												if !newLVal && lVal {
-													cmpResult = -1
-												} else if newLVal && !lVal {
-													cmpResult = 1
-												} else {
-													cmpResult = 0
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -10939,16 +8330,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -10976,17 +8357,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -10996,7 +8366,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -11083,8 +8452,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -11095,29 +8463,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
-												break
-											}
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-												cmpResult = bytes.Compare(newLVal, lVal)
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -11125,16 +8470,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -11162,17 +8497,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -11182,7 +8506,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -11269,8 +8592,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -11281,29 +8603,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
-												break
-											}
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-												cmpResult = tree.CompareDecimals(&newLVal, &lVal)
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -11311,16 +8610,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -11347,17 +8636,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -11367,7 +8645,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -11486,8 +8763,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -11498,40 +8774,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
-												break
-											}
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -11539,16 +8781,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -11572,17 +8804,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -11592,7 +8813,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -11711,8 +8931,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -11723,40 +8942,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
-												break
-											}
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -11764,16 +8949,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -11798,17 +8973,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -11818,7 +8982,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -11937,8 +9100,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -11949,40 +9111,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
-												break
-											}
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -11990,16 +9118,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -12027,17 +9145,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -12047,7 +9154,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -12190,8 +9296,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -12202,48 +9307,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
-												break
-											}
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := float64(newLVal), float64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else if a == b {
-														cmpResult = 0
-													} else if math.IsNaN(a) {
-														if math.IsNaN(b) {
-															cmpResult = 0
-														} else {
-															cmpResult = -1
-														}
-													} else {
-														cmpResult = 1
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -12251,16 +9314,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -12288,17 +9341,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -12308,7 +9350,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -12416,8 +9457,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -12428,36 +9468,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
-												break
-											}
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												if newLVal.Before(lVal) {
-													cmpResult = -1
-												} else if lVal.Before(newLVal) {
-													cmpResult = 1
-												} else {
-													cmpResult = 0
-												}
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -12465,16 +9475,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -12502,17 +9502,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -12522,7 +9511,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -12609,8 +9597,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -12621,29 +9608,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
-												break
-											}
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-												cmpResult = newLVal.Compare(lVal)
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -12651,16 +9615,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -12688,17 +9642,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -12708,7 +9651,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -12800,8 +9742,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -12812,31 +9753,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(lSel[curLIdx]) {
-												break
-											}
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												cmpResult = newLVal.(*coldataext.Datum).CompareDatum(lKeys, lVal)
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -12844,16 +9760,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -12889,17 +9795,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -13018,8 +9913,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -13030,34 +9924,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												if !newLVal && lVal {
-													cmpResult = -1
-												} else if newLVal && !lVal {
-													cmpResult = 1
-												} else {
-													cmpResult = 0
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -13065,16 +9931,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -13101,17 +9957,6 @@ EqLoop:
 							curLEndIdx := lGroup.rowEndIdx
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
-
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
 
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
@@ -13208,8 +10053,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -13220,26 +10064,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-												cmpResult = bytes.Compare(newLVal, lVal)
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -13247,16 +10071,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -13283,17 +10097,6 @@ EqLoop:
 							curLEndIdx := lGroup.rowEndIdx
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
-
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
 
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
@@ -13390,8 +10193,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -13402,26 +10204,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-												cmpResult = tree.CompareDecimals(&newLVal, &lVal)
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -13429,16 +10211,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -13465,17 +10237,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -13603,8 +10364,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -13615,37 +10375,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -13653,16 +10382,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -13686,17 +10405,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -13824,8 +10532,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -13836,37 +10543,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -13874,16 +10550,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -13908,17 +10574,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -14046,8 +10701,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -14058,37 +10712,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -14096,16 +10719,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -14132,17 +10745,6 @@ EqLoop:
 							curLEndIdx := lGroup.rowEndIdx
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
-
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
 
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
@@ -14295,8 +10897,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -14307,45 +10908,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := float64(newLVal), float64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else if a == b {
-														cmpResult = 0
-													} else if math.IsNaN(a) {
-														if math.IsNaN(b) {
-															cmpResult = 0
-														} else {
-															cmpResult = -1
-														}
-													} else {
-														cmpResult = 1
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -14353,16 +10915,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -14389,17 +10941,6 @@ EqLoop:
 							curLEndIdx := lGroup.rowEndIdx
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
-
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
 
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
@@ -14517,8 +11058,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -14529,33 +11069,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												if newLVal.Before(lVal) {
-													cmpResult = -1
-												} else if lVal.Before(newLVal) {
-													cmpResult = 1
-												} else {
-													cmpResult = 0
-												}
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -14563,16 +11076,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -14599,17 +11102,6 @@ EqLoop:
 							curLEndIdx := lGroup.rowEndIdx
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
-
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
 
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
@@ -14706,8 +11198,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -14718,26 +11209,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-												cmpResult = newLVal.Compare(lVal)
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -14745,16 +11216,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -14781,17 +11242,6 @@ EqLoop:
 							curLEndIdx := lGroup.rowEndIdx
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
-
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
 
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
@@ -14893,8 +11343,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -14905,28 +11354,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												cmpResult = newLVal.(*coldataext.Datum).CompareDatum(lKeys, lVal)
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -14934,16 +11361,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -14977,17 +11394,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -15096,8 +11502,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -15108,34 +11513,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												if !newLVal && lVal {
-													cmpResult = -1
-												} else if newLVal && !lVal {
-													cmpResult = 1
-												} else {
-													cmpResult = 0
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -15143,16 +11520,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -15179,17 +11546,6 @@ EqLoop:
 							curLEndIdx := lGroup.rowEndIdx
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
-
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
 
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
@@ -15276,8 +11632,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -15288,26 +11643,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-												cmpResult = bytes.Compare(newLVal, lVal)
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -15315,16 +11650,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -15351,17 +11676,6 @@ EqLoop:
 							curLEndIdx := lGroup.rowEndIdx
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
-
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
 
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
@@ -15448,8 +11762,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -15460,26 +11773,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-												cmpResult = tree.CompareDecimals(&newLVal, &lVal)
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -15487,16 +11780,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -15523,17 +11806,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -15651,8 +11923,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -15663,37 +11934,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -15701,16 +11941,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -15734,17 +11964,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -15862,8 +12081,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -15874,37 +12092,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -15912,16 +12099,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -15946,17 +12123,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -16074,8 +12240,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -16086,37 +12251,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -16124,16 +12258,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -16160,17 +12284,6 @@ EqLoop:
 							curLEndIdx := lGroup.rowEndIdx
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
-
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
 
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
@@ -16313,8 +12426,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -16325,45 +12437,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := float64(newLVal), float64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else if a == b {
-														cmpResult = 0
-													} else if math.IsNaN(a) {
-														if math.IsNaN(b) {
-															cmpResult = 0
-														} else {
-															cmpResult = -1
-														}
-													} else {
-														cmpResult = 1
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -16371,16 +12444,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -16407,17 +12470,6 @@ EqLoop:
 							curLEndIdx := lGroup.rowEndIdx
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
-
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
 
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
@@ -16525,8 +12577,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -16537,33 +12588,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												if newLVal.Before(lVal) {
-													cmpResult = -1
-												} else if lVal.Before(newLVal) {
-													cmpResult = 1
-												} else {
-													cmpResult = 0
-												}
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -16571,16 +12595,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -16607,17 +12621,6 @@ EqLoop:
 							curLEndIdx := lGroup.rowEndIdx
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
-
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
 
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
@@ -16704,8 +12707,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -16716,26 +12718,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-												cmpResult = newLVal.Compare(lVal)
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -16743,16 +12725,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -16779,17 +12751,6 @@ EqLoop:
 							curLEndIdx := lGroup.rowEndIdx
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
-
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
 
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
@@ -16881,8 +12842,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -16893,28 +12853,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = lSel[curLIdx]
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												cmpResult = newLVal.(*coldataext.Datum).CompareDatum(lKeys, lVal)
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -16922,16 +12860,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -16949,7 +12877,7 @@ EqLoop:
 	}
 }
 
-func (o *mergeJoinLeftAntiOp) probeBodyLSelfalseRSeltrue(ctx context.Context) {
+func (o *mergeJoinRightSemiOp) probeBodyLSelfalseRSeltrue(ctx context.Context) {
 	lSel := o.proberState.lBatch.Selection()
 	rSel := o.proberState.rBatch.Selection()
 EqLoop:
@@ -16984,17 +12912,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -17005,7 +12922,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -17124,8 +13040,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -17136,37 +13051,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
-												break
-											}
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												if !newLVal && lVal {
-													cmpResult = -1
-												} else if newLVal && !lVal {
-													cmpResult = 1
-												} else {
-													cmpResult = 0
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -17174,16 +13058,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -17211,17 +13085,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -17232,7 +13095,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -17328,8 +13190,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -17340,29 +13201,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
-												break
-											}
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-												cmpResult = bytes.Compare(newLVal, lVal)
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -17370,16 +13208,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -17407,17 +13235,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -17428,7 +13245,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -17524,8 +13340,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -17536,29 +13351,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
-												break
-											}
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-												cmpResult = tree.CompareDecimals(&newLVal, &lVal)
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -17566,16 +13358,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -17602,17 +13384,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -17623,7 +13394,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -17751,8 +13521,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -17763,40 +13532,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
-												break
-											}
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -17804,16 +13539,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -17837,17 +13562,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -17858,7 +13572,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -17986,8 +13699,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -17998,40 +13710,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
-												break
-											}
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -18039,16 +13717,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -18073,17 +13741,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -18094,7 +13751,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -18222,8 +13878,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -18234,40 +13889,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
-												break
-											}
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -18275,16 +13896,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -18312,17 +13923,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -18333,7 +13933,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -18485,8 +14084,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -18497,48 +14095,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
-												break
-											}
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := float64(newLVal), float64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else if a == b {
-														cmpResult = 0
-													} else if math.IsNaN(a) {
-														if math.IsNaN(b) {
-															cmpResult = 0
-														} else {
-															cmpResult = -1
-														}
-													} else {
-														cmpResult = 1
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -18546,16 +14102,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -18583,17 +14129,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -18604,7 +14139,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -18721,8 +14255,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -18733,36 +14266,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
-												break
-											}
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												if newLVal.Before(lVal) {
-													cmpResult = -1
-												} else if lVal.Before(newLVal) {
-													cmpResult = 1
-												} else {
-													cmpResult = 0
-												}
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -18770,16 +14273,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -18807,17 +14300,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -18828,7 +14310,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -18924,8 +14405,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -18936,29 +14416,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
-												break
-											}
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-												cmpResult = newLVal.Compare(lVal)
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -18966,16 +14423,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -19003,17 +14450,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -19024,7 +14460,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -19125,8 +14560,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -19137,31 +14571,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
-												break
-											}
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												cmpResult = newLVal.(*coldataext.Datum).CompareDatum(lKeys, lVal)
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -19169,16 +14578,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -19212,17 +14611,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -19232,7 +14620,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -19342,8 +14729,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -19354,37 +14740,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
-												break
-											}
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												if !newLVal && lVal {
-													cmpResult = -1
-												} else if newLVal && !lVal {
-													cmpResult = 1
-												} else {
-													cmpResult = 0
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -19392,16 +14747,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -19429,17 +14774,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -19449,7 +14783,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -19536,8 +14869,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -19548,29 +14880,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
-												break
-											}
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-												cmpResult = bytes.Compare(newLVal, lVal)
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -19578,16 +14887,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -19615,17 +14914,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -19635,7 +14923,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -19722,8 +15009,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -19734,29 +15020,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
-												break
-											}
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-												cmpResult = tree.CompareDecimals(&newLVal, &lVal)
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -19764,16 +15027,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -19800,17 +15053,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -19820,7 +15062,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -19939,8 +15180,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -19951,40 +15191,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
-												break
-											}
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -19992,16 +15198,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -20025,17 +15221,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -20045,7 +15230,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -20164,8 +15348,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -20176,40 +15359,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
-												break
-											}
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -20217,16 +15366,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -20251,17 +15390,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -20271,7 +15399,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -20390,8 +15517,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -20402,40 +15528,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
-												break
-											}
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -20443,16 +15535,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -20480,17 +15562,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -20500,7 +15571,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -20643,8 +15713,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -20655,48 +15724,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
-												break
-											}
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := float64(newLVal), float64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else if a == b {
-														cmpResult = 0
-													} else if math.IsNaN(a) {
-														if math.IsNaN(b) {
-															cmpResult = 0
-														} else {
-															cmpResult = -1
-														}
-													} else {
-														cmpResult = 1
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -20704,16 +15731,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -20741,17 +15758,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -20761,7 +15767,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -20869,8 +15874,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -20881,36 +15885,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
-												break
-											}
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												if newLVal.Before(lVal) {
-													cmpResult = -1
-												} else if lVal.Before(newLVal) {
-													cmpResult = 1
-												} else {
-													cmpResult = 0
-												}
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -20918,16 +15892,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -20955,17 +15919,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -20975,7 +15928,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -21062,8 +16014,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -21074,29 +16025,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
-												break
-											}
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-												cmpResult = newLVal.Compare(lVal)
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -21104,16 +16032,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -21141,17 +16059,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -21161,7 +16068,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -21253,8 +16159,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -21265,31 +16170,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
-												break
-											}
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												cmpResult = newLVal.(*coldataext.Datum).CompareDatum(lKeys, lVal)
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -21297,16 +16177,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -21342,17 +16212,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -21471,8 +16330,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -21483,34 +16341,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												if !newLVal && lVal {
-													cmpResult = -1
-												} else if newLVal && !lVal {
-													cmpResult = 1
-												} else {
-													cmpResult = 0
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -21518,16 +16348,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -21554,17 +16374,6 @@ EqLoop:
 							curLEndIdx := lGroup.rowEndIdx
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
-
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
 
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
@@ -21661,8 +16470,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -21673,26 +16481,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-												cmpResult = bytes.Compare(newLVal, lVal)
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -21700,16 +16488,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -21736,17 +16514,6 @@ EqLoop:
 							curLEndIdx := lGroup.rowEndIdx
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
-
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
 
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
@@ -21843,8 +16610,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -21855,26 +16621,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-												cmpResult = tree.CompareDecimals(&newLVal, &lVal)
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -21882,16 +16628,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -21918,17 +16654,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -22056,8 +16781,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -22068,37 +16792,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -22106,16 +16799,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -22139,17 +16822,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -22277,8 +16949,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -22289,37 +16960,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -22327,16 +16967,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -22361,17 +16991,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -22499,8 +17118,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -22511,37 +17129,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -22549,16 +17136,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -22585,17 +17162,6 @@ EqLoop:
 							curLEndIdx := lGroup.rowEndIdx
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
-
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
 
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
@@ -22748,8 +17314,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -22760,45 +17325,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := float64(newLVal), float64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else if a == b {
-														cmpResult = 0
-													} else if math.IsNaN(a) {
-														if math.IsNaN(b) {
-															cmpResult = 0
-														} else {
-															cmpResult = -1
-														}
-													} else {
-														cmpResult = 1
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -22806,16 +17332,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -22842,17 +17358,6 @@ EqLoop:
 							curLEndIdx := lGroup.rowEndIdx
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
-
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
 
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
@@ -22970,8 +17475,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -22982,33 +17486,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												if newLVal.Before(lVal) {
-													cmpResult = -1
-												} else if lVal.Before(newLVal) {
-													cmpResult = 1
-												} else {
-													cmpResult = 0
-												}
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -23016,16 +17493,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -23052,17 +17519,6 @@ EqLoop:
 							curLEndIdx := lGroup.rowEndIdx
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
-
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
 
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
@@ -23159,8 +17615,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -23171,26 +17626,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-												cmpResult = newLVal.Compare(lVal)
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -23198,16 +17633,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -23234,17 +17659,6 @@ EqLoop:
 							curLEndIdx := lGroup.rowEndIdx
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
-
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
 
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
@@ -23346,8 +17760,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -23358,28 +17771,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												cmpResult = newLVal.(*coldataext.Datum).CompareDatum(lKeys, lVal)
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -23387,16 +17778,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -23430,17 +17811,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -23549,8 +17919,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -23561,34 +17930,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												if !newLVal && lVal {
-													cmpResult = -1
-												} else if newLVal && !lVal {
-													cmpResult = 1
-												} else {
-													cmpResult = 0
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -23596,16 +17937,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -23632,17 +17963,6 @@ EqLoop:
 							curLEndIdx := lGroup.rowEndIdx
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
-
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
 
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
@@ -23729,8 +18049,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -23741,26 +18060,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-												cmpResult = bytes.Compare(newLVal, lVal)
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -23768,16 +18067,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -23804,17 +18093,6 @@ EqLoop:
 							curLEndIdx := lGroup.rowEndIdx
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
-
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
 
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
@@ -23901,8 +18179,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -23913,26 +18190,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-												cmpResult = tree.CompareDecimals(&newLVal, &lVal)
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -23940,16 +18197,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -23976,17 +18223,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -24104,8 +18340,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -24116,37 +18351,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -24154,16 +18358,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -24187,17 +18381,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -24315,8 +18498,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -24327,37 +18509,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -24365,16 +18516,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -24399,17 +18540,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -24527,8 +18657,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -24539,37 +18668,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -24577,16 +18675,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -24613,17 +18701,6 @@ EqLoop:
 							curLEndIdx := lGroup.rowEndIdx
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
-
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
 
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
@@ -24766,8 +18843,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -24778,45 +18854,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := float64(newLVal), float64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else if a == b {
-														cmpResult = 0
-													} else if math.IsNaN(a) {
-														if math.IsNaN(b) {
-															cmpResult = 0
-														} else {
-															cmpResult = -1
-														}
-													} else {
-														cmpResult = 1
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -24824,16 +18861,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -24860,17 +18887,6 @@ EqLoop:
 							curLEndIdx := lGroup.rowEndIdx
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
-
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
 
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
@@ -24978,8 +18994,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -24990,33 +19005,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												if newLVal.Before(lVal) {
-													cmpResult = -1
-												} else if lVal.Before(newLVal) {
-													cmpResult = 1
-												} else {
-													cmpResult = 0
-												}
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -25024,16 +19012,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -25060,17 +19038,6 @@ EqLoop:
 							curLEndIdx := lGroup.rowEndIdx
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
-
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
 
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
@@ -25157,8 +19124,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -25169,26 +19135,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-												cmpResult = newLVal.Compare(lVal)
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -25196,16 +19142,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -25232,17 +19168,6 @@ EqLoop:
 							curLEndIdx := lGroup.rowEndIdx
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
-
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
 
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
@@ -25334,8 +19259,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -25346,28 +19270,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												cmpResult = newLVal.(*coldataext.Datum).CompareDatum(lKeys, lVal)
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -25375,16 +19277,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -25402,7 +19294,7 @@ EqLoop:
 	}
 }
 
-func (o *mergeJoinLeftAntiOp) probeBodyLSelfalseRSelfalse(ctx context.Context) {
+func (o *mergeJoinRightSemiOp) probeBodyLSelfalseRSelfalse(ctx context.Context) {
 	lSel := o.proberState.lBatch.Selection()
 	rSel := o.proberState.rBatch.Selection()
 EqLoop:
@@ -25437,17 +19329,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -25458,7 +19339,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -25577,8 +19457,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -25589,37 +19468,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
-												break
-											}
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												if !newLVal && lVal {
-													cmpResult = -1
-												} else if newLVal && !lVal {
-													cmpResult = 1
-												} else {
-													cmpResult = 0
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -25627,16 +19475,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -25664,17 +19502,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -25685,7 +19512,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -25781,8 +19607,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -25793,29 +19618,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
-												break
-											}
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-												cmpResult = bytes.Compare(newLVal, lVal)
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -25823,16 +19625,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -25860,17 +19652,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -25881,7 +19662,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -25977,8 +19757,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -25989,29 +19768,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
-												break
-											}
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-												cmpResult = tree.CompareDecimals(&newLVal, &lVal)
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -26019,16 +19775,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -26055,17 +19801,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -26076,7 +19811,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -26204,8 +19938,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -26216,40 +19949,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
-												break
-											}
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -26257,16 +19956,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -26290,17 +19979,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -26311,7 +19989,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -26439,8 +20116,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -26451,40 +20127,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
-												break
-											}
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -26492,16 +20134,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -26526,17 +20158,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -26547,7 +20168,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -26675,8 +20295,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -26687,40 +20306,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
-												break
-											}
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -26728,16 +20313,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -26765,17 +20340,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -26786,7 +20350,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -26938,8 +20501,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -26950,48 +20512,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
-												break
-											}
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := float64(newLVal), float64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else if a == b {
-														cmpResult = 0
-													} else if math.IsNaN(a) {
-														if math.IsNaN(b) {
-															cmpResult = 0
-														} else {
-															cmpResult = -1
-														}
-													} else {
-														cmpResult = 1
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -26999,16 +20519,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -27036,17 +20546,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -27057,7 +20556,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -27174,8 +20672,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -27186,36 +20683,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
-												break
-											}
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												if newLVal.Before(lVal) {
-													cmpResult = -1
-												} else if lVal.Before(newLVal) {
-													cmpResult = 1
-												} else {
-													cmpResult = 0
-												}
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -27223,16 +20690,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -27260,17 +20717,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -27281,7 +20727,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -27377,8 +20822,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -27389,29 +20833,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
-												break
-											}
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-												cmpResult = newLVal.Compare(lVal)
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -27419,16 +20840,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -27456,17 +20867,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -27477,7 +20877,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -27578,8 +20977,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -27590,31 +20988,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
-												break
-											}
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												cmpResult = newLVal.(*coldataext.Datum).CompareDatum(lKeys, lVal)
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -27622,16 +20995,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -27665,17 +21028,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -27685,7 +21037,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -27795,8 +21146,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -27807,37 +21157,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
-												break
-											}
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												if !newLVal && lVal {
-													cmpResult = -1
-												} else if newLVal && !lVal {
-													cmpResult = 1
-												} else {
-													cmpResult = 0
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -27845,16 +21164,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -27882,17 +21191,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -27902,7 +21200,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -27989,8 +21286,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -28001,29 +21297,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
-												break
-											}
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-												cmpResult = bytes.Compare(newLVal, lVal)
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -28031,16 +21304,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -28068,17 +21331,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -28088,7 +21340,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -28175,8 +21426,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -28187,29 +21437,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
-												break
-											}
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-												cmpResult = tree.CompareDecimals(&newLVal, &lVal)
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -28217,16 +21444,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -28253,17 +21470,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -28273,7 +21479,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -28392,8 +21597,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -28404,40 +21608,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
-												break
-											}
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -28445,16 +21615,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -28478,17 +21638,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -28498,7 +21647,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -28617,8 +21765,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -28629,40 +21776,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
-												break
-											}
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -28670,16 +21783,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -28704,17 +21807,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -28724,7 +21816,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -28843,8 +21934,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -28855,40 +21945,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
-												break
-											}
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -28896,16 +21952,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -28933,17 +21979,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -28953,7 +21988,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -29096,8 +22130,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -29108,48 +22141,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
-												break
-											}
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := float64(newLVal), float64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else if a == b {
-														cmpResult = 0
-													} else if math.IsNaN(a) {
-														if math.IsNaN(b) {
-															cmpResult = 0
-														} else {
-															cmpResult = -1
-														}
-													} else {
-														cmpResult = 1
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -29157,16 +22148,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -29194,17 +22175,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -29214,7 +22184,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -29322,8 +22291,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -29334,36 +22302,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
-												break
-											}
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												if newLVal.Before(lVal) {
-													cmpResult = -1
-												} else if lVal.Before(newLVal) {
-													cmpResult = 1
-												} else {
-													cmpResult = 0
-												}
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -29371,16 +22309,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -29408,17 +22336,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -29428,7 +22345,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -29515,8 +22431,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -29527,29 +22442,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
-												break
-											}
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-												cmpResult = newLVal.Compare(lVal)
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -29557,16 +22449,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -29594,17 +22476,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -29614,7 +22485,6 @@ EqLoop:
 								// NULL.
 								if lNull {
 
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
 									curLIdx++
 									continue
 								}
@@ -29706,8 +22576,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -29718,31 +22587,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-											if lVec.Nulls().NullAt(curLIdx) {
-												break
-											}
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												cmpResult = newLVal.(*coldataext.Datum).CompareDatum(lKeys, lVal)
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -29750,16 +22594,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -29795,17 +22629,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -29924,8 +22747,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -29936,34 +22758,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												if !newLVal && lVal {
-													cmpResult = -1
-												} else if newLVal && !lVal {
-													cmpResult = 1
-												} else {
-													cmpResult = 0
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -29971,16 +22765,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -30007,17 +22791,6 @@ EqLoop:
 							curLEndIdx := lGroup.rowEndIdx
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
-
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
 
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
@@ -30114,8 +22887,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -30126,26 +22898,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-												cmpResult = bytes.Compare(newLVal, lVal)
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -30153,16 +22905,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -30189,17 +22931,6 @@ EqLoop:
 							curLEndIdx := lGroup.rowEndIdx
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
-
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
 
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
@@ -30296,8 +23027,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -30308,26 +23038,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-												cmpResult = tree.CompareDecimals(&newLVal, &lVal)
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -30335,16 +23045,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -30371,17 +23071,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -30509,8 +23198,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -30521,37 +23209,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -30559,16 +23216,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -30592,17 +23239,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -30730,8 +23366,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -30742,37 +23377,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -30780,16 +23384,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -30814,17 +23408,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -30952,8 +23535,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -30964,37 +23546,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -31002,16 +23553,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -31038,17 +23579,6 @@ EqLoop:
 							curLEndIdx := lGroup.rowEndIdx
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
-
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
 
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
@@ -31201,8 +23731,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -31213,45 +23742,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := float64(newLVal), float64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else if a == b {
-														cmpResult = 0
-													} else if math.IsNaN(a) {
-														if math.IsNaN(b) {
-															cmpResult = 0
-														} else {
-															cmpResult = -1
-														}
-													} else {
-														cmpResult = 1
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -31259,16 +23749,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -31295,17 +23775,6 @@ EqLoop:
 							curLEndIdx := lGroup.rowEndIdx
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
-
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
 
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
@@ -31423,8 +23892,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -31435,33 +23903,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												if newLVal.Before(lVal) {
-													cmpResult = -1
-												} else if lVal.Before(newLVal) {
-													cmpResult = 1
-												} else {
-													cmpResult = 0
-												}
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -31469,16 +23910,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -31505,17 +23936,6 @@ EqLoop:
 							curLEndIdx := lGroup.rowEndIdx
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
-
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
 
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
@@ -31612,8 +24032,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -31624,26 +24043,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-												cmpResult = newLVal.Compare(lVal)
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -31651,16 +24050,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -31687,17 +24076,6 @@ EqLoop:
 							curLEndIdx := lGroup.rowEndIdx
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
-
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
 
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
@@ -31799,8 +24177,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -31811,28 +24188,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												cmpResult = newLVal.(*coldataext.Datum).CompareDatum(lKeys, lVal)
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -31840,16 +24195,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -31883,17 +24228,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -32002,8 +24336,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -32014,34 +24347,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												if !newLVal && lVal {
-													cmpResult = -1
-												} else if newLVal && !lVal {
-													cmpResult = 1
-												} else {
-													cmpResult = 0
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -32049,16 +24354,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -32085,17 +24380,6 @@ EqLoop:
 							curLEndIdx := lGroup.rowEndIdx
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
-
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
 
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
@@ -32182,8 +24466,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -32194,26 +24477,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-												cmpResult = bytes.Compare(newLVal, lVal)
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -32221,16 +24484,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -32257,17 +24510,6 @@ EqLoop:
 							curLEndIdx := lGroup.rowEndIdx
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
-
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
 
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
@@ -32354,8 +24596,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -32366,26 +24607,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-												cmpResult = tree.CompareDecimals(&newLVal, &lVal)
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -32393,16 +24614,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -32429,17 +24640,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -32557,8 +24757,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -32569,37 +24768,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -32607,16 +24775,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -32640,17 +24798,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -32768,8 +24915,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -32780,37 +24926,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -32818,16 +24933,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -32852,17 +24957,6 @@ EqLoop:
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
 
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
-
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
 								cmp = 0
@@ -32980,8 +25074,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -32992,37 +25085,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := int64(newLVal), int64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else {
-														cmpResult = 0
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -33030,16 +25092,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -33066,17 +25118,6 @@ EqLoop:
 							curLEndIdx := lGroup.rowEndIdx
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
-
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
 
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
@@ -33219,8 +25260,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -33231,45 +25271,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												{
-													a, b := float64(newLVal), float64(lVal)
-													if a < b {
-														cmpResult = -1
-													} else if a > b {
-														cmpResult = 1
-													} else if a == b {
-														cmpResult = 0
-													} else if math.IsNaN(a) {
-														if math.IsNaN(b) {
-															cmpResult = 0
-														} else {
-															cmpResult = -1
-														}
-													} else {
-														cmpResult = 1
-													}
-												}
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -33277,16 +25278,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -33313,17 +25304,6 @@ EqLoop:
 							curLEndIdx := lGroup.rowEndIdx
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
-
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
 
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
@@ -33431,8 +25411,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -33443,33 +25422,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												if newLVal.Before(lVal) {
-													cmpResult = -1
-												} else if lVal.Before(newLVal) {
-													cmpResult = 1
-												} else {
-													cmpResult = 0
-												}
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -33477,16 +25429,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -33513,17 +25455,6 @@ EqLoop:
 							curLEndIdx := lGroup.rowEndIdx
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
-
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
 
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
@@ -33610,8 +25541,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -33622,26 +25552,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-												cmpResult = newLVal.Compare(lVal)
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -33649,16 +25559,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -33685,17 +25585,6 @@ EqLoop:
 							curLEndIdx := lGroup.rowEndIdx
 							curREndIdx := rGroup.rowEndIdx
 							areGroupsProcessed := false
-
-							if lGroup.unmatched {
-								if curLIdx+1 != curLEndIdx {
-									colexecerror.InternalError(errors.AssertionFailedf("unexpectedly length %d of the left unmatched group is not 1", curLEndIdx-curLIdx))
-								}
-								// The row already does not have a match, so we don't need to do any
-								// additional processing.
-								o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-								curLIdx++
-								areGroupsProcessed = true
-							}
 
 							// Expand or filter each group based on the current equality column.
 							for curLIdx < curLEndIdx && curRIdx < curREndIdx && !areGroupsProcessed {
@@ -33787,8 +25676,7 @@ EqLoop:
 									if eqColIdx < len(o.left.eqCols)-1 {
 										o.groups.addGroupsToNextCol(beginLIdx, lGroupLength, beginRIdx, rGroupLength)
 									} else {
-										// With LEFT ANTI join, we are only interested in unmatched tuples
-										// from the left, and all tuples in the current group have a match.
+										o.groups.addRightSemiGroup(beginRIdx, rGroupLength)
 									}
 								} else { // mismatch
 									// The line below is a compact form of the following:
@@ -33799,28 +25687,6 @@ EqLoop:
 									if incrementLeft {
 										curLIdx++
 
-										// All the rows on the left within the current group will not get a match on
-										// the right, so we're adding each of them as a left unmatched group.
-										o.groups.addLeftUnmatchedGroup(curLIdx-1, curRIdx)
-										for curLIdx < curLEndIdx {
-
-											lSelIdx = curLIdx
-											newLVal := lKeys.Get(lSelIdx)
-
-											{
-												var cmpResult int
-
-												cmpResult = newLVal.(*coldataext.Datum).CompareDatum(lKeys, lVal)
-
-												match = cmpResult == 0
-											}
-
-											if !match {
-												break
-											}
-											o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-											curLIdx++
-										}
 									} else {
 										curRIdx++
 
@@ -33828,16 +25694,6 @@ EqLoop:
 								}
 							}
 
-							if !o.groups.isLastGroupInCol() && !areGroupsProcessed {
-								// The current group is not the last one within the column, so it cannot be
-								// extended into the next batch, and we need to process it right now. Any
-								// unprocessed row in the left group will not get a match, so each one of
-								// them becomes a new unmatched group with a corresponding null group.
-								for curLIdx < curLEndIdx {
-									o.groups.addLeftUnmatchedGroup(curLIdx, curRIdx)
-									curLIdx++
-								}
-							}
 							// Both o.proberState.lIdx and o.proberState.rIdx should point to the
 							// last elements processed in their respective batches.
 							o.proberState.lIdx = curLIdx
@@ -33876,7 +25732,7 @@ EqLoop:
 // group is repeated numRepeats times, instead of a simple copy of the group as
 // a whole.
 // SIDE EFFECTS: writes into o.output.
-func (o *mergeJoinLeftAntiOp) buildLeftGroupsFromBatch(
+func (o *mergeJoinRightSemiOp) buildLeftGroupsFromBatch(
 	leftGroups []group, input *mergeJoinInput, batch coldata.Batch, destStartIdx int,
 ) {
 	sel := batch.Selection()
@@ -33913,9 +25769,6 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroupsFromBatch(
 								// Loop over every group.
 								for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
 									leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-									if !leftGroup.unmatched {
-										continue
-									}
 									// If curSrcStartIdx is uninitialized, start it at the group's start idx.
 									// Otherwise continue where we left off.
 									if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
@@ -33978,9 +25831,6 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroupsFromBatch(
 								// Loop over every group.
 								for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
 									leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-									if !leftGroup.unmatched {
-										continue
-									}
 									// If curSrcStartIdx is uninitialized, start it at the group's start idx.
 									// Otherwise continue where we left off.
 									if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
@@ -34043,9 +25893,6 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroupsFromBatch(
 								// Loop over every group.
 								for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
 									leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-									if !leftGroup.unmatched {
-										continue
-									}
 									// If curSrcStartIdx is uninitialized, start it at the group's start idx.
 									// Otherwise continue where we left off.
 									if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
@@ -34107,9 +25954,6 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroupsFromBatch(
 								// Loop over every group.
 								for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
 									leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-									if !leftGroup.unmatched {
-										continue
-									}
 									// If curSrcStartIdx is uninitialized, start it at the group's start idx.
 									// Otherwise continue where we left off.
 									if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
@@ -34168,9 +26012,6 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroupsFromBatch(
 								// Loop over every group.
 								for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
 									leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-									if !leftGroup.unmatched {
-										continue
-									}
 									// If curSrcStartIdx is uninitialized, start it at the group's start idx.
 									// Otherwise continue where we left off.
 									if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
@@ -34230,9 +26071,6 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroupsFromBatch(
 								// Loop over every group.
 								for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
 									leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-									if !leftGroup.unmatched {
-										continue
-									}
 									// If curSrcStartIdx is uninitialized, start it at the group's start idx.
 									// Otherwise continue where we left off.
 									if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
@@ -34295,9 +26133,6 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroupsFromBatch(
 								// Loop over every group.
 								for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
 									leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-									if !leftGroup.unmatched {
-										continue
-									}
 									// If curSrcStartIdx is uninitialized, start it at the group's start idx.
 									// Otherwise continue where we left off.
 									if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
@@ -34360,9 +26195,6 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroupsFromBatch(
 								// Loop over every group.
 								for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
 									leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-									if !leftGroup.unmatched {
-										continue
-									}
 									// If curSrcStartIdx is uninitialized, start it at the group's start idx.
 									// Otherwise continue where we left off.
 									if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
@@ -34425,9 +26257,6 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroupsFromBatch(
 								// Loop over every group.
 								for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
 									leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-									if !leftGroup.unmatched {
-										continue
-									}
 									// If curSrcStartIdx is uninitialized, start it at the group's start idx.
 									// Otherwise continue where we left off.
 									if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
@@ -34490,9 +26319,6 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroupsFromBatch(
 								// Loop over every group.
 								for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
 									leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-									if !leftGroup.unmatched {
-										continue
-									}
 									// If curSrcStartIdx is uninitialized, start it at the group's start idx.
 									// Otherwise continue where we left off.
 									if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
@@ -34561,9 +26387,6 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroupsFromBatch(
 								// Loop over every group.
 								for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
 									leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-									if !leftGroup.unmatched {
-										continue
-									}
 									// If curSrcStartIdx is uninitialized, start it at the group's start idx.
 									// Otherwise continue where we left off.
 									if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
@@ -34623,9 +26446,6 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroupsFromBatch(
 								// Loop over every group.
 								for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
 									leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-									if !leftGroup.unmatched {
-										continue
-									}
 									// If curSrcStartIdx is uninitialized, start it at the group's start idx.
 									// Otherwise continue where we left off.
 									if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
@@ -34685,9 +26505,6 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroupsFromBatch(
 								// Loop over every group.
 								for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
 									leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-									if !leftGroup.unmatched {
-										continue
-									}
 									// If curSrcStartIdx is uninitialized, start it at the group's start idx.
 									// Otherwise continue where we left off.
 									if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
@@ -34746,9 +26563,6 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroupsFromBatch(
 								// Loop over every group.
 								for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
 									leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-									if !leftGroup.unmatched {
-										continue
-									}
 									// If curSrcStartIdx is uninitialized, start it at the group's start idx.
 									// Otherwise continue where we left off.
 									if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
@@ -34804,9 +26618,6 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroupsFromBatch(
 								// Loop over every group.
 								for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
 									leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-									if !leftGroup.unmatched {
-										continue
-									}
 									// If curSrcStartIdx is uninitialized, start it at the group's start idx.
 									// Otherwise continue where we left off.
 									if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
@@ -34863,9 +26674,6 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroupsFromBatch(
 								// Loop over every group.
 								for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
 									leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-									if !leftGroup.unmatched {
-										continue
-									}
 									// If curSrcStartIdx is uninitialized, start it at the group's start idx.
 									// Otherwise continue where we left off.
 									if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
@@ -34925,9 +26733,6 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroupsFromBatch(
 								// Loop over every group.
 								for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
 									leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-									if !leftGroup.unmatched {
-										continue
-									}
 									// If curSrcStartIdx is uninitialized, start it at the group's start idx.
 									// Otherwise continue where we left off.
 									if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
@@ -34987,9 +26792,6 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroupsFromBatch(
 								// Loop over every group.
 								for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
 									leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-									if !leftGroup.unmatched {
-										continue
-									}
 									// If curSrcStartIdx is uninitialized, start it at the group's start idx.
 									// Otherwise continue where we left off.
 									if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
@@ -35049,9 +26851,6 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroupsFromBatch(
 								// Loop over every group.
 								for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
 									leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-									if !leftGroup.unmatched {
-										continue
-									}
 									// If curSrcStartIdx is uninitialized, start it at the group's start idx.
 									// Otherwise continue where we left off.
 									if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
@@ -35111,9 +26910,6 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroupsFromBatch(
 								// Loop over every group.
 								for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
 									leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-									if !leftGroup.unmatched {
-										continue
-									}
 									// If curSrcStartIdx is uninitialized, start it at the group's start idx.
 									// Otherwise continue where we left off.
 									if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
@@ -35181,9 +26977,6 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroupsFromBatch(
 								// Loop over every group.
 								for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
 									leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-									if !leftGroup.unmatched {
-										continue
-									}
 									// If curSrcStartIdx is uninitialized, start it at the group's start idx.
 									// Otherwise continue where we left off.
 									if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
@@ -35245,9 +27038,6 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroupsFromBatch(
 								// Loop over every group.
 								for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
 									leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-									if !leftGroup.unmatched {
-										continue
-									}
 									// If curSrcStartIdx is uninitialized, start it at the group's start idx.
 									// Otherwise continue where we left off.
 									if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
@@ -35309,9 +27099,6 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroupsFromBatch(
 								// Loop over every group.
 								for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
 									leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-									if !leftGroup.unmatched {
-										continue
-									}
 									// If curSrcStartIdx is uninitialized, start it at the group's start idx.
 									// Otherwise continue where we left off.
 									if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
@@ -35372,9 +27159,6 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroupsFromBatch(
 								// Loop over every group.
 								for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
 									leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-									if !leftGroup.unmatched {
-										continue
-									}
 									// If curSrcStartIdx is uninitialized, start it at the group's start idx.
 									// Otherwise continue where we left off.
 									if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
@@ -35432,9 +27216,6 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroupsFromBatch(
 								// Loop over every group.
 								for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
 									leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-									if !leftGroup.unmatched {
-										continue
-									}
 									// If curSrcStartIdx is uninitialized, start it at the group's start idx.
 									// Otherwise continue where we left off.
 									if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
@@ -35493,9 +27274,6 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroupsFromBatch(
 								// Loop over every group.
 								for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
 									leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-									if !leftGroup.unmatched {
-										continue
-									}
 									// If curSrcStartIdx is uninitialized, start it at the group's start idx.
 									// Otherwise continue where we left off.
 									if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
@@ -35557,9 +27335,6 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroupsFromBatch(
 								// Loop over every group.
 								for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
 									leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-									if !leftGroup.unmatched {
-										continue
-									}
 									// If curSrcStartIdx is uninitialized, start it at the group's start idx.
 									// Otherwise continue where we left off.
 									if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
@@ -35621,9 +27396,6 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroupsFromBatch(
 								// Loop over every group.
 								for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
 									leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-									if !leftGroup.unmatched {
-										continue
-									}
 									// If curSrcStartIdx is uninitialized, start it at the group's start idx.
 									// Otherwise continue where we left off.
 									if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
@@ -35685,9 +27457,6 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroupsFromBatch(
 								// Loop over every group.
 								for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
 									leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-									if !leftGroup.unmatched {
-										continue
-									}
 									// If curSrcStartIdx is uninitialized, start it at the group's start idx.
 									// Otherwise continue where we left off.
 									if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
@@ -35749,9 +27518,6 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroupsFromBatch(
 								// Loop over every group.
 								for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
 									leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-									if !leftGroup.unmatched {
-										continue
-									}
 									// If curSrcStartIdx is uninitialized, start it at the group's start idx.
 									// Otherwise continue where we left off.
 									if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
@@ -35819,9 +27585,6 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroupsFromBatch(
 								// Loop over every group.
 								for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
 									leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-									if !leftGroup.unmatched {
-										continue
-									}
 									// If curSrcStartIdx is uninitialized, start it at the group's start idx.
 									// Otherwise continue where we left off.
 									if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
@@ -35880,9 +27643,6 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroupsFromBatch(
 								// Loop over every group.
 								for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
 									leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-									if !leftGroup.unmatched {
-										continue
-									}
 									// If curSrcStartIdx is uninitialized, start it at the group's start idx.
 									// Otherwise continue where we left off.
 									if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
@@ -35941,9 +27701,6 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroupsFromBatch(
 								// Loop over every group.
 								for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
 									leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-									if !leftGroup.unmatched {
-										continue
-									}
 									// If curSrcStartIdx is uninitialized, start it at the group's start idx.
 									// Otherwise continue where we left off.
 									if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
@@ -36001,9 +27758,6 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroupsFromBatch(
 								// Loop over every group.
 								for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
 									leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-									if !leftGroup.unmatched {
-										continue
-									}
 									// If curSrcStartIdx is uninitialized, start it at the group's start idx.
 									// Otherwise continue where we left off.
 									if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
@@ -36058,9 +27812,6 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroupsFromBatch(
 								// Loop over every group.
 								for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
 									leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-									if !leftGroup.unmatched {
-										continue
-									}
 									// If curSrcStartIdx is uninitialized, start it at the group's start idx.
 									// Otherwise continue where we left off.
 									if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
@@ -36116,9 +27867,6 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroupsFromBatch(
 								// Loop over every group.
 								for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
 									leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-									if !leftGroup.unmatched {
-										continue
-									}
 									// If curSrcStartIdx is uninitialized, start it at the group's start idx.
 									// Otherwise continue where we left off.
 									if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
@@ -36177,9 +27925,6 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroupsFromBatch(
 								// Loop over every group.
 								for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
 									leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-									if !leftGroup.unmatched {
-										continue
-									}
 									// If curSrcStartIdx is uninitialized, start it at the group's start idx.
 									// Otherwise continue where we left off.
 									if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
@@ -36238,9 +27983,6 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroupsFromBatch(
 								// Loop over every group.
 								for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
 									leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-									if !leftGroup.unmatched {
-										continue
-									}
 									// If curSrcStartIdx is uninitialized, start it at the group's start idx.
 									// Otherwise continue where we left off.
 									if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
@@ -36299,9 +28041,6 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroupsFromBatch(
 								// Loop over every group.
 								for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
 									leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-									if !leftGroup.unmatched {
-										continue
-									}
 									// If curSrcStartIdx is uninitialized, start it at the group's start idx.
 									// Otherwise continue where we left off.
 									if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
@@ -36360,9 +28099,6 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroupsFromBatch(
 								// Loop over every group.
 								for ; o.builderState.left.groupsIdx < len(leftGroups); o.builderState.left.groupsIdx++ {
 									leftGroup := &leftGroups[o.builderState.left.groupsIdx]
-									if !leftGroup.unmatched {
-										continue
-									}
 									// If curSrcStartIdx is uninitialized, start it at the group's start idx.
 									// Otherwise continue where we left off.
 									if o.builderState.left.curSrcStartIdx == zeroMJCPCurSrcStartIdx {
@@ -36432,7 +28168,7 @@ func (o *mergeJoinLeftAntiOp) buildLeftGroupsFromBatch(
 // to output the first rows (for both INTERSECT ALL and EXCEPT ALL joins we
 // need to output exactly rowEndIdx different rows from the left, but the
 // choice of rows can be arbitrary).
-func (o *mergeJoinLeftAntiOp) buildLeftBufferedGroup(
+func (o *mergeJoinRightSemiOp) buildLeftBufferedGroup(
 	ctx context.Context,
 	leftGroup group,
 	input *mergeJoinInput,
@@ -37001,7 +28737,7 @@ func (o *mergeJoinLeftAntiOp) buildLeftBufferedGroup(
 // Note: this is different from buildLeftGroupsFromBatch in that each group is
 // not expanded but directly copied numRepeats times.
 // SIDE EFFECTS: writes into o.output.
-func (o *mergeJoinLeftAntiOp) buildRightGroupsFromBatch(
+func (o *mergeJoinRightSemiOp) buildRightGroupsFromBatch(
 	rightGroups []group, colOffset int, input *mergeJoinInput, batch coldata.Batch, destStartIdx int,
 ) {
 	initialBuilderState := o.builderState.right
@@ -39711,7 +31447,7 @@ func (o *mergeJoinLeftAntiOp) buildRightGroupsFromBatch(
 // all rows in the buffered group are part of rightGroup (i.e. we don't need to
 // look at rowStartIdx and rowEndIdx). Also, all rows in the buffered group do
 // have a match, so the group can neither be "nullGroup" nor "unmatched".
-func (o *mergeJoinLeftAntiOp) buildRightBufferedGroup(
+func (o *mergeJoinRightSemiOp) buildRightBufferedGroup(
 	ctx context.Context,
 	rightGroup group,
 	colOffset int,
@@ -40071,7 +31807,7 @@ func (o *mergeJoinLeftAntiOp) buildRightBufferedGroup(
 // and set the correct cardinality.
 // Note that in this phase, we do this for every group, except the last group
 // in the batch.
-func (o *mergeJoinLeftAntiOp) probe(ctx context.Context) {
+func (o *mergeJoinRightSemiOp) probe(ctx context.Context) {
 	o.groups.reset(o.proberState.lIdx, o.proberState.lLength, o.proberState.rIdx, o.proberState.rLength)
 	lSel := o.proberState.lBatch.Selection()
 	rSel := o.proberState.rBatch.Selection()
@@ -40092,10 +31828,20 @@ func (o *mergeJoinLeftAntiOp) probe(ctx context.Context) {
 
 // setBuilderSourceToBufferedGroup sets up the builder state to use the
 // buffered group.
-func (o *mergeJoinLeftAntiOp) setBuilderSourceToBufferedGroup(ctx context.Context) {
-	// All tuples in the buffered group have matches, so they are not output in
-	// case of LEFT ANTI join.
-	o.builderState.lGroups = o.builderState.lGroups[:0]
+func (o *mergeJoinRightSemiOp) setBuilderSourceToBufferedGroup(ctx context.Context) {
+	lGroupEndIdx := o.proberState.lBufferedGroup.numTuples
+	rGroupEndIdx := o.proberState.rBufferedGroup.numTuples
+	_, _ = lGroupEndIdx, rGroupEndIdx
+	// The capacity of builder state lGroups and rGroups is always at least 1
+	// given the init.
+	o.builderState.lGroups = o.builderState.lGroups[:1]
+	o.builderState.rGroups = o.builderState.rGroups[:1]
+	o.builderState.rGroups[0] = group{
+		rowStartIdx: 0,
+		rowEndIdx:   rGroupEndIdx,
+		numRepeats:  1,
+		toBuild:     rGroupEndIdx,
+	}
 
 	o.builderState.buildFrom = mjBuildFromBufferedGroup
 
@@ -40109,25 +31855,13 @@ func (o *mergeJoinLeftAntiOp) setBuilderSourceToBufferedGroup(ctx context.Contex
 // exhaustLeftSource sets up the builder to process any remaining tuples from
 // the left source. It should only be called when the right source has been
 // exhausted.
-func (o *mergeJoinLeftAntiOp) exhaustLeftSource(ctx context.Context) {
-	// The capacity of builder state lGroups and rGroups is always at least 1
-	// given the init.
-	o.builderState.lGroups = o.builderState.lGroups[:1]
-	o.builderState.lGroups[0] = group{
-		rowStartIdx: o.proberState.lIdx,
-		rowEndIdx:   o.proberState.lLength,
-		numRepeats:  1,
-		toBuild:     o.proberState.lLength - o.proberState.lIdx,
-		unmatched:   true,
-	}
-
-	o.proberState.lIdx = o.proberState.lLength
+func (o *mergeJoinRightSemiOp) exhaustLeftSource(ctx context.Context) {
 }
 
 // exhaustRightSource sets up the builder to process any remaining tuples from
 // the right source. It should only be called when the left source has been
 // exhausted.
-func (o *mergeJoinLeftAntiOp) exhaustRightSource() {
+func (o *mergeJoinRightSemiOp) exhaustRightSource() {
 	// Remaining tuples from the right source do not have a match, so they are
 	// ignored in all joins except for RIGHT OUTER and FULL OUTER.
 }
@@ -40136,16 +31870,10 @@ func (o *mergeJoinLeftAntiOp) exhaustRightSource() {
 // batch size to determine the output count. Note that as soon as a group is
 // materialized partially or fully to output, its toBuild field is updated
 // accordingly.
-func (o *mergeJoinLeftAntiOp) calculateOutputCount(groups []group) int {
+func (o *mergeJoinRightSemiOp) calculateOutputCount(groups []group) int {
 	count := o.builderState.outCount
 
 	for i := 0; i < len(groups); i++ {
-		if !groups[i].unmatched {
-			// "Matched" groups are not outputted in LEFT ANTI, RIGHT ANTI,
-			// and EXCEPT ALL joins (for the latter IsLeftAnti == true), so
-			// they do not contribute to the output count.
-			continue
-		}
 		count += groups[i].toBuild
 		groups[i].toBuild = 0
 		if count > o.output.Capacity() {
@@ -40159,9 +31887,9 @@ func (o *mergeJoinLeftAntiOp) calculateOutputCount(groups []group) int {
 }
 
 // build creates the cross product, and writes it to the output member.
-func (o *mergeJoinLeftAntiOp) build(ctx context.Context) {
+func (o *mergeJoinRightSemiOp) build(ctx context.Context) {
 	outStartIdx := o.builderState.outCount
-	o.builderState.outCount = o.calculateOutputCount(o.builderState.lGroups)
+	o.builderState.outCount = o.calculateOutputCount(o.builderState.rGroups)
 	if o.output.Width() != 0 && o.builderState.outCount > outStartIdx {
 		// We will be actually building the output if we have columns in the output
 		// batch (meaning that we're not doing query like 'SELECT count(*) ...')
@@ -40170,13 +31898,9 @@ func (o *mergeJoinLeftAntiOp) build(ctx context.Context) {
 		colOffsetForRightGroups := 0
 		switch o.builderState.buildFrom {
 		case mjBuildFromBatch:
-			o.buildLeftGroupsFromBatch(o.builderState.lGroups, &o.left, o.proberState.lBatch, outStartIdx)
-			colOffsetForRightGroups = len(o.left.sourceTypes)
-			_ = colOffsetForRightGroups
+			o.buildRightGroupsFromBatch(o.builderState.rGroups, colOffsetForRightGroups, &o.right, o.proberState.rBatch, outStartIdx)
 		case mjBuildFromBufferedGroup:
-			o.buildLeftBufferedGroup(ctx, o.builderState.lGroups[0], &o.left, o.proberState.lBufferedGroup, outStartIdx)
-			colOffsetForRightGroups = len(o.left.sourceTypes)
-			_ = colOffsetForRightGroups
+			o.buildRightBufferedGroup(ctx, o.builderState.rGroups[0], colOffsetForRightGroups, &o.right, o.proberState.rBufferedGroup, outStartIdx)
 
 		default:
 			colexecerror.InternalError(errors.AssertionFailedf("unsupported mjBuildFrom %d", o.builderState.buildFrom))
@@ -40184,7 +31908,7 @@ func (o *mergeJoinLeftAntiOp) build(ctx context.Context) {
 	}
 }
 
-func (o *mergeJoinLeftAntiOp) Next(ctx context.Context) coldata.Batch {
+func (o *mergeJoinRightSemiOp) Next(ctx context.Context) coldata.Batch {
 	o.output, _ = o.unlimitedAllocator.ResetMaybeReallocate(o.outputTypes, o.output, 1 /* minCapacity */)
 	for {
 		switch o.state {
@@ -40206,23 +31930,7 @@ func (o *mergeJoinLeftAntiOp) Next(ctx context.Context) coldata.Batch {
 
 			o.outputReady = true
 			o.builderState.buildFrom = mjBuildFromBatch
-			// Next, we need to make sure that builder state is set up for a case when
-			// neither exhaustLeftSource nor exhaustRightSource is called below. In such
-			// scenario the merge joiner is done, so it'll be outputting zero-length
-			// batches from now on.
-			o.builderState.lGroups = o.builderState.lGroups[:0]
-			o.builderState.rGroups = o.builderState.rGroups[:0]
-			// At least one of the sources is finished. If it was the right one,
-			// then we need to emit remaining tuples from the left source with
-			// nulls corresponding to the right one. But if the left source is
-			// finished, then there is nothing left to do.
-			if o.proberState.lIdx < o.proberState.lLength {
-				o.exhaustLeftSource(ctx)
-				// We unset o.outputReady here because we want to put as many unmatched
-				// tuples from the left into the output batch. Once outCount reaches the
-				// desired output batch size, the output will be returned.
-				o.outputReady = false
-			}
+			o.setBuilderSourceToBufferedGroup(ctx)
 			o.state = mjBuild
 		case mjFinishBufferedGroup:
 			o.finishProbe(ctx)
