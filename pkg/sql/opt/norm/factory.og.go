@@ -16909,6 +16909,33 @@ func (_f *Factory) ConstructCovarSamp(
 	return _f.onConstructScalar(e)
 }
 
+// ConstructRegressionIntercept constructs an expression for the RegressionIntercept operator.
+func (_f *Factory) ConstructRegressionIntercept(
+	y opt.ScalarExpr,
+	x opt.ScalarExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeRegressionIntercept(y, x)
+	return _f.onConstructScalar(e)
+}
+
+// ConstructRegressionR2 constructs an expression for the RegressionR2 operator.
+func (_f *Factory) ConstructRegressionR2(
+	y opt.ScalarExpr,
+	x opt.ScalarExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeRegressionR2(y, x)
+	return _f.onConstructScalar(e)
+}
+
+// ConstructRegressionSlope constructs an expression for the RegressionSlope operator.
+func (_f *Factory) ConstructRegressionSlope(
+	y opt.ScalarExpr,
+	x opt.ScalarExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeRegressionSlope(y, x)
+	return _f.onConstructScalar(e)
+}
+
 // ConstructMax constructs an expression for the Max operator.
 func (_f *Factory) ConstructMax(
 	input opt.ScalarExpr,
@@ -18592,6 +18619,30 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		}
 		return t
 
+	case *memo.RegressionInterceptExpr:
+		y := replace(t.Y).(opt.ScalarExpr)
+		x := replace(t.X).(opt.ScalarExpr)
+		if y != t.Y || x != t.X {
+			return f.ConstructRegressionIntercept(y, x)
+		}
+		return t
+
+	case *memo.RegressionR2Expr:
+		y := replace(t.Y).(opt.ScalarExpr)
+		x := replace(t.X).(opt.ScalarExpr)
+		if y != t.Y || x != t.X {
+			return f.ConstructRegressionR2(y, x)
+		}
+		return t
+
+	case *memo.RegressionSlopeExpr:
+		y := replace(t.Y).(opt.ScalarExpr)
+		x := replace(t.X).(opt.ScalarExpr)
+		if y != t.Y || x != t.X {
+			return f.ConstructRegressionSlope(y, x)
+		}
+		return t
+
 	case *memo.MaxExpr:
 		input := replace(t.Input).(opt.ScalarExpr)
 		if input != t.Input {
@@ -19990,6 +20041,24 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 			f.invokeReplace(t.X, replace).(opt.ScalarExpr),
 		)
 
+	case *memo.RegressionInterceptExpr:
+		return f.ConstructRegressionIntercept(
+			f.invokeReplace(t.Y, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.X, replace).(opt.ScalarExpr),
+		)
+
+	case *memo.RegressionR2Expr:
+		return f.ConstructRegressionR2(
+			f.invokeReplace(t.Y, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.X, replace).(opt.ScalarExpr),
+		)
+
+	case *memo.RegressionSlopeExpr:
+		return f.ConstructRegressionSlope(
+			f.invokeReplace(t.Y, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.X, replace).(opt.ScalarExpr),
+		)
+
 	case *memo.MaxExpr:
 		return f.ConstructMax(
 			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
@@ -21104,6 +21173,21 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 		)
 	case opt.CovarSampOp:
 		return f.ConstructCovarSamp(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.RegressionInterceptOp:
+		return f.ConstructRegressionIntercept(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.RegressionR2Op:
+		return f.ConstructRegressionR2(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.RegressionSlopeOp:
+		return f.ConstructRegressionSlope(
 			args[0].(opt.ScalarExpr),
 			args[1].(opt.ScalarExpr),
 		)

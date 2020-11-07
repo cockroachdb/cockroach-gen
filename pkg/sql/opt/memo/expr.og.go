@@ -12641,6 +12641,180 @@ func (e *CovarSampExpr) DataType() *types.T {
 	return e.Typ
 }
 
+type RegressionInterceptExpr struct {
+	Y opt.ScalarExpr
+	X opt.ScalarExpr
+
+	Typ *types.T
+	id  opt.ScalarID
+}
+
+var _ opt.ScalarExpr = &RegressionInterceptExpr{}
+
+func (e *RegressionInterceptExpr) ID() opt.ScalarID {
+	return e.id
+}
+
+func (e *RegressionInterceptExpr) Op() opt.Operator {
+	return opt.RegressionInterceptOp
+}
+
+func (e *RegressionInterceptExpr) ChildCount() int {
+	return 2
+}
+
+func (e *RegressionInterceptExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Y
+	case 1:
+		return e.X
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *RegressionInterceptExpr) Private() interface{} {
+	return nil
+}
+
+func (e *RegressionInterceptExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *RegressionInterceptExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Y = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.X = child.(opt.ScalarExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *RegressionInterceptExpr) DataType() *types.T {
+	return e.Typ
+}
+
+type RegressionR2Expr struct {
+	Y opt.ScalarExpr
+	X opt.ScalarExpr
+
+	Typ *types.T
+	id  opt.ScalarID
+}
+
+var _ opt.ScalarExpr = &RegressionR2Expr{}
+
+func (e *RegressionR2Expr) ID() opt.ScalarID {
+	return e.id
+}
+
+func (e *RegressionR2Expr) Op() opt.Operator {
+	return opt.RegressionR2Op
+}
+
+func (e *RegressionR2Expr) ChildCount() int {
+	return 2
+}
+
+func (e *RegressionR2Expr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Y
+	case 1:
+		return e.X
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *RegressionR2Expr) Private() interface{} {
+	return nil
+}
+
+func (e *RegressionR2Expr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *RegressionR2Expr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Y = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.X = child.(opt.ScalarExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *RegressionR2Expr) DataType() *types.T {
+	return e.Typ
+}
+
+type RegressionSlopeExpr struct {
+	Y opt.ScalarExpr
+	X opt.ScalarExpr
+
+	Typ *types.T
+	id  opt.ScalarID
+}
+
+var _ opt.ScalarExpr = &RegressionSlopeExpr{}
+
+func (e *RegressionSlopeExpr) ID() opt.ScalarID {
+	return e.id
+}
+
+func (e *RegressionSlopeExpr) Op() opt.Operator {
+	return opt.RegressionSlopeOp
+}
+
+func (e *RegressionSlopeExpr) ChildCount() int {
+	return 2
+}
+
+func (e *RegressionSlopeExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Y
+	case 1:
+		return e.X
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *RegressionSlopeExpr) Private() interface{} {
+	return nil
+}
+
+func (e *RegressionSlopeExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *RegressionSlopeExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Y = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.X = child.(opt.ScalarExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *RegressionSlopeExpr) DataType() *types.T {
+	return e.Typ
+}
+
 type MaxExpr struct {
 	Input opt.ScalarExpr
 
@@ -20183,6 +20357,72 @@ func (m *Memo) MemoizeCovarSamp(
 	return interned
 }
 
+func (m *Memo) MemoizeRegressionIntercept(
+	y opt.ScalarExpr,
+	x opt.ScalarExpr,
+) *RegressionInterceptExpr {
+	const size = int64(unsafe.Sizeof(RegressionInterceptExpr{}))
+	e := &RegressionInterceptExpr{
+		Y:  y,
+		X:  x,
+		id: m.NextID(),
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternRegressionIntercept(e)
+	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
+		m.memEstimate += size
+		m.CheckExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeRegressionR2(
+	y opt.ScalarExpr,
+	x opt.ScalarExpr,
+) *RegressionR2Expr {
+	const size = int64(unsafe.Sizeof(RegressionR2Expr{}))
+	e := &RegressionR2Expr{
+		Y:  y,
+		X:  x,
+		id: m.NextID(),
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternRegressionR2(e)
+	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
+		m.memEstimate += size
+		m.CheckExpr(e)
+	}
+	return interned
+}
+
+func (m *Memo) MemoizeRegressionSlope(
+	y opt.ScalarExpr,
+	x opt.ScalarExpr,
+) *RegressionSlopeExpr {
+	const size = int64(unsafe.Sizeof(RegressionSlopeExpr{}))
+	e := &RegressionSlopeExpr{
+		Y:  y,
+		X:  x,
+		id: m.NextID(),
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternRegressionSlope(e)
+	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
+		m.memEstimate += size
+		m.CheckExpr(e)
+	}
+	return interned
+}
+
 func (m *Memo) MemoizeMax(
 	input opt.ScalarExpr,
 ) *MaxExpr {
@@ -22490,6 +22730,12 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternCovarPop(t)
 	case *CovarSampExpr:
 		return in.InternCovarSamp(t)
+	case *RegressionInterceptExpr:
+		return in.InternRegressionIntercept(t)
+	case *RegressionR2Expr:
+		return in.InternRegressionR2(t)
+	case *RegressionSlopeExpr:
+		return in.InternRegressionSlope(t)
 	case *MaxExpr:
 		return in.InternMax(t)
 	case *MinExpr:
@@ -25893,6 +26139,66 @@ func (in *interner) InternCovarSamp(val *CovarSampExpr) *CovarSampExpr {
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*CovarSampExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Y, existing.Y) &&
+				in.hasher.IsScalarExprEqual(val.X, existing.X) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternRegressionIntercept(val *RegressionInterceptExpr) *RegressionInterceptExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.RegressionInterceptOp)
+	in.hasher.HashScalarExpr(val.Y)
+	in.hasher.HashScalarExpr(val.X)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*RegressionInterceptExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Y, existing.Y) &&
+				in.hasher.IsScalarExprEqual(val.X, existing.X) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternRegressionR2(val *RegressionR2Expr) *RegressionR2Expr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.RegressionR2Op)
+	in.hasher.HashScalarExpr(val.Y)
+	in.hasher.HashScalarExpr(val.X)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*RegressionR2Expr); ok {
+			if in.hasher.IsScalarExprEqual(val.Y, existing.Y) &&
+				in.hasher.IsScalarExprEqual(val.X, existing.X) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternRegressionSlope(val *RegressionSlopeExpr) *RegressionSlopeExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.RegressionSlopeOp)
+	in.hasher.HashScalarExpr(val.Y)
+	in.hasher.HashScalarExpr(val.X)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*RegressionSlopeExpr); ok {
 			if in.hasher.IsScalarExprEqual(val.Y, existing.Y) &&
 				in.hasher.IsScalarExprEqual(val.X, existing.X) {
 				return existing
