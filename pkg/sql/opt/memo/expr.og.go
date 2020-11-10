@@ -15644,6 +15644,11 @@ type ExplainPrivate struct {
 	// Options contains settings that control the output of the explain statement.
 	Options tree.ExplainOptions
 
+	// Analyze indicates if this is an EXPLAIN ANALYZE.
+	// TODO(radu): remove this onse ANALYZE Is only implemented as a top-level
+	// statement.
+	Analyze bool
+
 	// ColList stores the column IDs for the explain columns.
 	ColList opt.ColList
 
@@ -27100,6 +27105,7 @@ func (in *interner) InternExplain(val *ExplainExpr) *ExplainExpr {
 	in.hasher.HashOperator(opt.ExplainOp)
 	in.hasher.HashRelExpr(val.Input)
 	in.hasher.HashExplainOptions(val.Options)
+	in.hasher.HashBool(val.Analyze)
 	in.hasher.HashColList(val.ColList)
 	in.hasher.HashPhysProps(val.Props)
 	in.hasher.HashStatementType(val.StmtType)
@@ -27109,6 +27115,7 @@ func (in *interner) InternExplain(val *ExplainExpr) *ExplainExpr {
 		if existing, ok := in.cache.Item().(*ExplainExpr); ok {
 			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
 				in.hasher.IsExplainOptionsEqual(val.Options, existing.Options) &&
+				in.hasher.IsBoolEqual(val.Analyze, existing.Analyze) &&
 				in.hasher.IsColListEqual(val.ColList, existing.ColList) &&
 				in.hasher.IsPhysPropsEqual(val.Props, existing.Props) &&
 				in.hasher.IsStatementTypeEqual(val.StmtType, existing.StmtType) {

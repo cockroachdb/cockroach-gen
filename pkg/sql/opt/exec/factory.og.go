@@ -405,6 +405,7 @@ type Factory interface {
 	// Explain implements EXPLAIN, showing information about the given plan.
 	ConstructExplain(
 		options *tree.ExplainOptions,
+		analyze bool,
 		stmtType tree.StatementType,
 		plan Plan,
 	) (Node, error)
@@ -1043,6 +1044,7 @@ func (StubFactory) ConstructExplainOpt(
 
 func (StubFactory) ConstructExplain(
 	options *tree.ExplainOptions,
+	analyze bool,
 	stmtType tree.StatementType,
 	plan Plan,
 ) (Node, error) {
