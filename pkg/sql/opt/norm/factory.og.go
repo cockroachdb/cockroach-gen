@@ -16936,6 +16936,33 @@ func (_f *Factory) ConstructRegressionSlope(
 	return _f.onConstructScalar(e)
 }
 
+// ConstructRegressionSXX constructs an expression for the RegressionSXX operator.
+func (_f *Factory) ConstructRegressionSXX(
+	y opt.ScalarExpr,
+	x opt.ScalarExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeRegressionSXX(y, x)
+	return _f.onConstructScalar(e)
+}
+
+// ConstructRegressionSXY constructs an expression for the RegressionSXY operator.
+func (_f *Factory) ConstructRegressionSXY(
+	y opt.ScalarExpr,
+	x opt.ScalarExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeRegressionSXY(y, x)
+	return _f.onConstructScalar(e)
+}
+
+// ConstructRegressionSYY constructs an expression for the RegressionSYY operator.
+func (_f *Factory) ConstructRegressionSYY(
+	y opt.ScalarExpr,
+	x opt.ScalarExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeRegressionSYY(y, x)
+	return _f.onConstructScalar(e)
+}
+
 // ConstructMax constructs an expression for the Max operator.
 func (_f *Factory) ConstructMax(
 	input opt.ScalarExpr,
@@ -18643,6 +18670,30 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		}
 		return t
 
+	case *memo.RegressionSXXExpr:
+		y := replace(t.Y).(opt.ScalarExpr)
+		x := replace(t.X).(opt.ScalarExpr)
+		if y != t.Y || x != t.X {
+			return f.ConstructRegressionSXX(y, x)
+		}
+		return t
+
+	case *memo.RegressionSXYExpr:
+		y := replace(t.Y).(opt.ScalarExpr)
+		x := replace(t.X).(opt.ScalarExpr)
+		if y != t.Y || x != t.X {
+			return f.ConstructRegressionSXY(y, x)
+		}
+		return t
+
+	case *memo.RegressionSYYExpr:
+		y := replace(t.Y).(opt.ScalarExpr)
+		x := replace(t.X).(opt.ScalarExpr)
+		if y != t.Y || x != t.X {
+			return f.ConstructRegressionSYY(y, x)
+		}
+		return t
+
 	case *memo.MaxExpr:
 		input := replace(t.Input).(opt.ScalarExpr)
 		if input != t.Input {
@@ -20059,6 +20110,24 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 			f.invokeReplace(t.X, replace).(opt.ScalarExpr),
 		)
 
+	case *memo.RegressionSXXExpr:
+		return f.ConstructRegressionSXX(
+			f.invokeReplace(t.Y, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.X, replace).(opt.ScalarExpr),
+		)
+
+	case *memo.RegressionSXYExpr:
+		return f.ConstructRegressionSXY(
+			f.invokeReplace(t.Y, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.X, replace).(opt.ScalarExpr),
+		)
+
+	case *memo.RegressionSYYExpr:
+		return f.ConstructRegressionSYY(
+			f.invokeReplace(t.Y, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.X, replace).(opt.ScalarExpr),
+		)
+
 	case *memo.MaxExpr:
 		return f.ConstructMax(
 			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
@@ -21188,6 +21257,21 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 		)
 	case opt.RegressionSlopeOp:
 		return f.ConstructRegressionSlope(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.RegressionSXXOp:
+		return f.ConstructRegressionSXX(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.RegressionSXYOp:
+		return f.ConstructRegressionSXY(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.RegressionSYYOp:
+		return f.ConstructRegressionSYY(
 			args[0].(opt.ScalarExpr),
 			args[1].(opt.ScalarExpr),
 		)
