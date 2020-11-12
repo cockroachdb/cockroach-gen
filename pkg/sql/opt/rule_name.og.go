@@ -144,6 +144,7 @@ const (
 	RightAssociateJoinsLeft
 	RightAssociateJoinsRight
 	RemoveJoinNotNullCondition
+	ProjectInnerJoinValues
 	EliminateLimit
 	EliminateOffset
 	PushLimitIntoProject

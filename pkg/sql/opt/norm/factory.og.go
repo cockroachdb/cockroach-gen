@@ -2704,6 +2704,29 @@ func (_f *Factory) ConstructInnerJoin(
 		}
 	}
 
+	// [ProjectInnerJoinValues]
+	{
+		_values, _ := right.(*memo.ValuesExpr)
+		if _values != nil {
+			if _f.funcs.HasOneRow(_values) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.ProjectInnerJoinValues) {
+					_expr := _f.ConstructSelect(
+						_f.ConstructProject(
+							left,
+							_f.funcs.MakeProjectionsFromValues(_values),
+							_f.funcs.OutputCols(left),
+						),
+						on,
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.ProjectInnerJoinValues, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
 	// [HoistJoinSubquery]
 	{
 		for i := range on {
@@ -6300,6 +6323,29 @@ func (_f *Factory) ConstructInnerJoinApply(
 							}
 						}
 					}
+				}
+			}
+		}
+	}
+
+	// [ProjectInnerJoinValues]
+	{
+		_values, _ := right.(*memo.ValuesExpr)
+		if _values != nil {
+			if _f.funcs.HasOneRow(_values) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.ProjectInnerJoinValues) {
+					_expr := _f.ConstructSelect(
+						_f.ConstructProject(
+							left,
+							_f.funcs.MakeProjectionsFromValues(_values),
+							_f.funcs.OutputCols(left),
+						),
+						on,
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.ProjectInnerJoinValues, nil, _expr)
+					}
+					return _expr
 				}
 			}
 		}
