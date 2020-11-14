@@ -1812,7 +1812,7 @@ Index flags:
   '{' IGNORE_FOREIGN_KEYS [, ...] '}'
 
 Join types:
-  { INNER | { LEFT | RIGHT | FULL } [OUTER] } [ { HASH | MERGE | LOOKUP } ]
+  { INNER | { LEFT | RIGHT | FULL } [OUTER] } [ { HASH | MERGE | LOOKUP | INVERTED } ]
 
 `,
 		//line sql.y: 8699
