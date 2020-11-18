@@ -127,8 +127,9 @@ func (e *SortExpr) setGroup(member exprGroup) {
 // mutation columns, which are not writable (or even visible in the case of
 // mutation columns) by SQL users.
 type InsertExpr struct {
-	Input  RelExpr
-	Checks FKChecksExpr
+	Input        RelExpr
+	UniqueChecks UniqueChecksExpr
+	FKChecks     FKChecksExpr
 	MutationPrivate
 
 	grp  exprGroup
@@ -142,7 +143,7 @@ func (e *InsertExpr) Op() opt.Operator {
 }
 
 func (e *InsertExpr) ChildCount() int {
-	return 2
+	return 3
 }
 
 func (e *InsertExpr) Child(nth int) opt.Expr {
@@ -150,7 +151,9 @@ func (e *InsertExpr) Child(nth int) opt.Expr {
 	case 0:
 		return e.Input
 	case 1:
-		return &e.Checks
+		return &e.UniqueChecks
+	case 2:
+		return &e.FKChecks
 	}
 	panic(errors.AssertionFailedf("child index out of range"))
 }
@@ -171,7 +174,10 @@ func (e *InsertExpr) SetChild(nth int, child opt.Expr) {
 		e.Input = child.(RelExpr)
 		return
 	case 1:
-		e.Checks = *child.(*FKChecksExpr)
+		e.UniqueChecks = *child.(*UniqueChecksExpr)
+		return
+	case 2:
+		e.FKChecks = *child.(*FKChecksExpr)
 		return
 	}
 	panic(errors.AssertionFailedf("child index out of range"))
@@ -408,8 +414,9 @@ type MutationPrivate struct {
 // The Update operator will also update any computed columns, including mutation
 // columns that are computed.
 type UpdateExpr struct {
-	Input  RelExpr
-	Checks FKChecksExpr
+	Input        RelExpr
+	UniqueChecks UniqueChecksExpr
+	FKChecks     FKChecksExpr
 	MutationPrivate
 
 	grp  exprGroup
@@ -423,7 +430,7 @@ func (e *UpdateExpr) Op() opt.Operator {
 }
 
 func (e *UpdateExpr) ChildCount() int {
-	return 2
+	return 3
 }
 
 func (e *UpdateExpr) Child(nth int) opt.Expr {
@@ -431,7 +438,9 @@ func (e *UpdateExpr) Child(nth int) opt.Expr {
 	case 0:
 		return e.Input
 	case 1:
-		return &e.Checks
+		return &e.UniqueChecks
+	case 2:
+		return &e.FKChecks
 	}
 	panic(errors.AssertionFailedf("child index out of range"))
 }
@@ -452,7 +461,10 @@ func (e *UpdateExpr) SetChild(nth int, child opt.Expr) {
 		e.Input = child.(RelExpr)
 		return
 	case 1:
-		e.Checks = *child.(*FKChecksExpr)
+		e.UniqueChecks = *child.(*UniqueChecksExpr)
+		return
+	case 2:
+		e.FKChecks = *child.(*FKChecksExpr)
 		return
 	}
 	panic(errors.AssertionFailedf("child index out of range"))
@@ -551,8 +563,9 @@ func (g *updateGroup) bestProps() *bestProps {
 // The Update operator will also insert/update any computed columns, including
 // mutation columns that are computed.
 type UpsertExpr struct {
-	Input  RelExpr
-	Checks FKChecksExpr
+	Input        RelExpr
+	UniqueChecks UniqueChecksExpr
+	FKChecks     FKChecksExpr
 	MutationPrivate
 
 	grp  exprGroup
@@ -566,7 +579,7 @@ func (e *UpsertExpr) Op() opt.Operator {
 }
 
 func (e *UpsertExpr) ChildCount() int {
-	return 2
+	return 3
 }
 
 func (e *UpsertExpr) Child(nth int) opt.Expr {
@@ -574,7 +587,9 @@ func (e *UpsertExpr) Child(nth int) opt.Expr {
 	case 0:
 		return e.Input
 	case 1:
-		return &e.Checks
+		return &e.UniqueChecks
+	case 2:
+		return &e.FKChecks
 	}
 	panic(errors.AssertionFailedf("child index out of range"))
 }
@@ -595,7 +610,10 @@ func (e *UpsertExpr) SetChild(nth int, child opt.Expr) {
 		e.Input = child.(RelExpr)
 		return
 	case 1:
-		e.Checks = *child.(*FKChecksExpr)
+		e.UniqueChecks = *child.(*UniqueChecksExpr)
+		return
+	case 2:
+		e.FKChecks = *child.(*FKChecksExpr)
 		return
 	}
 	panic(errors.AssertionFailedf("child index out of range"))
@@ -683,8 +701,9 @@ func (g *upsertGroup) bestProps() *bestProps {
 //   DELETE FROM abc WHERE a>0 ORDER BY b LIMIT 10
 //
 type DeleteExpr struct {
-	Input  RelExpr
-	Checks FKChecksExpr
+	Input        RelExpr
+	UniqueChecks UniqueChecksExpr
+	FKChecks     FKChecksExpr
 	MutationPrivate
 
 	grp  exprGroup
@@ -698,7 +717,7 @@ func (e *DeleteExpr) Op() opt.Operator {
 }
 
 func (e *DeleteExpr) ChildCount() int {
-	return 2
+	return 3
 }
 
 func (e *DeleteExpr) Child(nth int) opt.Expr {
@@ -706,7 +725,9 @@ func (e *DeleteExpr) Child(nth int) opt.Expr {
 	case 0:
 		return e.Input
 	case 1:
-		return &e.Checks
+		return &e.UniqueChecks
+	case 2:
+		return &e.FKChecks
 	}
 	panic(errors.AssertionFailedf("child index out of range"))
 }
@@ -727,7 +748,10 @@ func (e *DeleteExpr) SetChild(nth int, child opt.Expr) {
 		e.Input = child.(RelExpr)
 		return
 	case 1:
-		e.Checks = *child.(*FKChecksExpr)
+		e.UniqueChecks = *child.(*UniqueChecksExpr)
+		return
+	case 2:
+		e.FKChecks = *child.(*FKChecksExpr)
 		return
 	}
 	panic(errors.AssertionFailedf("child index out of range"))
@@ -918,6 +942,116 @@ type FKChecksItemPrivate struct {
 	// The FK constraint is InboundForeignKey(FKOrdinal) on the referenced table.
 	FKOutbound bool
 	FKOrdinal  int
+
+	// KeyCols are the columns in the Check query that form the value tuple shown
+	// in the error message.
+	KeyCols opt.ColList
+
+	// OpName is the name that should be used for this check in error messages.
+	OpName string
+}
+
+// UniqueChecksExpr is a list of uniqueness check queries, to be run after the main
+// query.
+type UniqueChecksExpr []UniqueChecksItem
+
+var EmptyUniqueChecksExpr = UniqueChecksExpr{}
+
+var _ opt.ScalarExpr = &UniqueChecksExpr{}
+
+func (e *UniqueChecksExpr) ID() opt.ScalarID {
+	panic(errors.AssertionFailedf("lists have no id"))
+}
+
+func (e *UniqueChecksExpr) Op() opt.Operator {
+	return opt.UniqueChecksOp
+}
+
+func (e *UniqueChecksExpr) ChildCount() int {
+	return len(*e)
+}
+
+func (e *UniqueChecksExpr) Child(nth int) opt.Expr {
+	return &(*e)[nth]
+}
+
+func (e *UniqueChecksExpr) Private() interface{} {
+	return nil
+}
+
+func (e *UniqueChecksExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *UniqueChecksExpr) SetChild(nth int, child opt.Expr) {
+	(*e)[nth] = *child.(*UniqueChecksItem)
+}
+
+func (e *UniqueChecksExpr) DataType() *types.T {
+	return types.Any
+}
+
+// UniqueChecksItem is a unique check query, to be run after the main query.
+// An execution error will be generated if the query returns any results.
+type UniqueChecksItem struct {
+	Check RelExpr
+	UniqueChecksItemPrivate
+
+	Typ *types.T
+}
+
+var _ opt.ScalarExpr = &UniqueChecksItem{}
+
+func (e *UniqueChecksItem) ID() opt.ScalarID {
+	return 0
+}
+
+func (e *UniqueChecksItem) Op() opt.Operator {
+	return opt.UniqueChecksItemOp
+}
+
+func (e *UniqueChecksItem) ChildCount() int {
+	return 1
+}
+
+func (e *UniqueChecksItem) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Check
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *UniqueChecksItem) Private() interface{} {
+	return &e.UniqueChecksItemPrivate
+}
+
+func (e *UniqueChecksItem) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *UniqueChecksItem) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Check = child.(RelExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *UniqueChecksItem) DataType() *types.T {
+	return e.Typ
+}
+
+type UniqueChecksItemPrivate struct {
+	Table opt.TableID
+
+	// This is the ordinal of the check in the table's unique constraints.
+	CheckOrdinal int
 
 	// KeyCols are the columns in the Check query that form the value tuple shown
 	// in the error message.
@@ -17488,13 +17622,15 @@ type ExportPrivate struct {
 
 func (m *Memo) MemoizeInsert(
 	input RelExpr,
-	checks FKChecksExpr,
+	uniqueChecks UniqueChecksExpr,
+	fKChecks FKChecksExpr,
 	mutationPrivate *MutationPrivate,
 ) RelExpr {
 	const size = int64(unsafe.Sizeof(insertGroup{}))
 	grp := &insertGroup{mem: m, first: InsertExpr{
 		Input:           input,
-		Checks:          checks,
+		UniqueChecks:    uniqueChecks,
+		FKChecks:        fKChecks,
 		MutationPrivate: *mutationPrivate,
 	}}
 	e := &grp.first
@@ -17514,13 +17650,15 @@ func (m *Memo) MemoizeInsert(
 
 func (m *Memo) MemoizeUpdate(
 	input RelExpr,
-	checks FKChecksExpr,
+	uniqueChecks UniqueChecksExpr,
+	fKChecks FKChecksExpr,
 	mutationPrivate *MutationPrivate,
 ) RelExpr {
 	const size = int64(unsafe.Sizeof(updateGroup{}))
 	grp := &updateGroup{mem: m, first: UpdateExpr{
 		Input:           input,
-		Checks:          checks,
+		UniqueChecks:    uniqueChecks,
+		FKChecks:        fKChecks,
 		MutationPrivate: *mutationPrivate,
 	}}
 	e := &grp.first
@@ -17540,13 +17678,15 @@ func (m *Memo) MemoizeUpdate(
 
 func (m *Memo) MemoizeUpsert(
 	input RelExpr,
-	checks FKChecksExpr,
+	uniqueChecks UniqueChecksExpr,
+	fKChecks FKChecksExpr,
 	mutationPrivate *MutationPrivate,
 ) RelExpr {
 	const size = int64(unsafe.Sizeof(upsertGroup{}))
 	grp := &upsertGroup{mem: m, first: UpsertExpr{
 		Input:           input,
-		Checks:          checks,
+		UniqueChecks:    uniqueChecks,
+		FKChecks:        fKChecks,
 		MutationPrivate: *mutationPrivate,
 	}}
 	e := &grp.first
@@ -17566,13 +17706,15 @@ func (m *Memo) MemoizeUpsert(
 
 func (m *Memo) MemoizeDelete(
 	input RelExpr,
-	checks FKChecksExpr,
+	uniqueChecks UniqueChecksExpr,
+	fKChecks FKChecksExpr,
 	mutationPrivate *MutationPrivate,
 ) RelExpr {
 	const size = int64(unsafe.Sizeof(deleteGroup{}))
 	grp := &deleteGroup{mem: m, first: DeleteExpr{
 		Input:           input,
-		Checks:          checks,
+		UniqueChecks:    uniqueChecks,
+		FKChecks:        fKChecks,
 		MutationPrivate: *mutationPrivate,
 	}}
 	e := &grp.first
@@ -22695,6 +22837,10 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternFKChecks(t)
 	case *FKChecksItem:
 		return in.InternFKChecksItem(t)
+	case *UniqueChecksExpr:
+		return in.InternUniqueChecks(t)
+	case *UniqueChecksItem:
+		return in.InternUniqueChecksItem(t)
 	case *ScanExpr:
 		return in.InternScan(t)
 	case *SequenceSelectExpr:
@@ -23118,7 +23264,8 @@ func (in *interner) InternInsert(val *InsertExpr) *InsertExpr {
 	in.hasher.Init()
 	in.hasher.HashOperator(opt.InsertOp)
 	in.hasher.HashRelExpr(val.Input)
-	in.hasher.HashFKChecksExpr(val.Checks)
+	in.hasher.HashUniqueChecksExpr(val.UniqueChecks)
+	in.hasher.HashFKChecksExpr(val.FKChecks)
 	in.hasher.HashTableID(val.Table)
 	in.hasher.HashColList(val.InsertCols)
 	in.hasher.HashColList(val.FetchCols)
@@ -23137,7 +23284,8 @@ func (in *interner) InternInsert(val *InsertExpr) *InsertExpr {
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*InsertExpr); ok {
 			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
-				in.hasher.IsFKChecksExprEqual(val.Checks, existing.Checks) &&
+				in.hasher.IsUniqueChecksExprEqual(val.UniqueChecks, existing.UniqueChecks) &&
+				in.hasher.IsFKChecksExprEqual(val.FKChecks, existing.FKChecks) &&
 				in.hasher.IsTableIDEqual(val.Table, existing.Table) &&
 				in.hasher.IsColListEqual(val.InsertCols, existing.InsertCols) &&
 				in.hasher.IsColListEqual(val.FetchCols, existing.FetchCols) &&
@@ -23164,7 +23312,8 @@ func (in *interner) InternUpdate(val *UpdateExpr) *UpdateExpr {
 	in.hasher.Init()
 	in.hasher.HashOperator(opt.UpdateOp)
 	in.hasher.HashRelExpr(val.Input)
-	in.hasher.HashFKChecksExpr(val.Checks)
+	in.hasher.HashUniqueChecksExpr(val.UniqueChecks)
+	in.hasher.HashFKChecksExpr(val.FKChecks)
 	in.hasher.HashTableID(val.Table)
 	in.hasher.HashColList(val.InsertCols)
 	in.hasher.HashColList(val.FetchCols)
@@ -23183,7 +23332,8 @@ func (in *interner) InternUpdate(val *UpdateExpr) *UpdateExpr {
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*UpdateExpr); ok {
 			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
-				in.hasher.IsFKChecksExprEqual(val.Checks, existing.Checks) &&
+				in.hasher.IsUniqueChecksExprEqual(val.UniqueChecks, existing.UniqueChecks) &&
+				in.hasher.IsFKChecksExprEqual(val.FKChecks, existing.FKChecks) &&
 				in.hasher.IsTableIDEqual(val.Table, existing.Table) &&
 				in.hasher.IsColListEqual(val.InsertCols, existing.InsertCols) &&
 				in.hasher.IsColListEqual(val.FetchCols, existing.FetchCols) &&
@@ -23210,7 +23360,8 @@ func (in *interner) InternUpsert(val *UpsertExpr) *UpsertExpr {
 	in.hasher.Init()
 	in.hasher.HashOperator(opt.UpsertOp)
 	in.hasher.HashRelExpr(val.Input)
-	in.hasher.HashFKChecksExpr(val.Checks)
+	in.hasher.HashUniqueChecksExpr(val.UniqueChecks)
+	in.hasher.HashFKChecksExpr(val.FKChecks)
 	in.hasher.HashTableID(val.Table)
 	in.hasher.HashColList(val.InsertCols)
 	in.hasher.HashColList(val.FetchCols)
@@ -23229,7 +23380,8 @@ func (in *interner) InternUpsert(val *UpsertExpr) *UpsertExpr {
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*UpsertExpr); ok {
 			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
-				in.hasher.IsFKChecksExprEqual(val.Checks, existing.Checks) &&
+				in.hasher.IsUniqueChecksExprEqual(val.UniqueChecks, existing.UniqueChecks) &&
+				in.hasher.IsFKChecksExprEqual(val.FKChecks, existing.FKChecks) &&
 				in.hasher.IsTableIDEqual(val.Table, existing.Table) &&
 				in.hasher.IsColListEqual(val.InsertCols, existing.InsertCols) &&
 				in.hasher.IsColListEqual(val.FetchCols, existing.FetchCols) &&
@@ -23256,7 +23408,8 @@ func (in *interner) InternDelete(val *DeleteExpr) *DeleteExpr {
 	in.hasher.Init()
 	in.hasher.HashOperator(opt.DeleteOp)
 	in.hasher.HashRelExpr(val.Input)
-	in.hasher.HashFKChecksExpr(val.Checks)
+	in.hasher.HashUniqueChecksExpr(val.UniqueChecks)
+	in.hasher.HashFKChecksExpr(val.FKChecks)
 	in.hasher.HashTableID(val.Table)
 	in.hasher.HashColList(val.InsertCols)
 	in.hasher.HashColList(val.FetchCols)
@@ -23275,7 +23428,8 @@ func (in *interner) InternDelete(val *DeleteExpr) *DeleteExpr {
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*DeleteExpr); ok {
 			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
-				in.hasher.IsFKChecksExprEqual(val.Checks, existing.Checks) &&
+				in.hasher.IsUniqueChecksExprEqual(val.UniqueChecks, existing.UniqueChecks) &&
+				in.hasher.IsFKChecksExprEqual(val.FKChecks, existing.FKChecks) &&
 				in.hasher.IsTableIDEqual(val.Table, existing.Table) &&
 				in.hasher.IsColListEqual(val.InsertCols, existing.InsertCols) &&
 				in.hasher.IsColListEqual(val.FetchCols, existing.FetchCols) &&
@@ -23335,6 +23489,50 @@ func (in *interner) InternFKChecksItem(val *FKChecksItem) *FKChecksItem {
 				in.hasher.IsTableIDEqual(val.ReferencedTable, existing.ReferencedTable) &&
 				in.hasher.IsBoolEqual(val.FKOutbound, existing.FKOutbound) &&
 				in.hasher.IsIntEqual(val.FKOrdinal, existing.FKOrdinal) &&
+				in.hasher.IsColListEqual(val.KeyCols, existing.KeyCols) &&
+				in.hasher.IsStringEqual(val.OpName, existing.OpName) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternUniqueChecks(val *UniqueChecksExpr) *UniqueChecksExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.UniqueChecksOp)
+	in.hasher.HashUniqueChecksExpr(*val)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*UniqueChecksExpr); ok {
+			if in.hasher.IsUniqueChecksExprEqual(*val, *existing) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternUniqueChecksItem(val *UniqueChecksItem) *UniqueChecksItem {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.UniqueChecksItemOp)
+	in.hasher.HashRelExpr(val.Check)
+	in.hasher.HashTableID(val.Table)
+	in.hasher.HashInt(val.CheckOrdinal)
+	in.hasher.HashColList(val.KeyCols)
+	in.hasher.HashString(val.OpName)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*UniqueChecksItem); ok {
+			if in.hasher.IsRelExprEqual(val.Check, existing.Check) &&
+				in.hasher.IsTableIDEqual(val.Table, existing.Table) &&
+				in.hasher.IsIntEqual(val.CheckOrdinal, existing.CheckOrdinal) &&
 				in.hasher.IsColListEqual(val.KeyCols, existing.KeyCols) &&
 				in.hasher.IsStringEqual(val.OpName, existing.OpName) {
 				return existing

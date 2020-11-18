@@ -30,17 +30,20 @@ import (
 // mutation columns) by SQL users.
 func (_f *Factory) ConstructInsert(
 	input memo.RelExpr,
-	checks memo.FKChecksExpr,
+	uniqueChecks memo.UniqueChecksExpr,
+	fKChecks memo.FKChecksExpr,
 	mutationPrivate *memo.MutationPrivate,
 ) memo.RelExpr {
 	// [PruneMutationInputCols]
 	{
-		needed := _f.funcs.NeededMutationCols(mutationPrivate, checks)
+		fkChecks := fKChecks
+		needed := _f.funcs.NeededMutationCols(mutationPrivate, uniqueChecks, fkChecks)
 		if _f.funcs.CanPruneCols(input, needed) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.PruneMutationInputCols) {
 				_expr := _f.ConstructInsert(
 					_f.funcs.PruneCols(input, needed),
-					checks,
+					uniqueChecks,
+					fkChecks,
 					mutationPrivate,
 				)
 				if _f.appliedRule != nil {
@@ -51,7 +54,7 @@ func (_f *Factory) ConstructInsert(
 		}
 	}
 
-	e := _f.mem.MemoizeInsert(input, checks, mutationPrivate)
+	e := _f.mem.MemoizeInsert(input, uniqueChecks, fKChecks, mutationPrivate)
 	return _f.onConstructRelational(e)
 }
 
@@ -67,17 +70,20 @@ func (_f *Factory) ConstructInsert(
 // columns that are computed.
 func (_f *Factory) ConstructUpdate(
 	input memo.RelExpr,
-	checks memo.FKChecksExpr,
+	uniqueChecks memo.UniqueChecksExpr,
+	fKChecks memo.FKChecksExpr,
 	mutationPrivate *memo.MutationPrivate,
 ) memo.RelExpr {
 	// [PruneMutationFetchCols]
 	{
+		fkChecks := fKChecks
 		needed := _f.funcs.NeededMutationFetchCols(opt.UpdateOp, mutationPrivate)
 		if _f.funcs.CanPruneMutationFetchCols(mutationPrivate, needed) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.PruneMutationFetchCols) {
 				_expr := _f.ConstructUpdate(
 					input,
-					checks,
+					uniqueChecks,
+					fkChecks,
 					_f.funcs.PruneMutationFetchCols(mutationPrivate, needed),
 				)
 				if _f.appliedRule != nil {
@@ -90,12 +96,14 @@ func (_f *Factory) ConstructUpdate(
 
 	// [PruneMutationInputCols]
 	{
-		needed := _f.funcs.NeededMutationCols(mutationPrivate, checks)
+		fkChecks := fKChecks
+		needed := _f.funcs.NeededMutationCols(mutationPrivate, uniqueChecks, fkChecks)
 		if _f.funcs.CanPruneCols(input, needed) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.PruneMutationInputCols) {
 				_expr := _f.ConstructUpdate(
 					_f.funcs.PruneCols(input, needed),
-					checks,
+					uniqueChecks,
+					fkChecks,
 					mutationPrivate,
 				)
 				if _f.appliedRule != nil {
@@ -106,7 +114,7 @@ func (_f *Factory) ConstructUpdate(
 		}
 	}
 
-	e := _f.mem.MemoizeUpdate(input, checks, mutationPrivate)
+	e := _f.mem.MemoizeUpdate(input, uniqueChecks, fKChecks, mutationPrivate)
 	return _f.onConstructRelational(e)
 }
 
@@ -129,17 +137,20 @@ func (_f *Factory) ConstructUpdate(
 // mutation columns that are computed.
 func (_f *Factory) ConstructUpsert(
 	input memo.RelExpr,
-	checks memo.FKChecksExpr,
+	uniqueChecks memo.UniqueChecksExpr,
+	fKChecks memo.FKChecksExpr,
 	mutationPrivate *memo.MutationPrivate,
 ) memo.RelExpr {
 	// [PruneMutationFetchCols]
 	{
+		fkChecks := fKChecks
 		needed := _f.funcs.NeededMutationFetchCols(opt.UpsertOp, mutationPrivate)
 		if _f.funcs.CanPruneMutationFetchCols(mutationPrivate, needed) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.PruneMutationFetchCols) {
 				_expr := _f.ConstructUpsert(
 					input,
-					checks,
+					uniqueChecks,
+					fkChecks,
 					_f.funcs.PruneMutationFetchCols(mutationPrivate, needed),
 				)
 				if _f.appliedRule != nil {
@@ -152,12 +163,14 @@ func (_f *Factory) ConstructUpsert(
 
 	// [PruneMutationInputCols]
 	{
-		needed := _f.funcs.NeededMutationCols(mutationPrivate, checks)
+		fkChecks := fKChecks
+		needed := _f.funcs.NeededMutationCols(mutationPrivate, uniqueChecks, fkChecks)
 		if _f.funcs.CanPruneCols(input, needed) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.PruneMutationInputCols) {
 				_expr := _f.ConstructUpsert(
 					_f.funcs.PruneCols(input, needed),
-					checks,
+					uniqueChecks,
+					fkChecks,
 					mutationPrivate,
 				)
 				if _f.appliedRule != nil {
@@ -168,7 +181,7 @@ func (_f *Factory) ConstructUpsert(
 		}
 	}
 
-	e := _f.mem.MemoizeUpsert(input, checks, mutationPrivate)
+	e := _f.mem.MemoizeUpsert(input, uniqueChecks, fKChecks, mutationPrivate)
 	return _f.onConstructRelational(e)
 }
 
@@ -180,17 +193,20 @@ func (_f *Factory) ConstructUpsert(
 //
 func (_f *Factory) ConstructDelete(
 	input memo.RelExpr,
-	checks memo.FKChecksExpr,
+	uniqueChecks memo.UniqueChecksExpr,
+	fKChecks memo.FKChecksExpr,
 	mutationPrivate *memo.MutationPrivate,
 ) memo.RelExpr {
 	// [PruneMutationFetchCols]
 	{
+		fkChecks := fKChecks
 		needed := _f.funcs.NeededMutationFetchCols(opt.DeleteOp, mutationPrivate)
 		if _f.funcs.CanPruneMutationFetchCols(mutationPrivate, needed) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.PruneMutationFetchCols) {
 				_expr := _f.ConstructDelete(
 					input,
-					checks,
+					uniqueChecks,
+					fkChecks,
 					_f.funcs.PruneMutationFetchCols(mutationPrivate, needed),
 				)
 				if _f.appliedRule != nil {
@@ -203,12 +219,14 @@ func (_f *Factory) ConstructDelete(
 
 	// [PruneMutationInputCols]
 	{
-		needed := _f.funcs.NeededMutationCols(mutationPrivate, checks)
+		fkChecks := fKChecks
+		needed := _f.funcs.NeededMutationCols(mutationPrivate, uniqueChecks, fkChecks)
 		if _f.funcs.CanPruneCols(input, needed) {
 			if _f.matchedRule == nil || _f.matchedRule(opt.PruneMutationInputCols) {
 				_expr := _f.ConstructDelete(
 					_f.funcs.PruneCols(input, needed),
-					checks,
+					uniqueChecks,
+					fkChecks,
 					mutationPrivate,
 				)
 				if _f.appliedRule != nil {
@@ -219,7 +237,7 @@ func (_f *Factory) ConstructDelete(
 		}
 	}
 
-	e := _f.mem.MemoizeDelete(input, checks, mutationPrivate)
+	e := _f.mem.MemoizeDelete(input, uniqueChecks, fKChecks, mutationPrivate)
 	return _f.onConstructRelational(e)
 }
 
@@ -231,6 +249,17 @@ func (_f *Factory) ConstructFKChecksItem(
 	fKChecksItemPrivate *memo.FKChecksItemPrivate,
 ) memo.FKChecksItem {
 	item := memo.FKChecksItem{Check: check, FKChecksItemPrivate: *fKChecksItemPrivate}
+	return item
+}
+
+// ConstructUniqueChecksItem constructs an expression for the UniqueChecksItem operator.
+// UniqueChecksItem is a unique check query, to be run after the main query.
+// An execution error will be generated if the query returns any results.
+func (_f *Factory) ConstructUniqueChecksItem(
+	check memo.RelExpr,
+	uniqueChecksItemPrivate *memo.UniqueChecksItemPrivate,
+) memo.UniqueChecksItem {
+	item := memo.UniqueChecksItem{Check: check, UniqueChecksItemPrivate: *uniqueChecksItemPrivate}
 	return item
 }
 
@@ -1623,17 +1652,20 @@ func (_f *Factory) ConstructProject(
 	{
 		if input.Op() == opt.InsertOp || input.Op() == opt.UpdateOp || input.Op() == opt.UpsertOp || input.Op() == opt.DeleteOp {
 			innerInput := input.Child(0).(memo.RelExpr)
-			checks := *input.Child(1).(*memo.FKChecksExpr)
+			uniqueChecks := *input.Child(1).(*memo.UniqueChecksExpr)
+			fkChecks := *input.Child(2).(*memo.FKChecksExpr)
 			mutationPrivate := input.Private().(*memo.MutationPrivate)
 			needed := _f.funcs.UnionCols3(_f.funcs.PrimaryKeyCols(_f.funcs.MutationTable(mutationPrivate)), _f.funcs.ProjectionOuterCols(projections), passthrough)
 			if _f.funcs.CanPruneMutationReturnCols(mutationPrivate, needed) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.PruneMutationReturnCols) {
-					checks := checks
+					uniqueChecks := uniqueChecks
+					fkChecks := fkChecks
 					_expr := _f.ConstructProject(
 						_f.DynamicConstruct(
 							input.Op(),
 							innerInput,
-							&checks,
+							&uniqueChecks,
+							&fkChecks,
 							_f.funcs.PruneMutationReturnCols(mutationPrivate, needed),
 						).(memo.RelExpr),
 						projections,
@@ -17654,38 +17686,48 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 	switch t := e.(type) {
 	case *memo.InsertExpr:
 		input := replace(t.Input).(memo.RelExpr)
-		checks, checksChanged := f.replaceFKChecksExpr(t.Checks, replace)
-		if input != t.Input || checksChanged {
-			return f.ConstructInsert(input, checks, &t.MutationPrivate)
+		uniqueChecks, uniqueChecksChanged := f.replaceUniqueChecksExpr(t.UniqueChecks, replace)
+		fKChecks, fKChecksChanged := f.replaceFKChecksExpr(t.FKChecks, replace)
+		if input != t.Input || uniqueChecksChanged || fKChecksChanged {
+			return f.ConstructInsert(input, uniqueChecks, fKChecks, &t.MutationPrivate)
 		}
 		return t
 
 	case *memo.UpdateExpr:
 		input := replace(t.Input).(memo.RelExpr)
-		checks, checksChanged := f.replaceFKChecksExpr(t.Checks, replace)
-		if input != t.Input || checksChanged {
-			return f.ConstructUpdate(input, checks, &t.MutationPrivate)
+		uniqueChecks, uniqueChecksChanged := f.replaceUniqueChecksExpr(t.UniqueChecks, replace)
+		fKChecks, fKChecksChanged := f.replaceFKChecksExpr(t.FKChecks, replace)
+		if input != t.Input || uniqueChecksChanged || fKChecksChanged {
+			return f.ConstructUpdate(input, uniqueChecks, fKChecks, &t.MutationPrivate)
 		}
 		return t
 
 	case *memo.UpsertExpr:
 		input := replace(t.Input).(memo.RelExpr)
-		checks, checksChanged := f.replaceFKChecksExpr(t.Checks, replace)
-		if input != t.Input || checksChanged {
-			return f.ConstructUpsert(input, checks, &t.MutationPrivate)
+		uniqueChecks, uniqueChecksChanged := f.replaceUniqueChecksExpr(t.UniqueChecks, replace)
+		fKChecks, fKChecksChanged := f.replaceFKChecksExpr(t.FKChecks, replace)
+		if input != t.Input || uniqueChecksChanged || fKChecksChanged {
+			return f.ConstructUpsert(input, uniqueChecks, fKChecks, &t.MutationPrivate)
 		}
 		return t
 
 	case *memo.DeleteExpr:
 		input := replace(t.Input).(memo.RelExpr)
-		checks, checksChanged := f.replaceFKChecksExpr(t.Checks, replace)
-		if input != t.Input || checksChanged {
-			return f.ConstructDelete(input, checks, &t.MutationPrivate)
+		uniqueChecks, uniqueChecksChanged := f.replaceUniqueChecksExpr(t.UniqueChecks, replace)
+		fKChecks, fKChecksChanged := f.replaceFKChecksExpr(t.FKChecks, replace)
+		if input != t.Input || uniqueChecksChanged || fKChecksChanged {
+			return f.ConstructDelete(input, uniqueChecks, fKChecks, &t.MutationPrivate)
 		}
 		return t
 
 	case *memo.FKChecksExpr:
 		if after, changed := f.replaceFKChecksExpr(*t, replace); changed {
+			return &after
+		}
+		return t
+
+	case *memo.UniqueChecksExpr:
+		if after, changed := f.replaceUniqueChecksExpr(*t, replace); changed {
 			return &after
 		}
 		return t
@@ -19147,6 +19189,27 @@ func (f *Factory) replaceFKChecksExpr(list memo.FKChecksExpr, replace ReplaceFun
 	return newList, true
 }
 
+func (f *Factory) replaceUniqueChecksExpr(list memo.UniqueChecksExpr, replace ReplaceFunc) (_ memo.UniqueChecksExpr, changed bool) {
+	var newList []memo.UniqueChecksItem
+	for i := range list {
+		before := list[i].Check
+		after := replace(before).(memo.RelExpr)
+		if before != after {
+			if newList == nil {
+				newList = make([]memo.UniqueChecksItem, len(list))
+				copy(newList, list[:i])
+			}
+			newList[i] = f.ConstructUniqueChecksItem(after, &list[i].UniqueChecksItemPrivate)
+		} else if newList != nil {
+			newList[i] = list[i]
+		}
+	}
+	if newList == nil {
+		return list, false
+	}
+	return newList, true
+}
+
 func (f *Factory) replaceProjectionsExpr(list memo.ProjectionsExpr, replace ReplaceFunc) (_ memo.ProjectionsExpr, changed bool) {
 	var newList []memo.ProjectionsItem
 	for i := range list {
@@ -19307,7 +19370,8 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 		}
 		return f.ConstructInsert(
 			input,
-			f.copyAndReplaceDefaultFKChecksExpr(t.Checks, replace),
+			f.copyAndReplaceDefaultUniqueChecksExpr(t.UniqueChecks, replace),
+			f.copyAndReplaceDefaultFKChecksExpr(t.FKChecks, replace),
 			&t.MutationPrivate,
 		)
 
@@ -19318,7 +19382,8 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 		}
 		return f.ConstructUpdate(
 			input,
-			f.copyAndReplaceDefaultFKChecksExpr(t.Checks, replace),
+			f.copyAndReplaceDefaultUniqueChecksExpr(t.UniqueChecks, replace),
+			f.copyAndReplaceDefaultFKChecksExpr(t.FKChecks, replace),
 			&t.MutationPrivate,
 		)
 
@@ -19329,7 +19394,8 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 		}
 		return f.ConstructUpsert(
 			input,
-			f.copyAndReplaceDefaultFKChecksExpr(t.Checks, replace),
+			f.copyAndReplaceDefaultUniqueChecksExpr(t.UniqueChecks, replace),
+			f.copyAndReplaceDefaultFKChecksExpr(t.FKChecks, replace),
 			&t.MutationPrivate,
 		)
 
@@ -19340,7 +19406,8 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 		}
 		return f.ConstructDelete(
 			input,
-			f.copyAndReplaceDefaultFKChecksExpr(t.Checks, replace),
+			f.copyAndReplaceDefaultUniqueChecksExpr(t.UniqueChecks, replace),
+			f.copyAndReplaceDefaultFKChecksExpr(t.FKChecks, replace),
 			&t.MutationPrivate,
 		)
 
@@ -20462,6 +20529,10 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 		newVal := f.copyAndReplaceDefaultFKChecksExpr(*t, replace)
 		return &newVal
 
+	case *memo.UniqueChecksExpr:
+		newVal := f.copyAndReplaceDefaultUniqueChecksExpr(*t, replace)
+		return &newVal
+
 	case *memo.ProjectionsExpr:
 		newVal := f.copyAndReplaceDefaultProjectionsExpr(*t, replace)
 		return &newVal
@@ -20503,6 +20574,19 @@ func (f *Factory) copyAndReplaceDefaultFKChecksExpr(src memo.FKChecksExpr, repla
 		dst[i].ReferencedTable = src[i].ReferencedTable
 		dst[i].FKOutbound = src[i].FKOutbound
 		dst[i].FKOrdinal = src[i].FKOrdinal
+		dst[i].KeyCols = src[i].KeyCols
+		dst[i].OpName = src[i].OpName
+		f.mem.CheckExpr(&dst[i])
+	}
+	return dst
+}
+
+func (f *Factory) copyAndReplaceDefaultUniqueChecksExpr(src memo.UniqueChecksExpr, replace ReplaceFunc) (dst memo.UniqueChecksExpr) {
+	dst = make(memo.UniqueChecksExpr, len(src))
+	for i := range src {
+		dst[i].Check = f.invokeReplace(src[i].Check, replace).(memo.RelExpr)
+		dst[i].Table = src[i].Table
+		dst[i].CheckOrdinal = src[i].CheckOrdinal
 		dst[i].KeyCols = src[i].KeyCols
 		dst[i].OpName = src[i].OpName
 		f.mem.CheckExpr(&dst[i])
@@ -20597,26 +20681,30 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 	case opt.InsertOp:
 		return f.ConstructInsert(
 			args[0].(memo.RelExpr),
-			*args[1].(*memo.FKChecksExpr),
-			args[2].(*memo.MutationPrivate),
+			*args[1].(*memo.UniqueChecksExpr),
+			*args[2].(*memo.FKChecksExpr),
+			args[3].(*memo.MutationPrivate),
 		)
 	case opt.UpdateOp:
 		return f.ConstructUpdate(
 			args[0].(memo.RelExpr),
-			*args[1].(*memo.FKChecksExpr),
-			args[2].(*memo.MutationPrivate),
+			*args[1].(*memo.UniqueChecksExpr),
+			*args[2].(*memo.FKChecksExpr),
+			args[3].(*memo.MutationPrivate),
 		)
 	case opt.UpsertOp:
 		return f.ConstructUpsert(
 			args[0].(memo.RelExpr),
-			*args[1].(*memo.FKChecksExpr),
-			args[2].(*memo.MutationPrivate),
+			*args[1].(*memo.UniqueChecksExpr),
+			*args[2].(*memo.FKChecksExpr),
+			args[3].(*memo.MutationPrivate),
 		)
 	case opt.DeleteOp:
 		return f.ConstructDelete(
 			args[0].(memo.RelExpr),
-			*args[1].(*memo.FKChecksExpr),
-			args[2].(*memo.MutationPrivate),
+			*args[1].(*memo.UniqueChecksExpr),
+			*args[2].(*memo.FKChecksExpr),
+			args[3].(*memo.MutationPrivate),
 		)
 	case opt.ScanOp:
 		return f.ConstructScan(
