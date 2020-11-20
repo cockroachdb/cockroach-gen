@@ -1273,8 +1273,8 @@ SHOW [COMPACT] [KV] TRACE FOR SESSION
 		Category: hMisc,
 		//line sql.y: 5095
 		Text: `
-SHOW RANGE FROM TABLE <tablename> FOR ROW (row, value, ...)
-SHOW RANGE FROM INDEX [ <tablename> @ ] <indexname> FOR ROW (row, value, ...)
+SHOW RANGE FROM TABLE <tablename> FOR ROW (value1, value2, ...)
+SHOW RANGE FROM INDEX [ <tablename> @ ] <indexname> FOR ROW (value1, value2, ...)
 `,
 	},
 	//line sql.y: 5116
