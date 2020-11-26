@@ -11,6 +11,7 @@
 export * from "./badge";
 export * from "./button";
 export * from "./icon";
+export * from "./inlineAlert/inlineAlert";
 export * from "./globalNavigation";
 export * from "./anchor";
 export * from "./sideNavigation";
@@ -22,3 +23,4 @@ export * from "./tooltip";
 export * from "./select";
 export * from "./downloadFile";
 export * from "./modal";
+export * from "./rangeCalendar";
