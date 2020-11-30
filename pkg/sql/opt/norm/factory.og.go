@@ -8400,6 +8400,34 @@ func (_f *Factory) ConstructGroupBy(
 		}
 	}
 
+	// [ConvertRegressionCountToCount]
+	{
+		for i := range aggregations {
+			item := &aggregations[i]
+			_regressionCount, _ := item.Agg.(*memo.RegressionCountExpr)
+			if _regressionCount != nil {
+				arg1 := _regressionCount.Y
+				arg2 := _regressionCount.X
+				newArg := _f.funcs.SingleRegressionCountArgument(arg1, arg2, input)
+				if _f.funcs.Succeeded(newArg) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.ConvertRegressionCountToCount) {
+						_expr := _f.ConstructGroupBy(
+							input,
+							_f.funcs.ReplaceAggregationsItem(aggregations, item, _f.ConstructCount(
+								newArg,
+							)),
+							groupingPrivate,
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.ConvertRegressionCountToCount, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
 	// [FoldGroupingOperators]
 	{
 		_groupBy, _ := input.(*memo.GroupByExpr)
@@ -8712,6 +8740,34 @@ func (_f *Factory) ConstructScalarGroupBy(
 						)
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.ConvertCountToCountRows, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
+	// [ConvertRegressionCountToCount]
+	{
+		for i := range aggregations {
+			item := &aggregations[i]
+			_regressionCount, _ := item.Agg.(*memo.RegressionCountExpr)
+			if _regressionCount != nil {
+				arg1 := _regressionCount.Y
+				arg2 := _regressionCount.X
+				newArg := _f.funcs.SingleRegressionCountArgument(arg1, arg2, input)
+				if _f.funcs.Succeeded(newArg) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.ConvertRegressionCountToCount) {
+						_expr := _f.ConstructScalarGroupBy(
+							input,
+							_f.funcs.ReplaceAggregationsItem(aggregations, item, _f.ConstructCount(
+								newArg,
+							)),
+							groupingPrivate,
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.ConvertRegressionCountToCount, nil, _expr)
 						}
 						return _expr
 					}
@@ -17041,6 +17097,15 @@ func (_f *Factory) ConstructRegressionSYY(
 	return _f.onConstructScalar(e)
 }
 
+// ConstructRegressionCount constructs an expression for the RegressionCount operator.
+func (_f *Factory) ConstructRegressionCount(
+	y opt.ScalarExpr,
+	x opt.ScalarExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeRegressionCount(y, x)
+	return _f.onConstructScalar(e)
+}
+
 // ConstructMax constructs an expression for the Max operator.
 func (_f *Factory) ConstructMax(
 	input opt.ScalarExpr,
@@ -18782,6 +18847,14 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		}
 		return t
 
+	case *memo.RegressionCountExpr:
+		y := replace(t.Y).(opt.ScalarExpr)
+		x := replace(t.X).(opt.ScalarExpr)
+		if y != t.Y || x != t.X {
+			return f.ConstructRegressionCount(y, x)
+		}
+		return t
+
 	case *memo.MaxExpr:
 		input := replace(t.Input).(opt.ScalarExpr)
 		if input != t.Input {
@@ -20241,6 +20314,12 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 			f.invokeReplace(t.X, replace).(opt.ScalarExpr),
 		)
 
+	case *memo.RegressionCountExpr:
+		return f.ConstructRegressionCount(
+			f.invokeReplace(t.Y, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.X, replace).(opt.ScalarExpr),
+		)
+
 	case *memo.MaxExpr:
 		return f.ConstructMax(
 			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
@@ -21406,6 +21485,11 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 		)
 	case opt.RegressionSYYOp:
 		return f.ConstructRegressionSYY(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.RegressionCountOp:
+		return f.ConstructRegressionCount(
 			args[0].(opt.ScalarExpr),
 			args[1].(opt.ScalarExpr),
 		)

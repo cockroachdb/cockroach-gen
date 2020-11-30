@@ -13123,6 +13123,64 @@ func (e *RegressionSYYExpr) DataType() *types.T {
 	return e.Typ
 }
 
+type RegressionCountExpr struct {
+	Y opt.ScalarExpr
+	X opt.ScalarExpr
+
+	Typ *types.T
+	id  opt.ScalarID
+}
+
+var _ opt.ScalarExpr = &RegressionCountExpr{}
+
+func (e *RegressionCountExpr) ID() opt.ScalarID {
+	return e.id
+}
+
+func (e *RegressionCountExpr) Op() opt.Operator {
+	return opt.RegressionCountOp
+}
+
+func (e *RegressionCountExpr) ChildCount() int {
+	return 2
+}
+
+func (e *RegressionCountExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Y
+	case 1:
+		return e.X
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *RegressionCountExpr) Private() interface{} {
+	return nil
+}
+
+func (e *RegressionCountExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *RegressionCountExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Y = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.X = child.(opt.ScalarExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *RegressionCountExpr) DataType() *types.T {
+	return e.Typ
+}
+
 type MaxExpr struct {
 	Input opt.ScalarExpr
 
@@ -20810,6 +20868,28 @@ func (m *Memo) MemoizeRegressionSYY(
 	return interned
 }
 
+func (m *Memo) MemoizeRegressionCount(
+	y opt.ScalarExpr,
+	x opt.ScalarExpr,
+) *RegressionCountExpr {
+	const size = int64(unsafe.Sizeof(RegressionCountExpr{}))
+	e := &RegressionCountExpr{
+		Y:  y,
+		X:  x,
+		id: m.NextID(),
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternRegressionCount(e)
+	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
+		m.memEstimate += size
+		m.CheckExpr(e)
+	}
+	return interned
+}
+
 func (m *Memo) MemoizeMax(
 	input opt.ScalarExpr,
 ) *MaxExpr {
@@ -23133,6 +23213,8 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternRegressionSXY(t)
 	case *RegressionSYYExpr:
 		return in.InternRegressionSYY(t)
+	case *RegressionCountExpr:
+		return in.InternRegressionCount(t)
 	case *MaxExpr:
 		return in.InternMax(t)
 	case *MinExpr:
@@ -26708,6 +26790,26 @@ func (in *interner) InternRegressionSYY(val *RegressionSYYExpr) *RegressionSYYEx
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*RegressionSYYExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Y, existing.Y) &&
+				in.hasher.IsScalarExprEqual(val.X, existing.X) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternRegressionCount(val *RegressionCountExpr) *RegressionCountExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.RegressionCountOp)
+	in.hasher.HashScalarExpr(val.Y)
+	in.hasher.HashScalarExpr(val.X)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*RegressionCountExpr); ok {
 			if in.hasher.IsScalarExprEqual(val.Y, existing.Y) &&
 				in.hasher.IsScalarExprEqual(val.X, existing.X) {
 				return existing

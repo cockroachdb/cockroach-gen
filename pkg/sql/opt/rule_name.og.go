@@ -109,6 +109,7 @@ const (
 	PushAggDistinctIntoGroupBy
 	PushAggFilterIntoScalarGroupBy
 	ConvertCountToCountRows
+	ConvertRegressionCountToCount
 	FoldGroupingOperators
 	InlineConstVar
 	InlineProjectConstants
