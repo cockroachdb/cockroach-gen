@@ -8,16 +8,17 @@
 // by the Apache License, Version 2.0, included in the file
 // licenses/APL.txt.
 
-package optional
+package optional_test
 
 import (
 	"testing"
 
+	"github.com/cockroachdb/cockroach/pkg/util/optional"
 	"github.com/stretchr/testify/require"
 )
 
 func TestUint(t *testing.T) {
-	var v Uint
+	var v optional.Uint
 	require.False(t, v.HasValue())
 	require.Equal(t, uint64(0), v.Value())
 	require.Equal(t, v.String(), "<unset>")
