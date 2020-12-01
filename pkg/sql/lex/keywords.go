@@ -166,6 +166,7 @@ var KeywordsCategories = map[string]string{
 	"geometryz":                    "U",
 	"geometryzm":                   "U",
 	"global":                       "U",
+	"goal":                         "U",
 	"grant":                        "R",
 	"grants":                       "U",
 	"greatest":                     "C",
@@ -422,6 +423,7 @@ var KeywordsCategories = map[string]string{
 	"string":                       "C",
 	"subscription":                 "U",
 	"substring":                    "C",
+	"survival":                     "U",
 	"survive":                      "U",
 	"symmetric":                    "R",
 	"syntax":                       "U",
@@ -658,6 +660,7 @@ var KeywordNames = []string{
 	"geometryz",
 	"geometryzm",
 	"global",
+	"goal",
 	"grant",
 	"grants",
 	"greatest",
@@ -914,6 +917,7 @@ var KeywordNames = []string{
 	"string",
 	"subscription",
 	"substring",
+	"survival",
 	"survive",
 	"symmetric",
 	"syntax",
@@ -1318,6 +1322,8 @@ func GetKeywordID(k string) int32 {
 		return GEOMETRYZM
 	case "global":
 		return GLOBAL
+	case "goal":
+		return GOAL
 	case "grant":
 		return GRANT
 	case "grants":
@@ -1830,6 +1836,8 @@ func GetKeywordID(k string) int32 {
 		return SUBSCRIPTION
 	case "substring":
 		return SUBSTRING
+	case "survival":
+		return SURVIVAL
 	case "survive":
 		return SURVIVE
 	case "symmetric":
