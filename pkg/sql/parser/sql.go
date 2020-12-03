@@ -22337,7 +22337,7 @@ sqldefault:
 //line sql-gen.y:3618
 		{
 			var err error
-			sqlVAL.union.val, err = tree.MakeExplain([]string{"DISTSQL", "ANALYZE"}, sqlDollar[3].union.stmt())
+			sqlVAL.union.val, err = tree.MakeExplain([]string{"ANALYZE"}, sqlDollar[3].union.stmt())
 			if err != nil {
 				return setErr(sqllex, err)
 			}
@@ -22347,7 +22347,7 @@ sqldefault:
 //line sql-gen.y:3626
 		{
 			var err error
-			sqlVAL.union.val, err = tree.MakeExplain([]string{"DISTSQL", "ANALYZE"}, sqlDollar[3].union.stmt())
+			sqlVAL.union.val, err = tree.MakeExplain([]string{"ANALYZE"}, sqlDollar[3].union.stmt())
 			if err != nil {
 				return setErr(sqllex, err)
 			}
