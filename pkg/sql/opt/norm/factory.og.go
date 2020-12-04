@@ -4383,7 +4383,7 @@ func (_f *Factory) ConstructSemiJoin(
 								_f.funcs.MakeGrouping(_f.funcs.KeyCols(newLeft), _f.funcs.EmptyOrdering()),
 							),
 							memo.EmptyProjectionsExpr,
-							_f.funcs.OutputCols2(left, right),
+							_f.funcs.OutputCols(left),
 						)
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.TryDecorrelateSemiJoin, nil, _expr)
@@ -7225,7 +7225,7 @@ func (_f *Factory) ConstructSemiJoinApply(
 								_f.funcs.MakeGrouping(_f.funcs.KeyCols(newLeft), _f.funcs.EmptyOrdering()),
 							),
 							memo.EmptyProjectionsExpr,
-							_f.funcs.OutputCols2(left, right),
+							_f.funcs.OutputCols(left),
 						)
 						if _f.appliedRule != nil {
 							_f.appliedRule(opt.TryDecorrelateSemiJoin, nil, _expr)
