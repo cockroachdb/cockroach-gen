@@ -17043,6 +17043,15 @@ func (_f *Factory) ConstructCovarSamp(
 	return _f.onConstructScalar(e)
 }
 
+// ConstructRegressionAvgX constructs an expression for the RegressionAvgX operator.
+func (_f *Factory) ConstructRegressionAvgX(
+	y opt.ScalarExpr,
+	x opt.ScalarExpr,
+) opt.ScalarExpr {
+	e := _f.mem.MemoizeRegressionAvgX(y, x)
+	return _f.onConstructScalar(e)
+}
+
 // ConstructRegressionIntercept constructs an expression for the RegressionIntercept operator.
 func (_f *Factory) ConstructRegressionIntercept(
 	y opt.ScalarExpr,
@@ -18799,6 +18808,14 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		}
 		return t
 
+	case *memo.RegressionAvgXExpr:
+		y := replace(t.Y).(opt.ScalarExpr)
+		x := replace(t.X).(opt.ScalarExpr)
+		if y != t.Y || x != t.X {
+			return f.ConstructRegressionAvgX(y, x)
+		}
+		return t
+
 	case *memo.RegressionInterceptExpr:
 		y := replace(t.Y).(opt.ScalarExpr)
 		x := replace(t.X).(opt.ScalarExpr)
@@ -20278,6 +20295,12 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 			f.invokeReplace(t.X, replace).(opt.ScalarExpr),
 		)
 
+	case *memo.RegressionAvgXExpr:
+		return f.ConstructRegressionAvgX(
+			f.invokeReplace(t.Y, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.X, replace).(opt.ScalarExpr),
+		)
+
 	case *memo.RegressionInterceptExpr:
 		return f.ConstructRegressionIntercept(
 			f.invokeReplace(t.Y, replace).(opt.ScalarExpr),
@@ -21455,6 +21478,11 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 		)
 	case opt.CovarSampOp:
 		return f.ConstructCovarSamp(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.RegressionAvgXOp:
+		return f.ConstructRegressionAvgX(
 			args[0].(opt.ScalarExpr),
 			args[1].(opt.ScalarExpr),
 		)
