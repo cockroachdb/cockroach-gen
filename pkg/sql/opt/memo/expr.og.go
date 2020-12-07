@@ -7846,7 +7846,7 @@ func (e *ProjectionsExpr) DataType() *types.T {
 // then repeatedly reused.
 //
 // The Element scalar expression cannot contain a simple VariableOp with the same
-// ColumnID as the one stored in the ColPrivate field, since that would make it a
+// ColumnID as the one stored in the Col field, since that would make it a
 // pass-through column. Pass-through columns are always stored on the containing
 // Project operator instead. However, the Element field can contain a VariableOp
 // when a new ColumnID is being assigned, such as in the case of an outer column
