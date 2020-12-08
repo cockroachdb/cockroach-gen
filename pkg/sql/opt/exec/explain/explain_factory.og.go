@@ -863,13 +863,13 @@ func (f *Factory) ConstructExplain(
 	options *tree.ExplainOptions,
 	analyze bool,
 	stmtType tree.StatementType,
-	plan exec.Plan,
+	buildFn exec.BuildPlanForExplainFn,
 ) (exec.Node, error) {
 	args := &explainArgs{
 		Options:  options,
 		Analyze:  analyze,
 		StmtType: stmtType,
-		Plan:     plan,
+		BuildFn:  buildFn,
 	}
 	_n, err := f.newNode(explainOp, args, nil /* ordering */)
 	if err != nil {
@@ -880,30 +880,6 @@ func (f *Factory) ConstructExplain(
 		options,
 		analyze,
 		stmtType,
-		plan.(*Plan).WrappedPlan,
-	)
-	if err != nil {
-		return nil, err
-	}
-	_n.wrappedNode = wrapped
-	return _n, nil
-}
-
-func (f *Factory) ConstructExplainPlan(
-	options *tree.ExplainOptions,
-	buildFn exec.BuildPlanForExplainFn,
-) (exec.Node, error) {
-	args := &explainPlanArgs{
-		Options: options,
-		BuildFn: buildFn,
-	}
-	_n, err := f.newNode(explainPlanOp, args, nil /* ordering */)
-	if err != nil {
-		return nil, err
-	}
-	// Build the "real" node.
-	wrapped, err := f.wrappedFactory.ConstructExplainPlan(
-		options,
 		buildFn,
 	)
 	if err != nil {
@@ -1668,6 +1644,27 @@ func (f *Factory) ConstructCancelSessions(
 	return _n, nil
 }
 
+func (f *Factory) ConstructCreateStatistics(
+	cs *tree.CreateStats,
+) (exec.Node, error) {
+	args := &createStatisticsArgs{
+		Cs: cs,
+	}
+	_n, err := f.newNode(createStatisticsOp, args, nil /* ordering */)
+	if err != nil {
+		return nil, err
+	}
+	// Build the "real" node.
+	wrapped, err := f.wrappedFactory.ConstructCreateStatistics(
+		cs,
+	)
+	if err != nil {
+		return nil, err
+	}
+	_n.wrappedNode = wrapped
+	return _n, nil
+}
+
 func (f *Factory) ConstructExport(
 	input exec.Node,
 	fileName tree.TypedExpr,
@@ -1729,7 +1726,6 @@ const (
 	windowOp
 	explainOptOp
 	explainOp
-	explainPlanOp
 	showTraceOp
 	insertOp
 	insertFastPathOp
@@ -1755,6 +1751,7 @@ const (
 	controlSchedulesOp
 	cancelQueriesOp
 	cancelSessionsOp
+	createStatisticsOp
 	exportOp
 )
 
@@ -1955,12 +1952,7 @@ type explainArgs struct {
 	Options  *tree.ExplainOptions
 	Analyze  bool
 	StmtType tree.StatementType
-	Plan     exec.Plan
-}
-
-type explainPlanArgs struct {
-	Options *tree.ExplainOptions
-	BuildFn exec.BuildPlanForExplainFn
+	BuildFn  exec.BuildPlanForExplainFn
 }
 
 type showTraceArgs struct {
@@ -2125,6 +2117,10 @@ type cancelQueriesArgs struct {
 type cancelSessionsArgs struct {
 	Input    *Node
 	IfExists bool
+}
+
+type createStatisticsArgs struct {
+	Cs *tree.CreateStats
 }
 
 type exportArgs struct {

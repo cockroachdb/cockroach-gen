@@ -17735,6 +17735,15 @@ func (_f *Factory) ConstructExport(
 	return _f.onConstructRelational(e)
 }
 
+// ConstructCreateStatistics constructs an expression for the CreateStatistics operator.
+// CreateStatistics represents a CREATE STATISTICS or ANALYZE statement.
+func (_f *Factory) ConstructCreateStatistics(
+	createStatisticsPrivate *memo.CreateStatisticsPrivate,
+) memo.RelExpr {
+	e := _f.mem.MemoizeCreateStatistics(createStatisticsPrivate)
+	return _f.onConstructRelational(e)
+}
+
 // Replace enables an expression subtree to be rewritten under the control of
 // the caller. It passes each child of the given expression to the replace
 // callback. The caller can continue traversing the expression tree within the
@@ -19254,6 +19263,9 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		}
 		return t
 
+	case *memo.CreateStatisticsExpr:
+		return t
+
 	}
 	panic(errors.AssertionFailedf("unhandled op %s", errors.Safe(e.Op())))
 }
@@ -20627,6 +20639,9 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 			&t.ExportPrivate,
 		)
 
+	case *memo.CreateStatisticsExpr:
+		return f.mem.MemoizeCreateStatistics(&t.CreateStatisticsPrivate)
+
 	case *memo.FKChecksExpr:
 		newVal := f.copyAndReplaceDefaultFKChecksExpr(*t, replace)
 		return &newVal
@@ -21760,6 +21775,10 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 			args[1].(opt.ScalarExpr),
 			*args[2].(*memo.KVOptionsExpr),
 			args[3].(*memo.ExportPrivate),
+		)
+	case opt.CreateStatisticsOp:
+		return f.ConstructCreateStatistics(
+			args[0].(*memo.CreateStatisticsPrivate),
 		)
 	}
 	panic(errors.AssertionFailedf("cannot dynamically construct operator %s", errors.Safe(op)))

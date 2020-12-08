@@ -403,21 +403,13 @@ type Factory interface {
 	// ConstructExplain creates a node for a Explain operation.
 	//
 	// Explain implements EXPLAIN, showing information about the given plan.
+	//
+	// When the operator is created, it creates an ExplainFactory and calls BuildFn
+	// to construct the plan against that factory.
 	ConstructExplain(
 		options *tree.ExplainOptions,
 		analyze bool,
 		stmtType tree.StatementType,
-		plan Plan,
-	) (Node, error)
-
-	// ConstructExplainPlan creates a node for a ExplainPlan operation.
-	//
-	// ExplainPlan implements EXPLAIN (PLAN).
-	//
-	// When the operator is created, it creates an ExplainFactory and calls BuildFn
-	// to construct the plan against that factory.
-	ConstructExplainPlan(
-		options *tree.ExplainOptions,
 		buildFn BuildPlanForExplainFn,
 	) (Node, error)
 
@@ -777,6 +769,13 @@ type Factory interface {
 		ifExists bool,
 	) (Node, error)
 
+	// ConstructCreateStatistics creates a node for a CreateStatistics operation.
+	//
+	// CreateStatistics implements CREATE STATISTICS.
+	ConstructCreateStatistics(
+		cs *tree.CreateStats,
+	) (Node, error)
+
 	// ConstructExport creates a node for a Export operation.
 	//
 	// Export implements EXPORT.
@@ -1046,13 +1045,6 @@ func (StubFactory) ConstructExplain(
 	options *tree.ExplainOptions,
 	analyze bool,
 	stmtType tree.StatementType,
-	plan Plan,
-) (Node, error) {
-	return struct{}{}, nil
-}
-
-func (StubFactory) ConstructExplainPlan(
-	options *tree.ExplainOptions,
 	buildFn BuildPlanForExplainFn,
 ) (Node, error) {
 	return struct{}{}, nil
@@ -1268,6 +1260,12 @@ func (StubFactory) ConstructCancelQueries(
 func (StubFactory) ConstructCancelSessions(
 	input Node,
 	ifExists bool,
+) (Node, error) {
+	return struct{}{}, nil
+}
+
+func (StubFactory) ConstructCreateStatistics(
+	cs *tree.CreateStats,
 ) (Node, error) {
 	return struct{}{}, nil
 }

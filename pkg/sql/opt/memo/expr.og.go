@@ -17736,6 +17736,123 @@ type ExportPrivate struct {
 	Columns opt.ColList
 }
 
+// CreateStatisticsExpr represents a CREATE STATISTICS or ANALYZE statement.
+type CreateStatisticsExpr struct {
+	CreateStatisticsPrivate
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &CreateStatisticsExpr{}
+
+func (e *CreateStatisticsExpr) Op() opt.Operator {
+	return opt.CreateStatisticsOp
+}
+
+func (e *CreateStatisticsExpr) ChildCount() int {
+	return 0
+}
+
+func (e *CreateStatisticsExpr) Child(nth int) opt.Expr {
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *CreateStatisticsExpr) Private() interface{} {
+	return &e.CreateStatisticsPrivate
+}
+
+func (e *CreateStatisticsExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *CreateStatisticsExpr) SetChild(nth int, child opt.Expr) {
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *CreateStatisticsExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *CreateStatisticsExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *CreateStatisticsExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *CreateStatisticsExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *CreateStatisticsExpr) RequiredPhysical() *physical.Required {
+	return e.grp.bestProps().required
+}
+
+func (e *CreateStatisticsExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
+func (e *CreateStatisticsExpr) Cost() Cost {
+	return e.grp.bestProps().cost
+}
+
+func (e *CreateStatisticsExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *CreateStatisticsExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
+}
+
+func (e *CreateStatisticsExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(errors.AssertionFailedf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *CreateStatisticsExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(errors.AssertionFailedf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type createStatisticsGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	first CreateStatisticsExpr
+	best  bestProps
+}
+
+var _ exprGroup = &createStatisticsGroup{}
+
+func (g *createStatisticsGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *createStatisticsGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *createStatisticsGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *createStatisticsGroup) bestProps() *bestProps {
+	return &g.best
+}
+
+type CreateStatisticsPrivate struct {
+	// Syntax is the tree.CreateStats AST node.
+	Syntax *tree.CreateStats
+}
+
 func (m *Memo) MemoizeInsert(
 	input RelExpr,
 	uniqueChecks UniqueChecksExpr,
@@ -22093,6 +22210,28 @@ func (m *Memo) MemoizeExport(
 	return interned.FirstExpr()
 }
 
+func (m *Memo) MemoizeCreateStatistics(
+	createStatisticsPrivate *CreateStatisticsPrivate,
+) RelExpr {
+	const size = int64(unsafe.Sizeof(createStatisticsGroup{}))
+	grp := &createStatisticsGroup{mem: m, first: CreateStatisticsExpr{
+		CreateStatisticsPrivate: *createStatisticsPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternCreateStatistics(e)
+	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
+		m.logPropsBuilder.buildCreateStatisticsProps(e, &grp.rel)
+		grp.rel.Populated = true
+		m.memEstimate += size
+		m.CheckExpr(e)
+	}
+	return interned.FirstExpr()
+}
+
 func (m *Memo) AddInsertToGroup(e *InsertExpr, grp RelExpr) *InsertExpr {
 	const size = int64(unsafe.Sizeof(InsertExpr{}))
 	interned := m.interner.InternInsert(e)
@@ -22983,6 +23122,20 @@ func (m *Memo) AddExportToGroup(e *ExportExpr, grp RelExpr) *ExportExpr {
 	return interned
 }
 
+func (m *Memo) AddCreateStatisticsToGroup(e *CreateStatisticsExpr, grp RelExpr) *CreateStatisticsExpr {
+	const size = int64(unsafe.Sizeof(CreateStatisticsExpr{}))
+	interned := m.interner.InternCreateStatistics(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.CheckExpr(e)
+	} else if interned.group() != grp.group() {
+		// This is a group collision, do nothing.
+		return nil
+	}
+	return interned
+}
+
 func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 	switch t := e.(type) {
 	case *InsertExpr:
@@ -23419,6 +23572,8 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternCancelSessions(t)
 	case *ExportExpr:
 		return in.InternExport(t)
+	case *CreateStatisticsExpr:
+		return in.InternCreateStatistics(t)
 	default:
 		panic(errors.AssertionFailedf("unhandled op: %s", e.Op()))
 	}
@@ -28140,6 +28295,24 @@ func (in *interner) InternExport(val *ExportExpr) *ExportExpr {
 	return val
 }
 
+func (in *interner) InternCreateStatistics(val *CreateStatisticsExpr) *CreateStatisticsExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.CreateStatisticsOp)
+	in.hasher.HashPointer(unsafe.Pointer(val.Syntax))
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*CreateStatisticsExpr); ok {
+			if in.hasher.IsPointerEqual(unsafe.Pointer(val.Syntax), unsafe.Pointer(existing.Syntax)) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
 func (b *logicalPropsBuilder) buildProps(e RelExpr, rel *props.Relational) {
 	switch t := e.(type) {
 	case *InsertExpr:
@@ -28268,6 +28441,8 @@ func (b *logicalPropsBuilder) buildProps(e RelExpr, rel *props.Relational) {
 		b.buildCancelSessionsProps(t, rel)
 	case *ExportExpr:
 		b.buildExportProps(t, rel)
+	case *CreateStatisticsExpr:
+		b.buildCreateStatisticsProps(t, rel)
 	default:
 		panic(errors.AssertionFailedf("unhandled type: %s", t.Op()))
 	}
