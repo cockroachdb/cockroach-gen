@@ -12833,6 +12833,64 @@ func (e *RegressionAvgXExpr) DataType() *types.T {
 	return e.Typ
 }
 
+type RegressionAvgYExpr struct {
+	Y opt.ScalarExpr
+	X opt.ScalarExpr
+
+	Typ *types.T
+	id  opt.ScalarID
+}
+
+var _ opt.ScalarExpr = &RegressionAvgYExpr{}
+
+func (e *RegressionAvgYExpr) ID() opt.ScalarID {
+	return e.id
+}
+
+func (e *RegressionAvgYExpr) Op() opt.Operator {
+	return opt.RegressionAvgYOp
+}
+
+func (e *RegressionAvgYExpr) ChildCount() int {
+	return 2
+}
+
+func (e *RegressionAvgYExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Y
+	case 1:
+		return e.X
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *RegressionAvgYExpr) Private() interface{} {
+	return nil
+}
+
+func (e *RegressionAvgYExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *RegressionAvgYExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Y = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.X = child.(opt.ScalarExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *RegressionAvgYExpr) DataType() *types.T {
+	return e.Typ
+}
+
 type RegressionInterceptExpr struct {
 	Y opt.ScalarExpr
 	X opt.ScalarExpr
@@ -20933,6 +20991,28 @@ func (m *Memo) MemoizeRegressionAvgX(
 	return interned
 }
 
+func (m *Memo) MemoizeRegressionAvgY(
+	y opt.ScalarExpr,
+	x opt.ScalarExpr,
+) *RegressionAvgYExpr {
+	const size = int64(unsafe.Sizeof(RegressionAvgYExpr{}))
+	e := &RegressionAvgYExpr{
+		Y:  y,
+		X:  x,
+		id: m.NextID(),
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternRegressionAvgY(e)
+	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
+		m.memEstimate += size
+		m.CheckExpr(e)
+	}
+	return interned
+}
+
 func (m *Memo) MemoizeRegressionIntercept(
 	y opt.ScalarExpr,
 	x opt.ScalarExpr,
@@ -23436,6 +23516,8 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternCovarSamp(t)
 	case *RegressionAvgXExpr:
 		return in.InternRegressionAvgX(t)
+	case *RegressionAvgYExpr:
+		return in.InternRegressionAvgY(t)
 	case *RegressionInterceptExpr:
 		return in.InternRegressionIntercept(t)
 	case *RegressionR2Expr:
@@ -26927,6 +27009,26 @@ func (in *interner) InternRegressionAvgX(val *RegressionAvgXExpr) *RegressionAvg
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*RegressionAvgXExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Y, existing.Y) &&
+				in.hasher.IsScalarExprEqual(val.X, existing.X) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternRegressionAvgY(val *RegressionAvgYExpr) *RegressionAvgYExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.RegressionAvgYOp)
+	in.hasher.HashScalarExpr(val.Y)
+	in.hasher.HashScalarExpr(val.X)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*RegressionAvgYExpr); ok {
 			if in.hasher.IsScalarExprEqual(val.Y, existing.Y) &&
 				in.hasher.IsScalarExprEqual(val.X, existing.X) {
 				return existing
