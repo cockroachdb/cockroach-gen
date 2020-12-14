@@ -861,13 +861,11 @@ func (f *Factory) ConstructExplainOpt(
 
 func (f *Factory) ConstructExplain(
 	options *tree.ExplainOptions,
-	analyze bool,
 	stmtType tree.StatementType,
 	buildFn exec.BuildPlanForExplainFn,
 ) (exec.Node, error) {
 	args := &explainArgs{
 		Options:  options,
-		Analyze:  analyze,
 		StmtType: stmtType,
 		BuildFn:  buildFn,
 	}
@@ -878,7 +876,6 @@ func (f *Factory) ConstructExplain(
 	// Build the "real" node.
 	wrapped, err := f.wrappedFactory.ConstructExplain(
 		options,
-		analyze,
 		stmtType,
 		buildFn,
 	)
@@ -1950,7 +1947,6 @@ type explainOptArgs struct {
 
 type explainArgs struct {
 	Options  *tree.ExplainOptions
-	Analyze  bool
 	StmtType tree.StatementType
 	BuildFn  exec.BuildPlanForExplainFn
 }
