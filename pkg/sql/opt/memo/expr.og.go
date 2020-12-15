@@ -3211,6 +3211,12 @@ type InvertedJoinPrivate struct {
 	// IsFirstJoinInPairedJoiner is true.
 	ContinuationCol opt.ColumnID
 
+	// PrefixKeyCols are the columns (produced by the input) used to create
+	// lookup keys for the non-inverted prefix columns if the index is a
+	// multi-column inverted index. There must be a key column for each prefix
+	// column.
+	PrefixKeyCols opt.ColList
+
 	// Cols is the set of columns produced by the inverted join. This set can
 	// contain columns from the input and columns from the index. Any columns
 	// not in the input are retrieved from the index.
@@ -24312,6 +24318,7 @@ func (in *interner) InternInvertedJoin(val *InvertedJoinExpr) *InvertedJoinExpr 
 	in.hasher.HashColumnID(val.InvertedCol)
 	in.hasher.HashBool(val.IsFirstJoinInPairedJoiner)
 	in.hasher.HashColumnID(val.ContinuationCol)
+	in.hasher.HashColList(val.PrefixKeyCols)
 	in.hasher.HashColSet(val.Cols)
 	in.hasher.HashJoinFlags(val.Flags)
 	in.hasher.HashBool(val.WasReordered)
@@ -24328,6 +24335,7 @@ func (in *interner) InternInvertedJoin(val *InvertedJoinExpr) *InvertedJoinExpr 
 				in.hasher.IsColumnIDEqual(val.InvertedCol, existing.InvertedCol) &&
 				in.hasher.IsBoolEqual(val.IsFirstJoinInPairedJoiner, existing.IsFirstJoinInPairedJoiner) &&
 				in.hasher.IsColumnIDEqual(val.ContinuationCol, existing.ContinuationCol) &&
+				in.hasher.IsColListEqual(val.PrefixKeyCols, existing.PrefixKeyCols) &&
 				in.hasher.IsColSetEqual(val.Cols, existing.Cols) &&
 				in.hasher.IsJoinFlagsEqual(val.Flags, existing.Flags) &&
 				in.hasher.IsBoolEqual(val.WasReordered, existing.WasReordered) {
