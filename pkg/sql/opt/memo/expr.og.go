@@ -3221,6 +3221,11 @@ type InvertedJoinPrivate struct {
 	// contain columns from the input and columns from the index. Any columns
 	// not in the input are retrieved from the index.
 	Cols opt.ColSet
+
+	// ConstFilters contains the constant filters that are represented as
+	// equality conditions on the PrefixKeyCols. These filters are needed by the
+	// statistics code to correctly estimate selectivity.
+	ConstFilters FiltersExpr
 	JoinPrivate
 }
 
@@ -24320,6 +24325,7 @@ func (in *interner) InternInvertedJoin(val *InvertedJoinExpr) *InvertedJoinExpr 
 	in.hasher.HashColumnID(val.ContinuationCol)
 	in.hasher.HashColList(val.PrefixKeyCols)
 	in.hasher.HashColSet(val.Cols)
+	in.hasher.HashFiltersExpr(val.ConstFilters)
 	in.hasher.HashJoinFlags(val.Flags)
 	in.hasher.HashBool(val.WasReordered)
 
@@ -24337,6 +24343,7 @@ func (in *interner) InternInvertedJoin(val *InvertedJoinExpr) *InvertedJoinExpr 
 				in.hasher.IsColumnIDEqual(val.ContinuationCol, existing.ContinuationCol) &&
 				in.hasher.IsColListEqual(val.PrefixKeyCols, existing.PrefixKeyCols) &&
 				in.hasher.IsColSetEqual(val.Cols, existing.Cols) &&
+				in.hasher.IsFiltersExprEqual(val.ConstFilters, existing.ConstFilters) &&
 				in.hasher.IsJoinFlagsEqual(val.Flags, existing.Flags) &&
 				in.hasher.IsBoolEqual(val.WasReordered, existing.WasReordered) {
 				return existing
