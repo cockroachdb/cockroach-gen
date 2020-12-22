@@ -277,7 +277,7 @@ type MutationPrivate struct {
 	//
 	// If there is a delete-only mutation column "c", then InsertCols would contain
 	// [a_colid, b_colid, 0].
-	InsertCols opt.ColList
+	InsertCols opt.OptionalColList
 
 	// FetchCols are columns from the Input expression that will be fetched from
 	// the target table. They must be a subset of the Input expression's output
@@ -302,7 +302,7 @@ type MutationPrivate struct {
 	// updated value, and the "d" column is needed because it's in the same family
 	// as "c". Taking all this into account, FetchCols would contain this list:
 	// [a_colid, 0, c_colid, d_colid, 0].
-	FetchCols opt.ColList
+	FetchCols opt.OptionalColList
 
 	// UpdateCols are columns from the Input expression that contain updated values
 	// for columns of the target table. They must be a subset of the Input
@@ -318,7 +318,7 @@ type MutationPrivate struct {
 	//
 	// Since column "b" is updated, and "c" is a computed column dependent on "b",
 	// then UpdateCols would contain [0, b_colid, c_colid].
-	UpdateCols opt.ColList
+	UpdateCols opt.OptionalColList
 
 	// CheckCols are columns from the Input expression containing the results of
 	// evaluating the check constraints from the target table. Evaluating a check
@@ -336,7 +336,7 @@ type MutationPrivate struct {
 	// Since the check constraint for column "a" can be statically proven to be
 	// true, CheckCols would contain [0, b_colid].
 	// TODO(radu): we don't actually implement this optimization currently.
-	CheckCols opt.ColList
+	CheckCols opt.OptionalColList
 
 	// PartialIndexPutCols are columns from the Input expression containing the
 	// results of evaluating each partial index predicate from the target table
@@ -358,13 +358,13 @@ type MutationPrivate struct {
 	// evaluating the predicate of the index on c. The index on b is not a
 	// partial index, because it has no predicate, so it is not included in
 	// PartialIndexPutCols.
-	PartialIndexPutCols opt.ColList
+	PartialIndexPutCols opt.OptionalColList
 
 	// PartialIndexDelCols is similar to PartialIndexPutCols, but instead
 	// indicates when the previous version of a row must be deleted from a
 	// partial index during updates or deletes in order to maintain the state of
 	// the index.
-	PartialIndexDelCols opt.ColList
+	PartialIndexDelCols opt.OptionalColList
 
 	// CanaryCol is used only with the Upsert operator. It identifies the column
 	// that the execution engine uses to decide whether to insert or to update.
@@ -386,7 +386,7 @@ type MutationPrivate struct {
 	// including any columns that are undergoing mutation (being added or dropped
 	// as part of online schema change). If no RETURNING clause was specified,
 	// then ReturnCols is nil.
-	ReturnCols opt.ColList
+	ReturnCols opt.OptionalColList
 
 	// PassthroughCols are columns that the mutation needs to passthrough from
 	// its input. It's similar to the passthrough columns in projections. This
@@ -23674,15 +23674,15 @@ func (in *interner) InternInsert(val *InsertExpr) *InsertExpr {
 	in.hasher.HashUniqueChecksExpr(val.UniqueChecks)
 	in.hasher.HashFKChecksExpr(val.FKChecks)
 	in.hasher.HashTableID(val.Table)
-	in.hasher.HashColList(val.InsertCols)
-	in.hasher.HashColList(val.FetchCols)
-	in.hasher.HashColList(val.UpdateCols)
-	in.hasher.HashColList(val.CheckCols)
-	in.hasher.HashColList(val.PartialIndexPutCols)
-	in.hasher.HashColList(val.PartialIndexDelCols)
+	in.hasher.HashOptionalColList(val.InsertCols)
+	in.hasher.HashOptionalColList(val.FetchCols)
+	in.hasher.HashOptionalColList(val.UpdateCols)
+	in.hasher.HashOptionalColList(val.CheckCols)
+	in.hasher.HashOptionalColList(val.PartialIndexPutCols)
+	in.hasher.HashOptionalColList(val.PartialIndexDelCols)
 	in.hasher.HashColumnID(val.CanaryCol)
 	in.hasher.HashIndexOrdinals(val.Arbiters)
-	in.hasher.HashColList(val.ReturnCols)
+	in.hasher.HashOptionalColList(val.ReturnCols)
 	in.hasher.HashColList(val.PassthroughCols)
 	in.hasher.HashWithID(val.WithID)
 	in.hasher.HashFKCascades(val.FKCascades)
@@ -23694,15 +23694,15 @@ func (in *interner) InternInsert(val *InsertExpr) *InsertExpr {
 				in.hasher.IsUniqueChecksExprEqual(val.UniqueChecks, existing.UniqueChecks) &&
 				in.hasher.IsFKChecksExprEqual(val.FKChecks, existing.FKChecks) &&
 				in.hasher.IsTableIDEqual(val.Table, existing.Table) &&
-				in.hasher.IsColListEqual(val.InsertCols, existing.InsertCols) &&
-				in.hasher.IsColListEqual(val.FetchCols, existing.FetchCols) &&
-				in.hasher.IsColListEqual(val.UpdateCols, existing.UpdateCols) &&
-				in.hasher.IsColListEqual(val.CheckCols, existing.CheckCols) &&
-				in.hasher.IsColListEqual(val.PartialIndexPutCols, existing.PartialIndexPutCols) &&
-				in.hasher.IsColListEqual(val.PartialIndexDelCols, existing.PartialIndexDelCols) &&
+				in.hasher.IsOptionalColListEqual(val.InsertCols, existing.InsertCols) &&
+				in.hasher.IsOptionalColListEqual(val.FetchCols, existing.FetchCols) &&
+				in.hasher.IsOptionalColListEqual(val.UpdateCols, existing.UpdateCols) &&
+				in.hasher.IsOptionalColListEqual(val.CheckCols, existing.CheckCols) &&
+				in.hasher.IsOptionalColListEqual(val.PartialIndexPutCols, existing.PartialIndexPutCols) &&
+				in.hasher.IsOptionalColListEqual(val.PartialIndexDelCols, existing.PartialIndexDelCols) &&
 				in.hasher.IsColumnIDEqual(val.CanaryCol, existing.CanaryCol) &&
 				in.hasher.IsIndexOrdinalsEqual(val.Arbiters, existing.Arbiters) &&
-				in.hasher.IsColListEqual(val.ReturnCols, existing.ReturnCols) &&
+				in.hasher.IsOptionalColListEqual(val.ReturnCols, existing.ReturnCols) &&
 				in.hasher.IsColListEqual(val.PassthroughCols, existing.PassthroughCols) &&
 				in.hasher.IsWithIDEqual(val.WithID, existing.WithID) &&
 				in.hasher.IsFKCascadesEqual(val.FKCascades, existing.FKCascades) {
@@ -23722,15 +23722,15 @@ func (in *interner) InternUpdate(val *UpdateExpr) *UpdateExpr {
 	in.hasher.HashUniqueChecksExpr(val.UniqueChecks)
 	in.hasher.HashFKChecksExpr(val.FKChecks)
 	in.hasher.HashTableID(val.Table)
-	in.hasher.HashColList(val.InsertCols)
-	in.hasher.HashColList(val.FetchCols)
-	in.hasher.HashColList(val.UpdateCols)
-	in.hasher.HashColList(val.CheckCols)
-	in.hasher.HashColList(val.PartialIndexPutCols)
-	in.hasher.HashColList(val.PartialIndexDelCols)
+	in.hasher.HashOptionalColList(val.InsertCols)
+	in.hasher.HashOptionalColList(val.FetchCols)
+	in.hasher.HashOptionalColList(val.UpdateCols)
+	in.hasher.HashOptionalColList(val.CheckCols)
+	in.hasher.HashOptionalColList(val.PartialIndexPutCols)
+	in.hasher.HashOptionalColList(val.PartialIndexDelCols)
 	in.hasher.HashColumnID(val.CanaryCol)
 	in.hasher.HashIndexOrdinals(val.Arbiters)
-	in.hasher.HashColList(val.ReturnCols)
+	in.hasher.HashOptionalColList(val.ReturnCols)
 	in.hasher.HashColList(val.PassthroughCols)
 	in.hasher.HashWithID(val.WithID)
 	in.hasher.HashFKCascades(val.FKCascades)
@@ -23742,15 +23742,15 @@ func (in *interner) InternUpdate(val *UpdateExpr) *UpdateExpr {
 				in.hasher.IsUniqueChecksExprEqual(val.UniqueChecks, existing.UniqueChecks) &&
 				in.hasher.IsFKChecksExprEqual(val.FKChecks, existing.FKChecks) &&
 				in.hasher.IsTableIDEqual(val.Table, existing.Table) &&
-				in.hasher.IsColListEqual(val.InsertCols, existing.InsertCols) &&
-				in.hasher.IsColListEqual(val.FetchCols, existing.FetchCols) &&
-				in.hasher.IsColListEqual(val.UpdateCols, existing.UpdateCols) &&
-				in.hasher.IsColListEqual(val.CheckCols, existing.CheckCols) &&
-				in.hasher.IsColListEqual(val.PartialIndexPutCols, existing.PartialIndexPutCols) &&
-				in.hasher.IsColListEqual(val.PartialIndexDelCols, existing.PartialIndexDelCols) &&
+				in.hasher.IsOptionalColListEqual(val.InsertCols, existing.InsertCols) &&
+				in.hasher.IsOptionalColListEqual(val.FetchCols, existing.FetchCols) &&
+				in.hasher.IsOptionalColListEqual(val.UpdateCols, existing.UpdateCols) &&
+				in.hasher.IsOptionalColListEqual(val.CheckCols, existing.CheckCols) &&
+				in.hasher.IsOptionalColListEqual(val.PartialIndexPutCols, existing.PartialIndexPutCols) &&
+				in.hasher.IsOptionalColListEqual(val.PartialIndexDelCols, existing.PartialIndexDelCols) &&
 				in.hasher.IsColumnIDEqual(val.CanaryCol, existing.CanaryCol) &&
 				in.hasher.IsIndexOrdinalsEqual(val.Arbiters, existing.Arbiters) &&
-				in.hasher.IsColListEqual(val.ReturnCols, existing.ReturnCols) &&
+				in.hasher.IsOptionalColListEqual(val.ReturnCols, existing.ReturnCols) &&
 				in.hasher.IsColListEqual(val.PassthroughCols, existing.PassthroughCols) &&
 				in.hasher.IsWithIDEqual(val.WithID, existing.WithID) &&
 				in.hasher.IsFKCascadesEqual(val.FKCascades, existing.FKCascades) {
@@ -23770,15 +23770,15 @@ func (in *interner) InternUpsert(val *UpsertExpr) *UpsertExpr {
 	in.hasher.HashUniqueChecksExpr(val.UniqueChecks)
 	in.hasher.HashFKChecksExpr(val.FKChecks)
 	in.hasher.HashTableID(val.Table)
-	in.hasher.HashColList(val.InsertCols)
-	in.hasher.HashColList(val.FetchCols)
-	in.hasher.HashColList(val.UpdateCols)
-	in.hasher.HashColList(val.CheckCols)
-	in.hasher.HashColList(val.PartialIndexPutCols)
-	in.hasher.HashColList(val.PartialIndexDelCols)
+	in.hasher.HashOptionalColList(val.InsertCols)
+	in.hasher.HashOptionalColList(val.FetchCols)
+	in.hasher.HashOptionalColList(val.UpdateCols)
+	in.hasher.HashOptionalColList(val.CheckCols)
+	in.hasher.HashOptionalColList(val.PartialIndexPutCols)
+	in.hasher.HashOptionalColList(val.PartialIndexDelCols)
 	in.hasher.HashColumnID(val.CanaryCol)
 	in.hasher.HashIndexOrdinals(val.Arbiters)
-	in.hasher.HashColList(val.ReturnCols)
+	in.hasher.HashOptionalColList(val.ReturnCols)
 	in.hasher.HashColList(val.PassthroughCols)
 	in.hasher.HashWithID(val.WithID)
 	in.hasher.HashFKCascades(val.FKCascades)
@@ -23790,15 +23790,15 @@ func (in *interner) InternUpsert(val *UpsertExpr) *UpsertExpr {
 				in.hasher.IsUniqueChecksExprEqual(val.UniqueChecks, existing.UniqueChecks) &&
 				in.hasher.IsFKChecksExprEqual(val.FKChecks, existing.FKChecks) &&
 				in.hasher.IsTableIDEqual(val.Table, existing.Table) &&
-				in.hasher.IsColListEqual(val.InsertCols, existing.InsertCols) &&
-				in.hasher.IsColListEqual(val.FetchCols, existing.FetchCols) &&
-				in.hasher.IsColListEqual(val.UpdateCols, existing.UpdateCols) &&
-				in.hasher.IsColListEqual(val.CheckCols, existing.CheckCols) &&
-				in.hasher.IsColListEqual(val.PartialIndexPutCols, existing.PartialIndexPutCols) &&
-				in.hasher.IsColListEqual(val.PartialIndexDelCols, existing.PartialIndexDelCols) &&
+				in.hasher.IsOptionalColListEqual(val.InsertCols, existing.InsertCols) &&
+				in.hasher.IsOptionalColListEqual(val.FetchCols, existing.FetchCols) &&
+				in.hasher.IsOptionalColListEqual(val.UpdateCols, existing.UpdateCols) &&
+				in.hasher.IsOptionalColListEqual(val.CheckCols, existing.CheckCols) &&
+				in.hasher.IsOptionalColListEqual(val.PartialIndexPutCols, existing.PartialIndexPutCols) &&
+				in.hasher.IsOptionalColListEqual(val.PartialIndexDelCols, existing.PartialIndexDelCols) &&
 				in.hasher.IsColumnIDEqual(val.CanaryCol, existing.CanaryCol) &&
 				in.hasher.IsIndexOrdinalsEqual(val.Arbiters, existing.Arbiters) &&
-				in.hasher.IsColListEqual(val.ReturnCols, existing.ReturnCols) &&
+				in.hasher.IsOptionalColListEqual(val.ReturnCols, existing.ReturnCols) &&
 				in.hasher.IsColListEqual(val.PassthroughCols, existing.PassthroughCols) &&
 				in.hasher.IsWithIDEqual(val.WithID, existing.WithID) &&
 				in.hasher.IsFKCascadesEqual(val.FKCascades, existing.FKCascades) {
@@ -23818,15 +23818,15 @@ func (in *interner) InternDelete(val *DeleteExpr) *DeleteExpr {
 	in.hasher.HashUniqueChecksExpr(val.UniqueChecks)
 	in.hasher.HashFKChecksExpr(val.FKChecks)
 	in.hasher.HashTableID(val.Table)
-	in.hasher.HashColList(val.InsertCols)
-	in.hasher.HashColList(val.FetchCols)
-	in.hasher.HashColList(val.UpdateCols)
-	in.hasher.HashColList(val.CheckCols)
-	in.hasher.HashColList(val.PartialIndexPutCols)
-	in.hasher.HashColList(val.PartialIndexDelCols)
+	in.hasher.HashOptionalColList(val.InsertCols)
+	in.hasher.HashOptionalColList(val.FetchCols)
+	in.hasher.HashOptionalColList(val.UpdateCols)
+	in.hasher.HashOptionalColList(val.CheckCols)
+	in.hasher.HashOptionalColList(val.PartialIndexPutCols)
+	in.hasher.HashOptionalColList(val.PartialIndexDelCols)
 	in.hasher.HashColumnID(val.CanaryCol)
 	in.hasher.HashIndexOrdinals(val.Arbiters)
-	in.hasher.HashColList(val.ReturnCols)
+	in.hasher.HashOptionalColList(val.ReturnCols)
 	in.hasher.HashColList(val.PassthroughCols)
 	in.hasher.HashWithID(val.WithID)
 	in.hasher.HashFKCascades(val.FKCascades)
@@ -23838,15 +23838,15 @@ func (in *interner) InternDelete(val *DeleteExpr) *DeleteExpr {
 				in.hasher.IsUniqueChecksExprEqual(val.UniqueChecks, existing.UniqueChecks) &&
 				in.hasher.IsFKChecksExprEqual(val.FKChecks, existing.FKChecks) &&
 				in.hasher.IsTableIDEqual(val.Table, existing.Table) &&
-				in.hasher.IsColListEqual(val.InsertCols, existing.InsertCols) &&
-				in.hasher.IsColListEqual(val.FetchCols, existing.FetchCols) &&
-				in.hasher.IsColListEqual(val.UpdateCols, existing.UpdateCols) &&
-				in.hasher.IsColListEqual(val.CheckCols, existing.CheckCols) &&
-				in.hasher.IsColListEqual(val.PartialIndexPutCols, existing.PartialIndexPutCols) &&
-				in.hasher.IsColListEqual(val.PartialIndexDelCols, existing.PartialIndexDelCols) &&
+				in.hasher.IsOptionalColListEqual(val.InsertCols, existing.InsertCols) &&
+				in.hasher.IsOptionalColListEqual(val.FetchCols, existing.FetchCols) &&
+				in.hasher.IsOptionalColListEqual(val.UpdateCols, existing.UpdateCols) &&
+				in.hasher.IsOptionalColListEqual(val.CheckCols, existing.CheckCols) &&
+				in.hasher.IsOptionalColListEqual(val.PartialIndexPutCols, existing.PartialIndexPutCols) &&
+				in.hasher.IsOptionalColListEqual(val.PartialIndexDelCols, existing.PartialIndexDelCols) &&
 				in.hasher.IsColumnIDEqual(val.CanaryCol, existing.CanaryCol) &&
 				in.hasher.IsIndexOrdinalsEqual(val.Arbiters, existing.Arbiters) &&
-				in.hasher.IsColListEqual(val.ReturnCols, existing.ReturnCols) &&
+				in.hasher.IsOptionalColListEqual(val.ReturnCols, existing.ReturnCols) &&
 				in.hasher.IsColListEqual(val.PassthroughCols, existing.PassthroughCols) &&
 				in.hasher.IsWithIDEqual(val.WithID, existing.WithID) &&
 				in.hasher.IsFKCascadesEqual(val.FKCascades, existing.FKCascades) {
