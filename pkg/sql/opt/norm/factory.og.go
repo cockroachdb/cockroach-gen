@@ -4942,6 +4942,32 @@ func (_f *Factory) ConstructSemiJoin(
 		}
 	}
 
+	// [RejectNullsUnderJoinRight]
+	{
+		rejectCols := _f.funcs.RejectNullCols(right)
+		if !_f.funcs.ColsAreEmpty(rejectCols) {
+			nullRejectedCols := _f.funcs.IntersectionCols(rejectCols, _f.funcs.GetNullRejectedCols(on))
+			if !_f.funcs.ColsAreEmpty(nullRejectedCols) {
+				private := joinPrivate
+				if _f.matchedRule == nil || _f.matchedRule(opt.RejectNullsUnderJoinRight) {
+					_expr := _f.ConstructSemiJoin(
+						left,
+						_f.ConstructSelect(
+							right,
+							_f.funcs.MakeNullRejectFilters(nullRejectedCols),
+						),
+						on,
+						private,
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.RejectNullsUnderJoinRight, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
 	e := _f.mem.MemoizeSemiJoin(left, right, on, joinPrivate)
 	return _f.onConstructRelational(e)
 }
@@ -5425,6 +5451,32 @@ func (_f *Factory) ConstructAntiJoin(
 					_expr := _f.funcs.HoistJoinSubquery(opt.AntiJoinOp, left, right, on, private).(memo.RelExpr)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.HoistJoinSubquery, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
+	// [RejectNullsUnderJoinRight]
+	{
+		rejectCols := _f.funcs.RejectNullCols(right)
+		if !_f.funcs.ColsAreEmpty(rejectCols) {
+			nullRejectedCols := _f.funcs.IntersectionCols(rejectCols, _f.funcs.GetNullRejectedCols(on))
+			if !_f.funcs.ColsAreEmpty(nullRejectedCols) {
+				private := joinPrivate
+				if _f.matchedRule == nil || _f.matchedRule(opt.RejectNullsUnderJoinRight) {
+					_expr := _f.ConstructAntiJoin(
+						left,
+						_f.ConstructSelect(
+							right,
+							_f.funcs.MakeNullRejectFilters(nullRejectedCols),
+						),
+						on,
+						private,
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.RejectNullsUnderJoinRight, nil, _expr)
 					}
 					return _expr
 				}
