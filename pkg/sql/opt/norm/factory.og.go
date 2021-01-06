@@ -8504,22 +8504,22 @@ func (_f *Factory) ConstructGroupBy(
 
 	// [FoldGroupingOperators]
 	{
-		_groupBy, _ := input.(*memo.GroupByExpr)
-		if _groupBy != nil {
-			innerInput := _groupBy.Input
-			innerAggs := _groupBy.Aggregations
-			innerGrouping := &_groupBy.GroupingPrivate
+		if input.Op() == opt.GroupByOp || input.Op() == opt.DistinctOnOp {
+			innerInput := input.Child(0).(memo.RelExpr)
+			innerAggs := *input.Child(1).(*memo.AggregationsExpr)
+			innerGrouping := input.Private().(*memo.GroupingPrivate)
 			if _f.funcs.IsUnorderedGrouping(innerGrouping) {
 				outerAggs := aggregations
 				outerGrouping := groupingPrivate
 				if _f.funcs.IsUnorderedGrouping(outerGrouping) {
 					outerGroupingCols := _f.funcs.GroupingCols(outerGrouping)
-					if _f.funcs.ColsAreDeterminedBy(outerGroupingCols, _f.funcs.GroupingCols(innerGrouping), innerInput) {
-						if _f.funcs.CanMergeAggs(innerAggs, outerAggs) {
+					innerGroupingCols := _f.funcs.GroupingCols(innerGrouping)
+					if _f.funcs.ColsAreDeterminedBy(outerGroupingCols, innerGroupingCols, innerInput) {
+						if _f.funcs.CanMergeAggs(innerAggs, outerAggs, innerGroupingCols) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.FoldGroupingOperators) {
 								_expr := _f.ConstructGroupBy(
 									innerInput,
-									_f.funcs.MergeAggs(innerAggs, outerAggs),
+									_f.funcs.MergeAggs(innerAggs, outerAggs, innerGroupingCols),
 									_f.funcs.MakeGrouping(outerGroupingCols, _f.funcs.EmptyOrdering()),
 								)
 								if _f.appliedRule != nil {
@@ -8852,22 +8852,22 @@ func (_f *Factory) ConstructScalarGroupBy(
 
 	// [FoldGroupingOperators]
 	{
-		_groupBy, _ := input.(*memo.GroupByExpr)
-		if _groupBy != nil {
-			innerInput := _groupBy.Input
-			innerAggs := _groupBy.Aggregations
-			innerGrouping := &_groupBy.GroupingPrivate
+		if input.Op() == opt.GroupByOp || input.Op() == opt.DistinctOnOp {
+			innerInput := input.Child(0).(memo.RelExpr)
+			innerAggs := *input.Child(1).(*memo.AggregationsExpr)
+			innerGrouping := input.Private().(*memo.GroupingPrivate)
 			if _f.funcs.IsUnorderedGrouping(innerGrouping) {
 				outerAggs := aggregations
 				outerGrouping := groupingPrivate
 				if _f.funcs.IsUnorderedGrouping(outerGrouping) {
 					outerGroupingCols := _f.funcs.GroupingCols(outerGrouping)
-					if _f.funcs.ColsAreDeterminedBy(outerGroupingCols, _f.funcs.GroupingCols(innerGrouping), innerInput) {
-						if _f.funcs.CanMergeAggs(innerAggs, outerAggs) {
+					innerGroupingCols := _f.funcs.GroupingCols(innerGrouping)
+					if _f.funcs.ColsAreDeterminedBy(outerGroupingCols, innerGroupingCols, innerInput) {
+						if _f.funcs.CanMergeAggs(innerAggs, outerAggs, innerGroupingCols) {
 							if _f.matchedRule == nil || _f.matchedRule(opt.FoldGroupingOperators) {
 								_expr := _f.ConstructScalarGroupBy(
 									innerInput,
-									_f.funcs.MergeAggs(innerAggs, outerAggs),
+									_f.funcs.MergeAggs(innerAggs, outerAggs, innerGroupingCols),
 									_f.funcs.MakeGrouping(outerGroupingCols, _f.funcs.EmptyOrdering()),
 								)
 								if _f.appliedRule != nil {
@@ -9103,6 +9103,38 @@ func (_f *Factory) ConstructDistinctOn(
 					_f.appliedRule(opt.EliminateDistinctOnValues, nil, _expr)
 				}
 				return _expr
+			}
+		}
+	}
+
+	// [FoldGroupingOperators]
+	{
+		if input.Op() == opt.GroupByOp || input.Op() == opt.DistinctOnOp {
+			innerInput := input.Child(0).(memo.RelExpr)
+			innerAggs := *input.Child(1).(*memo.AggregationsExpr)
+			innerGrouping := input.Private().(*memo.GroupingPrivate)
+			if _f.funcs.IsUnorderedGrouping(innerGrouping) {
+				outerAggs := aggregations
+				outerGrouping := groupingPrivate
+				if _f.funcs.IsUnorderedGrouping(outerGrouping) {
+					outerGroupingCols := _f.funcs.GroupingCols(outerGrouping)
+					innerGroupingCols := _f.funcs.GroupingCols(innerGrouping)
+					if _f.funcs.ColsAreDeterminedBy(outerGroupingCols, innerGroupingCols, innerInput) {
+						if _f.funcs.CanMergeAggs(innerAggs, outerAggs, innerGroupingCols) {
+							if _f.matchedRule == nil || _f.matchedRule(opt.FoldGroupingOperators) {
+								_expr := _f.ConstructDistinctOn(
+									innerInput,
+									_f.funcs.MergeAggs(innerAggs, outerAggs, innerGroupingCols),
+									_f.funcs.MakeGrouping(outerGroupingCols, _f.funcs.EmptyOrdering()),
+								)
+								if _f.appliedRule != nil {
+									_f.appliedRule(opt.FoldGroupingOperators, nil, _expr)
+								}
+								return _expr
+							}
+						}
+					}
+				}
 			}
 		}
 	}
