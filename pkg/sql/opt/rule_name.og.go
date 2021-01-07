@@ -158,6 +158,7 @@ const (
 	AssociateLimitJoinsLeft
 	AssociateLimitJoinsRight
 	EliminateMax1Row
+	SimplifyPartialIndexProjections
 	FoldPlusZero
 	FoldZeroPlus
 	FoldMinusZero

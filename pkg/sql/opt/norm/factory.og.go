@@ -74,6 +74,37 @@ func (_f *Factory) ConstructUpdate(
 	fKChecks memo.FKChecksExpr,
 	mutationPrivate *memo.MutationPrivate,
 ) memo.RelExpr {
+	// [SimplifyPartialIndexProjections]
+	{
+		project := input
+		_project, _ := project.(*memo.ProjectExpr)
+		if _project != nil {
+			input := _project.Input
+			projections := _project.Projections
+			passthrough := _project.Passthrough
+			fkChecks := fKChecks
+			simplifiableCols := _f.funcs.SimplifiablePartialIndexProjectCols(mutationPrivate, uniqueChecks, fkChecks, projections)
+			if !_f.funcs.ColsAreEmpty(simplifiableCols) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyPartialIndexProjections) {
+					_expr := _f.ConstructUpdate(
+						_f.ConstructProject(
+							input,
+							_f.funcs.SimplifyPartialIndexProjections(projections, simplifiableCols),
+							passthrough,
+						),
+						uniqueChecks,
+						fkChecks,
+						mutationPrivate,
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.SimplifyPartialIndexProjections, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
 	// [PruneMutationFetchCols]
 	{
 		fkChecks := fKChecks
