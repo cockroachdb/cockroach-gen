@@ -9320,27 +9320,6 @@ func (_f *Factory) ConstructUpsertDistinctOn(
 	aggregations memo.AggregationsExpr,
 	groupingPrivate *memo.GroupingPrivate,
 ) memo.RelExpr {
-	// [EliminateGroupByProject]
-	{
-		_project, _ := input.(*memo.ProjectExpr)
-		if _project != nil {
-			innerInput := _project.Input
-			if _f.funcs.ColsAreSubset(_f.funcs.OutputCols(_project), _f.funcs.OutputCols(innerInput)) {
-				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateGroupByProject) {
-					_expr := _f.ConstructUpsertDistinctOn(
-						innerInput,
-						aggregations,
-						groupingPrivate,
-					)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.EliminateGroupByProject, nil, _expr)
-					}
-					return _expr
-				}
-			}
-		}
-	}
-
 	// [ReduceNotNullGroupingCols]
 	{
 		redundantCols := _f.funcs.IntersectionCols(_f.funcs.RedundantCols(input, _f.funcs.GroupingCols(groupingPrivate)), _f.funcs.NotNullCols(input))
