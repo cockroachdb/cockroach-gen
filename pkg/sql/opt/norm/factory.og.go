@@ -11140,6 +11140,24 @@ func (_f *Factory) ConstructNot(
 		}
 	}
 
+	// [SimplifyNotDisjoint]
+	{
+		_function, _ := input.(*memo.FunctionExpr)
+		if _function != nil {
+			args := _function.Args
+			private := &_function.FunctionPrivate
+			if _f.funcs.EqualsString(private.Name, "st_disjoint") {
+				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyNotDisjoint) {
+					_expr := _f.funcs.MakeIntersectionFunction(args).(opt.ScalarExpr)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.SimplifyNotDisjoint, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
 	e := _f.mem.MemoizeNot(input)
 	return _f.onConstructScalar(e)
 }

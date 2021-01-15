@@ -231,6 +231,7 @@ const (
 	NormalizeArrayFlattenToAgg
 	SimplifySameVarEqualities
 	SimplifySameVarInequalities
+	SimplifyNotDisjoint
 	SimplifySelectFilters
 	ConsolidateSelectFilters
 	EliminateSelect
