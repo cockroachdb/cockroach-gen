@@ -618,6 +618,7 @@ func (f *Factory) ConstructInvertedJoin(
 	input exec.Node,
 	table cat.Table,
 	index cat.Index,
+	prefixEqCols []exec.NodeColumnOrdinal,
 	lookupCols exec.TableColumnOrdinalSet,
 	onCond tree.TypedExpr,
 	isFirstJoinInPairedJoiner bool,
@@ -630,6 +631,7 @@ func (f *Factory) ConstructInvertedJoin(
 		Input:                     inputNode,
 		Table:                     table,
 		Index:                     index,
+		PrefixEqCols:              prefixEqCols,
 		LookupCols:                lookupCols,
 		OnCond:                    onCond,
 		IsFirstJoinInPairedJoiner: isFirstJoinInPairedJoiner,
@@ -646,6 +648,7 @@ func (f *Factory) ConstructInvertedJoin(
 		inputNode.WrappedNode(),
 		table,
 		index,
+		prefixEqCols,
 		lookupCols,
 		onCond,
 		isFirstJoinInPairedJoiner,
@@ -1896,6 +1899,7 @@ type invertedJoinArgs struct {
 	Input                     *Node
 	Table                     cat.Table
 	Index                     cat.Index
+	PrefixEqCols              []exec.NodeColumnOrdinal
 	LookupCols                exec.TableColumnOrdinalSet
 	OnCond                    tree.TypedExpr
 	IsFirstJoinInPairedJoiner bool

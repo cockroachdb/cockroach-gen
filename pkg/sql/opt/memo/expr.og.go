@@ -2720,9 +2720,9 @@ type JoinPrivate struct {
 	// Flags modify what type of join we choose.
 	Flags JoinFlags
 
-	// WasReordered indicates whether reorderings of the join tree rooted at this
-	// join have already been considered.
-	WasReordered bool
+	// SkipReorderJoins indicates whether the ReorderJoins rule should match this
+	// join.
+	SkipReorderJoins bool
 }
 
 // IndexJoinExpr represents an inner join between an input expression and a primary
@@ -3198,10 +3198,6 @@ type InvertedJoinPrivate struct {
 	// Index identifies the inverted index to do lookups in. It can be passed to
 	// the cat.Table.Index() method in order to fetch the cat.Index metadata.
 	Index cat.IndexOrdinal
-
-	// InvertedCol is the inverted column in the index that is referenced by
-	// InvertedExpr.
-	InvertedCol opt.ColumnID
 
 	// IsFirstJoinInPairedJoiner is true if this is the first join of a
 	// paired-joiner used for left joins.
@@ -24100,7 +24096,7 @@ func (in *interner) InternInnerJoin(val *InnerJoinExpr) *InnerJoinExpr {
 	in.hasher.HashRelExpr(val.Right)
 	in.hasher.HashFiltersExpr(val.On)
 	in.hasher.HashJoinFlags(val.Flags)
-	in.hasher.HashBool(val.WasReordered)
+	in.hasher.HashBool(val.SkipReorderJoins)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
@@ -24109,7 +24105,7 @@ func (in *interner) InternInnerJoin(val *InnerJoinExpr) *InnerJoinExpr {
 				in.hasher.IsRelExprEqual(val.Right, existing.Right) &&
 				in.hasher.IsFiltersExprEqual(val.On, existing.On) &&
 				in.hasher.IsJoinFlagsEqual(val.Flags, existing.Flags) &&
-				in.hasher.IsBoolEqual(val.WasReordered, existing.WasReordered) {
+				in.hasher.IsBoolEqual(val.SkipReorderJoins, existing.SkipReorderJoins) {
 				return existing
 			}
 		}
@@ -24126,7 +24122,7 @@ func (in *interner) InternLeftJoin(val *LeftJoinExpr) *LeftJoinExpr {
 	in.hasher.HashRelExpr(val.Right)
 	in.hasher.HashFiltersExpr(val.On)
 	in.hasher.HashJoinFlags(val.Flags)
-	in.hasher.HashBool(val.WasReordered)
+	in.hasher.HashBool(val.SkipReorderJoins)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
@@ -24135,7 +24131,7 @@ func (in *interner) InternLeftJoin(val *LeftJoinExpr) *LeftJoinExpr {
 				in.hasher.IsRelExprEqual(val.Right, existing.Right) &&
 				in.hasher.IsFiltersExprEqual(val.On, existing.On) &&
 				in.hasher.IsJoinFlagsEqual(val.Flags, existing.Flags) &&
-				in.hasher.IsBoolEqual(val.WasReordered, existing.WasReordered) {
+				in.hasher.IsBoolEqual(val.SkipReorderJoins, existing.SkipReorderJoins) {
 				return existing
 			}
 		}
@@ -24152,7 +24148,7 @@ func (in *interner) InternRightJoin(val *RightJoinExpr) *RightJoinExpr {
 	in.hasher.HashRelExpr(val.Right)
 	in.hasher.HashFiltersExpr(val.On)
 	in.hasher.HashJoinFlags(val.Flags)
-	in.hasher.HashBool(val.WasReordered)
+	in.hasher.HashBool(val.SkipReorderJoins)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
@@ -24161,7 +24157,7 @@ func (in *interner) InternRightJoin(val *RightJoinExpr) *RightJoinExpr {
 				in.hasher.IsRelExprEqual(val.Right, existing.Right) &&
 				in.hasher.IsFiltersExprEqual(val.On, existing.On) &&
 				in.hasher.IsJoinFlagsEqual(val.Flags, existing.Flags) &&
-				in.hasher.IsBoolEqual(val.WasReordered, existing.WasReordered) {
+				in.hasher.IsBoolEqual(val.SkipReorderJoins, existing.SkipReorderJoins) {
 				return existing
 			}
 		}
@@ -24178,7 +24174,7 @@ func (in *interner) InternFullJoin(val *FullJoinExpr) *FullJoinExpr {
 	in.hasher.HashRelExpr(val.Right)
 	in.hasher.HashFiltersExpr(val.On)
 	in.hasher.HashJoinFlags(val.Flags)
-	in.hasher.HashBool(val.WasReordered)
+	in.hasher.HashBool(val.SkipReorderJoins)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
@@ -24187,7 +24183,7 @@ func (in *interner) InternFullJoin(val *FullJoinExpr) *FullJoinExpr {
 				in.hasher.IsRelExprEqual(val.Right, existing.Right) &&
 				in.hasher.IsFiltersExprEqual(val.On, existing.On) &&
 				in.hasher.IsJoinFlagsEqual(val.Flags, existing.Flags) &&
-				in.hasher.IsBoolEqual(val.WasReordered, existing.WasReordered) {
+				in.hasher.IsBoolEqual(val.SkipReorderJoins, existing.SkipReorderJoins) {
 				return existing
 			}
 		}
@@ -24204,7 +24200,7 @@ func (in *interner) InternSemiJoin(val *SemiJoinExpr) *SemiJoinExpr {
 	in.hasher.HashRelExpr(val.Right)
 	in.hasher.HashFiltersExpr(val.On)
 	in.hasher.HashJoinFlags(val.Flags)
-	in.hasher.HashBool(val.WasReordered)
+	in.hasher.HashBool(val.SkipReorderJoins)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
@@ -24213,7 +24209,7 @@ func (in *interner) InternSemiJoin(val *SemiJoinExpr) *SemiJoinExpr {
 				in.hasher.IsRelExprEqual(val.Right, existing.Right) &&
 				in.hasher.IsFiltersExprEqual(val.On, existing.On) &&
 				in.hasher.IsJoinFlagsEqual(val.Flags, existing.Flags) &&
-				in.hasher.IsBoolEqual(val.WasReordered, existing.WasReordered) {
+				in.hasher.IsBoolEqual(val.SkipReorderJoins, existing.SkipReorderJoins) {
 				return existing
 			}
 		}
@@ -24230,7 +24226,7 @@ func (in *interner) InternAntiJoin(val *AntiJoinExpr) *AntiJoinExpr {
 	in.hasher.HashRelExpr(val.Right)
 	in.hasher.HashFiltersExpr(val.On)
 	in.hasher.HashJoinFlags(val.Flags)
-	in.hasher.HashBool(val.WasReordered)
+	in.hasher.HashBool(val.SkipReorderJoins)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
@@ -24239,7 +24235,7 @@ func (in *interner) InternAntiJoin(val *AntiJoinExpr) *AntiJoinExpr {
 				in.hasher.IsRelExprEqual(val.Right, existing.Right) &&
 				in.hasher.IsFiltersExprEqual(val.On, existing.On) &&
 				in.hasher.IsJoinFlagsEqual(val.Flags, existing.Flags) &&
-				in.hasher.IsBoolEqual(val.WasReordered, existing.WasReordered) {
+				in.hasher.IsBoolEqual(val.SkipReorderJoins, existing.SkipReorderJoins) {
 				return existing
 			}
 		}
@@ -24285,7 +24281,7 @@ func (in *interner) InternLookupJoin(val *LookupJoinExpr) *LookupJoinExpr {
 	in.hasher.HashBool(val.IsSecondJoinInPairedJoiner)
 	in.hasher.HashFiltersExpr(val.ConstFilters)
 	in.hasher.HashJoinFlags(val.Flags)
-	in.hasher.HashBool(val.WasReordered)
+	in.hasher.HashBool(val.SkipReorderJoins)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
@@ -24301,7 +24297,7 @@ func (in *interner) InternLookupJoin(val *LookupJoinExpr) *LookupJoinExpr {
 				in.hasher.IsBoolEqual(val.IsSecondJoinInPairedJoiner, existing.IsSecondJoinInPairedJoiner) &&
 				in.hasher.IsFiltersExprEqual(val.ConstFilters, existing.ConstFilters) &&
 				in.hasher.IsJoinFlagsEqual(val.Flags, existing.Flags) &&
-				in.hasher.IsBoolEqual(val.WasReordered, existing.WasReordered) {
+				in.hasher.IsBoolEqual(val.SkipReorderJoins, existing.SkipReorderJoins) {
 				return existing
 			}
 		}
@@ -24320,14 +24316,13 @@ func (in *interner) InternInvertedJoin(val *InvertedJoinExpr) *InvertedJoinExpr 
 	in.hasher.HashScalarExpr(val.InvertedExpr)
 	in.hasher.HashTableID(val.Table)
 	in.hasher.HashIndexOrdinal(val.Index)
-	in.hasher.HashColumnID(val.InvertedCol)
 	in.hasher.HashBool(val.IsFirstJoinInPairedJoiner)
 	in.hasher.HashColumnID(val.ContinuationCol)
 	in.hasher.HashColList(val.PrefixKeyCols)
 	in.hasher.HashColSet(val.Cols)
 	in.hasher.HashFiltersExpr(val.ConstFilters)
 	in.hasher.HashJoinFlags(val.Flags)
-	in.hasher.HashBool(val.WasReordered)
+	in.hasher.HashBool(val.SkipReorderJoins)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
@@ -24338,14 +24333,13 @@ func (in *interner) InternInvertedJoin(val *InvertedJoinExpr) *InvertedJoinExpr 
 				in.hasher.IsScalarExprEqual(val.InvertedExpr, existing.InvertedExpr) &&
 				in.hasher.IsTableIDEqual(val.Table, existing.Table) &&
 				in.hasher.IsIndexOrdinalEqual(val.Index, existing.Index) &&
-				in.hasher.IsColumnIDEqual(val.InvertedCol, existing.InvertedCol) &&
 				in.hasher.IsBoolEqual(val.IsFirstJoinInPairedJoiner, existing.IsFirstJoinInPairedJoiner) &&
 				in.hasher.IsColumnIDEqual(val.ContinuationCol, existing.ContinuationCol) &&
 				in.hasher.IsColListEqual(val.PrefixKeyCols, existing.PrefixKeyCols) &&
 				in.hasher.IsColSetEqual(val.Cols, existing.Cols) &&
 				in.hasher.IsFiltersExprEqual(val.ConstFilters, existing.ConstFilters) &&
 				in.hasher.IsJoinFlagsEqual(val.Flags, existing.Flags) &&
-				in.hasher.IsBoolEqual(val.WasReordered, existing.WasReordered) {
+				in.hasher.IsBoolEqual(val.SkipReorderJoins, existing.SkipReorderJoins) {
 				return existing
 			}
 		}
@@ -24367,7 +24361,7 @@ func (in *interner) InternMergeJoin(val *MergeJoinExpr) *MergeJoinExpr {
 	in.hasher.HashOrderingChoice(val.LeftOrdering)
 	in.hasher.HashOrderingChoice(val.RightOrdering)
 	in.hasher.HashJoinFlags(val.Flags)
-	in.hasher.HashBool(val.WasReordered)
+	in.hasher.HashBool(val.SkipReorderJoins)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
@@ -24381,7 +24375,7 @@ func (in *interner) InternMergeJoin(val *MergeJoinExpr) *MergeJoinExpr {
 				in.hasher.IsOrderingChoiceEqual(val.LeftOrdering, existing.LeftOrdering) &&
 				in.hasher.IsOrderingChoiceEqual(val.RightOrdering, existing.RightOrdering) &&
 				in.hasher.IsJoinFlagsEqual(val.Flags, existing.Flags) &&
-				in.hasher.IsBoolEqual(val.WasReordered, existing.WasReordered) {
+				in.hasher.IsBoolEqual(val.SkipReorderJoins, existing.SkipReorderJoins) {
 				return existing
 			}
 		}
@@ -24436,7 +24430,7 @@ func (in *interner) InternInnerJoinApply(val *InnerJoinApplyExpr) *InnerJoinAppl
 	in.hasher.HashRelExpr(val.Right)
 	in.hasher.HashFiltersExpr(val.On)
 	in.hasher.HashJoinFlags(val.Flags)
-	in.hasher.HashBool(val.WasReordered)
+	in.hasher.HashBool(val.SkipReorderJoins)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
@@ -24445,7 +24439,7 @@ func (in *interner) InternInnerJoinApply(val *InnerJoinApplyExpr) *InnerJoinAppl
 				in.hasher.IsRelExprEqual(val.Right, existing.Right) &&
 				in.hasher.IsFiltersExprEqual(val.On, existing.On) &&
 				in.hasher.IsJoinFlagsEqual(val.Flags, existing.Flags) &&
-				in.hasher.IsBoolEqual(val.WasReordered, existing.WasReordered) {
+				in.hasher.IsBoolEqual(val.SkipReorderJoins, existing.SkipReorderJoins) {
 				return existing
 			}
 		}
@@ -24462,7 +24456,7 @@ func (in *interner) InternLeftJoinApply(val *LeftJoinApplyExpr) *LeftJoinApplyEx
 	in.hasher.HashRelExpr(val.Right)
 	in.hasher.HashFiltersExpr(val.On)
 	in.hasher.HashJoinFlags(val.Flags)
-	in.hasher.HashBool(val.WasReordered)
+	in.hasher.HashBool(val.SkipReorderJoins)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
@@ -24471,7 +24465,7 @@ func (in *interner) InternLeftJoinApply(val *LeftJoinApplyExpr) *LeftJoinApplyEx
 				in.hasher.IsRelExprEqual(val.Right, existing.Right) &&
 				in.hasher.IsFiltersExprEqual(val.On, existing.On) &&
 				in.hasher.IsJoinFlagsEqual(val.Flags, existing.Flags) &&
-				in.hasher.IsBoolEqual(val.WasReordered, existing.WasReordered) {
+				in.hasher.IsBoolEqual(val.SkipReorderJoins, existing.SkipReorderJoins) {
 				return existing
 			}
 		}
@@ -24488,7 +24482,7 @@ func (in *interner) InternSemiJoinApply(val *SemiJoinApplyExpr) *SemiJoinApplyEx
 	in.hasher.HashRelExpr(val.Right)
 	in.hasher.HashFiltersExpr(val.On)
 	in.hasher.HashJoinFlags(val.Flags)
-	in.hasher.HashBool(val.WasReordered)
+	in.hasher.HashBool(val.SkipReorderJoins)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
@@ -24497,7 +24491,7 @@ func (in *interner) InternSemiJoinApply(val *SemiJoinApplyExpr) *SemiJoinApplyEx
 				in.hasher.IsRelExprEqual(val.Right, existing.Right) &&
 				in.hasher.IsFiltersExprEqual(val.On, existing.On) &&
 				in.hasher.IsJoinFlagsEqual(val.Flags, existing.Flags) &&
-				in.hasher.IsBoolEqual(val.WasReordered, existing.WasReordered) {
+				in.hasher.IsBoolEqual(val.SkipReorderJoins, existing.SkipReorderJoins) {
 				return existing
 			}
 		}
@@ -24514,7 +24508,7 @@ func (in *interner) InternAntiJoinApply(val *AntiJoinApplyExpr) *AntiJoinApplyEx
 	in.hasher.HashRelExpr(val.Right)
 	in.hasher.HashFiltersExpr(val.On)
 	in.hasher.HashJoinFlags(val.Flags)
-	in.hasher.HashBool(val.WasReordered)
+	in.hasher.HashBool(val.SkipReorderJoins)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
@@ -24523,7 +24517,7 @@ func (in *interner) InternAntiJoinApply(val *AntiJoinApplyExpr) *AntiJoinApplyEx
 				in.hasher.IsRelExprEqual(val.Right, existing.Right) &&
 				in.hasher.IsFiltersExprEqual(val.On, existing.On) &&
 				in.hasher.IsJoinFlagsEqual(val.Flags, existing.Flags) &&
-				in.hasher.IsBoolEqual(val.WasReordered, existing.WasReordered) {
+				in.hasher.IsBoolEqual(val.SkipReorderJoins, existing.SkipReorderJoins) {
 				return existing
 			}
 		}
