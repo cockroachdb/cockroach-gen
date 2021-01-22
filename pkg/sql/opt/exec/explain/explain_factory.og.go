@@ -916,7 +916,8 @@ func (f *Factory) ConstructShowTrace(
 func (f *Factory) ConstructInsert(
 	input exec.Node,
 	table cat.Table,
-	arbiters cat.IndexOrdinals,
+	arbiterIndexes cat.IndexOrdinals,
+	arbiterConstraints cat.UniqueOrdinals,
 	insertCols exec.TableColumnOrdinalSet,
 	returnCols exec.TableColumnOrdinalSet,
 	checkCols exec.CheckOrdinalSet,
@@ -928,13 +929,14 @@ func (f *Factory) ConstructInsert(
 ) (exec.Node, error) {
 	inputNode := input.(*Node)
 	args := &insertArgs{
-		Input:      inputNode,
-		Table:      table,
-		Arbiters:   arbiters,
-		InsertCols: insertCols,
-		ReturnCols: returnCols,
-		CheckCols:  checkCols,
-		AutoCommit: autoCommit,
+		Input:              inputNode,
+		Table:              table,
+		ArbiterIndexes:     arbiterIndexes,
+		ArbiterConstraints: arbiterConstraints,
+		InsertCols:         insertCols,
+		ReturnCols:         returnCols,
+		CheckCols:          checkCols,
+		AutoCommit:         autoCommit,
 	}
 	_n, err := f.newNode(insertOp, args, nil /* ordering */, inputNode)
 	if err != nil {
@@ -944,7 +946,8 @@ func (f *Factory) ConstructInsert(
 	wrapped, err := f.wrappedFactory.ConstructInsert(
 		inputNode.WrappedNode(),
 		table,
-		arbiters,
+		arbiterIndexes,
+		arbiterConstraints,
 		insertCols,
 		returnCols,
 		checkCols,
@@ -1045,7 +1048,8 @@ func (f *Factory) ConstructUpdate(
 func (f *Factory) ConstructUpsert(
 	input exec.Node,
 	table cat.Table,
-	arbiters cat.IndexOrdinals,
+	arbiterIndexes cat.IndexOrdinals,
+	arbiterConstraints cat.UniqueOrdinals,
 	canaryCol exec.NodeColumnOrdinal,
 	insertCols exec.TableColumnOrdinalSet,
 	fetchCols exec.TableColumnOrdinalSet,
@@ -1060,16 +1064,17 @@ func (f *Factory) ConstructUpsert(
 ) (exec.Node, error) {
 	inputNode := input.(*Node)
 	args := &upsertArgs{
-		Input:      inputNode,
-		Table:      table,
-		Arbiters:   arbiters,
-		CanaryCol:  canaryCol,
-		InsertCols: insertCols,
-		FetchCols:  fetchCols,
-		UpdateCols: updateCols,
-		ReturnCols: returnCols,
-		Checks:     checks,
-		AutoCommit: autoCommit,
+		Input:              inputNode,
+		Table:              table,
+		ArbiterIndexes:     arbiterIndexes,
+		ArbiterConstraints: arbiterConstraints,
+		CanaryCol:          canaryCol,
+		InsertCols:         insertCols,
+		FetchCols:          fetchCols,
+		UpdateCols:         updateCols,
+		ReturnCols:         returnCols,
+		Checks:             checks,
+		AutoCommit:         autoCommit,
 	}
 	_n, err := f.newNode(upsertOp, args, nil /* ordering */, inputNode)
 	if err != nil {
@@ -1079,7 +1084,8 @@ func (f *Factory) ConstructUpsert(
 	wrapped, err := f.wrappedFactory.ConstructUpsert(
 		inputNode.WrappedNode(),
 		table,
-		arbiters,
+		arbiterIndexes,
+		arbiterConstraints,
 		canaryCol,
 		insertCols,
 		fetchCols,
@@ -1961,13 +1967,14 @@ type showTraceArgs struct {
 }
 
 type insertArgs struct {
-	Input      *Node
-	Table      cat.Table
-	Arbiters   cat.IndexOrdinals
-	InsertCols exec.TableColumnOrdinalSet
-	ReturnCols exec.TableColumnOrdinalSet
-	CheckCols  exec.CheckOrdinalSet
-	AutoCommit bool
+	Input              *Node
+	Table              cat.Table
+	ArbiterIndexes     cat.IndexOrdinals
+	ArbiterConstraints cat.UniqueOrdinals
+	InsertCols         exec.TableColumnOrdinalSet
+	ReturnCols         exec.TableColumnOrdinalSet
+	CheckCols          exec.CheckOrdinalSet
+	AutoCommit         bool
 }
 
 type insertFastPathArgs struct {
@@ -1992,16 +1999,17 @@ type updateArgs struct {
 }
 
 type upsertArgs struct {
-	Input      *Node
-	Table      cat.Table
-	Arbiters   cat.IndexOrdinals
-	CanaryCol  exec.NodeColumnOrdinal
-	InsertCols exec.TableColumnOrdinalSet
-	FetchCols  exec.TableColumnOrdinalSet
-	UpdateCols exec.TableColumnOrdinalSet
-	ReturnCols exec.TableColumnOrdinalSet
-	Checks     exec.CheckOrdinalSet
-	AutoCommit bool
+	Input              *Node
+	Table              cat.Table
+	ArbiterIndexes     cat.IndexOrdinals
+	ArbiterConstraints cat.UniqueOrdinals
+	CanaryCol          exec.NodeColumnOrdinal
+	InsertCols         exec.TableColumnOrdinalSet
+	FetchCols          exec.TableColumnOrdinalSet
+	UpdateCols         exec.TableColumnOrdinalSet
+	ReturnCols         exec.TableColumnOrdinalSet
+	Checks             exec.CheckOrdinalSet
+	AutoCommit         bool
 }
 
 type deleteArgs struct {

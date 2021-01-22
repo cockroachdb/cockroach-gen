@@ -437,7 +437,8 @@ type Factory interface {
 	ConstructInsert(
 		input Node,
 		table cat.Table,
-		arbiters cat.IndexOrdinals,
+		arbiterIndexes cat.IndexOrdinals,
+		arbiterConstraints cat.UniqueOrdinals,
 		insertCols TableColumnOrdinalSet,
 		returnCols TableColumnOrdinalSet,
 		checkCols CheckOrdinalSet,
@@ -538,7 +539,8 @@ type Factory interface {
 	ConstructUpsert(
 		input Node,
 		table cat.Table,
-		arbiters cat.IndexOrdinals,
+		arbiterIndexes cat.IndexOrdinals,
+		arbiterConstraints cat.UniqueOrdinals,
 		canaryCol NodeColumnOrdinal,
 		insertCols TableColumnOrdinalSet,
 		fetchCols TableColumnOrdinalSet,
@@ -1063,7 +1065,8 @@ func (StubFactory) ConstructShowTrace(
 func (StubFactory) ConstructInsert(
 	input Node,
 	table cat.Table,
-	arbiters cat.IndexOrdinals,
+	arbiterIndexes cat.IndexOrdinals,
+	arbiterConstraints cat.UniqueOrdinals,
 	insertCols TableColumnOrdinalSet,
 	returnCols TableColumnOrdinalSet,
 	checkCols CheckOrdinalSet,
@@ -1100,7 +1103,8 @@ func (StubFactory) ConstructUpdate(
 func (StubFactory) ConstructUpsert(
 	input Node,
 	table cat.Table,
-	arbiters cat.IndexOrdinals,
+	arbiterIndexes cat.IndexOrdinals,
+	arbiterConstraints cat.UniqueOrdinals,
 	canaryCol NodeColumnOrdinal,
 	insertCols TableColumnOrdinalSet,
 	fetchCols TableColumnOrdinalSet,
