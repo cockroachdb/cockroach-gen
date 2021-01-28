@@ -5,11 +5,11 @@ package explain
 import (
 	"github.com/cockroachdb/cockroach/pkg/sql/catalog/colinfo"
 	"github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb"
+	"github.com/cockroachdb/cockroach/pkg/sql/inverted"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/cat"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/constraint"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/exec"
-	"github.com/cockroachdb/cockroach/pkg/sql/opt/invertedexpr"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 	"github.com/cockroachdb/cockroach/pkg/sql/types"
 )
@@ -98,7 +98,7 @@ func (f *Factory) ConstructFilter(
 
 func (f *Factory) ConstructInvertedFilter(
 	input exec.Node,
-	invFilter *invertedexpr.SpanExpression,
+	invFilter *inverted.SpanExpression,
 	preFiltererExpr tree.TypedExpr,
 	preFiltererType *types.T,
 	invColumn exec.NodeColumnOrdinal,
@@ -1781,7 +1781,7 @@ type filterArgs struct {
 
 type invertedFilterArgs struct {
 	Input           *Node
-	InvFilter       *invertedexpr.SpanExpression
+	InvFilter       *inverted.SpanExpression
 	PreFiltererExpr tree.TypedExpr
 	PreFiltererType *types.T
 	InvColumn       exec.NodeColumnOrdinal

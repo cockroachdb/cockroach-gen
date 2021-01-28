@@ -5,6 +5,7 @@ package memo
 import (
 	"unsafe"
 
+	"github.com/cockroachdb/cockroach/pkg/sql/inverted"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/cat"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/constraint"
@@ -1206,7 +1207,7 @@ type ScanPrivate struct {
 
 	// If set, the scan is a constrained scan of an inverted index; the
 	// InvertedConstraint contains the spans that need to be scanned.
-	InvertedConstraint invertedexpr.InvertedSpans
+	InvertedConstraint inverted.Spans
 
 	// HardLimit specifies the maximum number of rows that the scan can return
 	// (after applying any constraint), as well as the required scan direction.
@@ -1901,7 +1902,7 @@ type InvertedFilterPrivate struct {
 	// The input should already be filtered based on SpansToRead from the
 	// SpanExpression, but this InvertedExpression serves to filter the rows
 	// further by applying set operations on the primary key columns.
-	InvertedExpression *invertedexpr.SpanExpression
+	InvertedExpression *inverted.SpanExpression
 
 	// PreFiltererState represents the optional pre-filtering state.
 	PreFiltererState *invertedexpr.PreFiltererStateForInvertedFilterer

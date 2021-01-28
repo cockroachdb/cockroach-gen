@@ -5,10 +5,10 @@ package exec
 import (
 	"github.com/cockroachdb/cockroach/pkg/sql/catalog/colinfo"
 	"github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb"
+	"github.com/cockroachdb/cockroach/pkg/sql/inverted"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/cat"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/constraint"
-	"github.com/cockroachdb/cockroach/pkg/sql/opt/invertedexpr"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 	"github.com/cockroachdb/cockroach/pkg/sql/types"
 )
@@ -70,7 +70,7 @@ type Factory interface {
 	// node.
 	ConstructInvertedFilter(
 		input Node,
-		invFilter *invertedexpr.SpanExpression,
+		invFilter *inverted.SpanExpression,
 		preFiltererExpr tree.TypedExpr,
 		preFiltererType *types.T,
 		invColumn NodeColumnOrdinal,
@@ -829,7 +829,7 @@ func (StubFactory) ConstructFilter(
 
 func (StubFactory) ConstructInvertedFilter(
 	input Node,
-	invFilter *invertedexpr.SpanExpression,
+	invFilter *inverted.SpanExpression,
 	preFiltererExpr tree.TypedExpr,
 	preFiltererType *types.T,
 	invColumn NodeColumnOrdinal,
