@@ -360,6 +360,7 @@ var KeywordsCategories = map[string]string{
 	"rename":                       "U",
 	"repeatable":                   "U",
 	"replace":                      "U",
+	"replication":                  "U",
 	"reset":                        "U",
 	"restore":                      "U",
 	"restrict":                     "U",
@@ -421,6 +422,7 @@ var KeywordsCategories = map[string]string{
 	"store":                        "U",
 	"stored":                       "U",
 	"storing":                      "U",
+	"stream":                       "U",
 	"strict":                       "U",
 	"string":                       "C",
 	"subscription":                 "U",
@@ -856,6 +858,7 @@ var KeywordNames = []string{
 	"rename",
 	"repeatable",
 	"replace",
+	"replication",
 	"reset",
 	"restore",
 	"restrict",
@@ -917,6 +920,7 @@ var KeywordNames = []string{
 	"store",
 	"stored",
 	"storing",
+	"stream",
 	"strict",
 	"string",
 	"subscription",
@@ -1714,6 +1718,8 @@ func GetKeywordID(k string) int32 {
 		return REPEATABLE
 	case "replace":
 		return REPLACE
+	case "replication":
+		return REPLICATION
 	case "reset":
 		return RESET
 	case "restore":
@@ -1836,6 +1842,8 @@ func GetKeywordID(k string) int32 {
 		return STORED
 	case "storing":
 		return STORING
+	case "stream":
+		return STREAM
 	case "strict":
 		return STRICT
 	case "string":
