@@ -486,6 +486,7 @@ var KeywordsCategories = map[string]string{
 	"view":                         "U",
 	"viewactivity":                 "U",
 	"virtual":                      "C",
+	"visible":                      "R",
 	"when":                         "R",
 	"where":                        "R",
 	"window":                       "R",
@@ -984,6 +985,7 @@ var KeywordNames = []string{
 	"view",
 	"viewactivity",
 	"virtual",
+	"visible",
 	"when",
 	"where",
 	"window",
@@ -1970,6 +1972,8 @@ func GetKeywordID(k string) int32 {
 		return VIEWACTIVITY
 	case "virtual":
 		return VIRTUAL
+	case "visible":
+		return VISIBLE
 	case "when":
 		return WHEN
 	case "where":
