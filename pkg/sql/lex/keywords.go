@@ -85,6 +85,7 @@ var KeywordsCategories = map[string]string{
 	"createlogin":                  "U",
 	"createrole":                   "U",
 	"cross":                        "T",
+	"csv":                          "U",
 	"cube":                         "U",
 	"current":                      "U",
 	"current_catalog":              "R",
@@ -108,6 +109,7 @@ var KeywordsCategories = map[string]string{
 	"deferrable":                   "R",
 	"deferred":                     "U",
 	"delete":                       "U",
+	"delimiter":                    "U",
 	"desc":                         "R",
 	"destination":                  "U",
 	"detached":                     "U",
@@ -584,6 +586,7 @@ var KeywordNames = []string{
 	"createlogin",
 	"createrole",
 	"cross",
+	"csv",
 	"cube",
 	"current",
 	"current_catalog",
@@ -607,6 +610,7 @@ var KeywordNames = []string{
 	"deferrable",
 	"deferred",
 	"delete",
+	"delimiter",
 	"desc",
 	"destination",
 	"detached",
@@ -1170,6 +1174,8 @@ func GetKeywordID(k string) int32 {
 		return CREATEROLE
 	case "cross":
 		return CROSS
+	case "csv":
+		return CSV
 	case "cube":
 		return CUBE
 	case "current":
@@ -1216,6 +1222,8 @@ func GetKeywordID(k string) int32 {
 		return DEFERRED
 	case "delete":
 		return DELETE
+	case "delimiter":
+		return DELIMITER
 	case "desc":
 		return DESC
 	case "destination":
