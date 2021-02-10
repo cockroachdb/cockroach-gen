@@ -752,6 +752,59 @@ func (_e *explorer) exploreInnerJoin(
 		}
 	}
 
+	// [HoistProjectFromInnerJoin]
+	{
+		_partlyExplored := _rootOrd < _rootState.start
+		left := _root.Left
+		proj := _root.Right
+		_state := _e.lookupExploreState(proj)
+		if !_state.fullyExplored {
+			_fullyExplored = false
+		}
+		var _member memo.RelExpr
+		for _ord := 0; _ord < _state.end; _ord++ {
+			if _member == nil {
+				_member = proj.FirstExpr()
+			} else {
+				_member = _member.NextExpr()
+			}
+			if !_partlyExplored || _ord >= _state.start {
+				_project, _ := _member.(*memo.ProjectExpr)
+				if _project != nil {
+					right := _project.Input
+					projections := _project.Projections
+					if !_e.funcs.HasVolatileProjection(projections) {
+						passthrough := _project.Passthrough
+						on := _root.On
+						if !_e.funcs.ColsIntersect(_e.funcs.ProjectionCols(projections), _e.funcs.FilterOuterCols(on)) {
+							private := &_root.JoinPrivate
+							if _e.o.matchedRule == nil || _e.o.matchedRule(opt.HoistProjectFromInnerJoin) {
+								_expr := &memo.ProjectExpr{
+									Input: _e.f.ConstructInnerJoin(
+										left,
+										right,
+										on,
+										private,
+									),
+									Projections: projections,
+									Passthrough: _e.funcs.UnionCols(passthrough, _e.funcs.OutputCols(left)),
+								}
+								_interned := _e.mem.AddProjectToGroup(_expr, _root)
+								if _e.o.appliedRule != nil {
+									if _interned != _expr {
+										_e.o.appliedRule(opt.HoistProjectFromInnerJoin, _root, nil)
+									} else {
+										_e.o.appliedRule(opt.HoistProjectFromInnerJoin, _root, _interned)
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	return _fullyExplored
 }
 
@@ -1006,6 +1059,61 @@ func (_e *explorer) exploreLeftJoin(
 									_e.funcs.GenerateLookupJoins(_root, opt.LeftJoinOp, left, scanPrivate, _e.funcs.ConcatFilters(on, filters), private)
 									if _e.o.appliedRule != nil {
 										_e.o.appliedRule(opt.GenerateLookupJoinsWithFilter, _root, _last.NextExpr())
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [HoistProjectFromLeftJoin]
+	{
+		_partlyExplored := _rootOrd < _rootState.start
+		left := _root.Left
+		_state := _e.lookupExploreState(_root.Right)
+		if !_state.fullyExplored {
+			_fullyExplored = false
+		}
+		var _member memo.RelExpr
+		for _ord := 0; _ord < _state.end; _ord++ {
+			if _member == nil {
+				_member = _root.Right.FirstExpr()
+			} else {
+				_member = _member.NextExpr()
+			}
+			if !_partlyExplored || _ord >= _state.start {
+				_project, _ := _member.(*memo.ProjectExpr)
+				if _project != nil {
+					right := _project.Input
+					projections := _project.Projections
+					if !_e.funcs.HasVolatileProjection(projections) {
+						passthrough := _project.Passthrough
+						on := _root.On
+						if !_e.funcs.ColsIntersect(_e.funcs.ProjectionCols(projections), _e.funcs.FilterOuterCols(on)) {
+							canaryCol := _e.funcs.FindLeftJoinCanaryColumn(right, on)
+							if _e.funcs.FoundCanaryColumn(canaryCol) {
+								private := &_root.JoinPrivate
+								if _e.o.matchedRule == nil || _e.o.matchedRule(opt.HoistProjectFromLeftJoin) {
+									_expr := &memo.ProjectExpr{
+										Input: _e.f.ConstructLeftJoin(
+											left,
+											right,
+											on,
+											private,
+										),
+										Projections: _e.funcs.MakeProjectionsForOuterJoin(canaryCol, projections),
+										Passthrough: _e.funcs.UnionCols(passthrough, _e.funcs.OutputCols(left)),
+									}
+									_interned := _e.mem.AddProjectToGroup(_expr, _root)
+									if _e.o.appliedRule != nil {
+										if _interned != _expr {
+											_e.o.appliedRule(opt.HoistProjectFromLeftJoin, _root, nil)
+										} else {
+											_e.o.appliedRule(opt.HoistProjectFromLeftJoin, _root, _interned)
+										}
 									}
 								}
 							}

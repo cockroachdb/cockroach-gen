@@ -274,6 +274,8 @@ const (
 	GenerateInvertedJoinsFromSelect
 	GenerateLookupJoinsWithFilter
 	PushJoinIntoIndexJoin
+	HoistProjectFromInnerJoin
+	HoistProjectFromLeftJoin
 	GenerateLimitedScans
 	PushLimitIntoFilteredScan
 	PushLimitIntoIndexJoin
