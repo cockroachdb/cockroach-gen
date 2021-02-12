@@ -554,6 +554,43 @@ func (_f *Factory) ConstructSelect(
 		}
 	}
 
+	// [InlineSelectVirtualColumns]
+	{
+		_project, _ := input.(*memo.ProjectExpr)
+		if _project != nil {
+			scan := _project.Input
+			_scan, _ := scan.(*memo.ScanExpr)
+			if _scan != nil {
+				scanPrivate := &_scan.ScanPrivate
+				projections := _project.Projections
+				passthrough := _project.Passthrough
+				indexedVirtualColumns := _f.funcs.IndexedVirtualColumns(scanPrivate)
+				if !_f.funcs.ColsAreEmpty(indexedVirtualColumns) {
+					result := _f.funcs.TryInlineSelectVirtualColumns(filters, projections, indexedVirtualColumns)
+					if _f.funcs.InlineSelectVirtualColumnsSucceeded(result) {
+						if _f.matchedRule == nil || _f.matchedRule(opt.InlineSelectVirtualColumns) {
+							_expr := _f.ConstructSelect(
+								_f.ConstructProject(
+									_f.ConstructSelect(
+										_scan,
+										_f.funcs.InlinedFilters(result),
+									),
+									projections,
+									passthrough,
+								),
+								_f.funcs.NotInlinedFilters(result),
+							)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.InlineSelectVirtualColumns, nil, _expr)
+							}
+							return _expr
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [RejectNullsProject]
 	{
 		_project, _ := input.(*memo.ProjectExpr)

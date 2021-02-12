@@ -117,6 +117,7 @@ const (
 	InlineJoinConstantsLeft
 	InlineJoinConstantsRight
 	PushSelectIntoInlinableProject
+	InlineSelectVirtualColumns
 	InlineProjectInProject
 	CommuteRightJoin
 	SimplifyJoinFilters
