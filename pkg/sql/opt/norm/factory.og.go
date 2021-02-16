@@ -564,21 +564,21 @@ func (_f *Factory) ConstructSelect(
 				scanPrivate := &_scan.ScanPrivate
 				projections := _project.Projections
 				passthrough := _project.Passthrough
-				indexedVirtualColumns := _f.funcs.IndexedVirtualColumns(scanPrivate)
-				if !_f.funcs.ColsAreEmpty(indexedVirtualColumns) {
-					result := _f.funcs.TryInlineSelectVirtualColumns(filters, projections, indexedVirtualColumns)
-					if _f.funcs.InlineSelectVirtualColumnsSucceeded(result) {
+				virtualColumns := _f.funcs.VirtualColumns(scanPrivate)
+				if !_f.funcs.ColsAreEmpty(virtualColumns) {
+					inlinableFilters := _f.funcs.InlinableVirtualColumnFilters(filters, virtualColumns)
+					if !_f.funcs.IsFilterEmpty(inlinableFilters) {
 						if _f.matchedRule == nil || _f.matchedRule(opt.InlineSelectVirtualColumns) {
 							_expr := _f.ConstructSelect(
 								_f.ConstructProject(
 									_f.ConstructSelect(
 										_scan,
-										_f.funcs.InlinedFilters(result),
+										_f.funcs.InlineSelectProject(inlinableFilters, projections),
 									),
 									projections,
 									passthrough,
 								),
-								_f.funcs.NotInlinedFilters(result),
+								_f.funcs.DiffFilters(filters, inlinableFilters),
 							)
 							if _f.appliedRule != nil {
 								_f.appliedRule(opt.InlineSelectVirtualColumns, nil, _expr)
