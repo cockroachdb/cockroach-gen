@@ -274,8 +274,13 @@ type Factory interface {
 	//
 	// LookupJoin performs a lookup join.
 	//
-	// The eqCols are columns from the input used
-	// as keys for the columns of the index (or a prefix of them); lookupCols are
+	// The eqCols are columns from the input used as keys for the columns of the
+	// index (or a prefix of them); eqColsAreKey is set to true if the eqCols form a
+	// key in the table (and thus each input row matches with at most one index row);
+	// lookupExpr is used instead of eqCols when the lookup condition is more
+	// complicated than a simple equality between input columns and index columns
+	// (eqColsAreKey will be true in this case if the columns that are part of the
+	// simple equality join conditions form a key in the table); lookupCols are
 	// ordinals for the table columns we are retrieving.
 	//
 	// The node produces the columns in the input and (unless join type is
@@ -288,6 +293,7 @@ type Factory interface {
 		index cat.Index,
 		eqCols []NodeColumnOrdinal,
 		eqColsAreKey bool,
+		lookupExpr tree.TypedExpr,
 		lookupCols TableColumnOrdinalSet,
 		onCond tree.TypedExpr,
 		isSecondJoinInPairedJoiner bool,
@@ -968,6 +974,7 @@ func (StubFactory) ConstructLookupJoin(
 	index cat.Index,
 	eqCols []NodeColumnOrdinal,
 	eqColsAreKey bool,
+	lookupExpr tree.TypedExpr,
 	lookupCols TableColumnOrdinalSet,
 	onCond tree.TypedExpr,
 	isSecondJoinInPairedJoiner bool,

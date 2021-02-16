@@ -3015,10 +3015,31 @@ type LookupJoinPrivate struct {
 	// cat.Index metadata.
 	Index cat.IndexOrdinal
 
+	// KeyCols represents the part of the join condition used to perform the
+	// lookup into the index. It should only be set when LookupExpr is empty.
 	// KeyCols are the columns (produced by the input) used to create lookup keys.
-	// The key columns must be non-empty, and are listed in the same order as the
-	// index columns (or a prefix of them).
+	// The key columns are listed in the same order as the index columns (or a
+	// prefix of them).
+	// TODO(rytaft): consider removing this field in favor of using LookupExpr
+	// in all cases.
 	KeyCols opt.ColList
+
+	// LookupExpr represents the part of the join condition used to perform
+	// the lookup into the index. It should only be set when KeyCols is empty.
+	// LookupExpr is used instead of KeyCols when the lookup condition is
+	// more complicated than a simple equality between input columns and index
+	// columns. In this case, LookupExpr specifies the filter conditions that
+	// will be used to construct the spans for each lookup.
+	//
+	// Currently, the only filters supported for use in the LookupExpr are
+	// equality and IN expressions, specifically:
+	//  1. equalities between two variables (one from the input and one from the
+	//     index) representing the equi-join condition(s),
+	//  2. equalities between an index column and a constant, and
+	//  3. IN expressions between an index column and a tuple of constants.
+	// Note that all the index columns that show up in LookupExpr must correspond
+	// to a contiguous prefix of the index columns.
+	LookupExpr FiltersExpr
 
 	// Cols is the union between the set of input columns that are returned by
 	// the lookup join and the set of lookup columns retrieved through lookup.
@@ -24290,6 +24311,7 @@ func (in *interner) InternLookupJoin(val *LookupJoinExpr) *LookupJoinExpr {
 	in.hasher.HashTableID(val.Table)
 	in.hasher.HashIndexOrdinal(val.Index)
 	in.hasher.HashColList(val.KeyCols)
+	in.hasher.HashFiltersExpr(val.LookupExpr)
 	in.hasher.HashColSet(val.Cols)
 	in.hasher.HashBool(val.LookupColsAreTableKey)
 	in.hasher.HashBool(val.IsSecondJoinInPairedJoiner)
@@ -24306,6 +24328,7 @@ func (in *interner) InternLookupJoin(val *LookupJoinExpr) *LookupJoinExpr {
 				in.hasher.IsTableIDEqual(val.Table, existing.Table) &&
 				in.hasher.IsIndexOrdinalEqual(val.Index, existing.Index) &&
 				in.hasher.IsColListEqual(val.KeyCols, existing.KeyCols) &&
+				in.hasher.IsFiltersExprEqual(val.LookupExpr, existing.LookupExpr) &&
 				in.hasher.IsColSetEqual(val.Cols, existing.Cols) &&
 				in.hasher.IsBoolEqual(val.LookupColsAreTableKey, existing.LookupColsAreTableKey) &&
 				in.hasher.IsBoolEqual(val.IsSecondJoinInPairedJoiner, existing.IsSecondJoinInPairedJoiner) &&

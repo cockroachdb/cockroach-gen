@@ -567,6 +567,7 @@ func (f *Factory) ConstructLookupJoin(
 	index cat.Index,
 	eqCols []exec.NodeColumnOrdinal,
 	eqColsAreKey bool,
+	lookupExpr tree.TypedExpr,
 	lookupCols exec.TableColumnOrdinalSet,
 	onCond tree.TypedExpr,
 	isSecondJoinInPairedJoiner bool,
@@ -581,6 +582,7 @@ func (f *Factory) ConstructLookupJoin(
 		Index:                      index,
 		EqCols:                     eqCols,
 		EqColsAreKey:               eqColsAreKey,
+		LookupExpr:                 lookupExpr,
 		LookupCols:                 lookupCols,
 		OnCond:                     onCond,
 		IsSecondJoinInPairedJoiner: isSecondJoinInPairedJoiner,
@@ -599,6 +601,7 @@ func (f *Factory) ConstructLookupJoin(
 		index,
 		eqCols,
 		eqColsAreKey,
+		lookupExpr,
 		lookupCols,
 		onCond,
 		isSecondJoinInPairedJoiner,
@@ -1892,6 +1895,7 @@ type lookupJoinArgs struct {
 	Index                      cat.Index
 	EqCols                     []exec.NodeColumnOrdinal
 	EqColsAreKey               bool
+	LookupExpr                 tree.TypedExpr
 	LookupCols                 exec.TableColumnOrdinalSet
 	OnCond                     tree.TypedExpr
 	IsSecondJoinInPairedJoiner bool
