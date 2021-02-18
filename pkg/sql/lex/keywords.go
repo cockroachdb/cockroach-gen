@@ -95,6 +95,7 @@ var KeywordsCategories = map[string]string{
 	"current_time":                 "R",
 	"current_timestamp":            "R",
 	"current_user":                 "R",
+	"cursor":                       "U",
 	"cycle":                        "U",
 	"data":                         "U",
 	"database":                     "U",
@@ -596,6 +597,7 @@ var KeywordNames = []string{
 	"current_time",
 	"current_timestamp",
 	"current_user",
+	"cursor",
 	"cycle",
 	"data",
 	"database",
@@ -1194,6 +1196,8 @@ func GetKeywordID(k string) int32 {
 		return CURRENT_TIMESTAMP
 	case "current_user":
 		return CURRENT_USER
+	case "cursor":
+		return CURSOR
 	case "cycle":
 		return CYCLE
 	case "data":
