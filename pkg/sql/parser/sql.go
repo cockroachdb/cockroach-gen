@@ -25868,7 +25868,7 @@ sqldefault:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
 //line sql-gen.y:6347
 		{
-			sqllex.Error("use AS ( <expr> ) STORED")
+			sqllex.Error("use AS ( <expr> ) STORED or AS ( <expr> ) VIRTUAL")
 			return 1
 		}
 	case 1079:
