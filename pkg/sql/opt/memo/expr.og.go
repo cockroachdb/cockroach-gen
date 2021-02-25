@@ -1228,6 +1228,17 @@ type ScanPrivate struct {
 	// list will always be empty when part of a ScanPrivate.
 	Locking *tree.LockingItem
 
+	// LocalityOptimized is true if this scan is a child of a
+	// LocalityOptimizedSearch operator, indicating that it either contains all
+	// local (relative to the gateway region) or all remote spans. The
+	// LocalityOptimizedSearch operator is similar to a UNION ALL, but ensures
+	// that the right child (containing remote spans) is only executed if the
+	// left child (containing local spans) does not return any rows. Therefore,
+	// LocalityOptimized is used as a hint to the coster to reduce the cost of
+	// this scan. It is also used to ensure that the DistSQL planner creates a
+	// local plan.
+	LocalityOptimized bool
+
 	// PartitionConstrainedScan records whether or not we were able to use partitions
 	// to constrain the lookup spans further. This flag is used to record telemetry
 	// about how often this optimization is getting applied.
@@ -5881,6 +5892,183 @@ func (g *exceptAllGroup) firstExpr() RelExpr {
 }
 
 func (g *exceptAllGroup) bestProps() *bestProps {
+	return &g.best
+}
+
+// LocalityOptimizedSearchExpr is similar to UnionAll, but it is designed to avoid
+// communicating with remote nodes (relative to the gateway region) if at all
+// possible. LocalityOptimizedSearch can be planned when a scan is known to
+// produce at most one row, but it is not known which region contains that row
+// (if any). In this case, the scan can be split in two, and the resulting scans
+// will become the children of the LocalityOptimizedSearch operator. The left
+// scan should only contain spans targeting partitions on local nodes, and the
+// right scan should contain the remaining spans. The LocalityOptimizedSearch
+// operator ensures that the right child (containing remote spans) is only
+// executed if the left child (containing local spans) does not return any rows.
+//
+// This is a useful optimization if there is locality of access in the workload,
+// such that rows tend to be accessed from the region where they are located.
+// If there is no locality of access, using LocalityOptimizedSearch could be a
+// slight pessimization, since rows residing in remote regions will be fetched
+// slightly more slowly than they would be otherwise.
+//
+// For example, suppose we have a multi-region database with regions 'us-east1',
+// 'us-west1' and 'europe-west1', and we have the following table and query,
+// issued from 'us-east1':
+//
+//   CREATE TABLE tab (
+//     k INT PRIMARY KEY,
+//     v INT
+//   ) LOCALITY REGIONAL BY ROW;
+//
+//   SELECT * FROM tab WHERE k = 10;
+//
+// Normally, this would produce the following plan:
+//
+//   scan tab
+//    └── constraint: /3/1
+//         ├── [/'europe-west1'/10 - /'europe-west1'/10]
+//         ├── [/'us-east1'/10 - /'us-east1'/10]
+//         └── [/'us-west1'/10 - /'us-west1'/10]
+//
+// but if the session setting locality_optimized_partitioned_index_scan is enabled,
+// the optimizer will produce this plan, using locality optimized search:
+//
+//   locality-optimized-search
+//    ├── scan tab
+//    │    └── constraint: /9/7: [/'us-east1'/10 - /'us-east1'/10]
+//    └── scan tab
+//         └── constraint: /14/12
+//              ├── [/'europe-west1'/10 - /'europe-west1'/10]
+//              └── [/'us-west1'/10 - /'us-west1'/10]
+//
+// As long as k = 10 is located in 'us-east1', the second plan will be much faster.
+// But if k = 10 is located in one of the other regions, the first plan would be
+// slightly faster.
+type LocalityOptimizedSearchExpr struct {
+	Local  RelExpr
+	Remote RelExpr
+	SetPrivate
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &LocalityOptimizedSearchExpr{}
+
+func (e *LocalityOptimizedSearchExpr) Op() opt.Operator {
+	return opt.LocalityOptimizedSearchOp
+}
+
+func (e *LocalityOptimizedSearchExpr) ChildCount() int {
+	return 2
+}
+
+func (e *LocalityOptimizedSearchExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Local
+	case 1:
+		return e.Remote
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *LocalityOptimizedSearchExpr) Private() interface{} {
+	return &e.SetPrivate
+}
+
+func (e *LocalityOptimizedSearchExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *LocalityOptimizedSearchExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Local = child.(RelExpr)
+		return
+	case 1:
+		e.Remote = child.(RelExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *LocalityOptimizedSearchExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *LocalityOptimizedSearchExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *LocalityOptimizedSearchExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *LocalityOptimizedSearchExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *LocalityOptimizedSearchExpr) RequiredPhysical() *physical.Required {
+	return e.grp.bestProps().required
+}
+
+func (e *LocalityOptimizedSearchExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
+func (e *LocalityOptimizedSearchExpr) Cost() Cost {
+	return e.grp.bestProps().cost
+}
+
+func (e *LocalityOptimizedSearchExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *LocalityOptimizedSearchExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
+}
+
+func (e *LocalityOptimizedSearchExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(errors.AssertionFailedf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *LocalityOptimizedSearchExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(errors.AssertionFailedf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type localityOptimizedSearchGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	first LocalityOptimizedSearchExpr
+	best  bestProps
+}
+
+var _ exprGroup = &localityOptimizedSearchGroup{}
+
+func (g *localityOptimizedSearchGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *localityOptimizedSearchGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *localityOptimizedSearchGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *localityOptimizedSearchGroup) bestProps() *bestProps {
 	return &g.best
 }
 
@@ -18922,6 +19110,32 @@ func (m *Memo) MemoizeExceptAll(
 	return interned.FirstExpr()
 }
 
+func (m *Memo) MemoizeLocalityOptimizedSearch(
+	local RelExpr,
+	remote RelExpr,
+	setPrivate *SetPrivate,
+) RelExpr {
+	const size = int64(unsafe.Sizeof(localityOptimizedSearchGroup{}))
+	grp := &localityOptimizedSearchGroup{mem: m, first: LocalityOptimizedSearchExpr{
+		Local:      local,
+		Remote:     remote,
+		SetPrivate: *setPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternLocalityOptimizedSearch(e)
+	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
+		m.logPropsBuilder.buildLocalityOptimizedSearchProps(e, &grp.rel)
+		grp.rel.Populated = true
+		m.memEstimate += size
+		m.CheckExpr(e)
+	}
+	return interned.FirstExpr()
+}
+
 func (m *Memo) MemoizeLimit(
 	input RelExpr,
 	limit opt.ScalarExpr,
@@ -22867,6 +23081,20 @@ func (m *Memo) AddExceptAllToGroup(e *ExceptAllExpr, grp RelExpr) *ExceptAllExpr
 	return interned
 }
 
+func (m *Memo) AddLocalityOptimizedSearchToGroup(e *LocalityOptimizedSearchExpr, grp RelExpr) *LocalityOptimizedSearchExpr {
+	const size = int64(unsafe.Sizeof(LocalityOptimizedSearchExpr{}))
+	interned := m.interner.InternLocalityOptimizedSearch(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.CheckExpr(e)
+	} else if interned.group() != grp.group() {
+		// This is a group collision, do nothing.
+		return nil
+	}
+	return interned
+}
+
 func (m *Memo) AddLimitToGroup(e *LimitExpr, grp RelExpr) *LimitExpr {
 	const size = int64(unsafe.Sizeof(LimitExpr{}))
 	interned := m.interner.InternLimit(e)
@@ -23329,6 +23557,8 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternIntersectAll(t)
 	case *ExceptAllExpr:
 		return in.InternExceptAll(t)
+	case *LocalityOptimizedSearchExpr:
+		return in.InternLocalityOptimizedSearch(t)
 	case *LimitExpr:
 		return in.InternLimit(t)
 	case *OffsetExpr:
@@ -23993,6 +24223,7 @@ func (in *interner) InternScan(val *ScanExpr) *ScanExpr {
 	in.hasher.HashScanLimit(val.HardLimit)
 	in.hasher.HashScanFlags(val.Flags)
 	in.hasher.HashLockingItem(val.Locking)
+	in.hasher.HashBool(val.LocalityOptimized)
 	in.hasher.HashBool(val.PartitionConstrainedScan)
 
 	in.cache.Start(in.hasher.hash)
@@ -24006,6 +24237,7 @@ func (in *interner) InternScan(val *ScanExpr) *ScanExpr {
 				in.hasher.IsScanLimitEqual(val.HardLimit, existing.HardLimit) &&
 				in.hasher.IsScanFlagsEqual(val.Flags, existing.Flags) &&
 				in.hasher.IsLockingItemEqual(val.Locking, existing.Locking) &&
+				in.hasher.IsBoolEqual(val.LocalityOptimized, existing.LocalityOptimized) &&
 				in.hasher.IsBoolEqual(val.PartitionConstrainedScan, existing.PartitionConstrainedScan) {
 				return existing
 			}
@@ -24876,6 +25108,32 @@ func (in *interner) InternExceptAll(val *ExceptAllExpr) *ExceptAllExpr {
 		if existing, ok := in.cache.Item().(*ExceptAllExpr); ok {
 			if in.hasher.IsRelExprEqual(val.Left, existing.Left) &&
 				in.hasher.IsRelExprEqual(val.Right, existing.Right) &&
+				in.hasher.IsColListEqual(val.LeftCols, existing.LeftCols) &&
+				in.hasher.IsColListEqual(val.RightCols, existing.RightCols) &&
+				in.hasher.IsColListEqual(val.OutCols, existing.OutCols) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternLocalityOptimizedSearch(val *LocalityOptimizedSearchExpr) *LocalityOptimizedSearchExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.LocalityOptimizedSearchOp)
+	in.hasher.HashRelExpr(val.Local)
+	in.hasher.HashRelExpr(val.Remote)
+	in.hasher.HashColList(val.LeftCols)
+	in.hasher.HashColList(val.RightCols)
+	in.hasher.HashColList(val.OutCols)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*LocalityOptimizedSearchExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Local, existing.Local) &&
+				in.hasher.IsRelExprEqual(val.Remote, existing.Remote) &&
 				in.hasher.IsColListEqual(val.LeftCols, existing.LeftCols) &&
 				in.hasher.IsColListEqual(val.RightCols, existing.RightCols) &&
 				in.hasher.IsColListEqual(val.OutCols, existing.OutCols) {
@@ -28530,6 +28788,8 @@ func (b *logicalPropsBuilder) buildProps(e RelExpr, rel *props.Relational) {
 		b.buildIntersectAllProps(t, rel)
 	case *ExceptAllExpr:
 		b.buildExceptAllProps(t, rel)
+	case *LocalityOptimizedSearchExpr:
+		b.buildLocalityOptimizedSearchProps(t, rel)
 	case *LimitExpr:
 		b.buildLimitProps(t, rel)
 	case *OffsetExpr:

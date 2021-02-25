@@ -446,14 +446,16 @@ func (f *Factory) ConstructSetOp(
 	all bool,
 	left exec.Node,
 	right exec.Node,
+	hardLimit uint64,
 ) (exec.Node, error) {
 	leftNode := left.(*Node)
 	rightNode := right.(*Node)
 	args := &setOpArgs{
-		Typ:   typ,
-		All:   all,
-		Left:  leftNode,
-		Right: rightNode,
+		Typ:       typ,
+		All:       all,
+		Left:      leftNode,
+		Right:     rightNode,
+		HardLimit: hardLimit,
 	}
 	_n, err := f.newNode(setOpOp, args, nil /* ordering */, leftNode, rightNode)
 	if err != nil {
@@ -465,6 +467,7 @@ func (f *Factory) ConstructSetOp(
 		all,
 		leftNode.WrappedNode(),
 		rightNode.WrappedNode(),
+		hardLimit,
 	)
 	if err != nil {
 		return nil, err
@@ -1863,10 +1866,11 @@ type distinctArgs struct {
 }
 
 type setOpArgs struct {
-	Typ   tree.UnionType
-	All   bool
-	Left  *Node
-	Right *Node
+	Typ       tree.UnionType
+	All       bool
+	Left      *Node
+	Right     *Node
+	HardLimit uint64
 }
 
 type sortArgs struct {

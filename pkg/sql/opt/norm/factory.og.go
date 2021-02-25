@@ -9668,6 +9668,66 @@ func (_f *Factory) ConstructExceptAll(
 	return _f.onConstructRelational(e)
 }
 
+// ConstructLocalityOptimizedSearch constructs an expression for the LocalityOptimizedSearch operator.
+// LocalityOptimizedSearch is similar to UnionAll, but it is designed to avoid
+// communicating with remote nodes (relative to the gateway region) if at all
+// possible. LocalityOptimizedSearch can be planned when a scan is known to
+// produce at most one row, but it is not known which region contains that row
+// (if any). In this case, the scan can be split in two, and the resulting scans
+// will become the children of the LocalityOptimizedSearch operator. The left
+// scan should only contain spans targeting partitions on local nodes, and the
+// right scan should contain the remaining spans. The LocalityOptimizedSearch
+// operator ensures that the right child (containing remote spans) is only
+// executed if the left child (containing local spans) does not return any rows.
+//
+// This is a useful optimization if there is locality of access in the workload,
+// such that rows tend to be accessed from the region where they are located.
+// If there is no locality of access, using LocalityOptimizedSearch could be a
+// slight pessimization, since rows residing in remote regions will be fetched
+// slightly more slowly than they would be otherwise.
+//
+// For example, suppose we have a multi-region database with regions 'us-east1',
+// 'us-west1' and 'europe-west1', and we have the following table and query,
+// issued from 'us-east1':
+//
+//   CREATE TABLE tab (
+//     k INT PRIMARY KEY,
+//     v INT
+//   ) LOCALITY REGIONAL BY ROW;
+//
+//   SELECT * FROM tab WHERE k = 10;
+//
+// Normally, this would produce the following plan:
+//
+//   scan tab
+//    └── constraint: /3/1
+//         ├── [/'europe-west1'/10 - /'europe-west1'/10]
+//         ├── [/'us-east1'/10 - /'us-east1'/10]
+//         └── [/'us-west1'/10 - /'us-west1'/10]
+//
+// but if the session setting locality_optimized_partitioned_index_scan is enabled,
+// the optimizer will produce this plan, using locality optimized search:
+//
+//   locality-optimized-search
+//    ├── scan tab
+//    │    └── constraint: /9/7: [/'us-east1'/10 - /'us-east1'/10]
+//    └── scan tab
+//         └── constraint: /14/12
+//              ├── [/'europe-west1'/10 - /'europe-west1'/10]
+//              └── [/'us-west1'/10 - /'us-west1'/10]
+//
+// As long as k = 10 is located in 'us-east1', the second plan will be much faster.
+// But if k = 10 is located in one of the other regions, the first plan would be
+// slightly faster.
+func (_f *Factory) ConstructLocalityOptimizedSearch(
+	local memo.RelExpr,
+	remote memo.RelExpr,
+	setPrivate *memo.SetPrivate,
+) memo.RelExpr {
+	e := _f.mem.MemoizeLocalityOptimizedSearch(local, remote, setPrivate)
+	return _f.onConstructRelational(e)
+}
+
 // ConstructLimit constructs an expression for the Limit operator.
 // Limit returns a limited subset of the results in the input relation. The limit
 // expression is a scalar value; the operator returns at most this many rows. The
@@ -18256,6 +18316,14 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		}
 		return t
 
+	case *memo.LocalityOptimizedSearchExpr:
+		local := replace(t.Local).(memo.RelExpr)
+		remote := replace(t.Remote).(memo.RelExpr)
+		if local != t.Local || remote != t.Remote {
+			return f.ConstructLocalityOptimizedSearch(local, remote, &t.SetPrivate)
+		}
+		return t
+
 	case *memo.LimitExpr:
 		input := replace(t.Input).(memo.RelExpr)
 		limit := replace(t.Limit).(opt.ScalarExpr)
@@ -19930,6 +19998,13 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 			&t.SetPrivate,
 		)
 
+	case *memo.LocalityOptimizedSearchExpr:
+		return f.ConstructLocalityOptimizedSearch(
+			f.invokeReplace(t.Local, replace).(memo.RelExpr),
+			f.invokeReplace(t.Remote, replace).(memo.RelExpr),
+			&t.SetPrivate,
+		)
+
 	case *memo.LimitExpr:
 		return f.ConstructLimit(
 			f.invokeReplace(t.Input, replace).(memo.RelExpr),
@@ -21213,6 +21288,12 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 		)
 	case opt.ExceptAllOp:
 		return f.ConstructExceptAll(
+			args[0].(memo.RelExpr),
+			args[1].(memo.RelExpr),
+			args[2].(*memo.SetPrivate),
+		)
+	case opt.LocalityOptimizedSearchOp:
+		return f.ConstructLocalityOptimizedSearch(
 			args[0].(memo.RelExpr),
 			args[1].(memo.RelExpr),
 			args[2].(*memo.SetPrivate),

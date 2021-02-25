@@ -78,6 +78,25 @@ func (_e *explorer) exploreScan(
 		}
 	}
 
+	// [GenerateLocalityOptimizedScan]
+	{
+		if _rootOrd >= _rootState.start {
+			scanPrivate := &_root.ScanPrivate
+			if _e.funcs.CanMaybeGenerateLocalityOptimizedScan(scanPrivate) {
+				if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateLocalityOptimizedScan) {
+					var _last memo.RelExpr
+					if _e.o.appliedRule != nil {
+						_last = memo.LastGroupMember(_root)
+					}
+					_e.funcs.GenerateLocalityOptimizedScan(_root, scanPrivate)
+					if _e.o.appliedRule != nil {
+						_e.o.appliedRule(opt.GenerateLocalityOptimizedScan, _root, _last.NextExpr())
+					}
+				}
+			}
+		}
+	}
+
 	return _fullyExplored
 }
 

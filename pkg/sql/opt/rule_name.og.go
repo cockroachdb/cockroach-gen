@@ -283,6 +283,7 @@ const (
 	SplitScanIntoUnionScans
 	EliminateIndexJoinInsideProject
 	GenerateIndexScans
+	GenerateLocalityOptimizedScan
 	GeneratePartialIndexScans
 	GenerateConstrainedScans
 	GenerateInvertedIndexScans

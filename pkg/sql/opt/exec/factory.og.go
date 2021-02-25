@@ -228,11 +228,18 @@ type Factory interface {
 	// SetOp performs a UNION / INTERSECT / EXCEPT operation (either the ALL or the
 	// DISTINCT version). The left and right nodes must have the same number of
 	// columns.
+	//
+	// HardLimit can only be set for UNION ALL operations. It is used to implement
+	// locality optimized search, and instructs the execution engine that it should
+	// execute the left node to completion and possibly short-circuit if the limit is
+	// reached before executing the right node. The limit is guaranteed but the
+	// short-circuit behavior is not.
 	ConstructSetOp(
 		typ tree.UnionType,
 		all bool,
 		left Node,
 		right Node,
+		hardLimit uint64,
 	) (Node, error)
 
 	// ConstructSort creates a node for a Sort operation.
@@ -938,6 +945,7 @@ func (StubFactory) ConstructSetOp(
 	all bool,
 	left Node,
 	right Node,
+	hardLimit uint64,
 ) (Node, error) {
 	return struct{}{}, nil
 }
