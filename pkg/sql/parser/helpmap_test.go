@@ -111,6 +111,7 @@ var expectedHelpStrings = []string{
 	"SHOW TRANSACTIONS",
 	"SHOW TYPES",
 	"SHOW USERS",
+	"SHOW ZONE CONFIGURATION",
 	"SHOW",
 	"TABLE",
 	"TRUNCATE",
