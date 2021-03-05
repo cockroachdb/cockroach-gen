@@ -154,6 +154,7 @@ var KeywordsCategories = map[string]string{
 	"float":                        "C",
 	"following":                    "U",
 	"for":                          "R",
+	"force":                        "U",
 	"force_index":                  "U",
 	"foreign":                      "R",
 	"from":                         "R",
@@ -657,6 +658,7 @@ var KeywordNames = []string{
 	"float",
 	"following",
 	"for",
+	"force",
 	"force_index",
 	"foreign",
 	"from",
@@ -1316,6 +1318,8 @@ func GetKeywordID(k string) int32 {
 		return FOLLOWING
 	case "for":
 		return FOR
+	case "force":
+		return FORCE
 	case "force_index":
 		return FORCE_INDEX
 	case "foreign":
