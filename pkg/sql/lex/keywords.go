@@ -8,7 +8,6 @@ var KeywordsCategories = map[string]string{
 	"action":                       "U",
 	"add":                          "U",
 	"admin":                        "U",
-	"affinity":                     "U",
 	"after":                        "U",
 	"aggregate":                    "U",
 	"all":                          "R",
@@ -318,7 +317,6 @@ var KeywordsCategories = map[string]string{
 	"parent":                       "U",
 	"partial":                      "U",
 	"partition":                    "U",
-	"partitioned":                  "U",
 	"partitions":                   "U",
 	"password":                     "U",
 	"pause":                        "U",
@@ -512,7 +510,6 @@ var KeywordNames = []string{
 	"action",
 	"add",
 	"admin",
-	"affinity",
 	"after",
 	"aggregate",
 	"all",
@@ -822,7 +819,6 @@ var KeywordNames = []string{
 	"parent",
 	"partial",
 	"partition",
-	"partitioned",
 	"partitions",
 	"password",
 	"pause",
@@ -1026,8 +1022,6 @@ func GetKeywordID(k string) int32 {
 		return ADD
 	case "admin":
 		return ADMIN
-	case "affinity":
-		return AFFINITY
 	case "after":
 		return AFTER
 	case "aggregate":
@@ -1646,8 +1640,6 @@ func GetKeywordID(k string) int32 {
 		return PARTIAL
 	case "partition":
 		return PARTITION
-	case "partitioned":
-		return PARTITIONED
 	case "partitions":
 		return PARTITIONS
 	case "password":
