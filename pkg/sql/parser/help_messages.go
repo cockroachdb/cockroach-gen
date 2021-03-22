@@ -269,7 +269,7 @@ Options:
 		//line sql.y: 2432
 		Text: `
 CREATE SCHEDULE [<description>]
-FOR BACKUP [<targets>] TO <location...>
+FOR BACKUP [<targets>] INTO <location...>
 [WITH <backup_option>[=<value>] [, ...]]
 RECURRING [crontab|NEVER] [FULL BACKUP <crontab|ALWAYS>]
 [WITH EXPERIMENTAL SCHEDULE OPTIONS <schedule_option>[= <value>] [, ...] ]
@@ -1615,7 +1615,7 @@ RESUME JOB <jobid>
 RESUME SCHEDULES <selectclause>
  selectclause: select statement returning schedule IDs to resume.
 
-RESUME SCHEDULES <jobid>
+RESUME SCHEDULE <scheduleID>
 
 `,
 		//line sql.y: 7686
@@ -1632,7 +1632,7 @@ RESUME SCHEDULES <jobid>
 DROP SCHEDULES <selectclause>
  selectclause: select statement returning schedule IDs to resume.
 
-DROP SCHEDULE <scheduleid>
+DROP SCHEDULE <scheduleID>
 
 `,
 		//line sql.y: 7715
