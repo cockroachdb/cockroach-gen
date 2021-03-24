@@ -649,6 +649,7 @@ type Factory interface {
 		viewQuery string,
 		columns colinfo.ResultColumns,
 		deps opt.ViewDeps,
+		typeDeps opt.ViewTypeDeps,
 	) (Node, error)
 
 	// ConstructSequenceSelect creates a node for a SequenceSelect operation.
@@ -1176,6 +1177,7 @@ func (StubFactory) ConstructCreateView(
 	viewQuery string,
 	columns colinfo.ResultColumns,
 	deps opt.ViewDeps,
+	typeDeps opt.ViewTypeDeps,
 ) (Node, error) {
 	return struct{}{}, nil
 }

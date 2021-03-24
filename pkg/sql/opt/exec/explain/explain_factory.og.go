@@ -1245,6 +1245,7 @@ func (f *Factory) ConstructCreateView(
 	viewQuery string,
 	columns colinfo.ResultColumns,
 	deps opt.ViewDeps,
+	typeDeps opt.ViewTypeDeps,
 ) (exec.Node, error) {
 	args := &createViewArgs{
 		Schema:       schema,
@@ -1256,6 +1257,7 @@ func (f *Factory) ConstructCreateView(
 		ViewQuery:    viewQuery,
 		Columns:      columns,
 		deps:         deps,
+		typeDeps:     typeDeps,
 	}
 	_n, err := f.newNode(createViewOp, args, nil /* ordering */)
 	if err != nil {
@@ -1272,6 +1274,7 @@ func (f *Factory) ConstructCreateView(
 		viewQuery,
 		columns,
 		deps,
+		typeDeps,
 	)
 	if err != nil {
 		return nil, err
@@ -2057,6 +2060,7 @@ type createViewArgs struct {
 	ViewQuery    string
 	Columns      colinfo.ResultColumns
 	deps         opt.ViewDeps
+	typeDeps     opt.ViewTypeDeps
 }
 
 type sequenceSelectArgs struct {
