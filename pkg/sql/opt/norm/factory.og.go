@@ -11164,7 +11164,7 @@ func (_f *Factory) ConstructNot(
 		if opt.IsComparisonOp(input) {
 			left := input.Child(0).(opt.ScalarExpr)
 			right := input.Child(1).(opt.ScalarExpr)
-			if !(input.Op() == opt.ContainsOp || input.Op() == opt.JsonExistsOp || input.Op() == opt.JsonSomeExistsOp || input.Op() == opt.JsonAllExistsOp || input.Op() == opt.OverlapsOp) {
+			if !(input.Op() == opt.ContainsOp || input.Op() == opt.ContainedByOp || input.Op() == opt.JsonExistsOp || input.Op() == opt.JsonSomeExistsOp || input.Op() == opt.JsonAllExistsOp || input.Op() == opt.OverlapsOp) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.NegateComparison) {
 					_expr := _f.funcs.NegateComparison(input.Op(), left, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
@@ -14744,6 +14744,72 @@ func (_f *Factory) ConstructContains(
 	}
 
 	e := _f.mem.MemoizeContains(left, right)
+	return _f.onConstructScalar(e)
+}
+
+// ConstructContainedBy constructs an expression for the ContainedBy operator.
+func (_f *Factory) ConstructContainedBy(
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) opt.ScalarExpr {
+	// [FoldNullComparisonRight]
+	{
+		_null, _ := right.(*memo.NullExpr)
+		if _null != nil {
+			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullComparisonRight) {
+				_expr := _f.ConstructNull(
+					_f.funcs.BoolType(),
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.FoldNullComparisonRight, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
+	// [FoldComparison]
+	{
+		if _f.funcs.IsConstValueOrGroupOfConstValues(left) {
+			if _f.funcs.IsConstValueOrGroupOfConstValues(right) {
+				result := _f.funcs.FoldComparison(opt.ContainedByOp, left, right)
+				if _f.funcs.Succeeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
+						_expr := result.(opt.ScalarExpr)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldComparison, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
+	// [UnifyComparisonTypes]
+	{
+		_variable, _ := left.(*memo.VariableExpr)
+		if _variable != nil {
+			_const, _ := right.(*memo.ConstExpr)
+			if _const != nil {
+				result := _f.funcs.UnifyComparison(_variable, _const)
+				if _f.funcs.Succeeded(result) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
+						_expr := _f.ConstructContainedBy(
+							_variable,
+							result,
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.UnifyComparisonTypes, nil, _expr)
+						}
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
+	e := _f.mem.MemoizeContainedBy(left, right)
 	return _f.onConstructScalar(e)
 }
 
@@ -18676,6 +18742,14 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		}
 		return t
 
+	case *memo.ContainedByExpr:
+		left := replace(t.Left).(opt.ScalarExpr)
+		right := replace(t.Right).(opt.ScalarExpr)
+		if left != t.Left || right != t.Right {
+			return f.ConstructContainedBy(left, right)
+		}
+		return t
+
 	case *memo.JsonExistsExpr:
 		left := replace(t.Left).(opt.ScalarExpr)
 		right := replace(t.Right).(opt.ScalarExpr)
@@ -20274,6 +20348,12 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 			f.invokeReplace(t.Right, replace).(opt.ScalarExpr),
 		)
 
+	case *memo.ContainedByExpr:
+		return f.ConstructContainedBy(
+			f.invokeReplace(t.Left, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.Right, replace).(opt.ScalarExpr),
+		)
+
 	case *memo.JsonExistsExpr:
 		return f.ConstructJsonExists(
 			f.invokeReplace(t.Left, replace).(opt.ScalarExpr),
@@ -21522,6 +21602,11 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 		)
 	case opt.ContainsOp:
 		return f.ConstructContains(
+			args[0].(opt.ScalarExpr),
+			args[1].(opt.ScalarExpr),
+		)
+	case opt.ContainedByOp:
+		return f.ConstructContainedBy(
 			args[0].(opt.ScalarExpr),
 			args[1].(opt.ScalarExpr),
 		)

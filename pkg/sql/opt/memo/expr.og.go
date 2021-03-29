@@ -10036,6 +10036,63 @@ func (e *ContainsExpr) DataType() *types.T {
 	return types.Bool
 }
 
+type ContainedByExpr struct {
+	Left  opt.ScalarExpr
+	Right opt.ScalarExpr
+
+	id opt.ScalarID
+}
+
+var _ opt.ScalarExpr = &ContainedByExpr{}
+
+func (e *ContainedByExpr) ID() opt.ScalarID {
+	return e.id
+}
+
+func (e *ContainedByExpr) Op() opt.Operator {
+	return opt.ContainedByOp
+}
+
+func (e *ContainedByExpr) ChildCount() int {
+	return 2
+}
+
+func (e *ContainedByExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *ContainedByExpr) Private() interface{} {
+	return nil
+}
+
+func (e *ContainedByExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *ContainedByExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Right = child.(opt.ScalarExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *ContainedByExpr) DataType() *types.T {
+	return types.Bool
+}
+
 type JsonExistsExpr struct {
 	Left  opt.ScalarExpr
 	Right opt.ScalarExpr
@@ -20121,6 +20178,27 @@ func (m *Memo) MemoizeContains(
 	return interned
 }
 
+func (m *Memo) MemoizeContainedBy(
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) *ContainedByExpr {
+	const size = int64(unsafe.Sizeof(ContainedByExpr{}))
+	e := &ContainedByExpr{
+		Left:  left,
+		Right: right,
+		id:    m.NextID(),
+	}
+	interned := m.interner.InternContainedBy(e)
+	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
+		m.memEstimate += size
+		m.CheckExpr(e)
+	}
+	return interned
+}
+
 func (m *Memo) MemoizeJsonExists(
 	left opt.ScalarExpr,
 	right opt.ScalarExpr,
@@ -23672,6 +23750,8 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternIsNot(t)
 	case *ContainsExpr:
 		return in.InternContains(t)
+	case *ContainedByExpr:
+		return in.InternContainedBy(t)
 	case *JsonExistsExpr:
 		return in.InternJsonExists(t)
 	case *JsonAllExistsExpr:
@@ -26264,6 +26344,26 @@ func (in *interner) InternContains(val *ContainsExpr) *ContainsExpr {
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*ContainsExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsScalarExprEqual(val.Right, existing.Right) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternContainedBy(val *ContainedByExpr) *ContainedByExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.ContainedByOp)
+	in.hasher.HashScalarExpr(val.Left)
+	in.hasher.HashScalarExpr(val.Right)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*ContainedByExpr); ok {
 			if in.hasher.IsScalarExprEqual(val.Left, existing.Left) &&
 				in.hasher.IsScalarExprEqual(val.Right, existing.Right) {
 				return existing
