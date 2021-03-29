@@ -17404,7 +17404,8 @@ func (g *alterTableRelocateGroup) bestProps() *bestProps {
 }
 
 type AlterTableRelocatePrivate struct {
-	RelocateLease bool
+	RelocateLease     bool
+	RelocateNonVoters bool
 	AlterTableSplitPrivate
 }
 
@@ -28660,6 +28661,7 @@ func (in *interner) InternAlterTableRelocate(val *AlterTableRelocateExpr) *Alter
 	in.hasher.HashOperator(opt.AlterTableRelocateOp)
 	in.hasher.HashRelExpr(val.Input)
 	in.hasher.HashBool(val.RelocateLease)
+	in.hasher.HashBool(val.RelocateNonVoters)
 	in.hasher.HashTableID(val.Table)
 	in.hasher.HashIndexOrdinal(val.Index)
 	in.hasher.HashPhysProps(val.Props)
@@ -28670,6 +28672,7 @@ func (in *interner) InternAlterTableRelocate(val *AlterTableRelocateExpr) *Alter
 		if existing, ok := in.cache.Item().(*AlterTableRelocateExpr); ok {
 			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
 				in.hasher.IsBoolEqual(val.RelocateLease, existing.RelocateLease) &&
+				in.hasher.IsBoolEqual(val.RelocateNonVoters, existing.RelocateNonVoters) &&
 				in.hasher.IsTableIDEqual(val.Table, existing.Table) &&
 				in.hasher.IsIndexOrdinalEqual(val.Index, existing.Index) &&
 				in.hasher.IsPhysPropsEqual(val.Props, existing.Props) &&

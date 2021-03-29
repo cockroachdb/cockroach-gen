@@ -1457,12 +1457,14 @@ func (f *Factory) ConstructAlterTableRelocate(
 	index cat.Index,
 	input exec.Node,
 	relocateLease bool,
+	relocateNonVoters bool,
 ) (exec.Node, error) {
 	inputNode := input.(*Node)
 	args := &alterTableRelocateArgs{
-		Index:         index,
-		input:         inputNode,
-		relocateLease: relocateLease,
+		Index:             index,
+		input:             inputNode,
+		relocateLease:     relocateLease,
+		relocateNonVoters: relocateNonVoters,
 	}
 	_n, err := f.newNode(alterTableRelocateOp, args, nil /* ordering */, inputNode)
 	if err != nil {
@@ -1473,6 +1475,7 @@ func (f *Factory) ConstructAlterTableRelocate(
 		index,
 		inputNode.WrappedNode(),
 		relocateLease,
+		relocateNonVoters,
 	)
 	if err != nil {
 		return nil, err
@@ -2098,9 +2101,10 @@ type alterTableUnsplitAllArgs struct {
 }
 
 type alterTableRelocateArgs struct {
-	Index         cat.Index
-	input         *Node
-	relocateLease bool
+	Index             cat.Index
+	input             *Node
+	relocateLease     bool
+	relocateNonVoters bool
 }
 
 type bufferArgs struct {

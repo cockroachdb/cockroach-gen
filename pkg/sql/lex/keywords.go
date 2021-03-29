@@ -282,6 +282,7 @@ var KeywordsCategories = map[string]string{
 	"nologin":                      "U",
 	"nomodifyclustersetting":       "U",
 	"none":                         "T",
+	"non_voters":                   "U",
 	"normal":                       "U",
 	"not":                          "R",
 	"nothing":                      "R",
@@ -490,6 +491,7 @@ var KeywordsCategories = map[string]string{
 	"viewactivity":                 "U",
 	"virtual":                      "C",
 	"visible":                      "R",
+	"voters":                       "U",
 	"when":                         "R",
 	"where":                        "R",
 	"window":                       "R",
@@ -784,6 +786,7 @@ var KeywordNames = []string{
 	"nologin",
 	"nomodifyclustersetting",
 	"none",
+	"non_voters",
 	"normal",
 	"not",
 	"nothing",
@@ -992,6 +995,7 @@ var KeywordNames = []string{
 	"viewactivity",
 	"virtual",
 	"visible",
+	"voters",
 	"when",
 	"where",
 	"window",
@@ -1570,6 +1574,8 @@ func GetKeywordID(k string) int32 {
 		return NOMODIFYCLUSTERSETTING
 	case "none":
 		return NONE
+	case "non_voters":
+		return NON_VOTERS
 	case "normal":
 		return NORMAL
 	case "not":
@@ -1986,6 +1992,8 @@ func GetKeywordID(k string) int32 {
 		return VIRTUAL
 	case "visible":
 		return VISIBLE
+	case "voters":
+		return VOTERS
 	case "when":
 		return WHEN
 	case "where":
