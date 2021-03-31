@@ -717,6 +717,7 @@ type Factory interface {
 		index cat.Index,
 		input Node,
 		relocateLease bool,
+		relocateNonVoters bool,
 	) (Node, error)
 
 	// ConstructBuffer creates a node for a Buffer operation.
@@ -1232,6 +1233,7 @@ func (StubFactory) ConstructAlterTableRelocate(
 	index cat.Index,
 	input Node,
 	relocateLease bool,
+	relocateNonVoters bool,
 ) (Node, error) {
 	return struct{}{}, nil
 }
