@@ -3078,6 +3078,16 @@ type LookupJoinPrivate struct {
 	// paired-joiner used for left joins.
 	IsSecondJoinInPairedJoiner bool
 
+	// LocalityOptimized is true if this lookup join is part of a locality
+	// optimized search strategy, indicating that it either requires all local
+	// (relative to the gateway region) or all remote lookups. Currently, only
+	// anti joins can be locality optimized, and they are implemented with two
+	// nested anti lookup joins in which the first join targets local partitions
+	// and the second join targets remote partitions. Therefore,
+	// LocalityOptimized is used as a hint to the coster to reduce the cost of
+	// this lookup join.
+	LocalityOptimized bool
+
 	// ConstFilters contains the constant filters that are represented as equality
 	// conditions on the KeyCols. These filters are needed by the statistics code to
 	// correctly estimate selectivity.
@@ -5167,9 +5177,10 @@ func (g *unionGroup) bestProps() *bestProps {
 }
 
 // SetPrivate contains fields used by the relational set operators: Union,
-// Intersect, Except, UnionAll, IntersectAll and ExceptAll. It matches columns
-// from the left and right inputs of the operator with the output columns, since
-// OutputCols are not ordered and may not correspond to each other.
+// Intersect, Except, UnionAll, IntersectAll, ExceptAll, and
+// LocalityOptimizedSearch. It matches columns from the left and right inputs of
+// the operator with the output columns, since OutputCols are not ordered and may
+// not correspond to each other.
 //
 // For example, consider the following query:
 //   SELECT y, x FROM xy UNION SELECT b, a FROM ab
@@ -24631,6 +24642,7 @@ func (in *interner) InternLookupJoin(val *LookupJoinExpr) *LookupJoinExpr {
 	in.hasher.HashColSet(val.Cols)
 	in.hasher.HashBool(val.LookupColsAreTableKey)
 	in.hasher.HashBool(val.IsSecondJoinInPairedJoiner)
+	in.hasher.HashBool(val.LocalityOptimized)
 	in.hasher.HashFiltersExpr(val.ConstFilters)
 	in.hasher.HashJoinFlags(val.Flags)
 	in.hasher.HashBool(val.SkipReorderJoins)
@@ -24648,6 +24660,7 @@ func (in *interner) InternLookupJoin(val *LookupJoinExpr) *LookupJoinExpr {
 				in.hasher.IsColSetEqual(val.Cols, existing.Cols) &&
 				in.hasher.IsBoolEqual(val.LookupColsAreTableKey, existing.LookupColsAreTableKey) &&
 				in.hasher.IsBoolEqual(val.IsSecondJoinInPairedJoiner, existing.IsSecondJoinInPairedJoiner) &&
+				in.hasher.IsBoolEqual(val.LocalityOptimized, existing.LocalityOptimized) &&
 				in.hasher.IsFiltersExprEqual(val.ConstFilters, existing.ConstFilters) &&
 				in.hasher.IsJoinFlagsEqual(val.Flags, existing.Flags) &&
 				in.hasher.IsBoolEqual(val.SkipReorderJoins, existing.SkipReorderJoins) {
