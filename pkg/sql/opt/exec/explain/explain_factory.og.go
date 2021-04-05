@@ -870,7 +870,7 @@ func (f *Factory) ConstructExplainOpt(
 
 func (f *Factory) ConstructExplain(
 	options *tree.ExplainOptions,
-	stmtType tree.StatementType,
+	stmtType tree.StatementReturnType,
 	buildFn exec.BuildPlanForExplainFn,
 ) (exec.Node, error) {
 	args := &explainArgs{
@@ -1971,7 +1971,7 @@ type explainOptArgs struct {
 
 type explainArgs struct {
 	Options  *tree.ExplainOptions
-	StmtType tree.StatementType
+	StmtType tree.StatementReturnType
 	BuildFn  exec.BuildPlanForExplainFn
 }
 

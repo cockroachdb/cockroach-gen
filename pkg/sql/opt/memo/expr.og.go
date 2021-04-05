@@ -16414,8 +16414,8 @@ type ExplainPrivate struct {
 	// Props stores the required physical properties for the enclosed expression.
 	Props *physical.Required
 
-	// StmtType stores the type of the statement we are explaining.
-	StmtType tree.StatementType
+	// StmtType stores the type of the statement return we are explaining.
+	StmtType tree.StatementReturnType
 }
 
 // ShowTraceForSessionExpr returns the current session traces.
@@ -28477,7 +28477,7 @@ func (in *interner) InternExplain(val *ExplainExpr) *ExplainExpr {
 	in.hasher.HashExplainOptions(val.Options)
 	in.hasher.HashColList(val.ColList)
 	in.hasher.HashPhysProps(val.Props)
-	in.hasher.HashStatementType(val.StmtType)
+	in.hasher.HashStatementReturnType(val.StmtType)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
@@ -28486,7 +28486,7 @@ func (in *interner) InternExplain(val *ExplainExpr) *ExplainExpr {
 				in.hasher.IsExplainOptionsEqual(val.Options, existing.Options) &&
 				in.hasher.IsColListEqual(val.ColList, existing.ColList) &&
 				in.hasher.IsPhysPropsEqual(val.Props, existing.Props) &&
-				in.hasher.IsStatementTypeEqual(val.StmtType, existing.StmtType) {
+				in.hasher.IsStatementReturnTypeEqual(val.StmtType, existing.StmtType) {
 				return existing
 			}
 		}
