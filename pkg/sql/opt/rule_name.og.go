@@ -92,6 +92,7 @@ const (
 	FoldCast
 	FoldIndirection
 	FoldColumnAccess
+	FoldFunctionWithNullArg
 	FoldFunction
 	FoldEqualsAnyNull
 	ConvertGroupByToDistinct

@@ -17119,6 +17119,24 @@ func (_f *Factory) ConstructFunction(
 	args memo.ScalarListExpr,
 	functionPrivate *memo.FunctionPrivate,
 ) opt.ScalarExpr {
+	// [FoldFunctionWithNullArg]
+	{
+		private := functionPrivate
+		if _f.funcs.CanFoldFunctionWithNullArg(private) {
+			if _f.funcs.HasNullArg(args) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.FoldFunctionWithNullArg) {
+					_expr := _f.ConstructNull(
+						_f.funcs.FunctionReturnType(private),
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.FoldFunctionWithNullArg, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
 	// [FoldFunction]
 	{
 		if _f.funcs.IsListOfConstants(args) {
