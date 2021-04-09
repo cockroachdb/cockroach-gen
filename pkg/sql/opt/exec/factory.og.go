@@ -192,6 +192,8 @@ type Factory interface {
 		// distinct set of values on the set of columns in the ordering).
 		groupColOrdering colinfo.ColumnOrdering,
 		aggregations []AggInfo,
+		// If set, the output must have this ordering, but it is guaranteed that
+		// ReqOrdering is a prefix of GroupColOrdering.
 		reqOrdering OutputOrdering,
 	) (Node, error)
 
