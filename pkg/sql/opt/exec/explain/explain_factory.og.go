@@ -350,6 +350,8 @@ func (f *Factory) ConstructGroupBy(
 	// distinct set of values on the set of columns in the ordering).
 	groupColOrdering colinfo.ColumnOrdering,
 	aggregations []exec.AggInfo,
+	// If set, the output must have this ordering, but it is guaranteed that
+	// ReqOrdering is a prefix of GroupColOrdering.
 	reqOrdering exec.OutputOrdering,
 ) (exec.Node, error) {
 	inputNode := input.(*Node)
