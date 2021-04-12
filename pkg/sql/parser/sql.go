@@ -31247,7 +31247,7 @@ sqldefault:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
 //line sql-gen.y:10795
 		{
-			sqlVAL.union.val = &tree.ColumnAccessExpr{Expr: sqlDollar[2].union.expr(), ColName: sqlDollar[5].str}
+			sqlVAL.union.val = &tree.ColumnAccessExpr{Expr: sqlDollar[2].union.expr(), ColName: tree.Name(sqlDollar[5].str)}
 		}
 	case 1896:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
