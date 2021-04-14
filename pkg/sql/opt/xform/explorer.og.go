@@ -319,8 +319,8 @@ func (_e *explorer) exploreSelect(
 					if _e.funcs.IsCanonicalScan(scanPrivate) {
 						if _e.funcs.HasStrictKey(_scan) {
 							filters := _root.Filters
-							pair := _e.funcs.ExprPairForSplitDisjunction(scanPrivate, filters)
-							if _e.funcs.ExprPairSucceeded(pair) {
+							leftFilter, rightFilter, itemToReplace, ok := _e.funcs.SplitDisjunction(scanPrivate, filters)
+							if ok {
 								if _e.o.matchedRule == nil || _e.o.matchedRule(opt.SplitDisjunction) {
 									leftScan := _e.f.ConstructScan(
 										_e.funcs.DuplicateScanPrivate(scanPrivate),
@@ -332,11 +332,11 @@ func (_e *explorer) exploreSelect(
 										Input: _e.f.ConstructUnionAll(
 											_e.f.ConstructSelect(
 												leftScan,
-												_e.funcs.MapFilterCols(_e.funcs.ReplaceFiltersItem(filters, _e.funcs.ExprPairFiltersItemToReplace(pair), _e.funcs.ExprPairLeft(pair)), _e.funcs.OutputCols(_scan), _e.funcs.OutputCols(leftScan)),
+												_e.funcs.MapFilterCols(_e.funcs.ReplaceFiltersItem(filters, itemToReplace, leftFilter), _e.funcs.OutputCols(_scan), _e.funcs.OutputCols(leftScan)),
 											),
 											_e.f.ConstructSelect(
 												rightScan,
-												_e.funcs.MapFilterCols(_e.funcs.ReplaceFiltersItem(filters, _e.funcs.ExprPairFiltersItemToReplace(pair), _e.funcs.ExprPairRight(pair)), _e.funcs.OutputCols(_scan), _e.funcs.OutputCols(rightScan)),
+												_e.funcs.MapFilterCols(_e.funcs.ReplaceFiltersItem(filters, itemToReplace, rightFilter), _e.funcs.OutputCols(_scan), _e.funcs.OutputCols(rightScan)),
 											),
 											_e.funcs.MakeSetPrivate(_e.funcs.OutputCols(leftScan), _e.funcs.OutputCols(rightScan), _e.funcs.OutputCols(_scan)),
 										),
@@ -382,8 +382,8 @@ func (_e *explorer) exploreSelect(
 					if _e.funcs.IsCanonicalScan(scanPrivate) {
 						if !_e.funcs.HasStrictKey(_scan) {
 							filters := _root.Filters
-							pair := _e.funcs.ExprPairForSplitDisjunction(scanPrivate, filters)
-							if _e.funcs.ExprPairSucceeded(pair) {
+							leftFilter, rightFilter, itemToReplace, ok := _e.funcs.SplitDisjunction(scanPrivate, filters)
+							if ok {
 								if _e.o.matchedRule == nil || _e.o.matchedRule(opt.SplitDisjunctionAddKey) {
 									leftScan := _e.f.ConstructScan(
 										_e.funcs.AddPrimaryKeyColsToScanPrivate(_e.funcs.DuplicateScanPrivate(scanPrivate)),
@@ -398,11 +398,11 @@ func (_e *explorer) exploreSelect(
 											_e.f.ConstructUnionAll(
 												_e.f.ConstructSelect(
 													leftScan,
-													_e.funcs.MapFilterCols(_e.funcs.ReplaceFiltersItem(filters, _e.funcs.ExprPairFiltersItemToReplace(pair), _e.funcs.ExprPairLeft(pair)), outCols, _e.funcs.OutputCols(leftScan)),
+													_e.funcs.MapFilterCols(_e.funcs.ReplaceFiltersItem(filters, itemToReplace, leftFilter), outCols, _e.funcs.OutputCols(leftScan)),
 												),
 												_e.f.ConstructSelect(
 													rightScan,
-													_e.funcs.MapFilterCols(_e.funcs.ReplaceFiltersItem(filters, _e.funcs.ExprPairFiltersItemToReplace(pair), _e.funcs.ExprPairRight(pair)), outCols, _e.funcs.OutputCols(rightScan)),
+													_e.funcs.MapFilterCols(_e.funcs.ReplaceFiltersItem(filters, itemToReplace, rightFilter), outCols, _e.funcs.OutputCols(rightScan)),
 												),
 												_e.funcs.MakeSetPrivate(_e.funcs.OutputCols(leftScan), _e.funcs.OutputCols(rightScan), outCols),
 											),
