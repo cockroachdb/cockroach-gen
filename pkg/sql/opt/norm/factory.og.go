@@ -10655,6 +10655,57 @@ func (_f *Factory) ConstructExists(
 		}
 	}
 
+	// [InlineExistsSelectTuple]
+	{
+		_select, _ := input.(*memo.SelectExpr)
+		if _select != nil {
+			_project, _ := _select.Input.(*memo.ProjectExpr)
+			if _project != nil {
+				input := _project.Input
+				for i := range _project.Projections {
+					_item := &_project.Projections[i]
+					tuple := _item.Element
+					_tuple, _ := tuple.(*memo.TupleExpr)
+					if _tuple != nil {
+						tupleCol := _item.Col
+						filters := _select.Filters
+						for i := range filters {
+							item := &filters[i]
+							_eq, _ := item.Condition.(*memo.EqExpr)
+							if _eq != nil {
+								_variable, _ := _eq.Left.(*memo.VariableExpr)
+								if _variable != nil {
+									varCol := _variable.Col
+									if _f.funcs.EqualsColumn(varCol, tupleCol) {
+										rhs := _eq.Right
+										_tuple2, _ := rhs.(*memo.TupleExpr)
+										if _tuple2 != nil {
+											if _f.funcs.TuplesHaveSameLength(_tuple, _tuple2) {
+												if _f.matchedRule == nil || _f.matchedRule(opt.InlineExistsSelectTuple) {
+													_expr := _f.ConstructExists(
+														_f.ConstructSelect(
+															input,
+															_f.funcs.ConcatFilters(_f.funcs.RemoveFiltersItem(filters, item), _f.funcs.SplitTupleEq(_tuple, _tuple2)),
+														),
+														subqueryPrivate,
+													)
+													if _f.appliedRule != nil {
+														_f.appliedRule(opt.InlineExistsSelectTuple, nil, _expr)
+													}
+													return _expr
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [IntroduceExistsLimit]
 	{
 		if !_f.funcs.HasOuterCols(input) {

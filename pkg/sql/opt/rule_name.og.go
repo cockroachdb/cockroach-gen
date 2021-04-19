@@ -222,6 +222,7 @@ const (
 	EliminateExistsZeroRows
 	EliminateExistsProject
 	EliminateExistsGroupBy
+	InlineExistsSelectTuple
 	IntroduceExistsLimit
 	EliminateExistsLimit
 	SimplifyCaseWhenConstValue
