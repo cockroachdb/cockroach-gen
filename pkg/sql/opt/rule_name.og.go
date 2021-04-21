@@ -218,6 +218,8 @@ const (
 	EliminateCast
 	NormalizeInConst
 	FoldInNull
+	SimplifyInSingleElement
+	SimplifyNotInSingleElement
 	UnifyComparisonTypes
 	EliminateExistsZeroRows
 	EliminateExistsProject

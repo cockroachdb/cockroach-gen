@@ -1245,6 +1245,136 @@ type ScanPrivate struct {
 	PartitionConstrainedScan bool
 }
 
+// PlaceholderScanExpr is a special variant of Scan. It scans exactly one span of a
+// non-inverted index, and the span has the same start and end key. The values
+// for the span key are child scalar operators which are either constants or
+// placeholders. This operator evaluates the placeholders at execbuild time.
+//
+// PlaceholderScan cannot have a Constraint or InvertedConstraint.
+type PlaceholderScanExpr struct {
+	// Span contains the values for a constraint span key; they map 1-1 to a
+	// prefix of the index columns. They are either constant values or
+	// placeholders.
+	Span ScalarListExpr
+	ScanPrivate
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &PlaceholderScanExpr{}
+
+func (e *PlaceholderScanExpr) Op() opt.Operator {
+	return opt.PlaceholderScanOp
+}
+
+func (e *PlaceholderScanExpr) ChildCount() int {
+	return 1
+}
+
+func (e *PlaceholderScanExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return &e.Span
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *PlaceholderScanExpr) Private() interface{} {
+	return &e.ScanPrivate
+}
+
+func (e *PlaceholderScanExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *PlaceholderScanExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Span = *child.(*ScalarListExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *PlaceholderScanExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *PlaceholderScanExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *PlaceholderScanExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *PlaceholderScanExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *PlaceholderScanExpr) RequiredPhysical() *physical.Required {
+	return e.grp.bestProps().required
+}
+
+func (e *PlaceholderScanExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
+func (e *PlaceholderScanExpr) Cost() Cost {
+	return e.grp.bestProps().cost
+}
+
+func (e *PlaceholderScanExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *PlaceholderScanExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
+}
+
+func (e *PlaceholderScanExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(errors.AssertionFailedf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *PlaceholderScanExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(errors.AssertionFailedf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type placeholderScanGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	first PlaceholderScanExpr
+	best  bestProps
+}
+
+var _ exprGroup = &placeholderScanGroup{}
+
+func (g *placeholderScanGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *placeholderScanGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *placeholderScanGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *placeholderScanGroup) bestProps() *bestProps {
+	return &g.best
+}
+
 // SequenceSelectExpr represents a read from a sequence as a data source. It always returns
 // three columns, last_value, log_cnt, and is_called, with a single row. last_value is
 // the most recent value returned from the sequence and log_cnt and is_called are
@@ -18334,6 +18464,30 @@ func (m *Memo) MemoizeScan(
 	return interned.FirstExpr()
 }
 
+func (m *Memo) MemoizePlaceholderScan(
+	span ScalarListExpr,
+	scanPrivate *ScanPrivate,
+) RelExpr {
+	const size = int64(unsafe.Sizeof(placeholderScanGroup{}))
+	grp := &placeholderScanGroup{mem: m, first: PlaceholderScanExpr{
+		Span:        span,
+		ScanPrivate: *scanPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternPlaceholderScan(e)
+	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
+		m.logPropsBuilder.buildPlaceholderScanProps(e, &grp.rel)
+		grp.rel.Populated = true
+		m.memEstimate += size
+		m.CheckExpr(e)
+	}
+	return interned.FirstExpr()
+}
+
 func (m *Memo) MemoizeSequenceSelect(
 	sequenceSelectPrivate *SequenceSelectPrivate,
 ) RelExpr {
@@ -22718,6 +22872,20 @@ func (m *Memo) AddScanToGroup(e *ScanExpr, grp RelExpr) *ScanExpr {
 	return interned
 }
 
+func (m *Memo) AddPlaceholderScanToGroup(e *PlaceholderScanExpr, grp RelExpr) *PlaceholderScanExpr {
+	const size = int64(unsafe.Sizeof(PlaceholderScanExpr{}))
+	interned := m.interner.InternPlaceholderScan(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.CheckExpr(e)
+	} else if interned.group() != grp.group() {
+		// This is a group collision, do nothing.
+		return nil
+	}
+	return interned
+}
+
 func (m *Memo) AddSequenceSelectToGroup(e *SequenceSelectExpr, grp RelExpr) *SequenceSelectExpr {
 	const size = int64(unsafe.Sizeof(SequenceSelectExpr{}))
 	interned := m.interner.InternSequenceSelect(e)
@@ -23586,6 +23754,8 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternUniqueChecksItem(t)
 	case *ScanExpr:
 		return in.InternScan(t)
+	case *PlaceholderScanExpr:
+		return in.InternPlaceholderScan(t)
 	case *SequenceSelectExpr:
 		return in.InternSequenceSelect(t)
 	case *ValuesExpr:
@@ -24325,6 +24495,44 @@ func (in *interner) InternScan(val *ScanExpr) *ScanExpr {
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*ScanExpr); ok {
 			if in.hasher.IsTableIDEqual(val.Table, existing.Table) &&
+				in.hasher.IsIndexOrdinalEqual(val.Index, existing.Index) &&
+				in.hasher.IsColSetEqual(val.Cols, existing.Cols) &&
+				in.hasher.IsPointerEqual(unsafe.Pointer(val.Constraint), unsafe.Pointer(existing.Constraint)) &&
+				in.hasher.IsInvertedSpansEqual(val.InvertedConstraint, existing.InvertedConstraint) &&
+				in.hasher.IsScanLimitEqual(val.HardLimit, existing.HardLimit) &&
+				in.hasher.IsScanFlagsEqual(val.Flags, existing.Flags) &&
+				in.hasher.IsLockingItemEqual(val.Locking, existing.Locking) &&
+				in.hasher.IsBoolEqual(val.LocalityOptimized, existing.LocalityOptimized) &&
+				in.hasher.IsBoolEqual(val.PartitionConstrainedScan, existing.PartitionConstrainedScan) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternPlaceholderScan(val *PlaceholderScanExpr) *PlaceholderScanExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.PlaceholderScanOp)
+	in.hasher.HashScalarListExpr(val.Span)
+	in.hasher.HashTableID(val.Table)
+	in.hasher.HashIndexOrdinal(val.Index)
+	in.hasher.HashColSet(val.Cols)
+	in.hasher.HashPointer(unsafe.Pointer(val.Constraint))
+	in.hasher.HashInvertedSpans(val.InvertedConstraint)
+	in.hasher.HashScanLimit(val.HardLimit)
+	in.hasher.HashScanFlags(val.Flags)
+	in.hasher.HashLockingItem(val.Locking)
+	in.hasher.HashBool(val.LocalityOptimized)
+	in.hasher.HashBool(val.PartitionConstrainedScan)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*PlaceholderScanExpr); ok {
+			if in.hasher.IsScalarListExprEqual(val.Span, existing.Span) &&
+				in.hasher.IsTableIDEqual(val.Table, existing.Table) &&
 				in.hasher.IsIndexOrdinalEqual(val.Index, existing.Index) &&
 				in.hasher.IsColSetEqual(val.Cols, existing.Cols) &&
 				in.hasher.IsPointerEqual(unsafe.Pointer(val.Constraint), unsafe.Pointer(existing.Constraint)) &&
@@ -28845,6 +29053,8 @@ func (b *logicalPropsBuilder) buildProps(e RelExpr, rel *props.Relational) {
 		b.buildDeleteProps(t, rel)
 	case *ScanExpr:
 		b.buildScanProps(t, rel)
+	case *PlaceholderScanExpr:
+		b.buildPlaceholderScanProps(t, rel)
 	case *SequenceSelectExpr:
 		b.buildSequenceSelectProps(t, rel)
 	case *ValuesExpr:

@@ -310,6 +310,21 @@ func (_f *Factory) ConstructScan(
 	return _f.onConstructRelational(e)
 }
 
+// ConstructPlaceholderScan constructs an expression for the PlaceholderScan operator.
+// PlaceholderScan is a special variant of Scan. It scans exactly one span of a
+// non-inverted index, and the span has the same start and end key. The values
+// for the span key are child scalar operators which are either constants or
+// placeholders. This operator evaluates the placeholders at execbuild time.
+//
+// PlaceholderScan cannot have a Constraint or InvertedConstraint.
+func (_f *Factory) ConstructPlaceholderScan(
+	span memo.ScalarListExpr,
+	scanPrivate *memo.ScanPrivate,
+) memo.RelExpr {
+	e := _f.mem.MemoizePlaceholderScan(span, scanPrivate)
+	return _f.onConstructRelational(e)
+}
+
 // ConstructSequenceSelect constructs an expression for the SequenceSelect operator.
 // SequenceSelect represents a read from a sequence as a data source. It always returns
 // three columns, last_value, log_cnt, and is_called, with a single row. last_value is
@@ -13451,6 +13466,26 @@ func (_f *Factory) ConstructIn(
 		}
 	}
 
+	// [SimplifyInSingleElement]
+	{
+		_tuple, _ := right.(*memo.TupleExpr)
+		if _tuple != nil {
+			if len(_tuple.Elems) == 1 {
+				right := _tuple.Elems[0]
+				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyInSingleElement) {
+					_expr := _f.ConstructEq(
+						left,
+						right,
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.SimplifyInSingleElement, nil, _expr)
+					}
+					return _expr
+				}
+			}
+		}
+	}
+
 	// [UnifyComparisonTypes]
 	{
 		_variable, _ := left.(*memo.VariableExpr)
@@ -13577,6 +13612,26 @@ func (_f *Factory) ConstructNotIn(
 						}
 						return _expr
 					}
+				}
+			}
+		}
+	}
+
+	// [SimplifyNotInSingleElement]
+	{
+		_tuple, _ := right.(*memo.TupleExpr)
+		if _tuple != nil {
+			if len(_tuple.Elems) == 1 {
+				right := _tuple.Elems[0]
+				if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyNotInSingleElement) {
+					_expr := _f.ConstructNe(
+						left,
+						right,
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.SimplifyNotInSingleElement, nil, _expr)
+					}
+					return _expr
 				}
 			}
 		}
@@ -18193,6 +18248,13 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 	case *memo.ScanExpr:
 		return t
 
+	case *memo.PlaceholderScanExpr:
+		span, spanChanged := f.replaceScalarListExpr(t.Span, replace)
+		if spanChanged {
+			return f.ConstructPlaceholderScan(span, &t.ScanPrivate)
+		}
+		return t
+
 	case *memo.SequenceSelectExpr:
 		return t
 
@@ -19915,6 +19977,12 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 	case *memo.ScanExpr:
 		return f.mem.MemoizeScan(&t.ScanPrivate)
 
+	case *memo.PlaceholderScanExpr:
+		return f.ConstructPlaceholderScan(
+			f.copyAndReplaceDefaultScalarListExpr(t.Span, replace),
+			&t.ScanPrivate,
+		)
+
 	case *memo.SequenceSelectExpr:
 		return f.mem.MemoizeSequenceSelect(&t.SequenceSelectPrivate)
 
@@ -21244,6 +21312,11 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 	case opt.ScanOp:
 		return f.ConstructScan(
 			args[0].(*memo.ScanPrivate),
+		)
+	case opt.PlaceholderScanOp:
+		return f.ConstructPlaceholderScan(
+			*args[0].(*memo.ScalarListExpr),
+			args[1].(*memo.ScanPrivate),
 		)
 	case opt.SequenceSelectOp:
 		return f.ConstructSequenceSelect(
