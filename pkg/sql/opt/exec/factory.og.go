@@ -231,6 +231,14 @@ type Factory interface {
 	// DISTINCT version). The left and right nodes must have the same number of
 	// columns.
 	//
+	// ReqOrdering specifies the required output ordering, and if not empty, both
+	// inputs are already ordered according to it. If ReqOrdering is set, it is
+	// guaranteed to include all columns produced by this SetOp (the one exception is
+	// UNION ALL, which is implemented with only an ordered synchronizer and does not
+	// require an ordering over all columns). The execution engine is then guaranteed
+	// to use a merge join (or streaming DISTINCT for UNION), which is a streaming
+	// operation that maintains ordering.
+	//
 	// HardLimit can only be set for UNION ALL operations. It is used to implement
 	// locality optimized search, and instructs the execution engine that it should
 	// execute the left node to completion and possibly short-circuit if the limit is
@@ -241,6 +249,7 @@ type Factory interface {
 		all bool,
 		left Node,
 		right Node,
+		reqOrdering OutputOrdering,
 		hardLimit uint64,
 	) (Node, error)
 
@@ -949,6 +958,7 @@ func (StubFactory) ConstructSetOp(
 	all bool,
 	left Node,
 	right Node,
+	reqOrdering OutputOrdering,
 	hardLimit uint64,
 ) (Node, error) {
 	return struct{}{}, nil
