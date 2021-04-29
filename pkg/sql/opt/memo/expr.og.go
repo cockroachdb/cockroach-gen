@@ -1243,6 +1243,9 @@ type ScanPrivate struct {
 	// to constrain the lookup spans further. This flag is used to record telemetry
 	// about how often this optimization is getting applied.
 	PartitionConstrainedScan bool
+
+	// ExactPrefix caches the exact prefix of the Constraint.
+	ExactPrefix int
 }
 
 // PlaceholderScanExpr is a special variant of Scan. It scans exactly one span of a
@@ -24490,6 +24493,7 @@ func (in *interner) InternScan(val *ScanExpr) *ScanExpr {
 	in.hasher.HashLockingItem(val.Locking)
 	in.hasher.HashBool(val.LocalityOptimized)
 	in.hasher.HashBool(val.PartitionConstrainedScan)
+	in.hasher.HashInt(val.ExactPrefix)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
@@ -24503,7 +24507,8 @@ func (in *interner) InternScan(val *ScanExpr) *ScanExpr {
 				in.hasher.IsScanFlagsEqual(val.Flags, existing.Flags) &&
 				in.hasher.IsLockingItemEqual(val.Locking, existing.Locking) &&
 				in.hasher.IsBoolEqual(val.LocalityOptimized, existing.LocalityOptimized) &&
-				in.hasher.IsBoolEqual(val.PartitionConstrainedScan, existing.PartitionConstrainedScan) {
+				in.hasher.IsBoolEqual(val.PartitionConstrainedScan, existing.PartitionConstrainedScan) &&
+				in.hasher.IsIntEqual(val.ExactPrefix, existing.ExactPrefix) {
 				return existing
 			}
 		}
@@ -24527,6 +24532,7 @@ func (in *interner) InternPlaceholderScan(val *PlaceholderScanExpr) *Placeholder
 	in.hasher.HashLockingItem(val.Locking)
 	in.hasher.HashBool(val.LocalityOptimized)
 	in.hasher.HashBool(val.PartitionConstrainedScan)
+	in.hasher.HashInt(val.ExactPrefix)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
@@ -24541,7 +24547,8 @@ func (in *interner) InternPlaceholderScan(val *PlaceholderScanExpr) *Placeholder
 				in.hasher.IsScanFlagsEqual(val.Flags, existing.Flags) &&
 				in.hasher.IsLockingItemEqual(val.Locking, existing.Locking) &&
 				in.hasher.IsBoolEqual(val.LocalityOptimized, existing.LocalityOptimized) &&
-				in.hasher.IsBoolEqual(val.PartitionConstrainedScan, existing.PartitionConstrainedScan) {
+				in.hasher.IsBoolEqual(val.PartitionConstrainedScan, existing.PartitionConstrainedScan) &&
+				in.hasher.IsIntEqual(val.ExactPrefix, existing.ExactPrefix) {
 				return existing
 			}
 		}
