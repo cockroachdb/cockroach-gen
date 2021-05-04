@@ -29,7 +29,7 @@ type SortExpr struct {
 	// For a regular sort, this is empty. If it is not empty, this
 	// is a segmented sort where the input is already sorted on the
 	// specified prefix of columns.
-	InputOrdering physical.OrderingChoice
+	InputOrdering props.OrderingChoice
 	Input         RelExpr
 	best          bestProps
 }
@@ -3563,8 +3563,8 @@ type MergeJoinPrivate struct {
 	// taking into account the functional dependencies of each side. We need both
 	// versions because we need to configure execution with specific equality
 	// columns and orderings.
-	LeftOrdering  physical.OrderingChoice
-	RightOrdering physical.OrderingChoice
+	LeftOrdering  props.OrderingChoice
+	RightOrdering props.OrderingChoice
 	JoinPrivate
 }
 
@@ -4446,7 +4446,7 @@ type GroupingPrivate struct {
 	// The canonical operation always contains an ordering that has no grouping
 	// columns. Exploration rules can create versions of the operator with
 	// orderings that contain grouping columns.
-	Ordering physical.OrderingChoice
+	Ordering props.OrderingChoice
 
 	// NullsAreDistinct specifies the null behavior of the grouping operator. If
 	// true, the operator considers nulls to be distinct for grouping purposes.
@@ -6224,7 +6224,7 @@ func (g *localityOptimizedSearchGroup) bestProps() *bestProps {
 type LimitExpr struct {
 	Input    RelExpr
 	Limit    opt.ScalarExpr
-	Ordering physical.OrderingChoice
+	Ordering props.OrderingChoice
 
 	grp  exprGroup
 	next RelExpr
@@ -6353,7 +6353,7 @@ func (g *limitGroup) bestProps() *bestProps {
 type OffsetExpr struct {
 	Input    RelExpr
 	Offset   opt.ScalarExpr
-	Ordering physical.OrderingChoice
+	Ordering props.OrderingChoice
 
 	grp  exprGroup
 	next RelExpr
@@ -6728,7 +6728,7 @@ func (g *ordinalityGroup) bestProps() *bestProps {
 
 type OrdinalityPrivate struct {
 	// Ordering denotes the required ordering of the input.
-	Ordering physical.OrderingChoice
+	Ordering props.OrderingChoice
 
 	// ColID holds the id of the column introduced by this operator.
 	ColID opt.ColumnID
@@ -7022,7 +7022,7 @@ type WindowPrivate struct {
 
 	// Ordering is the ordering that the window function is computed relative to
 	// within each partition.
-	Ordering physical.OrderingChoice
+	Ordering props.OrderingChoice
 }
 
 // WithExpr executes Binding, making its results available to Main. Within Main, the
@@ -19368,7 +19368,7 @@ func (m *Memo) MemoizeLocalityOptimizedSearch(
 func (m *Memo) MemoizeLimit(
 	input RelExpr,
 	limit opt.ScalarExpr,
-	ordering physical.OrderingChoice,
+	ordering props.OrderingChoice,
 ) RelExpr {
 	const size = int64(unsafe.Sizeof(limitGroup{}))
 	grp := &limitGroup{mem: m, first: LimitExpr{
@@ -19394,7 +19394,7 @@ func (m *Memo) MemoizeLimit(
 func (m *Memo) MemoizeOffset(
 	input RelExpr,
 	offset opt.ScalarExpr,
-	ordering physical.OrderingChoice,
+	ordering props.OrderingChoice,
 ) RelExpr {
 	const size = int64(unsafe.Sizeof(offsetGroup{}))
 	grp := &offsetGroup{mem: m, first: OffsetExpr{

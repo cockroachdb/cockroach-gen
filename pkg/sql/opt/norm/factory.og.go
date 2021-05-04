@@ -5,7 +5,7 @@ package norm
 import (
 	"github.com/cockroachdb/cockroach/pkg/sql/opt"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/memo"
-	"github.com/cockroachdb/cockroach/pkg/sql/opt/props/physical"
+	"github.com/cockroachdb/cockroach/pkg/sql/opt/props"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 	"github.com/cockroachdb/cockroach/pkg/sql/types"
 	"github.com/cockroachdb/errors"
@@ -9752,7 +9752,7 @@ func (_f *Factory) ConstructLocalityOptimizedSearch(
 func (_f *Factory) ConstructLimit(
 	input memo.RelExpr,
 	limit opt.ScalarExpr,
-	ordering physical.OrderingChoice,
+	ordering props.OrderingChoice,
 ) memo.RelExpr {
 	// [EliminateLimit]
 	{
@@ -10156,7 +10156,7 @@ func (_f *Factory) ConstructLimit(
 func (_f *Factory) ConstructOffset(
 	input memo.RelExpr,
 	offset opt.ScalarExpr,
-	ordering physical.OrderingChoice,
+	ordering props.OrderingChoice,
 ) memo.RelExpr {
 	// [EliminateOffset]
 	{
@@ -21524,13 +21524,13 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 		return f.ConstructLimit(
 			args[0].(memo.RelExpr),
 			args[1].(opt.ScalarExpr),
-			*args[2].(*physical.OrderingChoice),
+			*args[2].(*props.OrderingChoice),
 		)
 	case opt.OffsetOp:
 		return f.ConstructOffset(
 			args[0].(memo.RelExpr),
 			args[1].(opt.ScalarExpr),
-			*args[2].(*physical.OrderingChoice),
+			*args[2].(*props.OrderingChoice),
 		)
 	case opt.Max1RowOp:
 		return f.ConstructMax1Row(
