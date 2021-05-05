@@ -8565,8 +8565,8 @@ func (_f *Factory) ConstructGroupBy(
 			if _regressionCount != nil {
 				arg1 := _regressionCount.Y
 				arg2 := _regressionCount.X
-				newArg := _f.funcs.SingleRegressionCountArgument(arg1, arg2, input)
-				if _f.funcs.Succeeded(newArg) {
+				newArg, ok := _f.funcs.SingleRegressionCountArgument(arg1, arg2, input)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.ConvertRegressionCountToCount) {
 						_expr := _f.ConstructGroupBy(
 							input,
@@ -8913,8 +8913,8 @@ func (_f *Factory) ConstructScalarGroupBy(
 			if _regressionCount != nil {
 				arg1 := _regressionCount.Y
 				arg2 := _regressionCount.X
-				newArg := _f.funcs.SingleRegressionCountArgument(arg1, arg2, input)
-				if _f.funcs.Succeeded(newArg) {
+				newArg, ok := _f.funcs.SingleRegressionCountArgument(arg1, arg2, input)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.ConvertRegressionCountToCount) {
 						_expr := _f.ConstructScalarGroupBy(
 							input,
@@ -10024,8 +10024,8 @@ func (_f *Factory) ConstructLimit(
 			fns := _window.Windows
 			if _f.funcs.AllArePrefixSafe(fns) {
 				private := &_window.WindowPrivate
-				newOrdering := _f.funcs.MakeSegmentedOrdering(input, _f.funcs.WindowPartition(private), _f.funcs.WindowOrdering(private), ordering)
-				if _f.funcs.OrderingSucceeded(newOrdering) {
+				newOrdering, ok := _f.funcs.MakeSegmentedOrdering(input, _f.funcs.WindowPartition(private), _f.funcs.WindowOrdering(private), ordering)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.PushLimitIntoWindow) {
 						_expr := _f.ConstructWindow(
 							_f.ConstructLimit(
@@ -11126,8 +11126,8 @@ func (_f *Factory) ConstructOr(
 		if _or == nil {
 			_or2, _ := right.(*memo.OrExpr)
 			if _or2 == nil {
-				conjunct := _f.funcs.FindRedundantConjunct(left, right)
-				if _f.funcs.Succeeded(conjunct) {
+				conjunct, ok := _f.funcs.FindRedundantConjunct(left, right)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.ExtractRedundantConjunct) {
 						_expr := _f.funcs.ExtractRedundantConjunct(conjunct, left, right).(opt.ScalarExpr)
 						if _f.appliedRule != nil {
@@ -11645,8 +11645,8 @@ func (_f *Factory) ConstructEq(
 	{
 		if _f.funcs.IsConstValueOrGroupOfConstValues(left) {
 			if _f.funcs.IsConstValueOrGroupOfConstValues(right) {
-				result := _f.funcs.FoldComparison(opt.EqOp, left, right)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.FoldComparison(opt.EqOp, left, right)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
 						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
@@ -11703,8 +11703,8 @@ func (_f *Factory) ConstructEq(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(_variable, _const)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.UnifyComparison(_variable, _const)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructEq(
 							_variable,
@@ -12048,8 +12048,8 @@ func (_f *Factory) ConstructLt(
 	{
 		if _f.funcs.IsConstValueOrGroupOfConstValues(left) {
 			if _f.funcs.IsConstValueOrGroupOfConstValues(right) {
-				result := _f.funcs.FoldComparison(opt.LtOp, left, right)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.FoldComparison(opt.LtOp, left, right)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
 						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
@@ -12068,8 +12068,8 @@ func (_f *Factory) ConstructLt(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(_variable, _const)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.UnifyComparison(_variable, _const)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructLt(
 							_variable,
@@ -12413,8 +12413,8 @@ func (_f *Factory) ConstructGt(
 	{
 		if _f.funcs.IsConstValueOrGroupOfConstValues(left) {
 			if _f.funcs.IsConstValueOrGroupOfConstValues(right) {
-				result := _f.funcs.FoldComparison(opt.GtOp, left, right)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.FoldComparison(opt.GtOp, left, right)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
 						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
@@ -12433,8 +12433,8 @@ func (_f *Factory) ConstructGt(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(_variable, _const)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.UnifyComparison(_variable, _const)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructGt(
 							_variable,
@@ -12778,8 +12778,8 @@ func (_f *Factory) ConstructLe(
 	{
 		if _f.funcs.IsConstValueOrGroupOfConstValues(left) {
 			if _f.funcs.IsConstValueOrGroupOfConstValues(right) {
-				result := _f.funcs.FoldComparison(opt.LeOp, left, right)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.FoldComparison(opt.LeOp, left, right)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
 						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
@@ -12798,8 +12798,8 @@ func (_f *Factory) ConstructLe(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(_variable, _const)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.UnifyComparison(_variable, _const)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructLe(
 							_variable,
@@ -13143,8 +13143,8 @@ func (_f *Factory) ConstructGe(
 	{
 		if _f.funcs.IsConstValueOrGroupOfConstValues(left) {
 			if _f.funcs.IsConstValueOrGroupOfConstValues(right) {
-				result := _f.funcs.FoldComparison(opt.GeOp, left, right)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.FoldComparison(opt.GeOp, left, right)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
 						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
@@ -13163,8 +13163,8 @@ func (_f *Factory) ConstructGe(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(_variable, _const)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.UnifyComparison(_variable, _const)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructGe(
 							_variable,
@@ -13254,8 +13254,8 @@ func (_f *Factory) ConstructNe(
 	{
 		if _f.funcs.IsConstValueOrGroupOfConstValues(left) {
 			if _f.funcs.IsConstValueOrGroupOfConstValues(right) {
-				result := _f.funcs.FoldComparison(opt.NeOp, left, right)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.FoldComparison(opt.NeOp, left, right)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
 						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
@@ -13312,8 +13312,8 @@ func (_f *Factory) ConstructNe(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(_variable, _const)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.UnifyComparison(_variable, _const)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructNe(
 							_variable,
@@ -13408,8 +13408,8 @@ func (_f *Factory) ConstructIn(
 	{
 		if _f.funcs.IsConstValueOrGroupOfConstValues(left) {
 			if _f.funcs.IsConstValueOrGroupOfConstValues(right) {
-				result := _f.funcs.FoldComparison(opt.InOp, left, right)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.FoldComparison(opt.InOp, left, right)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
 						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
@@ -13492,8 +13492,8 @@ func (_f *Factory) ConstructIn(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(_variable, _const)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.UnifyComparison(_variable, _const)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructIn(
 							_variable,
@@ -13559,8 +13559,8 @@ func (_f *Factory) ConstructNotIn(
 	{
 		if _f.funcs.IsConstValueOrGroupOfConstValues(left) {
 			if _f.funcs.IsConstValueOrGroupOfConstValues(right) {
-				result := _f.funcs.FoldComparison(opt.NotInOp, left, right)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.FoldComparison(opt.NotInOp, left, right)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
 						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
@@ -13643,8 +13643,8 @@ func (_f *Factory) ConstructNotIn(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(_variable, _const)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.UnifyComparison(_variable, _const)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructNotIn(
 							_variable,
@@ -13705,8 +13705,8 @@ func (_f *Factory) ConstructLike(
 	{
 		if _f.funcs.IsConstValueOrGroupOfConstValues(left) {
 			if _f.funcs.IsConstValueOrGroupOfConstValues(right) {
-				result := _f.funcs.FoldComparison(opt.LikeOp, left, right)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.FoldComparison(opt.LikeOp, left, right)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
 						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
@@ -13725,8 +13725,8 @@ func (_f *Factory) ConstructLike(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(_variable, _const)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.UnifyComparison(_variable, _const)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructLike(
 							_variable,
@@ -13787,8 +13787,8 @@ func (_f *Factory) ConstructNotLike(
 	{
 		if _f.funcs.IsConstValueOrGroupOfConstValues(left) {
 			if _f.funcs.IsConstValueOrGroupOfConstValues(right) {
-				result := _f.funcs.FoldComparison(opt.NotLikeOp, left, right)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.FoldComparison(opt.NotLikeOp, left, right)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
 						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
@@ -13807,8 +13807,8 @@ func (_f *Factory) ConstructNotLike(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(_variable, _const)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.UnifyComparison(_variable, _const)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructNotLike(
 							_variable,
@@ -13869,8 +13869,8 @@ func (_f *Factory) ConstructILike(
 	{
 		if _f.funcs.IsConstValueOrGroupOfConstValues(left) {
 			if _f.funcs.IsConstValueOrGroupOfConstValues(right) {
-				result := _f.funcs.FoldComparison(opt.ILikeOp, left, right)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.FoldComparison(opt.ILikeOp, left, right)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
 						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
@@ -13889,8 +13889,8 @@ func (_f *Factory) ConstructILike(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(_variable, _const)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.UnifyComparison(_variable, _const)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructILike(
 							_variable,
@@ -13951,8 +13951,8 @@ func (_f *Factory) ConstructNotILike(
 	{
 		if _f.funcs.IsConstValueOrGroupOfConstValues(left) {
 			if _f.funcs.IsConstValueOrGroupOfConstValues(right) {
-				result := _f.funcs.FoldComparison(opt.NotILikeOp, left, right)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.FoldComparison(opt.NotILikeOp, left, right)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
 						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
@@ -13971,8 +13971,8 @@ func (_f *Factory) ConstructNotILike(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(_variable, _const)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.UnifyComparison(_variable, _const)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructNotILike(
 							_variable,
@@ -14033,8 +14033,8 @@ func (_f *Factory) ConstructSimilarTo(
 	{
 		if _f.funcs.IsConstValueOrGroupOfConstValues(left) {
 			if _f.funcs.IsConstValueOrGroupOfConstValues(right) {
-				result := _f.funcs.FoldComparison(opt.SimilarToOp, left, right)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.FoldComparison(opt.SimilarToOp, left, right)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
 						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
@@ -14053,8 +14053,8 @@ func (_f *Factory) ConstructSimilarTo(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(_variable, _const)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.UnifyComparison(_variable, _const)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructSimilarTo(
 							_variable,
@@ -14115,8 +14115,8 @@ func (_f *Factory) ConstructNotSimilarTo(
 	{
 		if _f.funcs.IsConstValueOrGroupOfConstValues(left) {
 			if _f.funcs.IsConstValueOrGroupOfConstValues(right) {
-				result := _f.funcs.FoldComparison(opt.NotSimilarToOp, left, right)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.FoldComparison(opt.NotSimilarToOp, left, right)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
 						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
@@ -14135,8 +14135,8 @@ func (_f *Factory) ConstructNotSimilarTo(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(_variable, _const)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.UnifyComparison(_variable, _const)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructNotSimilarTo(
 							_variable,
@@ -14197,8 +14197,8 @@ func (_f *Factory) ConstructRegMatch(
 	{
 		if _f.funcs.IsConstValueOrGroupOfConstValues(left) {
 			if _f.funcs.IsConstValueOrGroupOfConstValues(right) {
-				result := _f.funcs.FoldComparison(opt.RegMatchOp, left, right)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.FoldComparison(opt.RegMatchOp, left, right)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
 						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
@@ -14217,8 +14217,8 @@ func (_f *Factory) ConstructRegMatch(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(_variable, _const)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.UnifyComparison(_variable, _const)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructRegMatch(
 							_variable,
@@ -14279,8 +14279,8 @@ func (_f *Factory) ConstructNotRegMatch(
 	{
 		if _f.funcs.IsConstValueOrGroupOfConstValues(left) {
 			if _f.funcs.IsConstValueOrGroupOfConstValues(right) {
-				result := _f.funcs.FoldComparison(opt.NotRegMatchOp, left, right)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.FoldComparison(opt.NotRegMatchOp, left, right)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
 						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
@@ -14299,8 +14299,8 @@ func (_f *Factory) ConstructNotRegMatch(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(_variable, _const)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.UnifyComparison(_variable, _const)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructNotRegMatch(
 							_variable,
@@ -14361,8 +14361,8 @@ func (_f *Factory) ConstructRegIMatch(
 	{
 		if _f.funcs.IsConstValueOrGroupOfConstValues(left) {
 			if _f.funcs.IsConstValueOrGroupOfConstValues(right) {
-				result := _f.funcs.FoldComparison(opt.RegIMatchOp, left, right)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.FoldComparison(opt.RegIMatchOp, left, right)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
 						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
@@ -14381,8 +14381,8 @@ func (_f *Factory) ConstructRegIMatch(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(_variable, _const)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.UnifyComparison(_variable, _const)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructRegIMatch(
 							_variable,
@@ -14443,8 +14443,8 @@ func (_f *Factory) ConstructNotRegIMatch(
 	{
 		if _f.funcs.IsConstValueOrGroupOfConstValues(left) {
 			if _f.funcs.IsConstValueOrGroupOfConstValues(right) {
-				result := _f.funcs.FoldComparison(opt.NotRegIMatchOp, left, right)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.FoldComparison(opt.NotRegIMatchOp, left, right)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
 						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
@@ -14463,8 +14463,8 @@ func (_f *Factory) ConstructNotRegIMatch(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(_variable, _const)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.UnifyComparison(_variable, _const)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructNotRegIMatch(
 							_variable,
@@ -14548,8 +14548,8 @@ func (_f *Factory) ConstructIs(
 	{
 		if _f.funcs.IsConstValueOrGroupOfConstValues(left) {
 			if _f.funcs.IsConstValueOrGroupOfConstValues(right) {
-				result := _f.funcs.FoldComparison(opt.IsOp, left, right)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.FoldComparison(opt.IsOp, left, right)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
 						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
@@ -14606,8 +14606,8 @@ func (_f *Factory) ConstructIs(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(_variable, _const)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.UnifyComparison(_variable, _const)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructIs(
 							_variable,
@@ -14692,8 +14692,8 @@ func (_f *Factory) ConstructIsNot(
 	{
 		if _f.funcs.IsConstValueOrGroupOfConstValues(left) {
 			if _f.funcs.IsConstValueOrGroupOfConstValues(right) {
-				result := _f.funcs.FoldComparison(opt.IsNotOp, left, right)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.FoldComparison(opt.IsNotOp, left, right)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
 						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
@@ -14750,8 +14750,8 @@ func (_f *Factory) ConstructIsNot(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(_variable, _const)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.UnifyComparison(_variable, _const)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructIsNot(
 							_variable,
@@ -14812,8 +14812,8 @@ func (_f *Factory) ConstructContains(
 	{
 		if _f.funcs.IsConstValueOrGroupOfConstValues(left) {
 			if _f.funcs.IsConstValueOrGroupOfConstValues(right) {
-				result := _f.funcs.FoldComparison(opt.ContainsOp, left, right)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.FoldComparison(opt.ContainsOp, left, right)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
 						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
@@ -14832,8 +14832,8 @@ func (_f *Factory) ConstructContains(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(_variable, _const)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.UnifyComparison(_variable, _const)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructContains(
 							_variable,
@@ -14878,8 +14878,8 @@ func (_f *Factory) ConstructContainedBy(
 	{
 		if _f.funcs.IsConstValueOrGroupOfConstValues(left) {
 			if _f.funcs.IsConstValueOrGroupOfConstValues(right) {
-				result := _f.funcs.FoldComparison(opt.ContainedByOp, left, right)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.FoldComparison(opt.ContainedByOp, left, right)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
 						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
@@ -14898,8 +14898,8 @@ func (_f *Factory) ConstructContainedBy(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(_variable, _const)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.UnifyComparison(_variable, _const)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructContainedBy(
 							_variable,
@@ -14960,8 +14960,8 @@ func (_f *Factory) ConstructJsonExists(
 	{
 		if _f.funcs.IsConstValueOrGroupOfConstValues(left) {
 			if _f.funcs.IsConstValueOrGroupOfConstValues(right) {
-				result := _f.funcs.FoldComparison(opt.JsonExistsOp, left, right)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.FoldComparison(opt.JsonExistsOp, left, right)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
 						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
@@ -14980,8 +14980,8 @@ func (_f *Factory) ConstructJsonExists(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(_variable, _const)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.UnifyComparison(_variable, _const)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructJsonExists(
 							_variable,
@@ -15042,8 +15042,8 @@ func (_f *Factory) ConstructJsonAllExists(
 	{
 		if _f.funcs.IsConstValueOrGroupOfConstValues(left) {
 			if _f.funcs.IsConstValueOrGroupOfConstValues(right) {
-				result := _f.funcs.FoldComparison(opt.JsonAllExistsOp, left, right)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.FoldComparison(opt.JsonAllExistsOp, left, right)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
 						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
@@ -15062,8 +15062,8 @@ func (_f *Factory) ConstructJsonAllExists(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(_variable, _const)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.UnifyComparison(_variable, _const)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructJsonAllExists(
 							_variable,
@@ -15124,8 +15124,8 @@ func (_f *Factory) ConstructJsonSomeExists(
 	{
 		if _f.funcs.IsConstValueOrGroupOfConstValues(left) {
 			if _f.funcs.IsConstValueOrGroupOfConstValues(right) {
-				result := _f.funcs.FoldComparison(opt.JsonSomeExistsOp, left, right)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.FoldComparison(opt.JsonSomeExistsOp, left, right)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
 						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
@@ -15144,8 +15144,8 @@ func (_f *Factory) ConstructJsonSomeExists(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(_variable, _const)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.UnifyComparison(_variable, _const)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructJsonSomeExists(
 							_variable,
@@ -15206,8 +15206,8 @@ func (_f *Factory) ConstructOverlaps(
 	{
 		if _f.funcs.IsConstValueOrGroupOfConstValues(left) {
 			if _f.funcs.IsConstValueOrGroupOfConstValues(right) {
-				result := _f.funcs.FoldComparison(opt.OverlapsOp, left, right)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.FoldComparison(opt.OverlapsOp, left, right)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
 						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
@@ -15226,8 +15226,8 @@ func (_f *Factory) ConstructOverlaps(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(_variable, _const)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.UnifyComparison(_variable, _const)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructOverlaps(
 							_variable,
@@ -15258,8 +15258,8 @@ func (_f *Factory) ConstructBBoxCovers(
 	{
 		if _f.funcs.IsConstValueOrGroupOfConstValues(left) {
 			if _f.funcs.IsConstValueOrGroupOfConstValues(right) {
-				result := _f.funcs.FoldComparison(opt.BBoxCoversOp, left, right)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.FoldComparison(opt.BBoxCoversOp, left, right)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
 						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
@@ -15278,8 +15278,8 @@ func (_f *Factory) ConstructBBoxCovers(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(_variable, _const)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.UnifyComparison(_variable, _const)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructBBoxCovers(
 							_variable,
@@ -15310,8 +15310,8 @@ func (_f *Factory) ConstructBBoxIntersects(
 	{
 		if _f.funcs.IsConstValueOrGroupOfConstValues(left) {
 			if _f.funcs.IsConstValueOrGroupOfConstValues(right) {
-				result := _f.funcs.FoldComparison(opt.BBoxIntersectsOp, left, right)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.FoldComparison(opt.BBoxIntersectsOp, left, right)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldComparison) {
 						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
@@ -15330,8 +15330,8 @@ func (_f *Factory) ConstructBBoxIntersects(
 		if _variable != nil {
 			_const, _ := right.(*memo.ConstExpr)
 			if _const != nil {
-				result := _f.funcs.UnifyComparison(_variable, _const)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.UnifyComparison(_variable, _const)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.UnifyComparisonTypes) {
 						_expr := _f.ConstructBBoxIntersects(
 							_variable,
@@ -15463,8 +15463,8 @@ func (_f *Factory) ConstructBitand(
 	{
 		if _f.funcs.IsConstValueOrGroupOfConstValues(left) {
 			if _f.funcs.IsConstValueOrGroupOfConstValues(right) {
-				result := _f.funcs.FoldBinary(opt.BitandOp, left, right)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.FoldBinary(opt.BitandOp, left, right)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
 						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
@@ -15560,8 +15560,8 @@ func (_f *Factory) ConstructBitor(
 	{
 		if _f.funcs.IsConstValueOrGroupOfConstValues(left) {
 			if _f.funcs.IsConstValueOrGroupOfConstValues(right) {
-				result := _f.funcs.FoldBinary(opt.BitorOp, left, right)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.FoldBinary(opt.BitorOp, left, right)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
 						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
@@ -15657,8 +15657,8 @@ func (_f *Factory) ConstructBitxor(
 	{
 		if _f.funcs.IsConstValueOrGroupOfConstValues(left) {
 			if _f.funcs.IsConstValueOrGroupOfConstValues(right) {
-				result := _f.funcs.FoldBinary(opt.BitxorOp, left, right)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.FoldBinary(opt.BitxorOp, left, right)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
 						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
@@ -15754,8 +15754,8 @@ func (_f *Factory) ConstructPlus(
 	{
 		if _f.funcs.IsConstValueOrGroupOfConstValues(left) {
 			if _f.funcs.IsConstValueOrGroupOfConstValues(right) {
-				result := _f.funcs.FoldBinary(opt.PlusOp, left, right)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.FoldBinary(opt.PlusOp, left, right)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
 						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
@@ -15889,8 +15889,8 @@ func (_f *Factory) ConstructMinus(
 	{
 		if _f.funcs.IsConstValueOrGroupOfConstValues(left) {
 			if _f.funcs.IsConstValueOrGroupOfConstValues(right) {
-				result := _f.funcs.FoldBinary(opt.MinusOp, left, right)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.FoldBinary(opt.MinusOp, left, right)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
 						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
@@ -15969,8 +15969,8 @@ func (_f *Factory) ConstructMult(
 	{
 		if _f.funcs.IsConstValueOrGroupOfConstValues(left) {
 			if _f.funcs.IsConstValueOrGroupOfConstValues(right) {
-				result := _f.funcs.FoldBinary(opt.MultOp, left, right)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.FoldBinary(opt.MultOp, left, right)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
 						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
@@ -16104,8 +16104,8 @@ func (_f *Factory) ConstructDiv(
 	{
 		if _f.funcs.IsConstValueOrGroupOfConstValues(left) {
 			if _f.funcs.IsConstValueOrGroupOfConstValues(right) {
-				result := _f.funcs.FoldBinary(opt.DivOp, left, right)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.FoldBinary(opt.DivOp, left, right)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
 						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
@@ -16182,8 +16182,8 @@ func (_f *Factory) ConstructFloorDiv(
 	{
 		if _f.funcs.IsConstValueOrGroupOfConstValues(left) {
 			if _f.funcs.IsConstValueOrGroupOfConstValues(right) {
-				result := _f.funcs.FoldBinary(opt.FloorDivOp, left, right)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.FoldBinary(opt.FloorDivOp, left, right)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
 						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
@@ -16260,8 +16260,8 @@ func (_f *Factory) ConstructMod(
 	{
 		if _f.funcs.IsConstValueOrGroupOfConstValues(left) {
 			if _f.funcs.IsConstValueOrGroupOfConstValues(right) {
-				result := _f.funcs.FoldBinary(opt.ModOp, left, right)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.FoldBinary(opt.ModOp, left, right)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
 						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
@@ -16319,8 +16319,8 @@ func (_f *Factory) ConstructPow(
 	{
 		if _f.funcs.IsConstValueOrGroupOfConstValues(left) {
 			if _f.funcs.IsConstValueOrGroupOfConstValues(right) {
-				result := _f.funcs.FoldBinary(opt.PowOp, left, right)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.FoldBinary(opt.PowOp, left, right)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
 						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
@@ -16378,8 +16378,8 @@ func (_f *Factory) ConstructConcat(
 	{
 		if _f.funcs.IsConstValueOrGroupOfConstValues(left) {
 			if _f.funcs.IsConstValueOrGroupOfConstValues(right) {
-				result := _f.funcs.FoldBinary(opt.ConcatOp, left, right)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.FoldBinary(opt.ConcatOp, left, right)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
 						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
@@ -16437,8 +16437,8 @@ func (_f *Factory) ConstructLShift(
 	{
 		if _f.funcs.IsConstValueOrGroupOfConstValues(left) {
 			if _f.funcs.IsConstValueOrGroupOfConstValues(right) {
-				result := _f.funcs.FoldBinary(opt.LShiftOp, left, right)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.FoldBinary(opt.LShiftOp, left, right)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
 						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
@@ -16496,8 +16496,8 @@ func (_f *Factory) ConstructRShift(
 	{
 		if _f.funcs.IsConstValueOrGroupOfConstValues(left) {
 			if _f.funcs.IsConstValueOrGroupOfConstValues(right) {
-				result := _f.funcs.FoldBinary(opt.RShiftOp, left, right)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.FoldBinary(opt.RShiftOp, left, right)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
 						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
@@ -16561,8 +16561,8 @@ func (_f *Factory) ConstructFetchVal(
 		if _f.funcs.IsConstValueOrGroupOfConstValues(left) {
 			right := index
 			if _f.funcs.IsConstValueOrGroupOfConstValues(right) {
-				result := _f.funcs.FoldBinary(opt.FetchValOp, left, right)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.FoldBinary(opt.FetchValOp, left, right)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
 						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
@@ -16626,8 +16626,8 @@ func (_f *Factory) ConstructFetchText(
 		if _f.funcs.IsConstValueOrGroupOfConstValues(left) {
 			right := index
 			if _f.funcs.IsConstValueOrGroupOfConstValues(right) {
-				result := _f.funcs.FoldBinary(opt.FetchTextOp, left, right)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.FoldBinary(opt.FetchTextOp, left, right)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
 						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
@@ -16691,8 +16691,8 @@ func (_f *Factory) ConstructFetchValPath(
 		if _f.funcs.IsConstValueOrGroupOfConstValues(left) {
 			right := path
 			if _f.funcs.IsConstValueOrGroupOfConstValues(right) {
-				result := _f.funcs.FoldBinary(opt.FetchValPathOp, left, right)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.FoldBinary(opt.FetchValPathOp, left, right)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
 						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
@@ -16756,8 +16756,8 @@ func (_f *Factory) ConstructFetchTextPath(
 		if _f.funcs.IsConstValueOrGroupOfConstValues(left) {
 			right := path
 			if _f.funcs.IsConstValueOrGroupOfConstValues(right) {
-				result := _f.funcs.FoldBinary(opt.FetchTextPathOp, left, right)
-				if _f.funcs.Succeeded(result) {
+				result, ok := _f.funcs.FoldBinary(opt.FetchTextPathOp, left, right)
+				if ok {
 					if _f.matchedRule == nil || _f.matchedRule(opt.FoldBinary) {
 						_expr := result.(opt.ScalarExpr)
 						if _f.appliedRule != nil {
@@ -16795,8 +16795,8 @@ func (_f *Factory) ConstructUnaryMinus(
 	// [FoldUnary]
 	{
 		if _f.funcs.IsConstValueOrGroupOfConstValues(input) {
-			result := _f.funcs.FoldUnary(opt.UnaryMinusOp, input)
-			if _f.funcs.Succeeded(result) {
+			result, ok := _f.funcs.FoldUnary(opt.UnaryMinusOp, input)
+			if ok {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldUnary) {
 					_expr := result.(opt.ScalarExpr)
 					if _f.appliedRule != nil {
@@ -16869,8 +16869,8 @@ func (_f *Factory) ConstructUnaryComplement(
 	// [FoldUnary]
 	{
 		if _f.funcs.IsConstValueOrGroupOfConstValues(input) {
-			result := _f.funcs.FoldUnary(opt.UnaryComplementOp, input)
-			if _f.funcs.Succeeded(result) {
+			result, ok := _f.funcs.FoldUnary(opt.UnaryComplementOp, input)
+			if ok {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldUnary) {
 					_expr := result.(opt.ScalarExpr)
 					if _f.appliedRule != nil {
@@ -16907,8 +16907,8 @@ func (_f *Factory) ConstructUnarySqrt(
 	// [FoldUnary]
 	{
 		if _f.funcs.IsConstValueOrGroupOfConstValues(input) {
-			result := _f.funcs.FoldUnary(opt.UnarySqrtOp, input)
-			if _f.funcs.Succeeded(result) {
+			result, ok := _f.funcs.FoldUnary(opt.UnarySqrtOp, input)
+			if ok {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldUnary) {
 					_expr := result.(opt.ScalarExpr)
 					if _f.appliedRule != nil {
@@ -16945,8 +16945,8 @@ func (_f *Factory) ConstructUnaryCbrt(
 	// [FoldUnary]
 	{
 		if _f.funcs.IsConstValueOrGroupOfConstValues(input) {
-			result := _f.funcs.FoldUnary(opt.UnaryCbrtOp, input)
-			if _f.funcs.Succeeded(result) {
+			result, ok := _f.funcs.FoldUnary(opt.UnaryCbrtOp, input)
+			if ok {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldUnary) {
 					_expr := result.(opt.ScalarExpr)
 					if _f.appliedRule != nil {
@@ -16996,8 +16996,8 @@ func (_f *Factory) ConstructCast(
 	// [FoldCast]
 	{
 		if _f.funcs.IsConstValueOrGroupOfConstValues(input) {
-			result := _f.funcs.FoldCast(input, typ)
-			if _f.funcs.Succeeded(result) {
+			result, ok := _f.funcs.FoldCast(input, typ)
+			if ok {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldCast) {
 					_expr := result.(opt.ScalarExpr)
 					if _f.appliedRule != nil {
@@ -17148,8 +17148,8 @@ func (_f *Factory) ConstructIndirection(
 	// [FoldIndirection]
 	{
 		if _f.funcs.IsConstValueOrGroupOfConstValues(index) {
-			result := _f.funcs.FoldIndirection(input, index)
-			if _f.funcs.Succeeded(result) {
+			result, ok := _f.funcs.FoldIndirection(input, index)
+			if ok {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldIndirection) {
 					_expr := result.(opt.ScalarExpr)
 					if _f.appliedRule != nil {
@@ -17247,8 +17247,8 @@ func (_f *Factory) ConstructFunction(
 	{
 		if _f.funcs.IsListOfConstants(args) {
 			private := functionPrivate
-			result := _f.funcs.FoldFunction(args, private)
-			if _f.funcs.Succeeded(result) {
+			result, ok := _f.funcs.FoldFunction(args, private)
+			if ok {
 				if _f.matchedRule == nil || _f.matchedRule(opt.FoldFunction) {
 					_expr := result.(opt.ScalarExpr)
 					if _f.appliedRule != nil {
@@ -17341,8 +17341,8 @@ func (_f *Factory) ConstructColumnAccess(
 ) opt.ScalarExpr {
 	// [FoldColumnAccess]
 	{
-		result := _f.funcs.FoldColumnAccess(input, idx)
-		if _f.funcs.Succeeded(result) {
+		result, ok := _f.funcs.FoldColumnAccess(input, idx)
+		if ok {
 			if _f.matchedRule == nil || _f.matchedRule(opt.FoldColumnAccess) {
 				_expr := result.(opt.ScalarExpr)
 				if _f.appliedRule != nil {

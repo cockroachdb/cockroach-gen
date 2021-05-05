@@ -1792,17 +1792,17 @@ func (_e *explorer) exploreLookupJoin(
 			input := _root.Input
 			on := _root.On
 			private := &_root.LookupJoinPrivate
-			localAndRemoteLookupExprs := _e.funcs.GetLocalityOptimizedAntiJoinLookupExprs(input, private)
-			if _e.funcs.LocalAndRemoteLookupExprsSucceeded(localAndRemoteLookupExprs) {
+			localExpr, remoteExpr, ok := _e.funcs.GetLocalityOptimizedAntiJoinLookupExprs(input, private)
+			if ok {
 				if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateLocalityOptimizedAntiJoin) {
 					_expr := &memo.LookupJoinExpr{
 						Input: _e.f.ConstructLookupJoin(
 							input,
 							on,
-							_e.funcs.CreateLocalityOptimizedAntiLookupJoinPrivate(_e.funcs.LocalLookupExpr(localAndRemoteLookupExprs), private),
+							_e.funcs.CreateLocalityOptimizedAntiLookupJoinPrivate(localExpr, private),
 						),
 						On:                on,
-						LookupJoinPrivate: *_e.funcs.CreateLocalityOptimizedAntiLookupJoinPrivate(_e.funcs.RemoteLookupExpr(localAndRemoteLookupExprs), private),
+						LookupJoinPrivate: *_e.funcs.CreateLocalityOptimizedAntiLookupJoinPrivate(remoteExpr, private),
 					}
 					_interned := _e.mem.AddLookupJoinToGroup(_expr, _root)
 					if _e.o.appliedRule != nil {
@@ -2301,8 +2301,8 @@ func (_e *explorer) exploreLimit(
 								limit := _const.Value
 								if _e.funcs.IsPositiveInt(limit) {
 									ordering := _root.Ordering
-									unionScans := _e.funcs.SplitScanIntoUnionScans(ordering, _scan, scanPrivate, limit)
-									if _e.funcs.Succeeded(unionScans) {
+									unionScans, ok := _e.funcs.SplitScanIntoUnionScans(ordering, _scan, scanPrivate, limit)
+									if ok {
 										if _e.o.matchedRule == nil || _e.o.matchedRule(opt.SplitScanIntoUnionScans) {
 											_expr := &memo.LimitExpr{
 												Input:    unionScans,
