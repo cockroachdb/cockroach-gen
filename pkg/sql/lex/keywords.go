@@ -410,6 +410,7 @@ var KeywordsCategories = map[string]string{
 	"similar":                        "T",
 	"simple":                         "U",
 	"skip":                           "U",
+	"skip_localities_check":          "U",
 	"skip_missing_foreign_keys":      "U",
 	"skip_missing_sequences":         "U",
 	"skip_missing_sequence_owners":   "U",
@@ -916,6 +917,7 @@ var KeywordNames = []string{
 	"similar",
 	"simple",
 	"skip",
+	"skip_localities_check",
 	"skip_missing_foreign_keys",
 	"skip_missing_sequences",
 	"skip_missing_sequence_owners",
@@ -1834,6 +1836,8 @@ func GetKeywordID(k string) int32 {
 		return SIMPLE
 	case "skip":
 		return SKIP
+	case "skip_localities_check":
+		return SKIP_LOCALITIES_CHECK
 	case "skip_missing_foreign_keys":
 		return SKIP_MISSING_FOREIGN_KEYS
 	case "skip_missing_sequences":
