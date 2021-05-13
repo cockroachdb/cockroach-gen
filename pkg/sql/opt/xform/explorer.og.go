@@ -32,6 +32,8 @@ func (_e *explorer) exploreGroupMember(
 		return _e.exploreSemiJoin(state, t, ordinal)
 	case *memo.AntiJoinExpr:
 		return _e.exploreAntiJoin(state, t, ordinal)
+	case *memo.LookupJoinExpr:
+		return _e.exploreLookupJoin(state, t, ordinal)
 	case *memo.GroupByExpr:
 		return _e.exploreGroupBy(state, t, ordinal)
 	case *memo.ScalarGroupByExpr:
@@ -1767,6 +1769,47 @@ func (_e *explorer) exploreAntiJoin(
 									}
 								}
 							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return _fullyExplored
+}
+
+func (_e *explorer) exploreLookupJoin(
+	_rootState *exploreState,
+	_root *memo.LookupJoinExpr,
+	_rootOrd int,
+) (_fullyExplored bool) {
+	_fullyExplored = true
+
+	// [GenerateLocalityOptimizedAntiJoin]
+	{
+		if _rootOrd >= _rootState.start {
+			input := _root.Input
+			on := _root.On
+			private := &_root.LookupJoinPrivate
+			localAndRemoteLookupExprs := _e.funcs.GetLocalityOptimizedAntiJoinLookupExprs(input, private)
+			if _e.funcs.LocalAndRemoteLookupExprsSucceeded(localAndRemoteLookupExprs) {
+				if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateLocalityOptimizedAntiJoin) {
+					_expr := &memo.LookupJoinExpr{
+						Input: _e.f.ConstructLookupJoin(
+							input,
+							on,
+							_e.funcs.CreateLocalityOptimizedAntiLookupJoinPrivate(_e.funcs.LocalLookupExpr(localAndRemoteLookupExprs), private),
+						),
+						On:                on,
+						LookupJoinPrivate: *_e.funcs.CreateLocalityOptimizedAntiLookupJoinPrivate(_e.funcs.RemoteLookupExpr(localAndRemoteLookupExprs), private),
+					}
+					_interned := _e.mem.AddLookupJoinToGroup(_expr, _root)
+					if _e.o.appliedRule != nil {
+						if _interned != _expr {
+							_e.o.appliedRule(opt.GenerateLocalityOptimizedAntiJoin, _root, nil)
+						} else {
+							_e.o.appliedRule(opt.GenerateLocalityOptimizedAntiJoin, _root, _interned)
 						}
 					}
 				}
