@@ -387,10 +387,8 @@ func registerTPCC(r *testRegistry) {
 		Distribution: multiRegion,
 		LoadConfig:   multiLoadgen,
 
-		LoadWarehouses: 5000,
-		EstimatedMax:   3000,
-
-		MinVersion: "v20.1.0",
+		LoadWarehouses: 3000,
+		EstimatedMax:   2000,
 	})
 	registerTPCCBenchSpec(r, tpccBenchSpec{
 		Nodes:      9,
@@ -400,8 +398,6 @@ func registerTPCC(r *testRegistry) {
 
 		LoadWarehouses: 2000,
 		EstimatedMax:   900,
-
-		MinVersion: "v20.1.0",
 	})
 }
 
@@ -645,12 +641,18 @@ func loadTPCCBench(
 		return err
 	}
 
-	// Split and scatter the tables. Ramp up to the expected load in the desired
-	// distribution. This should allow for load-based rebalancing to help
-	// distribute load. Optionally pass some load configuration-specific flags.
+	// Split and scatter the tables. Ramp up to the half of the expected load in
+	// the desired distribution. This should allow for load-based rebalancing to
+	// help distribute load. Optionally pass some load configuration-specific
+	// flags.
+	const txnsPerWarehousePerSecond = 12.8 * (23.0 / 10.0) * (1.0 / 60.0) // max_tpmC/warehouse * all_txns/new_order_txns * minutes/seconds
+	rateAtExpected := txnsPerWarehousePerSecond * float64(b.EstimatedMax)
+	maxRate := int(rateAtExpected / 2)
+	rampTime := (1 * rebalanceWait) / 4
+	loadTime := (3 * rebalanceWait) / 4
 	cmd = fmt.Sprintf("./workload run tpcc --warehouses=%d --workers=%d --max-rate=%d "+
-		"--wait=false --duration=%s --scatter --tolerate-errors {pgurl%s}",
-		b.LoadWarehouses, b.LoadWarehouses, b.LoadWarehouses/2, rebalanceWait, roachNodes)
+		"--wait=false --ramp=%s --duration=%s --scatter --tolerate-errors {pgurl%s}",
+		b.LoadWarehouses, b.LoadWarehouses, maxRate, rampTime, loadTime, roachNodes)
 	if out, err := c.RunWithBuffer(ctx, c.l, loadNode, cmd); err != nil {
 		return errors.Wrapf(err, "failed with output %q", string(out))
 	}
@@ -789,7 +791,6 @@ func runTPCCBench(ctx context.Context, t *test, c *cluster, b tpccBenchSpec) {
 				}
 
 				extraFlags := ""
-				activeWarehouses := warehouses
 				switch b.LoadConfig {
 				case singleLoadgen:
 					// Nothing.
@@ -798,7 +799,6 @@ func runTPCCBench(ctx context.Context, t *test, c *cluster, b tpccBenchSpec) {
 				case multiLoadgen:
 					extraFlags = fmt.Sprintf(` --partitions=%d --partition-affinity=%d`,
 						b.partitions(), groupIdx)
-					activeWarehouses = warehouses / numLoadGroups
 				default:
 					panic("unexpected")
 				}
@@ -808,10 +808,10 @@ func runTPCCBench(ctx context.Context, t *test, c *cluster, b tpccBenchSpec) {
 					extraFlags += " --method=simple"
 				}
 				t.Status(fmt.Sprintf("running benchmark, warehouses=%d", warehouses))
-				histogramsPath := fmt.Sprintf("%s/warehouses=%d/stats.json", perfArtifactsDir, activeWarehouses)
+				histogramsPath := fmt.Sprintf("%s/warehouses=%d/stats.json", perfArtifactsDir, warehouses)
 				cmd := fmt.Sprintf("./workload run tpcc --warehouses=%d --active-warehouses=%d "+
 					"--tolerate-errors --ramp=%s --duration=%s%s --histograms=%s {pgurl%s}",
-					b.LoadWarehouses, activeWarehouses, rampDur,
+					b.LoadWarehouses, warehouses, rampDur,
 					loadDur, extraFlags, histogramsPath, sqlGateways)
 				err := c.RunE(ctx, group.loadNodes, cmd)
 				loadDone <- timeutil.Now()
@@ -828,7 +828,7 @@ func runTPCCBench(ctx context.Context, t *test, c *cluster, b tpccBenchSpec) {
 				if err != nil {
 					return errors.Wrapf(err, "failed to decode histogram snapshots")
 				}
-				result := tpcc.NewResultWithSnapshots(activeWarehouses, 0, snapshots)
+				result := tpcc.NewResultWithSnapshots(warehouses, 0, snapshots)
 				resultChan <- result
 				return nil
 			})
