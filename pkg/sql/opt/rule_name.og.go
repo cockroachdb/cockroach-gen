@@ -269,6 +269,8 @@ const (
 	ReplaceMinWithLimit
 	ReplaceMaxWithLimit
 	GenerateStreamingGroupBy
+	SplitGroupByScanIntoUnionScans
+	SplitGroupByFilteredScanIntoUnionScans
 	ReorderJoins
 	CommuteLeftJoin
 	CommuteSemiJoin
@@ -285,7 +287,7 @@ const (
 	GenerateLimitedScans
 	PushLimitIntoFilteredScan
 	PushLimitIntoIndexJoin
-	SplitScanIntoUnionScans
+	SplitLimitedScanIntoUnionScans
 	EliminateIndexJoinInsideProject
 	GenerateIndexScans
 	GenerateLocalityOptimizedScan
