@@ -192,7 +192,8 @@ const (
 	ConcatAggOp
 
 	// Const is a typed scalar constant value. The Value field is a tree.Datum value
-	// having any datum type that's legal in the expression's context.
+	// having any datum type that's legal in the expression's context. Do NOT call
+	// ConstructConst directly; use ConstructConstVal instead.
 	ConstOp
 
 	// ConstAgg is used in the special case when the value of a column is known to be
