@@ -251,6 +251,8 @@ const (
 	PushFilterIntoSetOp
 	EliminateUnionAllLeft
 	EliminateUnionAllRight
+	EliminateUnionLeft
+	EliminateUnionRight
 	EliminateWindow
 	ReduceWindowPartitionCols
 	SimplifyWindowOrdering

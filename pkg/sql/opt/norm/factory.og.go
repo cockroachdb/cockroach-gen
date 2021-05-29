@@ -9527,6 +9527,52 @@ func (_f *Factory) ConstructUnion(
 	right memo.RelExpr,
 	setPrivate *memo.SetPrivate,
 ) memo.RelExpr {
+	// [EliminateUnionLeft]
+	{
+		if _f.funcs.HasZeroRows(right) {
+			colMap := setPrivate
+			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateUnionLeft) {
+				project := _f.ConstructProject(
+					left,
+					_f.funcs.ProjectColMapLeft(colMap),
+					_f.funcs.ProjectPassthroughLeft(colMap),
+				)
+				_expr := _f.ConstructDistinctOn(
+					project,
+					memo.EmptyAggregationsExpr,
+					_f.funcs.MakeGrouping(_f.funcs.OutputCols(project), _f.funcs.EmptyOrdering()),
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.EliminateUnionLeft, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
+	// [EliminateUnionRight]
+	{
+		if _f.funcs.HasZeroRows(left) {
+			colMap := setPrivate
+			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateUnionRight) {
+				project := _f.ConstructProject(
+					right,
+					_f.funcs.ProjectColMapRight(colMap),
+					_f.funcs.ProjectPassthroughRight(colMap),
+				)
+				_expr := _f.ConstructDistinctOn(
+					project,
+					memo.EmptyAggregationsExpr,
+					_f.funcs.MakeGrouping(_f.funcs.OutputCols(project), _f.funcs.EmptyOrdering()),
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.EliminateUnionRight, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
 	e := _f.mem.MemoizeUnion(left, right, setPrivate)
 	return _f.onConstructRelational(e)
 }
