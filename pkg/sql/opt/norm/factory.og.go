@@ -11688,6 +11688,36 @@ func (_f *Factory) ConstructEq(
 		}
 	}
 
+	// [FoldEqTrue]
+	{
+		_true, _ := right.(*memo.TrueExpr)
+		if _true != nil {
+			if _f.matchedRule == nil || _f.matchedRule(opt.FoldEqTrue) {
+				_expr := left
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.FoldEqTrue, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
+	// [FoldEqFalse]
+	{
+		_false, _ := right.(*memo.FalseExpr)
+		if _false != nil {
+			if _f.matchedRule == nil || _f.matchedRule(opt.FoldEqFalse) {
+				_expr := _f.ConstructNot(
+					left,
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.FoldEqFalse, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
 	// [FoldComparison]
 	{
 		if _f.funcs.IsConstValueOrGroupOfConstValues(left) {
@@ -13291,6 +13321,36 @@ func (_f *Factory) ConstructNe(
 				)
 				if _f.appliedRule != nil {
 					_f.appliedRule(opt.FoldNullComparisonRight, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
+	// [FoldNeTrue]
+	{
+		_true, _ := right.(*memo.TrueExpr)
+		if _true != nil {
+			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNeTrue) {
+				_expr := _f.ConstructNot(
+					left,
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.FoldNeTrue, nil, _expr)
+				}
+				return _expr
+			}
+		}
+	}
+
+	// [FoldNeFalse]
+	{
+		_false, _ := right.(*memo.FalseExpr)
+		if _false != nil {
+			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNeFalse) {
+				_expr := left
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.FoldNeFalse, nil, _expr)
 				}
 				return _expr
 			}
