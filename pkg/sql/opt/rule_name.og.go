@@ -52,6 +52,10 @@ const (
 	FoldCmpSTDistanceRight
 	FoldCmpSTMaxDistanceLeft
 	FoldCmpSTMaxDistanceRight
+	FoldEqTrue
+	FoldEqFalse
+	FoldNeTrue
+	FoldNeFalse
 	DecorrelateJoin
 	DecorrelateProjectSet
 	TryDecorrelateSelect
