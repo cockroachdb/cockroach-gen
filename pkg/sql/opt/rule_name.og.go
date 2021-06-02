@@ -290,6 +290,7 @@ const (
 	HoistProjectFromInnerJoin
 	HoistProjectFromLeftJoin
 	GenerateLocalityOptimizedAntiJoin
+	GenerateLocalityOptimizedLookupJoin
 	GenerateLimitedScans
 	PushLimitIntoFilteredScan
 	PushLimitIntoIndexJoin

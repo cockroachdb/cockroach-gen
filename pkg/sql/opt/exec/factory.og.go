@@ -298,8 +298,12 @@ type Factory interface {
 	// lookupExpr is used instead of eqCols when the lookup condition is more
 	// complicated than a simple equality between input columns and index columns
 	// (eqColsAreKey will be true in this case if the columns that are part of the
-	// simple equality join conditions form a key in the table); lookupCols are
-	// ordinals for the table columns we are retrieving.
+	// simple equality join conditions form a key in the table); if remoteLookupExpr
+	// is non-nil, this is a locality optimized lookup join. In this case, lookupExpr
+	// contains the lookup join conditions targeting ranges located on local nodes
+	// (relative to the gateway region), and remoteLookupExpr contains the lookup
+	// join conditions targeting remote nodes; lookupCols are ordinals for the table
+	// columns we are retrieving.
 	//
 	// The node produces the columns in the input and (unless join type is
 	// LeftSemiJoin or LeftAntiJoin) the lookupCols, ordered by ordinal. The ON
@@ -312,6 +316,7 @@ type Factory interface {
 		eqCols []NodeColumnOrdinal,
 		eqColsAreKey bool,
 		lookupExpr tree.TypedExpr,
+		remoteLookupExpr tree.TypedExpr,
 		lookupCols TableColumnOrdinalSet,
 		onCond tree.TypedExpr,
 		isSecondJoinInPairedJoiner bool,
@@ -997,6 +1002,7 @@ func (StubFactory) ConstructLookupJoin(
 	eqCols []NodeColumnOrdinal,
 	eqColsAreKey bool,
 	lookupExpr tree.TypedExpr,
+	remoteLookupExpr tree.TypedExpr,
 	lookupCols TableColumnOrdinalSet,
 	onCond tree.TypedExpr,
 	isSecondJoinInPairedJoiner bool,

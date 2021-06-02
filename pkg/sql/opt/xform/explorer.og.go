@@ -1792,24 +1792,55 @@ func (_e *explorer) exploreLookupJoin(
 			input := _root.Input
 			on := _root.On
 			private := &_root.LookupJoinPrivate
-			localExpr, remoteExpr, ok := _e.funcs.GetLocalityOptimizedAntiJoinLookupExprs(input, private)
-			if ok {
-				if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateLocalityOptimizedAntiJoin) {
-					_expr := &memo.LookupJoinExpr{
-						Input: _e.f.ConstructLookupJoin(
-							input,
-							on,
-							_e.funcs.CreateLocalityOptimizedAntiLookupJoinPrivate(localExpr, private),
-						),
-						On:                on,
-						LookupJoinPrivate: *_e.funcs.CreateLocalityOptimizedAntiLookupJoinPrivate(remoteExpr, private),
+			if _e.funcs.IsAntiJoin(private) {
+				localExpr, remoteExpr, ok := _e.funcs.GetLocalityOptimizedLookupJoinExprs(input, private)
+				if ok {
+					if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateLocalityOptimizedAntiJoin) {
+						_expr := &memo.LookupJoinExpr{
+							Input: _e.f.ConstructLookupJoin(
+								input,
+								on,
+								_e.funcs.CreateLocalityOptimizedLookupJoinPrivate(localExpr, _e.funcs.EmptyFiltersExpr(), private),
+							),
+							On:                on,
+							LookupJoinPrivate: *_e.funcs.CreateLocalityOptimizedLookupJoinPrivate(remoteExpr, _e.funcs.EmptyFiltersExpr(), private),
+						}
+						_interned := _e.mem.AddLookupJoinToGroup(_expr, _root)
+						if _e.o.appliedRule != nil {
+							if _interned != _expr {
+								_e.o.appliedRule(opt.GenerateLocalityOptimizedAntiJoin, _root, nil)
+							} else {
+								_e.o.appliedRule(opt.GenerateLocalityOptimizedAntiJoin, _root, _interned)
+							}
+						}
 					}
-					_interned := _e.mem.AddLookupJoinToGroup(_expr, _root)
-					if _e.o.appliedRule != nil {
-						if _interned != _expr {
-							_e.o.appliedRule(opt.GenerateLocalityOptimizedAntiJoin, _root, nil)
-						} else {
-							_e.o.appliedRule(opt.GenerateLocalityOptimizedAntiJoin, _root, _interned)
+				}
+			}
+		}
+	}
+
+	// [GenerateLocalityOptimizedLookupJoin]
+	{
+		if _rootOrd >= _rootState.start {
+			input := _root.Input
+			on := _root.On
+			private := &_root.LookupJoinPrivate
+			if !_e.funcs.IsAntiJoin(private) {
+				localExpr, remoteExpr, ok := _e.funcs.GetLocalityOptimizedLookupJoinExprs(input, private)
+				if ok {
+					if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateLocalityOptimizedLookupJoin) {
+						_expr := &memo.LookupJoinExpr{
+							Input:             input,
+							On:                on,
+							LookupJoinPrivate: *_e.funcs.CreateLocalityOptimizedLookupJoinPrivate(localExpr, remoteExpr, private),
+						}
+						_interned := _e.mem.AddLookupJoinToGroup(_expr, _root)
+						if _e.o.appliedRule != nil {
+							if _interned != _expr {
+								_e.o.appliedRule(opt.GenerateLocalityOptimizedLookupJoin, _root, nil)
+							} else {
+								_e.o.appliedRule(opt.GenerateLocalityOptimizedLookupJoin, _root, _interned)
+							}
 						}
 					}
 				}
