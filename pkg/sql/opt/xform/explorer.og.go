@@ -388,26 +388,21 @@ func (_e *explorer) exploreSelect(
 									leftScan := _e.f.ConstructScan(
 										_e.funcs.AddPrimaryKeyColsToScanPrivate(_e.funcs.DuplicateScanPrivate(scanPrivate)),
 									)
-									groupingCols := _e.funcs.PrimaryKeyCols(_e.funcs.TableIDFromScanPrivate(scanPrivate))
-									outCols := _e.funcs.UnionCols(_e.funcs.OutputCols(_scan), groupingCols)
+									outCols := _e.funcs.UnionCols(_e.funcs.OutputCols(_scan), _e.funcs.PrimaryKeyCols(_e.funcs.TableIDFromScanPrivate(scanPrivate)))
 									rightScan := _e.f.ConstructScan(
 										_e.funcs.AddPrimaryKeyColsToScanPrivate(_e.funcs.DuplicateScanPrivate(scanPrivate)),
 									)
 									_expr := &memo.ProjectExpr{
-										Input: _e.f.ConstructDistinctOn(
-											_e.f.ConstructUnionAll(
-												_e.f.ConstructSelect(
-													leftScan,
-													_e.funcs.MapFilterCols(_e.funcs.ReplaceFiltersItem(filters, itemToReplace, leftFilter), outCols, _e.funcs.OutputCols(leftScan)),
-												),
-												_e.f.ConstructSelect(
-													rightScan,
-													_e.funcs.MapFilterCols(_e.funcs.ReplaceFiltersItem(filters, itemToReplace, rightFilter), outCols, _e.funcs.OutputCols(rightScan)),
-												),
-												_e.funcs.MakeSetPrivate(_e.funcs.OutputCols(leftScan), _e.funcs.OutputCols(rightScan), outCols),
+										Input: _e.f.ConstructUnion(
+											_e.f.ConstructSelect(
+												leftScan,
+												_e.funcs.MapFilterCols(_e.funcs.ReplaceFiltersItem(filters, itemToReplace, leftFilter), outCols, _e.funcs.OutputCols(leftScan)),
 											),
-											_e.funcs.MakeAggCols(opt.ConstAggOp, _e.funcs.OutputCols(_scan)),
-											_e.funcs.MakeGrouping(groupingCols, _e.funcs.EmptyOrdering()),
+											_e.f.ConstructSelect(
+												rightScan,
+												_e.funcs.MapFilterCols(_e.funcs.ReplaceFiltersItem(filters, itemToReplace, rightFilter), outCols, _e.funcs.OutputCols(rightScan)),
+											),
+											_e.funcs.MakeSetPrivate(_e.funcs.OutputCols(leftScan), _e.funcs.OutputCols(rightScan), outCols),
 										),
 										Projections: memo.EmptyProjectionsExpr,
 										Passthrough: _e.funcs.OutputCols(_scan),

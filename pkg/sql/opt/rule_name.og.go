@@ -56,6 +56,8 @@ const (
 	FoldEqFalse
 	FoldNeTrue
 	FoldNeFalse
+	NormCycleTestRelTrueToFalse
+	NormCycleTestRelFalseToTrue
 	DecorrelateJoin
 	DecorrelateProjectSet
 	TryDecorrelateSelect
@@ -257,6 +259,7 @@ const (
 	EliminateUnionAllRight
 	EliminateUnionLeft
 	EliminateUnionRight
+	ConvertUnionToDistinctUnionAll
 	EliminateWindow
 	ReduceWindowPartitionCols
 	SimplifyWindowOrdering

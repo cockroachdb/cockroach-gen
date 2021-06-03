@@ -7621,6 +7621,131 @@ type FakeRelPrivate struct {
 	Props *props.Relational
 }
 
+// NormCycleTestRelExpr is a relational operator for testing that normalization rule
+// cycles are detected by the Factory and a stack overflow is prevented. Two
+// rules for this expression, NormCycleTestRelTrueToFalse and
+// NormCycleTestRelFalseToTrue, create a normalization rule cycle. See the cycle
+// test file for tests that use this expression.
+type NormCycleTestRelExpr struct {
+	Scalar opt.ScalarExpr
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &NormCycleTestRelExpr{}
+
+func (e *NormCycleTestRelExpr) Op() opt.Operator {
+	return opt.NormCycleTestRelOp
+}
+
+func (e *NormCycleTestRelExpr) ChildCount() int {
+	return 1
+}
+
+func (e *NormCycleTestRelExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Scalar
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *NormCycleTestRelExpr) Private() interface{} {
+	return nil
+}
+
+func (e *NormCycleTestRelExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *NormCycleTestRelExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Scalar = child.(opt.ScalarExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *NormCycleTestRelExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *NormCycleTestRelExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *NormCycleTestRelExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *NormCycleTestRelExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *NormCycleTestRelExpr) RequiredPhysical() *physical.Required {
+	return e.grp.bestProps().required
+}
+
+func (e *NormCycleTestRelExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
+func (e *NormCycleTestRelExpr) Cost() Cost {
+	return e.grp.bestProps().cost
+}
+
+func (e *NormCycleTestRelExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *NormCycleTestRelExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
+}
+
+func (e *NormCycleTestRelExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(errors.AssertionFailedf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *NormCycleTestRelExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(errors.AssertionFailedf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type normCycleTestRelGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	first NormCycleTestRelExpr
+	best  bestProps
+}
+
+var _ exprGroup = &normCycleTestRelGroup{}
+
+func (g *normCycleTestRelGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *normCycleTestRelGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *normCycleTestRelGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *normCycleTestRelGroup) bestProps() *bestProps {
+	return &g.best
+}
+
 // SubqueryExpr is a subquery in a single-row context. Here are some examples:
 //
 //   SELECT 1 = (SELECT 1)
@@ -19630,6 +19755,28 @@ func (m *Memo) MemoizeFakeRel(
 	return interned.FirstExpr()
 }
 
+func (m *Memo) MemoizeNormCycleTestRel(
+	scalar opt.ScalarExpr,
+) RelExpr {
+	const size = int64(unsafe.Sizeof(normCycleTestRelGroup{}))
+	grp := &normCycleTestRelGroup{mem: m, first: NormCycleTestRelExpr{
+		Scalar: scalar,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternNormCycleTestRel(e)
+	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
+		m.logPropsBuilder.buildNormCycleTestRelProps(e, &grp.rel)
+		grp.rel.Populated = true
+		m.memEstimate += size
+		m.CheckExpr(e)
+	}
+	return interned.FirstExpr()
+}
+
 func (m *Memo) MemoizeSubquery(
 	input RelExpr,
 	subqueryPrivate *SubqueryPrivate,
@@ -23516,6 +23663,20 @@ func (m *Memo) AddFakeRelToGroup(e *FakeRelExpr, grp RelExpr) *FakeRelExpr {
 	return interned
 }
 
+func (m *Memo) AddNormCycleTestRelToGroup(e *NormCycleTestRelExpr, grp RelExpr) *NormCycleTestRelExpr {
+	const size = int64(unsafe.Sizeof(NormCycleTestRelExpr{}))
+	interned := m.interner.InternNormCycleTestRel(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.CheckExpr(e)
+	} else if interned.group() != grp.group() {
+		// This is a group collision, do nothing.
+		return nil
+	}
+	return interned
+}
+
 func (m *Memo) AddCreateTableToGroup(e *CreateTableExpr, grp RelExpr) *CreateTableExpr {
 	const size = int64(unsafe.Sizeof(CreateTableExpr{}))
 	interned := m.interner.InternCreateTable(e)
@@ -23862,6 +24023,8 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternRecursiveCTE(t)
 	case *FakeRelExpr:
 		return in.InternFakeRel(t)
+	case *NormCycleTestRelExpr:
+		return in.InternNormCycleTestRel(t)
 	case *SubqueryExpr:
 		return in.InternSubquery(t)
 	case *AnyExpr:
@@ -25702,6 +25865,24 @@ func (in *interner) InternFakeRel(val *FakeRelExpr) *FakeRelExpr {
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*FakeRelExpr); ok {
 			if in.hasher.IsPointerEqual(unsafe.Pointer(val.Props), unsafe.Pointer(existing.Props)) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternNormCycleTestRel(val *NormCycleTestRelExpr) *NormCycleTestRelExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.NormCycleTestRelOp)
+	in.hasher.HashScalarExpr(val.Scalar)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*NormCycleTestRelExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Scalar, existing.Scalar) {
 				return existing
 			}
 		}
@@ -29167,6 +29348,8 @@ func (b *logicalPropsBuilder) buildProps(e RelExpr, rel *props.Relational) {
 		b.buildRecursiveCTEProps(t, rel)
 	case *FakeRelExpr:
 		b.buildFakeRelProps(t, rel)
+	case *NormCycleTestRelExpr:
+		b.buildNormCycleTestRelProps(t, rel)
 	case *CreateTableExpr:
 		b.buildCreateTableProps(t, rel)
 	case *CreateViewExpr:
