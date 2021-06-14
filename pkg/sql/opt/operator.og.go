@@ -554,6 +554,9 @@ const (
 	// The SetPrivate field matches columns from the Left and Right inputs of the
 	// Intersect with the output columns. See the comment above SetPrivate for more
 	// details.
+	// Note that Intersect is symmetric in most cases, but there are exceptions:
+	// some types allow values that are equal but not identical (e.g. collated
+	// strings) in which case it could be visible which side a row is coming from.
 	IntersectOp
 
 	// IntersectAll is an operator used to perform an intersection between the Left
@@ -575,6 +578,9 @@ const (
 	// The SetPrivate field matches columns from the Left and Right inputs of the
 	// IntersectAll with the output columns. See the comment above SetPrivate for more
 	// details.
+	// Note that IntersectAll is symmetric in most cases, but there are exceptions:
+	// some types allow values that are equal but not identical (e.g. collated
+	// strings) in which case it could be visible which side a row is coming from.
 	IntersectAllOp
 
 	// InvertedFilter filters rows from its input result set, based on the

@@ -5361,6 +5361,9 @@ type SetPrivate struct {
 // The SetPrivate field matches columns from the Left and Right inputs of the
 // Intersect with the output columns. See the comment above SetPrivate for more
 // details.
+// Note that Intersect is symmetric in most cases, but there are exceptions:
+// some types allow values that are equal but not identical (e.g. collated
+// strings) in which case it could be visible which side a row is coming from.
 type IntersectExpr struct {
 	Left  RelExpr
 	Right RelExpr
@@ -5783,6 +5786,9 @@ func (g *unionAllGroup) bestProps() *bestProps {
 // The SetPrivate field matches columns from the Left and Right inputs of the
 // IntersectAll with the output columns. See the comment above SetPrivate for more
 // details.
+// Note that IntersectAll is symmetric in most cases, but there are exceptions:
+// some types allow values that are equal but not identical (e.g. collated
+// strings) in which case it could be visible which side a row is coming from.
 type IntersectAllExpr struct {
 	Left  RelExpr
 	Right RelExpr

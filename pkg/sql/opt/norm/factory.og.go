@@ -10201,11 +10201,11 @@ func (_f *Factory) ConstructUnion(
 		goto SKIP_RULES
 	}
 
-	// [EliminateUnionLeft]
+	// [EliminateDistinctSetLeft]
 	{
 		if _f.funcs.HasZeroRows(right) {
 			colMap := setPrivate
-			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateUnionLeft) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateDistinctSetLeft) {
 				project := _f.ConstructProject(
 					left,
 					_f.funcs.ProjectColMapLeft(colMap),
@@ -10217,7 +10217,7 @@ func (_f *Factory) ConstructUnion(
 					_f.funcs.MakeGrouping(_f.funcs.OutputCols(project), _f.funcs.EmptyOrdering()),
 				)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EliminateUnionLeft, nil, _expr)
+					_f.appliedRule(opt.EliminateDistinctSetLeft, nil, _expr)
 				}
 				_f.constructorStackDepth--
 				return _expr
@@ -10225,11 +10225,11 @@ func (_f *Factory) ConstructUnion(
 		}
 	}
 
-	// [EliminateUnionRight]
+	// [EliminateDistinctSetRight]
 	{
 		if _f.funcs.HasZeroRows(left) {
 			colMap := setPrivate
-			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateUnionRight) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateDistinctSetRight) {
 				project := _f.ConstructProject(
 					right,
 					_f.funcs.ProjectColMapRight(colMap),
@@ -10241,7 +10241,7 @@ func (_f *Factory) ConstructUnion(
 					_f.funcs.MakeGrouping(_f.funcs.OutputCols(project), _f.funcs.EmptyOrdering()),
 				)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EliminateUnionRight, nil, _expr)
+					_f.appliedRule(opt.EliminateDistinctSetRight, nil, _expr)
 				}
 				_f.constructorStackDepth--
 				return _expr
@@ -10291,6 +10291,9 @@ SKIP_RULES:
 // The SetPrivate field matches columns from the Left and Right inputs of the
 // Intersect with the output columns. See the comment above SetPrivate for more
 // details.
+// Note that Intersect is symmetric in most cases, but there are exceptions:
+// some types allow values that are equal but not identical (e.g. collated
+// strings) in which case it could be visible which side a row is coming from.
 func (_f *Factory) ConstructIntersect(
 	left memo.RelExpr,
 	right memo.RelExpr,
@@ -10302,6 +10305,44 @@ func (_f *Factory) ConstructIntersect(
 		// onMaxConstructorStackDepthExceeded and skip all rules.
 		_f.onMaxConstructorStackDepthExceeded()
 		goto SKIP_RULES
+	}
+
+	// [SimplifyIntersectLeft]
+	{
+		if _f.funcs.HasStrictKey(left) {
+			colMap := setPrivate
+			if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyIntersectLeft) {
+				_expr := _f.ConstructIntersectAll(
+					left,
+					right,
+					colMap,
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.SimplifyIntersectLeft, nil, _expr)
+				}
+				_f.constructorStackDepth--
+				return _expr
+			}
+		}
+	}
+
+	// [SimplifyIntersectRight]
+	{
+		if _f.funcs.HasStrictKey(right) {
+			colMap := setPrivate
+			if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyIntersectRight) {
+				_expr := _f.ConstructIntersectAll(
+					left,
+					right,
+					colMap,
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.SimplifyIntersectRight, nil, _expr)
+				}
+				_f.constructorStackDepth--
+				return _expr
+			}
+		}
 	}
 
 SKIP_RULES:
@@ -10328,6 +10369,49 @@ func (_f *Factory) ConstructExcept(
 		// onMaxConstructorStackDepthExceeded and skip all rules.
 		_f.onMaxConstructorStackDepthExceeded()
 		goto SKIP_RULES
+	}
+
+	// [EliminateDistinctSetLeft]
+	{
+		if _f.funcs.HasZeroRows(right) {
+			colMap := setPrivate
+			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateDistinctSetLeft) {
+				project := _f.ConstructProject(
+					left,
+					_f.funcs.ProjectColMapLeft(colMap),
+					_f.funcs.ProjectPassthroughLeft(colMap),
+				)
+				_expr := _f.ConstructDistinctOn(
+					project,
+					memo.EmptyAggregationsExpr,
+					_f.funcs.MakeGrouping(_f.funcs.OutputCols(project), _f.funcs.EmptyOrdering()),
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.EliminateDistinctSetLeft, nil, _expr)
+				}
+				_f.constructorStackDepth--
+				return _expr
+			}
+		}
+	}
+
+	// [SimplifyExcept]
+	{
+		if _f.funcs.HasStrictKey(left) {
+			colMap := setPrivate
+			if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyExcept) {
+				_expr := _f.ConstructExceptAll(
+					left,
+					right,
+					colMap,
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.SimplifyExcept, nil, _expr)
+				}
+				_f.constructorStackDepth--
+				return _expr
+			}
+		}
 	}
 
 SKIP_RULES:
@@ -10368,18 +10452,18 @@ func (_f *Factory) ConstructUnionAll(
 		goto SKIP_RULES
 	}
 
-	// [EliminateUnionAllLeft]
+	// [EliminateSetLeft]
 	{
 		if _f.funcs.HasZeroRows(right) {
 			colmap := setPrivate
-			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateUnionAllLeft) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateSetLeft) {
 				_expr := _f.ConstructProject(
 					left,
 					_f.funcs.ProjectColMapLeft(colmap),
 					_f.funcs.ProjectPassthroughLeft(colmap),
 				)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EliminateUnionAllLeft, nil, _expr)
+					_f.appliedRule(opt.EliminateSetLeft, nil, _expr)
 				}
 				_f.constructorStackDepth--
 				return _expr
@@ -10387,18 +10471,18 @@ func (_f *Factory) ConstructUnionAll(
 		}
 	}
 
-	// [EliminateUnionAllRight]
+	// [EliminateSetRight]
 	{
 		if _f.funcs.HasZeroRows(left) {
 			colmap := setPrivate
-			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateUnionAllRight) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateSetRight) {
 				_expr := _f.ConstructProject(
 					right,
 					_f.funcs.ProjectColMapRight(colmap),
 					_f.funcs.ProjectPassthroughRight(colmap),
 				)
 				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EliminateUnionAllRight, nil, _expr)
+					_f.appliedRule(opt.EliminateSetRight, nil, _expr)
 				}
 				_f.constructorStackDepth--
 				return _expr
@@ -10433,6 +10517,9 @@ SKIP_RULES:
 // The SetPrivate field matches columns from the Left and Right inputs of the
 // IntersectAll with the output columns. See the comment above SetPrivate for more
 // details.
+// Note that IntersectAll is symmetric in most cases, but there are exceptions:
+// some types allow values that are equal but not identical (e.g. collated
+// strings) in which case it could be visible which side a row is coming from.
 func (_f *Factory) ConstructIntersectAll(
 	left memo.RelExpr,
 	right memo.RelExpr,
@@ -10483,6 +10570,25 @@ func (_f *Factory) ConstructExceptAll(
 		// onMaxConstructorStackDepthExceeded and skip all rules.
 		_f.onMaxConstructorStackDepthExceeded()
 		goto SKIP_RULES
+	}
+
+	// [EliminateSetLeft]
+	{
+		if _f.funcs.HasZeroRows(right) {
+			colmap := setPrivate
+			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateSetLeft) {
+				_expr := _f.ConstructProject(
+					left,
+					_f.funcs.ProjectColMapLeft(colmap),
+					_f.funcs.ProjectPassthroughLeft(colmap),
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.EliminateSetLeft, nil, _expr)
+				}
+				_f.constructorStackDepth--
+				return _expr
+			}
+		}
 	}
 
 SKIP_RULES:

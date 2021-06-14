@@ -255,10 +255,13 @@ const (
 	RemoveNotNullCondition
 	PushSelectIntoProjectSet
 	PushFilterIntoSetOp
-	EliminateUnionAllLeft
-	EliminateUnionAllRight
-	EliminateUnionLeft
-	EliminateUnionRight
+	EliminateSetLeft
+	EliminateSetRight
+	EliminateDistinctSetLeft
+	EliminateDistinctSetRight
+	SimplifyExcept
+	SimplifyIntersectLeft
+	SimplifyIntersectRight
 	ConvertUnionToDistinctUnionAll
 	EliminateWindow
 	ReduceWindowPartitionCols
