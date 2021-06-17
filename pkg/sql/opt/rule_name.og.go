@@ -311,6 +311,7 @@ const (
 	GenerateInvertedIndexZigzagJoins
 	SplitDisjunction
 	SplitDisjunctionAddKey
+	GenerateStreamingSetOp
 
 	// NumRuleNames tracks the total count of rule names.
 	NumRuleNames

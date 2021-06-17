@@ -443,9 +443,77 @@ func (f *Factory) ConstructDistinct(
 	return _n, nil
 }
 
-func (f *Factory) ConstructSetOp(
+func (f *Factory) ConstructHashSetOp(
 	typ tree.UnionType,
 	all bool,
+	left exec.Node,
+	right exec.Node,
+) (exec.Node, error) {
+	leftNode := left.(*Node)
+	rightNode := right.(*Node)
+	args := &hashSetOpArgs{
+		Typ:   typ,
+		All:   all,
+		Left:  leftNode,
+		Right: rightNode,
+	}
+	_n, err := f.newNode(hashSetOpOp, args, nil /* ordering */, leftNode, rightNode)
+	if err != nil {
+		return nil, err
+	}
+	// Build the "real" node.
+	wrapped, err := f.wrappedFactory.ConstructHashSetOp(
+		typ,
+		all,
+		leftNode.WrappedNode(),
+		rightNode.WrappedNode(),
+	)
+	if err != nil {
+		return nil, err
+	}
+	_n.wrappedNode = wrapped
+	return _n, nil
+}
+
+func (f *Factory) ConstructStreamingSetOp(
+	typ tree.UnionType,
+	all bool,
+	left exec.Node,
+	right exec.Node,
+	streamingOrdering colinfo.ColumnOrdering,
+	reqOrdering exec.OutputOrdering,
+) (exec.Node, error) {
+	leftNode := left.(*Node)
+	rightNode := right.(*Node)
+	args := &streamingSetOpArgs{
+		Typ:               typ,
+		All:               all,
+		Left:              leftNode,
+		Right:             rightNode,
+		StreamingOrdering: streamingOrdering,
+		ReqOrdering:       reqOrdering,
+	}
+	_n, err := f.newNode(streamingSetOpOp, args, reqOrdering, leftNode, rightNode)
+	if err != nil {
+		return nil, err
+	}
+	// Build the "real" node.
+	wrapped, err := f.wrappedFactory.ConstructStreamingSetOp(
+		typ,
+		all,
+		leftNode.WrappedNode(),
+		rightNode.WrappedNode(),
+		streamingOrdering,
+		reqOrdering,
+	)
+	if err != nil {
+		return nil, err
+	}
+	_n.wrappedNode = wrapped
+	return _n, nil
+}
+
+func (f *Factory) ConstructUnionAll(
 	left exec.Node,
 	right exec.Node,
 	reqOrdering exec.OutputOrdering,
@@ -453,22 +521,18 @@ func (f *Factory) ConstructSetOp(
 ) (exec.Node, error) {
 	leftNode := left.(*Node)
 	rightNode := right.(*Node)
-	args := &setOpArgs{
-		Typ:         typ,
-		All:         all,
+	args := &unionAllArgs{
 		Left:        leftNode,
 		Right:       rightNode,
 		ReqOrdering: reqOrdering,
 		HardLimit:   hardLimit,
 	}
-	_n, err := f.newNode(setOpOp, args, reqOrdering, leftNode, rightNode)
+	_n, err := f.newNode(unionAllOp, args, reqOrdering, leftNode, rightNode)
 	if err != nil {
 		return nil, err
 	}
 	// Build the "real" node.
-	wrapped, err := f.wrappedFactory.ConstructSetOp(
-		typ,
-		all,
+	wrapped, err := f.wrappedFactory.ConstructUnionAll(
 		leftNode.WrappedNode(),
 		rightNode.WrappedNode(),
 		reqOrdering,
@@ -1739,7 +1803,9 @@ const (
 	groupByOp
 	scalarGroupByOp
 	distinctOp
-	setOpOp
+	hashSetOpOp
+	streamingSetOpOp
+	unionAllOp
 	sortOp
 	ordinalityOp
 	indexJoinOp
@@ -1879,9 +1945,23 @@ type distinctArgs struct {
 	ErrorOnDup       string
 }
 
-type setOpArgs struct {
-	Typ         tree.UnionType
-	All         bool
+type hashSetOpArgs struct {
+	Typ   tree.UnionType
+	All   bool
+	Left  *Node
+	Right *Node
+}
+
+type streamingSetOpArgs struct {
+	Typ               tree.UnionType
+	All               bool
+	Left              *Node
+	Right             *Node
+	StreamingOrdering colinfo.ColumnOrdering
+	ReqOrdering       exec.OutputOrdering
+}
+
+type unionAllArgs struct {
 	Left        *Node
 	Right       *Node
 	ReqOrdering exec.OutputOrdering

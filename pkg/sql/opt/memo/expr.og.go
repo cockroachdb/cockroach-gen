@@ -5348,10 +5348,24 @@ func (g *unionGroup) bestProps() *bestProps {
 //
 // To make normalization rules and execution simpler, both inputs to the set op
 // must have matching types.
+//
+// SetPrivate can also contain an optional ordering, allowing for more efficient
+// streaming execution.
 type SetPrivate struct {
 	LeftCols  opt.ColList
 	RightCols opt.ColList
 	OutCols   opt.ColList
+
+	// Ordering specifies the order required of the input, allowing for more
+	// efficient streaming execution.
+	//
+	// The canonical operation always contains an empty ordering. Exploration
+	// rules can create versions of the operator with orderings on the OutCols.
+	// The ordering can be mapped to the input columns using the LeftCols and
+	// RightCols ColLists.
+	//
+	// This field cannot be set for LocalityOptimizedSearch.
+	Ordering props.OrderingChoice
 }
 
 // IntersectExpr is an operator used to perform an intersection between the Left
@@ -25472,6 +25486,7 @@ func (in *interner) InternUnion(val *UnionExpr) *UnionExpr {
 	in.hasher.HashColList(val.LeftCols)
 	in.hasher.HashColList(val.RightCols)
 	in.hasher.HashColList(val.OutCols)
+	in.hasher.HashOrderingChoice(val.Ordering)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
@@ -25480,7 +25495,8 @@ func (in *interner) InternUnion(val *UnionExpr) *UnionExpr {
 				in.hasher.IsRelExprEqual(val.Right, existing.Right) &&
 				in.hasher.IsColListEqual(val.LeftCols, existing.LeftCols) &&
 				in.hasher.IsColListEqual(val.RightCols, existing.RightCols) &&
-				in.hasher.IsColListEqual(val.OutCols, existing.OutCols) {
+				in.hasher.IsColListEqual(val.OutCols, existing.OutCols) &&
+				in.hasher.IsOrderingChoiceEqual(val.Ordering, existing.Ordering) {
 				return existing
 			}
 		}
@@ -25498,6 +25514,7 @@ func (in *interner) InternIntersect(val *IntersectExpr) *IntersectExpr {
 	in.hasher.HashColList(val.LeftCols)
 	in.hasher.HashColList(val.RightCols)
 	in.hasher.HashColList(val.OutCols)
+	in.hasher.HashOrderingChoice(val.Ordering)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
@@ -25506,7 +25523,8 @@ func (in *interner) InternIntersect(val *IntersectExpr) *IntersectExpr {
 				in.hasher.IsRelExprEqual(val.Right, existing.Right) &&
 				in.hasher.IsColListEqual(val.LeftCols, existing.LeftCols) &&
 				in.hasher.IsColListEqual(val.RightCols, existing.RightCols) &&
-				in.hasher.IsColListEqual(val.OutCols, existing.OutCols) {
+				in.hasher.IsColListEqual(val.OutCols, existing.OutCols) &&
+				in.hasher.IsOrderingChoiceEqual(val.Ordering, existing.Ordering) {
 				return existing
 			}
 		}
@@ -25524,6 +25542,7 @@ func (in *interner) InternExcept(val *ExceptExpr) *ExceptExpr {
 	in.hasher.HashColList(val.LeftCols)
 	in.hasher.HashColList(val.RightCols)
 	in.hasher.HashColList(val.OutCols)
+	in.hasher.HashOrderingChoice(val.Ordering)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
@@ -25532,7 +25551,8 @@ func (in *interner) InternExcept(val *ExceptExpr) *ExceptExpr {
 				in.hasher.IsRelExprEqual(val.Right, existing.Right) &&
 				in.hasher.IsColListEqual(val.LeftCols, existing.LeftCols) &&
 				in.hasher.IsColListEqual(val.RightCols, existing.RightCols) &&
-				in.hasher.IsColListEqual(val.OutCols, existing.OutCols) {
+				in.hasher.IsColListEqual(val.OutCols, existing.OutCols) &&
+				in.hasher.IsOrderingChoiceEqual(val.Ordering, existing.Ordering) {
 				return existing
 			}
 		}
@@ -25550,6 +25570,7 @@ func (in *interner) InternUnionAll(val *UnionAllExpr) *UnionAllExpr {
 	in.hasher.HashColList(val.LeftCols)
 	in.hasher.HashColList(val.RightCols)
 	in.hasher.HashColList(val.OutCols)
+	in.hasher.HashOrderingChoice(val.Ordering)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
@@ -25558,7 +25579,8 @@ func (in *interner) InternUnionAll(val *UnionAllExpr) *UnionAllExpr {
 				in.hasher.IsRelExprEqual(val.Right, existing.Right) &&
 				in.hasher.IsColListEqual(val.LeftCols, existing.LeftCols) &&
 				in.hasher.IsColListEqual(val.RightCols, existing.RightCols) &&
-				in.hasher.IsColListEqual(val.OutCols, existing.OutCols) {
+				in.hasher.IsColListEqual(val.OutCols, existing.OutCols) &&
+				in.hasher.IsOrderingChoiceEqual(val.Ordering, existing.Ordering) {
 				return existing
 			}
 		}
@@ -25576,6 +25598,7 @@ func (in *interner) InternIntersectAll(val *IntersectAllExpr) *IntersectAllExpr 
 	in.hasher.HashColList(val.LeftCols)
 	in.hasher.HashColList(val.RightCols)
 	in.hasher.HashColList(val.OutCols)
+	in.hasher.HashOrderingChoice(val.Ordering)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
@@ -25584,7 +25607,8 @@ func (in *interner) InternIntersectAll(val *IntersectAllExpr) *IntersectAllExpr 
 				in.hasher.IsRelExprEqual(val.Right, existing.Right) &&
 				in.hasher.IsColListEqual(val.LeftCols, existing.LeftCols) &&
 				in.hasher.IsColListEqual(val.RightCols, existing.RightCols) &&
-				in.hasher.IsColListEqual(val.OutCols, existing.OutCols) {
+				in.hasher.IsColListEqual(val.OutCols, existing.OutCols) &&
+				in.hasher.IsOrderingChoiceEqual(val.Ordering, existing.Ordering) {
 				return existing
 			}
 		}
@@ -25602,6 +25626,7 @@ func (in *interner) InternExceptAll(val *ExceptAllExpr) *ExceptAllExpr {
 	in.hasher.HashColList(val.LeftCols)
 	in.hasher.HashColList(val.RightCols)
 	in.hasher.HashColList(val.OutCols)
+	in.hasher.HashOrderingChoice(val.Ordering)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
@@ -25610,7 +25635,8 @@ func (in *interner) InternExceptAll(val *ExceptAllExpr) *ExceptAllExpr {
 				in.hasher.IsRelExprEqual(val.Right, existing.Right) &&
 				in.hasher.IsColListEqual(val.LeftCols, existing.LeftCols) &&
 				in.hasher.IsColListEqual(val.RightCols, existing.RightCols) &&
-				in.hasher.IsColListEqual(val.OutCols, existing.OutCols) {
+				in.hasher.IsColListEqual(val.OutCols, existing.OutCols) &&
+				in.hasher.IsOrderingChoiceEqual(val.Ordering, existing.Ordering) {
 				return existing
 			}
 		}
@@ -25628,6 +25654,7 @@ func (in *interner) InternLocalityOptimizedSearch(val *LocalityOptimizedSearchEx
 	in.hasher.HashColList(val.LeftCols)
 	in.hasher.HashColList(val.RightCols)
 	in.hasher.HashColList(val.OutCols)
+	in.hasher.HashOrderingChoice(val.Ordering)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
@@ -25636,7 +25663,8 @@ func (in *interner) InternLocalityOptimizedSearch(val *LocalityOptimizedSearchEx
 				in.hasher.IsRelExprEqual(val.Remote, existing.Remote) &&
 				in.hasher.IsColListEqual(val.LeftCols, existing.LeftCols) &&
 				in.hasher.IsColListEqual(val.RightCols, existing.RightCols) &&
-				in.hasher.IsColListEqual(val.OutCols, existing.OutCols) {
+				in.hasher.IsColListEqual(val.OutCols, existing.OutCols) &&
+				in.hasher.IsOrderingChoiceEqual(val.Ordering, existing.Ordering) {
 				return existing
 			}
 		}

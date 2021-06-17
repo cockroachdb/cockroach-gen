@@ -1059,6 +1059,9 @@ const (
 	//
 	// To make normalization rules and execution simpler, both inputs to the set op
 	// must have matching types.
+	//
+	// SetPrivate can also contain an optional ordering, allowing for more efficient
+	// streaming execution.
 	SetPrivateOp
 
 	// ShowTraceForSession returns the current session traces.

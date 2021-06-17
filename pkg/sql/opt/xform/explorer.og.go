@@ -46,6 +46,16 @@ func (_e *explorer) exploreGroupMember(
 		return _e.exploreUpsertDistinctOn(state, t, ordinal)
 	case *memo.EnsureUpsertDistinctOnExpr:
 		return _e.exploreEnsureUpsertDistinctOn(state, t, ordinal)
+	case *memo.UnionExpr:
+		return _e.exploreUnion(state, t, ordinal)
+	case *memo.IntersectExpr:
+		return _e.exploreIntersect(state, t, ordinal)
+	case *memo.ExceptExpr:
+		return _e.exploreExcept(state, t, ordinal)
+	case *memo.IntersectAllExpr:
+		return _e.exploreIntersectAll(state, t, ordinal)
+	case *memo.ExceptAllExpr:
+		return _e.exploreExceptAll(state, t, ordinal)
 	case *memo.LimitExpr:
 		return _e.exploreLimit(state, t, ordinal)
 	}
@@ -2504,6 +2514,161 @@ func (_e *explorer) exploreEnsureUpsertDistinctOn(
 								}
 							}
 						}
+					}
+				}
+			}
+		}
+	}
+
+	return _fullyExplored
+}
+
+func (_e *explorer) exploreUnion(
+	_rootState *exploreState,
+	_root *memo.UnionExpr,
+	_rootOrd int,
+) (_fullyExplored bool) {
+	_fullyExplored = true
+
+	// [GenerateStreamingSetOp]
+	{
+		if _rootOrd >= _rootState.start {
+			left := _root.Left
+			right := _root.Right
+			private := &_root.SetPrivate
+			if _e.funcs.IsCanonicalSetOp(private) {
+				if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateStreamingSetOp) {
+					var _last memo.RelExpr
+					if _e.o.appliedRule != nil {
+						_last = memo.LastGroupMember(_root)
+					}
+					_e.funcs.GenerateStreamingSetOp(_root, opt.UnionOp, left, right, private)
+					if _e.o.appliedRule != nil {
+						_e.o.appliedRule(opt.GenerateStreamingSetOp, _root, _last.NextExpr())
+					}
+				}
+			}
+		}
+	}
+
+	return _fullyExplored
+}
+
+func (_e *explorer) exploreIntersect(
+	_rootState *exploreState,
+	_root *memo.IntersectExpr,
+	_rootOrd int,
+) (_fullyExplored bool) {
+	_fullyExplored = true
+
+	// [GenerateStreamingSetOp]
+	{
+		if _rootOrd >= _rootState.start {
+			left := _root.Left
+			right := _root.Right
+			private := &_root.SetPrivate
+			if _e.funcs.IsCanonicalSetOp(private) {
+				if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateStreamingSetOp) {
+					var _last memo.RelExpr
+					if _e.o.appliedRule != nil {
+						_last = memo.LastGroupMember(_root)
+					}
+					_e.funcs.GenerateStreamingSetOp(_root, opt.IntersectOp, left, right, private)
+					if _e.o.appliedRule != nil {
+						_e.o.appliedRule(opt.GenerateStreamingSetOp, _root, _last.NextExpr())
+					}
+				}
+			}
+		}
+	}
+
+	return _fullyExplored
+}
+
+func (_e *explorer) exploreExcept(
+	_rootState *exploreState,
+	_root *memo.ExceptExpr,
+	_rootOrd int,
+) (_fullyExplored bool) {
+	_fullyExplored = true
+
+	// [GenerateStreamingSetOp]
+	{
+		if _rootOrd >= _rootState.start {
+			left := _root.Left
+			right := _root.Right
+			private := &_root.SetPrivate
+			if _e.funcs.IsCanonicalSetOp(private) {
+				if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateStreamingSetOp) {
+					var _last memo.RelExpr
+					if _e.o.appliedRule != nil {
+						_last = memo.LastGroupMember(_root)
+					}
+					_e.funcs.GenerateStreamingSetOp(_root, opt.ExceptOp, left, right, private)
+					if _e.o.appliedRule != nil {
+						_e.o.appliedRule(opt.GenerateStreamingSetOp, _root, _last.NextExpr())
+					}
+				}
+			}
+		}
+	}
+
+	return _fullyExplored
+}
+
+func (_e *explorer) exploreIntersectAll(
+	_rootState *exploreState,
+	_root *memo.IntersectAllExpr,
+	_rootOrd int,
+) (_fullyExplored bool) {
+	_fullyExplored = true
+
+	// [GenerateStreamingSetOp]
+	{
+		if _rootOrd >= _rootState.start {
+			left := _root.Left
+			right := _root.Right
+			private := &_root.SetPrivate
+			if _e.funcs.IsCanonicalSetOp(private) {
+				if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateStreamingSetOp) {
+					var _last memo.RelExpr
+					if _e.o.appliedRule != nil {
+						_last = memo.LastGroupMember(_root)
+					}
+					_e.funcs.GenerateStreamingSetOp(_root, opt.IntersectAllOp, left, right, private)
+					if _e.o.appliedRule != nil {
+						_e.o.appliedRule(opt.GenerateStreamingSetOp, _root, _last.NextExpr())
+					}
+				}
+			}
+		}
+	}
+
+	return _fullyExplored
+}
+
+func (_e *explorer) exploreExceptAll(
+	_rootState *exploreState,
+	_root *memo.ExceptAllExpr,
+	_rootOrd int,
+) (_fullyExplored bool) {
+	_fullyExplored = true
+
+	// [GenerateStreamingSetOp]
+	{
+		if _rootOrd >= _rootState.start {
+			left := _root.Left
+			right := _root.Right
+			private := &_root.SetPrivate
+			if _e.funcs.IsCanonicalSetOp(private) {
+				if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateStreamingSetOp) {
+					var _last memo.RelExpr
+					if _e.o.appliedRule != nil {
+						_last = memo.LastGroupMember(_root)
+					}
+					_e.funcs.GenerateStreamingSetOp(_root, opt.ExceptAllOp, left, right, private)
+					if _e.o.appliedRule != nil {
+						_e.o.appliedRule(opt.GenerateStreamingSetOp, _root, _last.NextExpr())
 					}
 				}
 			}
