@@ -2086,6 +2086,51 @@ func (_e *explorer) exploreGroupBy(
 		}
 	}
 
+	// [EliminateIndexJoinInsideGroupBy]
+	{
+		_partlyExplored := _rootOrd < _rootState.start
+		_state := _e.lookupExploreState(_root.Input)
+		if !_state.fullyExplored {
+			_fullyExplored = false
+		}
+		var _member memo.RelExpr
+		for _ord := 0; _ord < _state.end; _ord++ {
+			if _member == nil {
+				_member = _root.Input.FirstExpr()
+			} else {
+				_member = _member.NextExpr()
+			}
+			if !_partlyExplored || _ord >= _state.start {
+				_indexJoin, _ := _member.(*memo.IndexJoinExpr)
+				if _indexJoin != nil {
+					input := _indexJoin.Input
+					aggs := _root.Aggregations
+					private := &_root.GroupingPrivate
+					inputCols := _e.funcs.OutputCols(input)
+					if _e.funcs.OrderingCanProjectCols(_e.funcs.GroupingOrdering(private), inputCols) {
+						if _e.funcs.ColsAreSubset(_e.funcs.UnionCols(_e.funcs.GroupingColumns(private), _e.funcs.AggregationOuterCols(aggs)), inputCols) {
+							if _e.o.matchedRule == nil || _e.o.matchedRule(opt.EliminateIndexJoinInsideGroupBy) {
+								_expr := &memo.GroupByExpr{
+									Input:           input,
+									Aggregations:    aggs,
+									GroupingPrivate: *private,
+								}
+								_interned := _e.mem.AddGroupByToGroup(_expr, _root)
+								if _e.o.appliedRule != nil {
+									if _interned != _expr {
+										_e.o.appliedRule(opt.EliminateIndexJoinInsideGroupBy, _root, nil)
+									} else {
+										_e.o.appliedRule(opt.EliminateIndexJoinInsideGroupBy, _root, _interned)
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	return _fullyExplored
 }
 
@@ -2307,6 +2352,51 @@ func (_e *explorer) exploreDistinctOn(
 		}
 	}
 
+	// [EliminateIndexJoinInsideGroupBy]
+	{
+		_partlyExplored := _rootOrd < _rootState.start
+		_state := _e.lookupExploreState(_root.Input)
+		if !_state.fullyExplored {
+			_fullyExplored = false
+		}
+		var _member memo.RelExpr
+		for _ord := 0; _ord < _state.end; _ord++ {
+			if _member == nil {
+				_member = _root.Input.FirstExpr()
+			} else {
+				_member = _member.NextExpr()
+			}
+			if !_partlyExplored || _ord >= _state.start {
+				_indexJoin, _ := _member.(*memo.IndexJoinExpr)
+				if _indexJoin != nil {
+					input := _indexJoin.Input
+					aggs := _root.Aggregations
+					private := &_root.GroupingPrivate
+					inputCols := _e.funcs.OutputCols(input)
+					if _e.funcs.OrderingCanProjectCols(_e.funcs.GroupingOrdering(private), inputCols) {
+						if _e.funcs.ColsAreSubset(_e.funcs.UnionCols(_e.funcs.GroupingColumns(private), _e.funcs.AggregationOuterCols(aggs)), inputCols) {
+							if _e.o.matchedRule == nil || _e.o.matchedRule(opt.EliminateIndexJoinInsideGroupBy) {
+								_expr := &memo.DistinctOnExpr{
+									Input:           input,
+									Aggregations:    aggs,
+									GroupingPrivate: *private,
+								}
+								_interned := _e.mem.AddDistinctOnToGroup(_expr, _root)
+								if _e.o.appliedRule != nil {
+									if _interned != _expr {
+										_e.o.appliedRule(opt.EliminateIndexJoinInsideGroupBy, _root, nil)
+									} else {
+										_e.o.appliedRule(opt.EliminateIndexJoinInsideGroupBy, _root, _interned)
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	return _fullyExplored
 }
 
@@ -2510,6 +2600,51 @@ func (_e *explorer) exploreEnsureUpsertDistinctOn(
 												}
 											}
 										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [EliminateIndexJoinInsideGroupBy]
+	{
+		_partlyExplored := _rootOrd < _rootState.start
+		_state := _e.lookupExploreState(_root.Input)
+		if !_state.fullyExplored {
+			_fullyExplored = false
+		}
+		var _member memo.RelExpr
+		for _ord := 0; _ord < _state.end; _ord++ {
+			if _member == nil {
+				_member = _root.Input.FirstExpr()
+			} else {
+				_member = _member.NextExpr()
+			}
+			if !_partlyExplored || _ord >= _state.start {
+				_indexJoin, _ := _member.(*memo.IndexJoinExpr)
+				if _indexJoin != nil {
+					input := _indexJoin.Input
+					aggs := _root.Aggregations
+					private := &_root.GroupingPrivate
+					inputCols := _e.funcs.OutputCols(input)
+					if _e.funcs.OrderingCanProjectCols(_e.funcs.GroupingOrdering(private), inputCols) {
+						if _e.funcs.ColsAreSubset(_e.funcs.UnionCols(_e.funcs.GroupingColumns(private), _e.funcs.AggregationOuterCols(aggs)), inputCols) {
+							if _e.o.matchedRule == nil || _e.o.matchedRule(opt.EliminateIndexJoinInsideGroupBy) {
+								_expr := &memo.EnsureUpsertDistinctOnExpr{
+									Input:           input,
+									Aggregations:    aggs,
+									GroupingPrivate: *private,
+								}
+								_interned := _e.mem.AddEnsureUpsertDistinctOnToGroup(_expr, _root)
+								if _e.o.appliedRule != nil {
+									if _interned != _expr {
+										_e.o.appliedRule(opt.EliminateIndexJoinInsideGroupBy, _root, nil)
+									} else {
+										_e.o.appliedRule(opt.EliminateIndexJoinInsideGroupBy, _root, _interned)
 									}
 								}
 							}
