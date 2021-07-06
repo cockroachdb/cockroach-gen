@@ -283,7 +283,7 @@ const (
 	GenerateStreamingGroupBy
 	SplitGroupByScanIntoUnionScans
 	SplitGroupByFilteredScanIntoUnionScans
-	EliminateIndexJoinInsideGroupBy
+	EliminateIndexJoinOrProjectInsideGroupBy
 	ReorderJoins
 	CommuteLeftJoin
 	CommuteSemiJoin
