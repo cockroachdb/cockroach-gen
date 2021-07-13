@@ -1780,7 +1780,7 @@ const sqlEofCode = 1
 const sqlErrCode = 2
 const sqlInitialStackSize = 16
 
-//line sql-gen.y:13114
+//line sql-gen.y:13123
 
 //line yacctab:1
 var sqlExca = [...]int{
@@ -33640,129 +33640,130 @@ sqldefault:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
 //line sql-gen.y:12217
 		{
-			var err error
-			var d tree.Datum
+			var t *types.T
 			if sqlDollar[3].union.val == nil {
-				d, err = tree.ParseDInterval(sqlDollar[2].str)
+				t = types.Interval
 			} else {
-				d, err = tree.ParseDIntervalWithTypeMetadata(sqlDollar[2].str, sqlDollar[3].union.intervalTypeMetadata())
+				t = types.MakeInterval(sqlDollar[3].union.intervalTypeMetadata())
 			}
-			if err != nil {
-				return setErr(sqllex, err)
+			sqlVAL.union.val = &tree.CastExpr{
+				Expr: tree.NewStrVal(sqlDollar[2].str),
+				Type: t,
+
+				SyntaxMode: tree.CastShort,
 			}
-			sqlVAL.union.val = d
 		}
 	case 2179:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:12229
+//line sql-gen.y:12234
 		{
 			prec := sqlDollar[3].union.int32()
 			if prec < 0 || prec > 6 {
 				sqllex.Error(fmt.Sprintf("precision %d out of range", prec))
 				return 1
 			}
-			d, err := tree.ParseDIntervalWithTypeMetadata(sqlDollar[5].str, types.IntervalTypeMetadata{
-				Precision:      prec,
-				PrecisionIsSet: true,
-			})
-			if err != nil {
-				return setErr(sqllex, err)
+			sqlVAL.union.val = &tree.CastExpr{
+				Expr: tree.NewStrVal(sqlDollar[5].str),
+				Type: types.MakeInterval(
+					types.IntervalTypeMetadata{Precision: prec, PrecisionIsSet: true},
+				),
+
+				SyntaxMode: tree.CastShort,
 			}
-			sqlVAL.union.val = d
 		}
 	case 2198:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12310
+//line sql-gen.y:12319
 		{
 			sqlVAL.union.val = sqlDollar[1].union.nameList()
 		}
 	case 2200:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12318
+//line sql-gen.y:12327
 		{
 			sqlVAL.union.val = tree.ObjectNamePrefix{SchemaName: tree.Name(sqlDollar[1].str), ExplicitSchema: true}
 		}
 	case 2201:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:12322
+//line sql-gen.y:12331
 		{
 			sqlVAL.union.val = tree.ObjectNamePrefix{CatalogName: tree.Name(sqlDollar[1].str), SchemaName: tree.Name(sqlDollar[3].str), ExplicitCatalog: true, ExplicitSchema: true}
 		}
 	case 2202:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12328
+//line sql-gen.y:12337
 		{
 			sqlVAL.union.val = tree.ObjectNamePrefixList{sqlDollar[1].union.objectNamePrefix()}
 		}
 	case 2203:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:12332
+//line sql-gen.y:12341
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.objectNamePrefixList(), sqlDollar[3].union.objectNamePrefix())
 		}
 	case 2205:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:12340
+//line sql-gen.y:12349
 		{
 			sqlVAL.union.val = tree.ObjectNamePrefix{ExplicitSchema: false}
 		}
 	case 2211:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12367
+//line sql-gen.y:12376
 		{
 			sqlVAL.union.val = &tree.UnresolvedName{NumParts: 1, Parts: tree.NameParts{sqlDollar[1].str}}
 		}
 	case 2213:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:12374
+//line sql-gen.y:12383
 		{
 			sqlVAL.union.val = &tree.UnresolvedName{NumParts: 2, Parts: tree.NameParts{sqlDollar[3].str, sqlDollar[1].str}}
 		}
 	case 2214:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:12378
+//line sql-gen.y:12387
 		{
 			sqlVAL.union.val = &tree.UnresolvedName{NumParts: 3, Parts: tree.NameParts{sqlDollar[5].str, sqlDollar[3].str, sqlDollar[1].str}}
 		}
 	case 2215:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql-gen.y:12382
+//line sql-gen.y:12391
 		{
 			sqlVAL.union.val = &tree.UnresolvedName{NumParts: 4, Parts: tree.NameParts{sqlDollar[7].str, sqlDollar[5].str, sqlDollar[3].str, sqlDollar[1].str}}
 		}
 	case 2217:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql-gen.y:12396
+//line sql-gen.y:12405
 		{
 			sqlVAL.union.val = &tree.UnresolvedName{Star: true, NumParts: 4, Parts: tree.NameParts{"", sqlDollar[5].str, sqlDollar[3].str, sqlDollar[1].str}}
 		}
 	case 2218:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:12400
+//line sql-gen.y:12409
 		{
 			sqlVAL.union.val = &tree.UnresolvedName{Star: true, NumParts: 3, Parts: tree.NameParts{"", sqlDollar[3].str, sqlDollar[1].str}}
 		}
 	case 2219:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:12404
+//line sql-gen.y:12413
 		{
 			sqlVAL.union.val = &tree.UnresolvedName{Star: true, NumParts: 2, Parts: tree.NameParts{"", sqlDollar[1].str}}
 		}
 	case 2220:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12417
+//line sql-gen.y:12426
 		{
 			sqlVAL.union.val = &tree.UnresolvedName{NumParts: 1, Parts: tree.NameParts{sqlDollar[1].str}}
 		}
 	case 2222:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12426
+//line sql-gen.y:12435
 		{
 			sqlVAL.union.val = &tree.UnresolvedName{NumParts: 1, Parts: tree.NameParts{sqlDollar[1].str}}
 		}
 	case 2226:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12444
+//line sql-gen.y:12453
 		{
 			aIdx := sqllex.(*lexer).NewAnnotation()
 			res, err := tree.NewUnresolvedObjectName(1, [3]string{sqlDollar[1].str}, aIdx)
@@ -33773,7 +33774,7 @@ sqldefault:
 		}
 	case 2227:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:12457
+//line sql-gen.y:12466
 		{
 			aIdx := sqllex.(*lexer).NewAnnotation()
 			res, err := tree.NewUnresolvedObjectName(2, [3]string{sqlDollar[3].str, sqlDollar[1].str}, aIdx)
@@ -33784,7 +33785,7 @@ sqldefault:
 		}
 	case 2228:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:12464
+//line sql-gen.y:12473
 		{
 			aIdx := sqllex.(*lexer).NewAnnotation()
 			res, err := tree.NewUnresolvedObjectName(3, [3]string{sqlDollar[5].str, sqlDollar[3].str, sqlDollar[1].str}, aIdx)
@@ -33795,19 +33796,19 @@ sqldefault:
 		}
 	case 2236:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:12489
+//line sql-gen.y:12498
 		{
 			sqlVAL.str = ""
 		}
 	case 2237:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:12495
+//line sql-gen.y:12504
 		{
 			sqlVAL.str = sqlDollar[2].str
 		}
 	case 2238:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:12499
+//line sql-gen.y:12508
 		{
 			sqlVAL.str = ""
 		}
