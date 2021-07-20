@@ -73,12 +73,14 @@ func New_UPPERCASE_NAMEOperator(
 	buffer := colexecutils.NewSpillingBuffer(
 		bufferAllocator, bufferMemLimit, diskQueueCfg, fdSemaphore, inputTypes, diskAcc, argIdx)
 	base := _OP_NAMEBase{
-		buffer:          buffer,
-		outputColIdx:    outputColIdx,
-		partitionColIdx: partitionColIdx,
-		argIdx:          argIdx,
-		offsetIdx:       offsetIdx,
-		defaultIdx:      defaultIdx,
+		partitionSeekerBase: partitionSeekerBase{
+			buffer:          buffer,
+			partitionColIdx: partitionColIdx,
+		},
+		outputColIdx: outputColIdx,
+		argIdx:       argIdx,
+		offsetIdx:    offsetIdx,
+		defaultIdx:   defaultIdx,
 	}
 	argType := inputTypes[argIdx]
 	switch typeconv.TypeFamilyToCanonicalTypeFamily(argType.Family()) {
@@ -101,11 +103,9 @@ func New_UPPERCASE_NAMEOperator(
 // _OP_NAMEBase extracts common fields and methods of the _OP_NAME windower
 // variations.
 type _OP_NAMEBase struct {
-	colexecop.InitHelper
+	partitionSeekerBase
 	colexecop.CloserHelper
 	_OP_NAMEComputeFields
-
-	buffer *colexecutils.SpillingBuffer
 
 	outputColIdx    int
 	partitionColIdx int
@@ -117,8 +117,7 @@ type _OP_NAMEBase struct {
 // _OP_NAMEComputeFields extracts the fields that are used to calculate _OP_NAME
 // output values.
 type _OP_NAMEComputeFields struct {
-	partitionSize int
-	idx           int
+	idx int
 }
 
 // {{range .}}
@@ -129,42 +128,6 @@ type _OP_NAME_TYPEWindow struct {
 }
 
 var _ bufferedWindower = &_OP_NAME_TYPEWindow{}
-
-func (w *_OP_NAME_TYPEWindow) seekNextPartition(
-	batch coldata.Batch, startIdx int, isPartitionStart bool,
-) (nextPartitionIdx int) {
-	n := batch.Length()
-	if w.partitionColIdx == -1 {
-		// There is only one partition, so it includes the entirety of this batch.
-		w.partitionSize += n
-		nextPartitionIdx = n
-	} else {
-		i := startIdx
-		partitionCol := batch.ColVec(w.partitionColIdx).Bool()
-		_ = partitionCol[n-1]
-		_ = partitionCol[i]
-		// Find the location of the start of the next partition (and the end of the
-		// current one).
-		for ; i < n; i++ {
-			//gcassert:bce
-			if partitionCol[i] {
-				// Don't break for the start of the current partition.
-				if !isPartitionStart || i != startIdx {
-					break
-				}
-			}
-		}
-		w.partitionSize += i - startIdx
-		nextPartitionIdx = i
-	}
-
-	// Add all tuples from the argument column that fall within the current
-	// partition to the buffer so that they can be accessed later.
-	if startIdx < nextPartitionIdx {
-		w.buffer.AppendTuples(w.Ctx, batch, startIdx, nextPartitionIdx)
-	}
-	return nextPartitionIdx
-}
 
 func (w *_OP_NAME_TYPEWindow) processBatch(batch coldata.Batch, startIdx, endIdx int) {
 	if startIdx >= endIdx {
@@ -211,9 +174,7 @@ func (w *_OP_NAME_TYPEWindow) processBatch(batch coldata.Batch, startIdx, endIdx
 // {{end}}
 // {{end}}
 
-func (b *_OP_NAMEBase) transitionToProcessing() {
-
-}
+func (b *_OP_NAMEBase) transitionToProcessing() {}
 
 func (b *_OP_NAMEBase) startNewPartition() {
 	b.idx = 0
