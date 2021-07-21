@@ -7,6 +7,7 @@ var expectedHelpStrings = []string{
 	"<SELECTCLAUSE>",
 	"<SOURCE>",
 	"ALTER DATABASE",
+	"ALTER DEFAULT PRIVILEGES",
 	"ALTER INDEX",
 	"ALTER PARTITION",
 	"ALTER RANGE",

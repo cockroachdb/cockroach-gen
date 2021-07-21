@@ -159,6 +159,7 @@ var KeywordsCategories = map[string]string{
 	"from":                           "R",
 	"full":                           "T",
 	"function":                       "U",
+	"functions":                      "U",
 	"generated":                      "U",
 	"geography":                      "C",
 	"geometry":                       "C",
@@ -379,6 +380,7 @@ var KeywordsCategories = map[string]string{
 	"roles":                          "U",
 	"rollback":                       "U",
 	"rollup":                         "U",
+	"routines":                       "U",
 	"row":                            "C",
 	"rows":                           "U",
 	"rule":                           "U",
@@ -666,6 +668,7 @@ var KeywordNames = []string{
 	"from",
 	"full",
 	"function",
+	"functions",
 	"generated",
 	"geography",
 	"geometry",
@@ -886,6 +889,7 @@ var KeywordNames = []string{
 	"roles",
 	"rollback",
 	"rollup",
+	"routines",
 	"row",
 	"rows",
 	"rule",
@@ -1334,6 +1338,8 @@ func GetKeywordID(k string) int32 {
 		return FULL
 	case "function":
 		return FUNCTION
+	case "functions":
+		return FUNCTIONS
 	case "generated":
 		return GENERATED
 	case "geography":
@@ -1774,6 +1780,8 @@ func GetKeywordID(k string) int32 {
 		return ROLLBACK
 	case "rollup":
 		return ROLLUP
+	case "routines":
+		return ROUTINES
 	case "row":
 		return ROW
 	case "rows":
