@@ -19013,6 +19013,57 @@ SKIP_RULES:
 	return expr
 }
 
+// ConstructUnaryPlus constructs an expression for the UnaryPlus operator.
+func (_f *Factory) ConstructUnaryPlus(
+	input opt.ScalarExpr,
+) opt.ScalarExpr {
+	_f.constructorStackDepth++
+	if _f.constructorStackDepth > maxConstructorStackDepth {
+		// If the constructor call stack depth exceeds the limit, call
+		// onMaxConstructorStackDepthExceeded and skip all rules.
+		_f.onMaxConstructorStackDepthExceeded()
+		goto SKIP_RULES
+	}
+
+	// [FoldNullUnary]
+	{
+		_null, _ := input.(*memo.NullExpr)
+		if _null != nil {
+			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullUnary) {
+				_expr := _f.funcs.FoldNullUnary(opt.UnaryPlusOp, _null).(opt.ScalarExpr)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.FoldNullUnary, nil, _expr)
+				}
+				_f.constructorStackDepth--
+				return _expr
+			}
+		}
+	}
+
+	// [FoldUnary]
+	{
+		if _f.funcs.IsConstValueOrGroupOfConstValues(input) {
+			result, ok := _f.funcs.FoldUnary(opt.UnaryPlusOp, input)
+			if ok {
+				if _f.matchedRule == nil || _f.matchedRule(opt.FoldUnary) {
+					_expr := result.(opt.ScalarExpr)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.FoldUnary, nil, _expr)
+					}
+					_f.constructorStackDepth--
+					return _expr
+				}
+			}
+		}
+	}
+
+SKIP_RULES:
+	e := _f.mem.MemoizeUnaryPlus(input)
+	expr := _f.onConstructScalar(e)
+	_f.constructorStackDepth--
+	return expr
+}
+
 // ConstructUnaryComplement constructs an expression for the UnaryComplement operator.
 func (_f *Factory) ConstructUnaryComplement(
 	input opt.ScalarExpr,
@@ -22297,6 +22348,13 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		}
 		return t
 
+	case *memo.UnaryPlusExpr:
+		input := replace(t.Input).(opt.ScalarExpr)
+		if input != t.Input {
+			return f.ConstructUnaryPlus(input)
+		}
+		return t
+
 	case *memo.UnaryComplementExpr:
 		input := replace(t.Input).(opt.ScalarExpr)
 		if input != t.Input {
@@ -23863,6 +23921,11 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
 		)
 
+	case *memo.UnaryPlusExpr:
+		return f.ConstructUnaryPlus(
+			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
+		)
+
 	case *memo.UnaryComplementExpr:
 		return f.ConstructUnaryComplement(
 			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
@@ -25101,6 +25164,10 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 		)
 	case opt.UnaryMinusOp:
 		return f.ConstructUnaryMinus(
+			args[0].(opt.ScalarExpr),
+		)
+	case opt.UnaryPlusOp:
+		return f.ConstructUnaryPlus(
 			args[0].(opt.ScalarExpr),
 		)
 	case opt.UnaryComplementOp:
