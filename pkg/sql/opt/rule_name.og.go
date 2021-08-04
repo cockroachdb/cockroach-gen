@@ -293,6 +293,7 @@ const (
 	GenerateInvertedJoins
 	GenerateInvertedJoinsFromSelect
 	GenerateLookupJoinsWithFilter
+	GenerateLookupJoinsWithVirtualCols
 	PushJoinIntoIndexJoin
 	HoistProjectFromInnerJoin
 	HoistProjectFromLeftJoin
