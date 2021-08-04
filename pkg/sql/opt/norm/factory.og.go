@@ -2383,6 +2383,45 @@ func (_f *Factory) ConstructInnerJoin(
 		}
 	}
 
+	// [TryDecorrelateLimit]
+	{
+		_limit, _ := right.(*memo.LimitExpr)
+		if _limit != nil {
+			input := _limit.Input
+			_const, _ := _limit.Limit.(*memo.ConstExpr)
+			if _const != nil {
+				limit := _const.Value
+				ordering := _limit.Ordering
+				if _f.funcs.HasOuterCols(_limit) {
+					if _f.funcs.IsGreaterThan(limit, tree.NewDInt(1)) {
+						private := joinPrivate
+						if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateLimit) {
+							rowNum, rowNumCol := _f.funcs.MakeRowNumberWindowFunc()
+							_expr := _f.ConstructSelect(
+								_f.ConstructInnerJoin(
+									left,
+									_f.ConstructWindow(
+										input,
+										rowNum,
+										_f.funcs.MakeWindowPrivate(_f.funcs.MakeEmptyColSet(), ordering),
+									),
+									on,
+									private,
+								),
+								_f.funcs.LimitToRowNumberFilter(limit, rowNumCol),
+							)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.TryDecorrelateLimit, nil, _expr)
+							}
+							_f.constructorStackDepth--
+							return _expr
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [TryDecorrelateWindow]
 	{
 		_window, _ := right.(*memo.WindowExpr)
@@ -4778,7 +4817,7 @@ func (_f *Factory) ConstructSemiJoin(
 	{
 		if _f.funcs.HasOuterCols(right) {
 			if _f.funcs.CanHaveZeroRows(right) {
-				if right.Op() == opt.GroupByOp || right.Op() == opt.DistinctOnOp || right.Op() == opt.ProjectOp || right.Op() == opt.ProjectSetOp {
+				if right.Op() == opt.GroupByOp || right.Op() == opt.DistinctOnOp || right.Op() == opt.ProjectOp || right.Op() == opt.ProjectSetOp || right.Op() == opt.WindowOp {
 					private := joinPrivate
 					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateSemiJoin) {
 						newLeft := _f.funcs.EnsureKey(left)
@@ -6391,6 +6430,45 @@ func (_f *Factory) ConstructInnerJoinApply(
 		}
 	}
 
+	// [TryDecorrelateLimit]
+	{
+		_limit, _ := right.(*memo.LimitExpr)
+		if _limit != nil {
+			input := _limit.Input
+			_const, _ := _limit.Limit.(*memo.ConstExpr)
+			if _const != nil {
+				limit := _const.Value
+				ordering := _limit.Ordering
+				if _f.funcs.HasOuterCols(_limit) {
+					if _f.funcs.IsGreaterThan(limit, tree.NewDInt(1)) {
+						private := joinPrivate
+						if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateLimit) {
+							rowNum, rowNumCol := _f.funcs.MakeRowNumberWindowFunc()
+							_expr := _f.ConstructSelect(
+								_f.ConstructInnerJoinApply(
+									left,
+									_f.ConstructWindow(
+										input,
+										rowNum,
+										_f.funcs.MakeWindowPrivate(_f.funcs.MakeEmptyColSet(), ordering),
+									),
+									on,
+									private,
+								),
+								_f.funcs.LimitToRowNumberFilter(limit, rowNumCol),
+							)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.TryDecorrelateLimit, nil, _expr)
+							}
+							_f.constructorStackDepth--
+							return _expr
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [TryDecorrelateProjectSet]
 	{
 		_projectSet, _ := right.(*memo.ProjectSetExpr)
@@ -7872,7 +7950,7 @@ func (_f *Factory) ConstructSemiJoinApply(
 	{
 		if _f.funcs.HasOuterCols(right) {
 			if _f.funcs.CanHaveZeroRows(right) {
-				if right.Op() == opt.GroupByOp || right.Op() == opt.DistinctOnOp || right.Op() == opt.ProjectOp || right.Op() == opt.ProjectSetOp {
+				if right.Op() == opt.GroupByOp || right.Op() == opt.DistinctOnOp || right.Op() == opt.ProjectOp || right.Op() == opt.ProjectSetOp || right.Op() == opt.WindowOp {
 					private := joinPrivate
 					if _f.matchedRule == nil || _f.matchedRule(opt.TryDecorrelateSemiJoin) {
 						newLeft := _f.funcs.EnsureKey(left)

@@ -70,6 +70,7 @@ const (
 	TryDecorrelateScalarGroupBy
 	TryDecorrelateSemiJoin
 	TryDecorrelateLimitOne
+	TryDecorrelateLimit
 	TryDecorrelateProjectSet
 	TryDecorrelateWindow
 	TryDecorrelateMax1Row
