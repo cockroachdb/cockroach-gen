@@ -427,7 +427,7 @@ type Factory interface {
 	// to construct the plan against that factory.
 	ConstructExplain(
 		options *tree.ExplainOptions,
-		stmtType tree.StatementType,
+		stmtType tree.StatementReturnType,
 		buildFn BuildPlanForExplainFn,
 	) (Node, error)
 
@@ -1067,7 +1067,7 @@ func (StubFactory) ConstructExplainOpt(
 
 func (StubFactory) ConstructExplain(
 	options *tree.ExplainOptions,
-	stmtType tree.StatementType,
+	stmtType tree.StatementReturnType,
 	buildFn BuildPlanForExplainFn,
 ) (Node, error) {
 	return struct{}{}, nil
