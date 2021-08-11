@@ -1291,6 +1291,23 @@ func (_f *Factory) ConstructSelect(
 		}
 	}
 
+	// [DeduplicateSelectFilters]
+	{
+		if _f.funcs.HasDuplicateFilters(filters) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.DeduplicateSelectFilters) {
+				_expr := _f.ConstructSelect(
+					input,
+					_f.funcs.DeduplicateFilters(filters),
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.DeduplicateSelectFilters, nil, _expr)
+				}
+				_f.constructorStackDepth--
+				return _expr
+			}
+		}
+	}
+
 SKIP_RULES:
 	e := _f.mem.MemoizeSelect(input, filters)
 	expr := _f.onConstructRelational(e)

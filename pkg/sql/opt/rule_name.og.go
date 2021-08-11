@@ -246,6 +246,7 @@ const (
 	SimplifyNotDisjoint
 	SimplifySelectFilters
 	ConsolidateSelectFilters
+	DeduplicateSelectFilters
 	EliminateSelect
 	MergeSelects
 	PushSelectIntoProject
@@ -295,6 +296,7 @@ const (
 	GenerateInvertedJoinsFromSelect
 	GenerateLookupJoinsWithFilter
 	GenerateLookupJoinsWithVirtualCols
+	GenerateLookupJoinsWithVirtualColsAndFilter
 	PushJoinIntoIndexJoin
 	HoistProjectFromInnerJoin
 	HoistProjectFromLeftJoin
