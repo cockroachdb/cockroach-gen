@@ -1271,7 +1271,7 @@ SHOW [COMPACT] [KV] TRACE FOR SESSION
 		Text: `SHOW TRANSACTION {ISOLATION LEVEL | PRIORITY | STATUS}
 `,
 		//line sql.y: 5513
-		SeeAlso: `WEBDOCS/show-transaction.html
+		SeeAlso: `WEBDOCS/show-vars.html
 `,
 	},
 	//line sql.y: 5532
@@ -1285,7 +1285,7 @@ SHOW CREATE [ TABLE | SEQUENCE | VIEW | DATABASE ] <object_name>
 SHOW CREATE ALL TABLES
 `,
 		//line sql.y: 5537
-		SeeAlso: `WEBDOCS/show-create-table.html
+		SeeAlso: `WEBDOCS/show-create.html
 `,
 	},
 	//line sql.y: 5569
