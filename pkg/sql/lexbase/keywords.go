@@ -354,6 +354,7 @@ var KeywordsCategories = map[string]string{
 	"ranges":                         "U",
 	"read":                           "U",
 	"real":                           "C",
+	"reason":                         "U",
 	"reassign":                       "U",
 	"recurring":                      "U",
 	"recursive":                      "U",
@@ -866,6 +867,7 @@ var KeywordNames = []string{
 	"ranges",
 	"read",
 	"real",
+	"reason",
 	"reassign",
 	"recurring",
 	"recursive",
@@ -1734,6 +1736,8 @@ func GetKeywordID(k string) int32 {
 		return READ
 	case "real":
 		return REAL
+	case "reason":
+		return REASON
 	case "reassign":
 		return REASSIGN
 	case "recurring":

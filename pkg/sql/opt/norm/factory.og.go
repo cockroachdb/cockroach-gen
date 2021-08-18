@@ -21407,6 +21407,7 @@ SKIP_RULES:
 // ControlJobs represents a `PAUSE/CANCEL/RESUME JOBS` statement.
 func (_f *Factory) ConstructControlJobs(
 	input memo.RelExpr,
+	reason opt.ScalarExpr,
 	controlJobsPrivate *memo.ControlJobsPrivate,
 ) memo.RelExpr {
 	_f.constructorStackDepth++
@@ -21418,7 +21419,7 @@ func (_f *Factory) ConstructControlJobs(
 	}
 
 SKIP_RULES:
-	e := _f.mem.MemoizeControlJobs(input, controlJobsPrivate)
+	e := _f.mem.MemoizeControlJobs(input, reason, controlJobsPrivate)
 	expr := _f.onConstructRelational(e)
 	_f.constructorStackDepth--
 	return expr
@@ -23059,8 +23060,9 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 
 	case *memo.ControlJobsExpr:
 		input := replace(t.Input).(memo.RelExpr)
-		if input != t.Input {
-			return f.ConstructControlJobs(input, &t.ControlJobsPrivate)
+		reason := replace(t.Reason).(opt.ScalarExpr)
+		if input != t.Input || reason != t.Reason {
+			return f.ConstructControlJobs(input, reason, &t.ControlJobsPrivate)
 		}
 		return t
 
@@ -24476,6 +24478,7 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 	case *memo.ControlJobsExpr:
 		return f.ConstructControlJobs(
 			f.invokeReplace(t.Input, replace).(memo.RelExpr),
+			f.invokeReplace(t.Reason, replace).(opt.ScalarExpr),
 			&t.ControlJobsPrivate,
 		)
 
@@ -25647,7 +25650,8 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 	case opt.ControlJobsOp:
 		return f.ConstructControlJobs(
 			args[0].(memo.RelExpr),
-			args[1].(*memo.ControlJobsPrivate),
+			args[1].(opt.ScalarExpr),
+			args[2].(*memo.ControlJobsPrivate),
 		)
 	case opt.ControlSchedulesOp:
 		return f.ConstructControlSchedules(

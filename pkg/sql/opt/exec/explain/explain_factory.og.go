@@ -1637,11 +1637,13 @@ func (f *Factory) ConstructRecursiveCTE(
 func (f *Factory) ConstructControlJobs(
 	command tree.JobCommand,
 	input exec.Node,
+	reason tree.TypedExpr,
 ) (exec.Node, error) {
 	inputNode := input.(*Node)
 	args := &controlJobsArgs{
 		Command: command,
 		input:   inputNode,
+		Reason:  reason,
 	}
 	_n, err := f.newNode(controlJobsOp, args, nil /* ordering */, inputNode)
 	if err != nil {
@@ -1651,6 +1653,7 @@ func (f *Factory) ConstructControlJobs(
 	wrapped, err := f.wrappedFactory.ConstructControlJobs(
 		command,
 		inputNode.WrappedNode(),
+		reason,
 	)
 	if err != nil {
 		return nil, err
@@ -2216,6 +2219,7 @@ type recursiveCTEArgs struct {
 type controlJobsArgs struct {
 	Command tree.JobCommand
 	input   *Node
+	Reason  tree.TypedExpr
 }
 
 type controlSchedulesArgs struct {

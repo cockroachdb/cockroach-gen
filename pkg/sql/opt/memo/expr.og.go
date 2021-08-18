@@ -17771,6 +17771,9 @@ type AlterTableRelocatePrivate struct {
 type ControlJobsExpr struct {
 	// The input expression returns job IDs (as integers).
 	Input RelExpr
+
+	// Reason is the reason string for the command job.
+	Reason opt.ScalarExpr
 	ControlJobsPrivate
 
 	grp  exprGroup
@@ -17784,13 +17787,15 @@ func (e *ControlJobsExpr) Op() opt.Operator {
 }
 
 func (e *ControlJobsExpr) ChildCount() int {
-	return 1
+	return 2
 }
 
 func (e *ControlJobsExpr) Child(nth int) opt.Expr {
 	switch nth {
 	case 0:
 		return e.Input
+	case 1:
+		return e.Reason
 	}
 	panic(errors.AssertionFailedf("child index out of range"))
 }
@@ -17809,6 +17814,9 @@ func (e *ControlJobsExpr) SetChild(nth int, child opt.Expr) {
 	switch nth {
 	case 0:
 		e.Input = child.(RelExpr)
+		return
+	case 1:
+		e.Reason = child.(opt.ScalarExpr)
 		return
 	}
 	panic(errors.AssertionFailedf("child index out of range"))
@@ -22917,11 +22925,13 @@ func (m *Memo) MemoizeAlterTableRelocate(
 
 func (m *Memo) MemoizeControlJobs(
 	input RelExpr,
+	reason opt.ScalarExpr,
 	controlJobsPrivate *ControlJobsPrivate,
 ) RelExpr {
 	const size = int64(unsafe.Sizeof(controlJobsGroup{}))
 	grp := &controlJobsGroup{mem: m, first: ControlJobsExpr{
 		Input:              input,
+		Reason:             reason,
 		ControlJobsPrivate: *controlJobsPrivate,
 	}}
 	e := &grp.first
@@ -29244,6 +29254,7 @@ func (in *interner) InternControlJobs(val *ControlJobsExpr) *ControlJobsExpr {
 	in.hasher.Init()
 	in.hasher.HashOperator(opt.ControlJobsOp)
 	in.hasher.HashRelExpr(val.Input)
+	in.hasher.HashScalarExpr(val.Reason)
 	in.hasher.HashPhysProps(val.Props)
 	in.hasher.HashJobCommand(val.Command)
 
@@ -29251,6 +29262,7 @@ func (in *interner) InternControlJobs(val *ControlJobsExpr) *ControlJobsExpr {
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*ControlJobsExpr); ok {
 			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsScalarExprEqual(val.Reason, existing.Reason) &&
 				in.hasher.IsPhysPropsEqual(val.Props, existing.Props) &&
 				in.hasher.IsJobCommandEqual(val.Command, existing.Command) {
 				return existing

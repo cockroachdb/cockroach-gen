@@ -811,6 +811,7 @@ type Factory interface {
 	ConstructControlJobs(
 		command tree.JobCommand,
 		input Node,
+		reason tree.TypedExpr,
 	) (Node, error)
 
 	// ConstructControlSchedules creates a node for a ControlSchedules operation.
@@ -1333,6 +1334,7 @@ func (StubFactory) ConstructRecursiveCTE(
 func (StubFactory) ConstructControlJobs(
 	command tree.JobCommand,
 	input Node,
+	reason tree.TypedExpr,
 ) (Node, error) {
 	return struct{}{}, nil
 }
