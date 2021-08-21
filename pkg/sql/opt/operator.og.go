@@ -1982,6 +1982,7 @@ var CompositeInsensitiveOperators = [...]Operator{
 	NotInOp,
 	PlusOp,
 	PowOp,
+	ScalarListOp,
 	UnaryCbrtOp,
 	UnaryMinusOp,
 	UnaryPlusOp,
@@ -1995,7 +1996,8 @@ func IsCompositeInsensitiveOp(e Expr) bool {
 		FloorDivOp, GeOp, GtOp, InOp, IsOp,
 		IsNotOp, LeOp, LtOp, MinusOp, ModOp,
 		MultOp, NeOp, NotInOp, PlusOp, PowOp,
-		UnaryCbrtOp, UnaryMinusOp, UnaryPlusOp, UnarySqrtOp, VariableOp:
+		ScalarListOp, UnaryCbrtOp, UnaryMinusOp, UnaryPlusOp, UnarySqrtOp,
+		VariableOp:
 		return true
 	}
 	return false
