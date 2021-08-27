@@ -79,6 +79,7 @@ var expectedHelpStrings = []string{
 	"SCRUB",
 	"SELECT",
 	"SET CLUSTER SETTING",
+	"SET LOCAL",
 	"SET SESSION",
 	"SET TRANSACTION",
 	"SHOW BACKUP",
