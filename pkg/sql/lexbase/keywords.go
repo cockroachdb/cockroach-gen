@@ -101,6 +101,7 @@ var KeywordsCategories = map[string]string{
 	"databases":                      "U",
 	"day":                            "U",
 	"deallocate":                     "U",
+	"debug_pause_on":                 "U",
 	"dec":                            "C",
 	"decimal":                        "C",
 	"declare":                        "U",
@@ -614,6 +615,7 @@ var KeywordNames = []string{
 	"databases",
 	"day",
 	"deallocate",
+	"debug_pause_on",
 	"dec",
 	"decimal",
 	"declare",
@@ -1230,6 +1232,8 @@ func GetKeywordID(k string) int32 {
 		return DAY
 	case "deallocate":
 		return DEALLOCATE
+	case "debug_pause_on":
+		return DEBUG_PAUSE_ON
 	case "dec":
 		return DEC
 	case "decimal":
