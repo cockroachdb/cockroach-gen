@@ -248,12 +248,12 @@ export class DatabasesPage extends React.Component<
     this.columns.find(
       c => c.name === "nodeRegions",
     ).showByDefault = this.props.showNodeRegionsColumn;
+    const displayColumns = this.columns.filter(
+      col => col.showByDefault !== false,
+    );
     return (
       <div>
-        <section className={baseHeadingClasses.wrapper}>
-          <h1 className={baseHeadingClasses.tableName}>Databases</h1>
-        </section>
-
+        <h3 className={baseHeadingClasses.tableName}>Databases</h3>
         <section className={sortableTableCx("cl-table-container")}>
           <div className={statisticsClasses.statistic}>
             <h4 className={statisticsClasses.countTitle}>
@@ -272,7 +272,7 @@ export class DatabasesPage extends React.Component<
           <DatabasesSortedTable
             className={cx("databases-table")}
             data={this.props.databases}
-            columns={this.columns}
+            columns={displayColumns}
             sortSetting={this.state.sortSetting}
             onChangeSortSetting={this.changeSortSetting.bind(this)}
             pagination={this.state.pagination}
