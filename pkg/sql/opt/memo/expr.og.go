@@ -6259,7 +6259,7 @@ func (g *localityOptimizedSearchGroup) bestProps() *bestProps {
 
 // LimitExpr returns a limited subset of the results in the input relation. The limit
 // expression is a scalar value; the operator returns at most this many rows. The
-// Orering field is a physical.OrderingChoice which indicates the row ordering
+// Ordering field is a physical.OrderingChoice which indicates the row ordering
 // required from the input (the first rows with respect to this ordering are
 // returned).
 type LimitExpr struct {
@@ -6516,6 +6516,143 @@ func (g *offsetGroup) firstExpr() RelExpr {
 
 func (g *offsetGroup) bestProps() *bestProps {
 	return &g.best
+}
+
+// TopKExpr returns the top K, where K is a constant, rows from the input set according to its
+// sort ordering, discarding the remaining rows. The Limit is a constant
+// positive integer; the operator returns at most Limit rows. Rows can be sorted by one
+// or more of the input columns, each of which can be sorted in either ascending
+// or descending order. See the Ordering field in the PhysicalProps struct.
+//
+// Unlike the Limit relational operator, TopK does not require its input to be
+// ordered. TopK can be used to substitute a Limit that requires its input to be
+// ordered and performs best when the input is not already ordered. TopK scans the
+// input, storing the K rows that best meet the ordering requirement in a max
+// heap, then sorts the K rows.
+type TopKExpr struct {
+	Input RelExpr
+	TopKPrivate
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &TopKExpr{}
+
+func (e *TopKExpr) Op() opt.Operator {
+	return opt.TopKOp
+}
+
+func (e *TopKExpr) ChildCount() int {
+	return 1
+}
+
+func (e *TopKExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *TopKExpr) Private() interface{} {
+	return &e.TopKPrivate
+}
+
+func (e *TopKExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *TopKExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(RelExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *TopKExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *TopKExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *TopKExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *TopKExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *TopKExpr) RequiredPhysical() *physical.Required {
+	return e.grp.bestProps().required
+}
+
+func (e *TopKExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
+func (e *TopKExpr) Cost() Cost {
+	return e.grp.bestProps().cost
+}
+
+func (e *TopKExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *TopKExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
+}
+
+func (e *TopKExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(errors.AssertionFailedf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *TopKExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(errors.AssertionFailedf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type topKGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	first TopKExpr
+	best  bestProps
+}
+
+var _ exprGroup = &topKGroup{}
+
+func (g *topKGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *topKGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *topKGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *topKGroup) bestProps() *bestProps {
+	return &g.best
+}
+
+type TopKPrivate struct {
+	K        int64
+	Ordering props.OrderingChoice
 }
 
 // Max1RowExpr enforces that its input must return at most one row. If the input
@@ -19644,6 +19781,30 @@ func (m *Memo) MemoizeOffset(
 	return interned.FirstExpr()
 }
 
+func (m *Memo) MemoizeTopK(
+	input RelExpr,
+	topKPrivate *TopKPrivate,
+) RelExpr {
+	const size = int64(unsafe.Sizeof(topKGroup{}))
+	grp := &topKGroup{mem: m, first: TopKExpr{
+		Input:       input,
+		TopKPrivate: *topKPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternTopK(e)
+	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
+		m.logPropsBuilder.buildTopKProps(e, &grp.rel)
+		grp.rel.Populated = true
+		m.memEstimate += size
+		m.CheckExpr(e)
+	}
+	return interned.FirstExpr()
+}
+
 func (m *Memo) MemoizeMax1Row(
 	input RelExpr,
 	errorText string,
@@ -23658,6 +23819,20 @@ func (m *Memo) AddOffsetToGroup(e *OffsetExpr, grp RelExpr) *OffsetExpr {
 	return interned
 }
 
+func (m *Memo) AddTopKToGroup(e *TopKExpr, grp RelExpr) *TopKExpr {
+	const size = int64(unsafe.Sizeof(TopKExpr{}))
+	interned := m.interner.InternTopK(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.CheckExpr(e)
+	} else if interned.group() != grp.group() {
+		// This is a group collision, do nothing.
+		return nil
+	}
+	return interned
+}
+
 func (m *Memo) AddMax1RowToGroup(e *Max1RowExpr, grp RelExpr) *Max1RowExpr {
 	const size = int64(unsafe.Sizeof(Max1RowExpr{}))
 	interned := m.interner.InternMax1Row(e)
@@ -24114,6 +24289,8 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternLimit(t)
 	case *OffsetExpr:
 		return in.InternOffset(t)
+	case *TopKExpr:
+		return in.InternTopK(t)
 	case *Max1RowExpr:
 		return in.InternMax1Row(t)
 	case *OrdinalityExpr:
@@ -25797,6 +25974,28 @@ func (in *interner) InternOffset(val *OffsetExpr) *OffsetExpr {
 		if existing, ok := in.cache.Item().(*OffsetExpr); ok {
 			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
 				in.hasher.IsScalarExprEqual(val.Offset, existing.Offset) &&
+				in.hasher.IsOrderingChoiceEqual(val.Ordering, existing.Ordering) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternTopK(val *TopKExpr) *TopKExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.TopKOp)
+	in.hasher.HashRelExpr(val.Input)
+	in.hasher.HashInt64(val.K)
+	in.hasher.HashOrderingChoice(val.Ordering)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*TopKExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsInt64Equal(val.K, existing.K) &&
 				in.hasher.IsOrderingChoiceEqual(val.Ordering, existing.Ordering) {
 				return existing
 			}
@@ -29475,6 +29674,8 @@ func (b *logicalPropsBuilder) buildProps(e RelExpr, rel *props.Relational) {
 		b.buildLimitProps(t, rel)
 	case *OffsetExpr:
 		b.buildOffsetProps(t, rel)
+	case *TopKExpr:
+		b.buildTopKProps(t, rel)
 	case *Max1RowExpr:
 		b.buildMax1RowProps(t, rel)
 	case *OrdinalityExpr:

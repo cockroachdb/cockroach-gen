@@ -306,6 +306,7 @@ const (
 	PushLimitIntoFilteredScan
 	PushLimitIntoIndexJoin
 	SplitLimitedScanIntoUnionScans
+	GenerateTopK
 	EliminateIndexJoinInsideProject
 	GenerateIndexScans
 	GenerateLocalityOptimizedScan

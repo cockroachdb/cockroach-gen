@@ -3204,5 +3204,36 @@ func (_e *explorer) exploreLimit(
 		}
 	}
 
+	// [GenerateTopK]
+	{
+		if _rootOrd >= _rootState.start {
+			input := _root.Input
+			limitExpr := _root.Limit
+			_const, _ := limitExpr.(*memo.ConstExpr)
+			if _const != nil {
+				limit := _const.Value
+				if _e.funcs.IsPositiveInt(limit) {
+					ordering := _root.Ordering
+					if !_e.funcs.IsSameOrdering(ordering, _e.funcs.EmptyOrdering()) {
+						if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateTopK) {
+							_expr := &memo.TopKExpr{
+								Input:       input,
+								TopKPrivate: *_e.funcs.MakeTopKPrivate(limit, ordering),
+							}
+							_interned := _e.mem.AddTopKToGroup(_expr, _root)
+							if _e.o.appliedRule != nil {
+								if _interned != _expr {
+									_e.o.appliedRule(opt.GenerateTopK, _root, nil)
+								} else {
+									_e.o.appliedRule(opt.GenerateTopK, _root, _interned)
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	return _fullyExplored
 }

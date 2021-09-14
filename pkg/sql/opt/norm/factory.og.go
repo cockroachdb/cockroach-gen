@@ -10767,7 +10767,7 @@ SKIP_RULES:
 // ConstructLimit constructs an expression for the Limit operator.
 // Limit returns a limited subset of the results in the input relation. The limit
 // expression is a scalar value; the operator returns at most this many rows. The
-// Orering field is a physical.OrderingChoice which indicates the row ordering
+// Ordering field is a physical.OrderingChoice which indicates the row ordering
 // required from the input (the first rows with respect to this ordering are
 // returned).
 func (_f *Factory) ConstructLimit(
@@ -11275,6 +11275,37 @@ func (_f *Factory) ConstructOffset(
 
 SKIP_RULES:
 	e := _f.mem.MemoizeOffset(input, offset, ordering)
+	expr := _f.onConstructRelational(e)
+	_f.constructorStackDepth--
+	return expr
+}
+
+// ConstructTopK constructs an expression for the TopK operator.
+// TopK returns the top K, where K is a constant, rows from the input set according to its
+// sort ordering, discarding the remaining rows. The Limit is a constant
+// positive integer; the operator returns at most Limit rows. Rows can be sorted by one
+// or more of the input columns, each of which can be sorted in either ascending
+// or descending order. See the Ordering field in the PhysicalProps struct.
+//
+// Unlike the Limit relational operator, TopK does not require its input to be
+// ordered. TopK can be used to substitute a Limit that requires its input to be
+// ordered and performs best when the input is not already ordered. TopK scans the
+// input, storing the K rows that best meet the ordering requirement in a max
+// heap, then sorts the K rows.
+func (_f *Factory) ConstructTopK(
+	input memo.RelExpr,
+	topKPrivate *memo.TopKPrivate,
+) memo.RelExpr {
+	_f.constructorStackDepth++
+	if _f.constructorStackDepth > maxConstructorStackDepth {
+		// If the constructor call stack depth exceeds the limit, call
+		// onMaxConstructorStackDepthExceeded and skip all rules.
+		_f.onMaxConstructorStackDepthExceeded()
+		goto SKIP_RULES
+	}
+
+SKIP_RULES:
+	e := _f.mem.MemoizeTopK(input, topKPrivate)
 	expr := _f.onConstructRelational(e)
 	_f.constructorStackDepth--
 	return expr
@@ -21894,6 +21925,13 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		}
 		return t
 
+	case *memo.TopKExpr:
+		input := replace(t.Input).(memo.RelExpr)
+		if input != t.Input {
+			return f.ConstructTopK(input, &t.TopKPrivate)
+		}
+		return t
+
 	case *memo.Max1RowExpr:
 		input := replace(t.Input).(memo.RelExpr)
 		if input != t.Input {
@@ -23602,6 +23640,12 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 			t.Ordering,
 		)
 
+	case *memo.TopKExpr:
+		return f.ConstructTopK(
+			f.invokeReplace(t.Input, replace).(memo.RelExpr),
+			&t.TopKPrivate,
+		)
+
 	case *memo.Max1RowExpr:
 		return f.ConstructMax1Row(
 			f.invokeReplace(t.Input, replace).(memo.RelExpr),
@@ -24914,6 +24958,11 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 			args[0].(memo.RelExpr),
 			args[1].(opt.ScalarExpr),
 			*args[2].(*props.OrderingChoice),
+		)
+	case opt.TopKOp:
+		return f.ConstructTopK(
+			args[0].(memo.RelExpr),
+			args[1].(*memo.TopKPrivate),
 		)
 	case opt.Max1RowOp:
 		return f.ConstructMax1Row(
