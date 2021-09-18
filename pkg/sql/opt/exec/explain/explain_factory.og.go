@@ -835,6 +835,34 @@ func (f *Factory) ConstructLimit(
 	return _n, nil
 }
 
+func (f *Factory) ConstructTopK(
+	input exec.Node,
+	k int64,
+	ordering exec.OutputOrdering,
+) (exec.Node, error) {
+	inputNode := input.(*Node)
+	args := &topKArgs{
+		Input:    inputNode,
+		K:        k,
+		Ordering: ordering,
+	}
+	_n, err := f.newNode(topKOp, args, ordering, inputNode)
+	if err != nil {
+		return nil, err
+	}
+	// Build the "real" node.
+	wrapped, err := f.wrappedFactory.ConstructTopK(
+		inputNode.WrappedNode(),
+		k,
+		ordering,
+	)
+	if err != nil {
+		return nil, err
+	}
+	_n.wrappedNode = wrapped
+	return _n, nil
+}
+
 func (f *Factory) ConstructMax1Row(
 	input exec.Node,
 	errorText string,
@@ -1816,6 +1844,7 @@ const (
 	invertedJoinOp
 	zigzagJoinOp
 	limitOp
+	topKOp
 	max1RowOp
 	projectSetOp
 	windowOp
@@ -2038,6 +2067,12 @@ type limitArgs struct {
 	Input  *Node
 	Limit  tree.TypedExpr
 	Offset tree.TypedExpr
+}
+
+type topKArgs struct {
+	Input    *Node
+	K        int64
+	Ordering exec.OutputOrdering
 }
 
 type max1RowArgs struct {

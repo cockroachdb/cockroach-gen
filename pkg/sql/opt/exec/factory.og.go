@@ -429,6 +429,16 @@ type Factory interface {
 		offset tree.TypedExpr,
 	) (Node, error)
 
+	// ConstructTopK creates a node for a TopK operation.
+	//
+	// TopK implements a TopK sorter that outputs the top K rows from the input
+	// according to the ordering.
+	ConstructTopK(
+		input Node,
+		k int64,
+		ordering OutputOrdering,
+	) (Node, error)
+
 	// ConstructMax1Row creates a node for a Max1Row operation.
 	//
 	// Max1Row permits at most one row from the given input node, causing an error
@@ -1099,6 +1109,14 @@ func (StubFactory) ConstructLimit(
 	input Node,
 	limit tree.TypedExpr,
 	offset tree.TypedExpr,
+) (Node, error) {
+	return struct{}{}, nil
+}
+
+func (StubFactory) ConstructTopK(
+	input Node,
+	k int64,
+	ordering OutputOrdering,
 ) (Node, error) {
 	return struct{}{}, nil
 }
