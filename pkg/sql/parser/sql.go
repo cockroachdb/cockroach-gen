@@ -33984,7 +33984,7 @@ sqldefault:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
 //line sql-gen.y:11746
 		{
-			sqlVAL.union.val = &tree.FuncExpr{Func: tree.WrapFunction("current_user")}
+			sqlVAL.union.val = &tree.FuncExpr{Func: tree.WrapFunction("session_user")}
 		}
 	case 2042:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
