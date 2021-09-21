@@ -437,6 +437,7 @@ type Factory interface {
 		input Node,
 		k int64,
 		ordering OutputOrdering,
+		alreadyOrderedPrefix int,
 	) (Node, error)
 
 	// ConstructMax1Row creates a node for a Max1Row operation.
@@ -1117,6 +1118,7 @@ func (StubFactory) ConstructTopK(
 	input Node,
 	k int64,
 	ordering OutputOrdering,
+	alreadyOrderedPrefix int,
 ) (Node, error) {
 	return struct{}{}, nil
 }

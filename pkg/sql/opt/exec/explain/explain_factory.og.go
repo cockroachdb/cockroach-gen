@@ -839,12 +839,14 @@ func (f *Factory) ConstructTopK(
 	input exec.Node,
 	k int64,
 	ordering exec.OutputOrdering,
+	alreadyOrderedPrefix int,
 ) (exec.Node, error) {
 	inputNode := input.(*Node)
 	args := &topKArgs{
-		Input:    inputNode,
-		K:        k,
-		Ordering: ordering,
+		Input:                inputNode,
+		K:                    k,
+		Ordering:             ordering,
+		AlreadyOrderedPrefix: alreadyOrderedPrefix,
 	}
 	_n, err := f.newNode(topKOp, args, ordering, inputNode)
 	if err != nil {
@@ -855,6 +857,7 @@ func (f *Factory) ConstructTopK(
 		inputNode.WrappedNode(),
 		k,
 		ordering,
+		alreadyOrderedPrefix,
 	)
 	if err != nil {
 		return nil, err
@@ -2070,9 +2073,10 @@ type limitArgs struct {
 }
 
 type topKArgs struct {
-	Input    *Node
-	K        int64
-	Ordering exec.OutputOrdering
+	Input                *Node
+	K                    int64
+	Ordering             exec.OutputOrdering
+	AlreadyOrderedPrefix int
 }
 
 type max1RowArgs struct {
