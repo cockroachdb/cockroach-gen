@@ -501,7 +501,7 @@ var KeywordsCategories = map[string]string{
 	"view":                           "U",
 	"viewactivity":                   "U",
 	"virtual":                        "C",
-	"visible":                        "R",
+	"visible":                        "U",
 	"voters":                         "U",
 	"when":                           "R",
 	"where":                          "R",
