@@ -275,6 +275,7 @@ var KeywordsCategories = map[string]string{
 	"nan":                            "U",
 	"natural":                        "T",
 	"never":                          "U",
+	"new_db_name":                    "U",
 	"next":                           "U",
 	"no":                             "U",
 	"nocancelquery":                  "U",
@@ -790,6 +791,7 @@ var KeywordNames = []string{
 	"nan",
 	"natural",
 	"never",
+	"new_db_name",
 	"next",
 	"no",
 	"nocancelquery",
@@ -1582,6 +1584,8 @@ func GetKeywordID(k string) int32 {
 		return NATURAL
 	case "never":
 		return NEVER
+	case "new_db_name":
+		return NEW_DB_NAME
 	case "next":
 		return NEXT
 	case "no":
