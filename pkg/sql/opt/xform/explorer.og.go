@@ -2283,6 +2283,47 @@ func (_e *explorer) exploreScalarGroupBy(
 ) (_fullyExplored bool) {
 	_fullyExplored = true
 
+	// [ReplaceScalarMinMaxWithScalarSubqueries]
+	{
+		_partlyExplored := _rootOrd < _rootState.start
+		_state := _e.lookupExploreState(_root.Input)
+		if !_state.fullyExplored {
+			_fullyExplored = false
+		}
+		var _member memo.RelExpr
+		for _ord := 0; _ord < _state.end; _ord++ {
+			if _member == nil {
+				_member = _root.Input.FirstExpr()
+			} else {
+				_member = _member.NextExpr()
+			}
+			if !_partlyExplored || _ord >= _state.start {
+				_scan, _ := _member.(*memo.ScanExpr)
+				if _scan != nil {
+					scanPrivate := &_scan.ScanPrivate
+					if _e.funcs.IsCanonicalScan(scanPrivate) {
+						aggregations := _root.Aggregations
+						if _e.funcs.TwoOrMoreMinOrMax(aggregations) {
+							groupingPrivate := &_root.GroupingPrivate
+							if _e.funcs.IsCanonicalGroupBy(groupingPrivate) {
+								if _e.o.matchedRule == nil || _e.o.matchedRule(opt.ReplaceScalarMinMaxWithScalarSubqueries) {
+									var _last memo.RelExpr
+									if _e.o.appliedRule != nil {
+										_last = memo.LastGroupMember(_root)
+									}
+									_e.funcs.MakeMinMaxScalarSubqueries(_root, scanPrivate, aggregations)
+									if _e.o.appliedRule != nil {
+										_e.o.appliedRule(opt.ReplaceScalarMinMaxWithScalarSubqueries, _root, _last.NextExpr())
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [ReplaceScalarMinMaxWithLimit]
 	{
 		if _rootOrd >= _rootState.start {

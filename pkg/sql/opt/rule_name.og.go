@@ -279,6 +279,7 @@ const (
 	// ------------------------------------------------------------
 	// Explore Rule Names
 	// ------------------------------------------------------------
+	ReplaceScalarMinMaxWithScalarSubqueries
 	ReplaceScalarMinMaxWithLimit
 	ReplaceMinWithLimit
 	ReplaceMaxWithLimit
