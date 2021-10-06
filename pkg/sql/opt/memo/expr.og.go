@@ -12879,51 +12879,6 @@ func (e *ColumnAccessExpr) DataType() *types.T {
 	return e.Typ
 }
 
-// UnsupportedExprExpr is used for interfacing with the old planner code. It can
-// encapsulate a TypedExpr that is otherwise not supported by the optimizer.
-type UnsupportedExprExpr struct {
-	Value tree.TypedExpr
-
-	Typ *types.T
-	id  opt.ScalarID
-}
-
-var _ opt.ScalarExpr = &UnsupportedExprExpr{}
-
-func (e *UnsupportedExprExpr) ID() opt.ScalarID {
-	return e.id
-}
-
-func (e *UnsupportedExprExpr) Op() opt.Operator {
-	return opt.UnsupportedExprOp
-}
-
-func (e *UnsupportedExprExpr) ChildCount() int {
-	return 0
-}
-
-func (e *UnsupportedExprExpr) Child(nth int) opt.Expr {
-	panic(errors.AssertionFailedf("child index out of range"))
-}
-
-func (e *UnsupportedExprExpr) Private() interface{} {
-	return e.Value
-}
-
-func (e *UnsupportedExprExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
-	f.FormatExpr(e)
-	return f.Buffer.String()
-}
-
-func (e *UnsupportedExprExpr) SetChild(nth int, child opt.Expr) {
-	panic(errors.AssertionFailedf("child index out of range"))
-}
-
-func (e *UnsupportedExprExpr) DataType() *types.T {
-	return e.Typ
-}
-
 type ArrayAggExpr struct {
 	Input opt.ScalarExpr
 
@@ -21642,26 +21597,6 @@ func (m *Memo) MemoizeColumnAccess(
 	return interned
 }
 
-func (m *Memo) MemoizeUnsupportedExpr(
-	value tree.TypedExpr,
-) *UnsupportedExprExpr {
-	const size = int64(unsafe.Sizeof(UnsupportedExprExpr{}))
-	e := &UnsupportedExprExpr{
-		Value: value,
-		id:    m.NextID(),
-	}
-	e.Typ = InferType(m, e)
-	interned := m.interner.InternUnsupportedExpr(e)
-	if interned == e {
-		if m.newGroupFn != nil {
-			m.newGroupFn(e)
-		}
-		m.memEstimate += size
-		m.CheckExpr(e)
-	}
-	return interned
-}
-
 func (m *Memo) MemoizeArrayAgg(
 	input opt.ScalarExpr,
 ) *ArrayAggExpr {
@@ -24481,8 +24416,6 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternCoalesce(t)
 	case *ColumnAccessExpr:
 		return in.InternColumnAccess(t)
-	case *UnsupportedExprExpr:
-		return in.InternUnsupportedExpr(t)
 	case *ArrayAggExpr:
 		return in.InternArrayAgg(t)
 	case *AvgExpr:
@@ -27925,24 +27858,6 @@ func (in *interner) InternColumnAccess(val *ColumnAccessExpr) *ColumnAccessExpr 
 		if existing, ok := in.cache.Item().(*ColumnAccessExpr); ok {
 			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) &&
 				in.hasher.IsTupleOrdinalEqual(val.Idx, existing.Idx) {
-				return existing
-			}
-		}
-	}
-
-	in.cache.Add(val)
-	return val
-}
-
-func (in *interner) InternUnsupportedExpr(val *UnsupportedExprExpr) *UnsupportedExprExpr {
-	in.hasher.Init()
-	in.hasher.HashOperator(opt.UnsupportedExprOp)
-	in.hasher.HashTypedExpr(val.Value)
-
-	in.cache.Start(in.hasher.hash)
-	for in.cache.Next() {
-		if existing, ok := in.cache.Item().(*UnsupportedExprExpr); ok {
-			if in.hasher.IsTypedExprEqual(val.Value, existing.Value) {
 				return existing
 			}
 		}

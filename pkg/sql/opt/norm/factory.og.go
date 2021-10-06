@@ -19872,27 +19872,6 @@ SKIP_RULES:
 	return expr
 }
 
-// ConstructUnsupportedExpr constructs an expression for the UnsupportedExpr operator.
-// UnsupportedExpr is used for interfacing with the old planner code. It can
-// encapsulate a TypedExpr that is otherwise not supported by the optimizer.
-func (_f *Factory) ConstructUnsupportedExpr(
-	value tree.TypedExpr,
-) opt.ScalarExpr {
-	_f.constructorStackDepth++
-	if _f.constructorStackDepth > maxConstructorStackDepth {
-		// If the constructor call stack depth exceeds the limit, call
-		// onMaxConstructorStackDepthExceeded and skip all rules.
-		_f.onMaxConstructorStackDepthExceeded()
-		goto SKIP_RULES
-	}
-
-SKIP_RULES:
-	e := _f.mem.MemoizeUnsupportedExpr(value)
-	expr := _f.onConstructScalar(e)
-	_f.constructorStackDepth--
-	return expr
-}
-
 // ConstructArrayAgg constructs an expression for the ArrayAgg operator.
 func (_f *Factory) ConstructArrayAgg(
 	input opt.ScalarExpr,
@@ -22593,9 +22572,6 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		}
 		return t
 
-	case *memo.UnsupportedExprExpr:
-		return t
-
 	case *memo.ArrayAggExpr:
 		input := replace(t.Input).(opt.ScalarExpr)
 		if input != t.Input {
@@ -24149,9 +24125,6 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 			t.Idx,
 		)
 
-	case *memo.UnsupportedExprExpr:
-		return t
-
 	case *memo.ArrayAggExpr:
 		return f.ConstructArrayAgg(
 			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
@@ -25384,10 +25357,6 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 		return f.ConstructColumnAccess(
 			args[0].(opt.ScalarExpr),
 			*args[1].(*memo.TupleOrdinal),
-		)
-	case opt.UnsupportedExprOp:
-		return f.ConstructUnsupportedExpr(
-			args[0].(tree.TypedExpr),
 		)
 	case opt.ArrayAggOp:
 		return f.ConstructArrayAgg(
