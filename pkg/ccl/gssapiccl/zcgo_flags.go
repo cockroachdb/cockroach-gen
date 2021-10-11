@@ -1,5 +1,6 @@
 // GENERATED FILE DO NOT EDIT
 
+//go:build !make
 // +build !make
 
 package gssapiccl

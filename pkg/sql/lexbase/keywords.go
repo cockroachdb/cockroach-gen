@@ -297,6 +297,7 @@ var KeywordsCategories = map[string]string{
 	"notnull":                        "T",
 	"noviewactivity":                 "U",
 	"nowait":                         "U",
+	"no_full_scan":                   "U",
 	"no_index_join":                  "U",
 	"no_zigzag_join":                 "U",
 	"null":                           "R",
@@ -816,6 +817,7 @@ var KeywordNames = []string{
 	"notnull",
 	"noviewactivity",
 	"nowait",
+	"no_full_scan",
 	"no_index_join",
 	"no_zigzag_join",
 	"null",
@@ -1634,6 +1636,8 @@ func GetKeywordID(k string) int32 {
 		return NOVIEWACTIVITY
 	case "nowait":
 		return NOWAIT
+	case "no_full_scan":
+		return NO_FULL_SCAN
 	case "no_index_join":
 		return NO_INDEX_JOIN
 	case "no_zigzag_join":

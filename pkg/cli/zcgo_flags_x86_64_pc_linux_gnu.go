@@ -1,5 +1,6 @@
 // GENERATED FILE DO NOT EDIT
 
+//go:build x86_64_pc_linux_gnu
 // +build x86_64_pc_linux_gnu
 
 package cli
