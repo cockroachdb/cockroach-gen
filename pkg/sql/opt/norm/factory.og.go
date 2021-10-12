@@ -11591,6 +11591,24 @@ func (_f *Factory) ConstructWith(
 		goto SKIP_RULES
 	}
 
+	// [SimplifyWithBindingOrdering]
+	{
+		if _f.funcs.CanSimplifyWithBindingOrdering(binding, withPrivate) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyWithBindingOrdering) {
+				_expr := _f.ConstructWith(
+					binding,
+					main,
+					_f.funcs.SimplifyWithBindingOrdering(binding, withPrivate),
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.SimplifyWithBindingOrdering, nil, _expr)
+				}
+				_f.constructorStackDepth--
+				return _expr
+			}
+		}
+	}
+
 	// [InlineWith]
 	{
 		input := main

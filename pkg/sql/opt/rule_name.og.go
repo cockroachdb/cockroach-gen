@@ -181,6 +181,7 @@ const (
 	SimplifyGroupByOrdering
 	SimplifyOrdinalityOrdering
 	SimplifyExplainOrdering
+	SimplifyWithBindingOrdering
 	EliminateJoinUnderProjectLeft
 	EliminateJoinUnderProjectRight
 	EliminateProject

@@ -7344,6 +7344,12 @@ type WithPrivate struct {
 	// default decision for materializing or not materializing tables.
 	Mtr tree.MaterializeClause
 
+	// Ordering specifies the order required of the binding, and thus controls
+	// the order in which the rows are materialized. Can only be used when Mtr is
+	// set to always materialize. Only used for the propagate_input_ordering
+	// flag.
+	BindingOrdering props.OrderingChoice
+
 	// Name is used to identify the with for debugging purposes.
 	Name string
 }
@@ -26033,6 +26039,7 @@ func (in *interner) InternWith(val *WithExpr) *WithExpr {
 	in.hasher.HashWithID(val.ID)
 	in.hasher.HashStatement(val.OriginalExpr)
 	in.hasher.HashMaterializeClause(val.Mtr)
+	in.hasher.HashOrderingChoice(val.BindingOrdering)
 	in.hasher.HashString(val.Name)
 
 	in.cache.Start(in.hasher.hash)
@@ -26043,6 +26050,7 @@ func (in *interner) InternWith(val *WithExpr) *WithExpr {
 				in.hasher.IsWithIDEqual(val.ID, existing.ID) &&
 				in.hasher.IsStatementEqual(val.OriginalExpr, existing.OriginalExpr) &&
 				in.hasher.IsMaterializeClauseEqual(val.Mtr, existing.Mtr) &&
+				in.hasher.IsOrderingChoiceEqual(val.BindingOrdering, existing.BindingOrdering) &&
 				in.hasher.IsStringEqual(val.Name, existing.Name) {
 				return existing
 			}
