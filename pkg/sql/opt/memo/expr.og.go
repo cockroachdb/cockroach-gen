@@ -8952,7 +8952,7 @@ func (e *ZipItem) ScalarProps() *props.Scalar {
 	return &e.scalar
 }
 
-// AndExpr is the boolean conjunction operator that evalutes to true only if both of
+// AndExpr is the boolean conjunction operator that evaluates to true only if both of
 // its conditions evaluate to true.
 type AndExpr struct {
 	Left  opt.ScalarExpr
@@ -12199,8 +12199,8 @@ func (e *UnaryCbrtExpr) DataType() *types.T {
 	return e.Typ
 }
 
-// CastExpr converts the input expression into an expression of the target type.
-// Note that the conversion may cause trunction based on the target types' width,
+// CastExpr converts the input expression into an expression of the target type. Note
+// that the conversion may cause truncation based on the target types' width,
 // such as in this example:
 //
 //   'hello'::VARCHAR(2)
@@ -12257,6 +12257,69 @@ func (e *CastExpr) SetChild(nth int, child opt.Expr) {
 }
 
 func (e *CastExpr) DataType() *types.T {
+	return e.Typ
+}
+
+// AssignmentCastExpr is similar to CastExpr, but is performed in the context of an
+// INSERT, UPDATE, or UPSERT to match the type of a mutation value to the type of
+// the target column. An expression separate from CastExpr is required because it
+// behaves slightly differently than an explicit cast. For example, while an
+// explicit cast will truncate a value to fit the width of a type, an assignment
+// cast will error instead if the value does not fit the type. See
+// tree.CastContext for more details.
+//
+// An assignment cast is represented as a distinct expression within the
+// optimizer, but is built into a crdb_internal.assignment_cast function call in
+// execbuilder.
+type AssignmentCastExpr struct {
+	Input opt.ScalarExpr
+	Typ   *types.T
+
+	rank opt.ScalarRank
+}
+
+var _ opt.ScalarExpr = &AssignmentCastExpr{}
+
+func (e *AssignmentCastExpr) Rank() opt.ScalarRank {
+	return e.rank
+}
+
+func (e *AssignmentCastExpr) Op() opt.Operator {
+	return opt.AssignmentCastOp
+}
+
+func (e *AssignmentCastExpr) ChildCount() int {
+	return 1
+}
+
+func (e *AssignmentCastExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *AssignmentCastExpr) Private() interface{} {
+	return e.Typ
+}
+
+func (e *AssignmentCastExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *AssignmentCastExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(opt.ScalarExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *AssignmentCastExpr) DataType() *types.T {
 	return e.Typ
 }
 
@@ -21383,6 +21446,27 @@ func (m *Memo) MemoizeCast(
 	return interned
 }
 
+func (m *Memo) MemoizeAssignmentCast(
+	input opt.ScalarExpr,
+	typ *types.T,
+) *AssignmentCastExpr {
+	const size = int64(unsafe.Sizeof(AssignmentCastExpr{}))
+	e := &AssignmentCastExpr{
+		Input: input,
+		Typ:   typ,
+		rank:  m.NextRank(),
+	}
+	interned := m.interner.InternAssignmentCast(e)
+	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
+		m.memEstimate += size
+		m.CheckExpr(e)
+	}
+	return interned
+}
+
 func (m *Memo) MemoizeIfErr(
 	cond opt.ScalarExpr,
 	orElse ScalarListExpr,
@@ -24402,6 +24486,8 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternUnaryCbrt(t)
 	case *CastExpr:
 		return in.InternCast(t)
+	case *AssignmentCastExpr:
+		return in.InternAssignmentCast(t)
 	case *IfErrExpr:
 		return in.InternIfErr(t)
 	case *CaseExpr:
@@ -27648,6 +27734,26 @@ func (in *interner) InternCast(val *CastExpr) *CastExpr {
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*CastExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsTypeEqual(val.Typ, existing.Typ) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternAssignmentCast(val *AssignmentCastExpr) *AssignmentCastExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.AssignmentCastOp)
+	in.hasher.HashScalarExpr(val.Input)
+	in.hasher.HashType(val.Typ)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*AssignmentCastExpr); ok {
 			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) &&
 				in.hasher.IsTypeEqual(val.Typ, existing.Typ) {
 				return existing

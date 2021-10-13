@@ -32069,7 +32069,7 @@ sqldefault:
 		{
 
 			if sqlDollar[1].str == "char" {
-				sqlVAL.union.val = types.MakeQChar(0)
+				sqlVAL.union.val = types.QChar
 			} else if sqlDollar[1].str == "serial" {
 				switch sqllex.(*lexer).nakedIntType.Width() {
 				case 32:
@@ -33852,7 +33852,7 @@ sqldefault:
 				typName := name.Parts[0]
 
 				if typName == "char" {
-					sqlVAL.union.val = &tree.CastExpr{Expr: tree.NewStrVal(sqlDollar[2].str), Type: types.MakeQChar(0), SyntaxMode: tree.CastPrepend}
+					sqlVAL.union.val = &tree.CastExpr{Expr: tree.NewStrVal(sqlDollar[2].str), Type: types.QChar, SyntaxMode: tree.CastPrepend}
 				} else if typName == "serial" {
 					switch sqllex.(*lexer).nakedIntType.Width() {
 					case 32:

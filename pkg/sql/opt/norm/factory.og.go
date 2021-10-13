@@ -12314,7 +12314,7 @@ func (_f *Factory) ConstructZipItem(
 }
 
 // ConstructAnd constructs an expression for the And operator.
-// And is the boolean conjunction operator that evalutes to true only if both of
+// And is the boolean conjunction operator that evaluates to true only if both of
 // its conditions evaluate to true.
 func (_f *Factory) ConstructAnd(
 	left opt.ScalarExpr,
@@ -19362,8 +19362,8 @@ SKIP_RULES:
 }
 
 // ConstructCast constructs an expression for the Cast operator.
-// Cast converts the input expression into an expression of the target type.
-// Note that the conversion may cause trunction based on the target types' width,
+// Cast converts the input expression into an expression of the target type. Note
+// that the conversion may cause truncation based on the target types' width,
 // such as in this example:
 //
 //   'hello'::VARCHAR(2)
@@ -19435,6 +19435,37 @@ func (_f *Factory) ConstructCast(
 
 SKIP_RULES:
 	e := _f.mem.MemoizeCast(input, typ)
+	expr := _f.onConstructScalar(e)
+	_f.constructorStackDepth--
+	return expr
+}
+
+// ConstructAssignmentCast constructs an expression for the AssignmentCast operator.
+// AssignmentCast is similar to CastExpr, but is performed in the context of an
+// INSERT, UPDATE, or UPSERT to match the type of a mutation value to the type of
+// the target column. An expression separate from CastExpr is required because it
+// behaves slightly differently than an explicit cast. For example, while an
+// explicit cast will truncate a value to fit the width of a type, an assignment
+// cast will error instead if the value does not fit the type. See
+// tree.CastContext for more details.
+//
+// An assignment cast is represented as a distinct expression within the
+// optimizer, but is built into a crdb_internal.assignment_cast function call in
+// execbuilder.
+func (_f *Factory) ConstructAssignmentCast(
+	input opt.ScalarExpr,
+	typ *types.T,
+) opt.ScalarExpr {
+	_f.constructorStackDepth++
+	if _f.constructorStackDepth > maxConstructorStackDepth {
+		// If the constructor call stack depth exceeds the limit, call
+		// onMaxConstructorStackDepthExceeded and skip all rules.
+		_f.onMaxConstructorStackDepthExceeded()
+		goto SKIP_RULES
+	}
+
+SKIP_RULES:
+	e := _f.mem.MemoizeAssignmentCast(input, typ)
 	expr := _f.onConstructScalar(e)
 	_f.constructorStackDepth--
 	return expr
@@ -22514,6 +22545,13 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		}
 		return t
 
+	case *memo.AssignmentCastExpr:
+		input := replace(t.Input).(opt.ScalarExpr)
+		if input != t.Input {
+			return f.ConstructAssignmentCast(input, t.Typ)
+		}
+		return t
+
 	case *memo.IfErrExpr:
 		cond := replace(t.Cond).(opt.ScalarExpr)
 		orElse, orElseChanged := f.replaceScalarListExpr(t.OrElse, replace)
@@ -24082,6 +24120,12 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 			t.Typ,
 		)
 
+	case *memo.AssignmentCastExpr:
+		return f.ConstructAssignmentCast(
+			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
+			t.Typ,
+		)
+
 	case *memo.IfErrExpr:
 		return f.ConstructIfErr(
 			f.invokeReplace(t.Cond, replace).(opt.ScalarExpr),
@@ -25322,6 +25366,11 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 		)
 	case opt.CastOp:
 		return f.ConstructCast(
+			args[0].(opt.ScalarExpr),
+			args[1].(*types.T),
+		)
+	case opt.AssignmentCastOp:
+		return f.ConstructAssignmentCast(
 			args[0].(opt.ScalarExpr),
 			args[1].(*types.T),
 		)
