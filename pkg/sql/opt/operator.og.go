@@ -1305,7 +1305,7 @@ const (
 
 	// WithScan returns the results present in the With expression referenced
 	// by ID.
-	// Note that in order to contruct a WithScan, the WithID must have a bound
+	// Note that in order to construct a WithScan, the WithID must have a bound
 	// expression in the metadata.
 	WithScanOp
 
