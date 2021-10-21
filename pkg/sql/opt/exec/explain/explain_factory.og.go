@@ -1641,12 +1641,14 @@ func (f *Factory) ConstructRecursiveCTE(
 	initial exec.Node,
 	fn exec.RecursiveCTEIterationFn,
 	label string,
+	deduplicate bool,
 ) (exec.Node, error) {
 	initialNode := initial.(*Node)
 	args := &recursiveCTEArgs{
-		Initial: initialNode,
-		Fn:      fn,
-		Label:   label,
+		Initial:     initialNode,
+		Fn:          fn,
+		Label:       label,
+		Deduplicate: deduplicate,
 	}
 	_n, err := f.newNode(recursiveCTEOp, args, nil /* ordering */, initialNode)
 	if err != nil {
@@ -1657,6 +1659,7 @@ func (f *Factory) ConstructRecursiveCTE(
 		initialNode.WrappedNode(),
 		fn,
 		label,
+		deduplicate,
 	)
 	if err != nil {
 		return nil, err
@@ -2250,9 +2253,10 @@ type scanBufferArgs struct {
 }
 
 type recursiveCTEArgs struct {
-	Initial *Node
-	Fn      exec.RecursiveCTEIterationFn
-	Label   string
+	Initial     *Node
+	Fn          exec.RecursiveCTEIterationFn
+	Label       string
+	Deduplicate bool
 }
 
 type controlJobsArgs struct {

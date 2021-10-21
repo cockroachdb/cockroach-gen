@@ -816,11 +816,13 @@ type Factory interface {
 	//       function. The returned plan uses this reference with a
 	//       ConstructScanBuffer call.
 	//     - the plan is executed; the results are emitted and also saved in a new
-	//       buffer for the next iteration.
+	//       buffer for the next iteration. If Deduplicate is true, only rows that
+	//       haven't been returned yet are emitted and saved.
 	ConstructRecursiveCTE(
 		initial Node,
 		fn RecursiveCTEIterationFn,
 		label string,
+		deduplicate bool,
 	) (Node, error)
 
 	// ConstructControlJobs creates a node for a ControlJobs operation.
@@ -1358,6 +1360,7 @@ func (StubFactory) ConstructRecursiveCTE(
 	initial Node,
 	fn RecursiveCTEIterationFn,
 	label string,
+	deduplicate bool,
 ) (Node, error) {
 	return struct{}{}, nil
 }

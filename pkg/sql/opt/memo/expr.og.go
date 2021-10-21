@@ -7668,6 +7668,10 @@ type RecursiveCTEPrivate struct {
 	// These columns are also used by the Recursive query to refer to the working
 	// table (see WithID).
 	OutCols opt.ColList
+
+	// Deduplicate indicates if output rows should be deduplicated against all
+	// previous output rows (UNION variant, not UNION ALL).
+	Deduplicate bool
 }
 
 // FakeRelExpr is a mock relational operator used for testing and as a dummy binding
@@ -26184,6 +26188,7 @@ func (in *interner) InternRecursiveCTE(val *RecursiveCTEExpr) *RecursiveCTEExpr 
 	in.hasher.HashColList(val.InitialCols)
 	in.hasher.HashColList(val.RecursiveCols)
 	in.hasher.HashColList(val.OutCols)
+	in.hasher.HashBool(val.Deduplicate)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
@@ -26195,7 +26200,8 @@ func (in *interner) InternRecursiveCTE(val *RecursiveCTEExpr) *RecursiveCTEExpr 
 				in.hasher.IsWithIDEqual(val.WithID, existing.WithID) &&
 				in.hasher.IsColListEqual(val.InitialCols, existing.InitialCols) &&
 				in.hasher.IsColListEqual(val.RecursiveCols, existing.RecursiveCols) &&
-				in.hasher.IsColListEqual(val.OutCols, existing.OutCols) {
+				in.hasher.IsColListEqual(val.OutCols, existing.OutCols) &&
+				in.hasher.IsBoolEqual(val.Deduplicate, existing.Deduplicate) {
 				return existing
 			}
 		}
