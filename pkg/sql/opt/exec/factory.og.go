@@ -660,23 +660,15 @@ type Factory interface {
 	// true:
 	//  - there are no secondary indexes;
 	//  - the input to the delete is a scan (without limits);
-	//  - the table is not involved in interleaving, or it is at the root of an
-	//    interleaving hierarchy with cascading FKs such that a delete of a row
-	//    cascades and deletes all interleaved rows corresponding to that row;
-	//  - there are no inbound FKs to the table (other than within the
-	//    interleaving as described above).
+	//  - there are no inbound FKs to the table.
 	//
 	// See the comment for ConstructScan for descriptions of the needed and
 	// indexConstraint parameters, since DeleteRange combines Delete + Scan into a
 	// single operator.
-	//
-	// If any interleavedTables are passed, they are all the descendant tables in
-	// an interleaving hierarchy we are deleting from.
 	ConstructDeleteRange(
 		table cat.Table,
 		needed TableColumnOrdinalSet,
 		indexConstraint *constraint.Constraint,
-		interleavedTables []cat.Table,
 		// If set, the operator will commit the transaction as part of its execution.
 		// This is false when executing inside an explicit transaction, or there are
 		// multiple mutations in a statement, or the output of the mutation is
@@ -1249,7 +1241,6 @@ func (StubFactory) ConstructDeleteRange(
 	table cat.Table,
 	needed TableColumnOrdinalSet,
 	indexConstraint *constraint.Constraint,
-	interleavedTables []cat.Table,
 	autoCommit bool,
 ) (Node, error) {
 	return struct{}{}, nil

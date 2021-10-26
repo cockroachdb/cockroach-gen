@@ -1252,7 +1252,6 @@ func (f *Factory) ConstructDeleteRange(
 	table cat.Table,
 	needed exec.TableColumnOrdinalSet,
 	indexConstraint *constraint.Constraint,
-	interleavedTables []cat.Table,
 	// If set, the operator will commit the transaction as part of its execution.
 	// This is false when executing inside an explicit transaction, or there are
 	// multiple mutations in a statement, or the output of the mutation is
@@ -1261,11 +1260,10 @@ func (f *Factory) ConstructDeleteRange(
 	autoCommit bool,
 ) (exec.Node, error) {
 	args := &deleteRangeArgs{
-		Table:             table,
-		Needed:            needed,
-		IndexConstraint:   indexConstraint,
-		InterleavedTables: interleavedTables,
-		AutoCommit:        autoCommit,
+		Table:           table,
+		Needed:          needed,
+		IndexConstraint: indexConstraint,
+		AutoCommit:      autoCommit,
 	}
 	_n, err := f.newNode(deleteRangeOp, args, nil /* ordering */)
 	if err != nil {
@@ -1276,7 +1274,6 @@ func (f *Factory) ConstructDeleteRange(
 		table,
 		needed,
 		indexConstraint,
-		interleavedTables,
 		autoCommit,
 	)
 	if err != nil {
@@ -2170,11 +2167,10 @@ type deleteArgs struct {
 }
 
 type deleteRangeArgs struct {
-	Table             cat.Table
-	Needed            exec.TableColumnOrdinalSet
-	IndexConstraint   *constraint.Constraint
-	InterleavedTables []cat.Table
-	AutoCommit        bool
+	Table           cat.Table
+	Needed          exec.TableColumnOrdinalSet
+	IndexConstraint *constraint.Constraint
+	AutoCommit      bool
 }
 
 type createTableArgs struct {
