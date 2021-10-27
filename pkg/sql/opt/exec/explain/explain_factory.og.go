@@ -26,7 +26,7 @@ func (f *Factory) ConstructScan(
 		Params:      params,
 		ReqOrdering: reqOrdering,
 	}
-	_n, err := f.newNode(scanOp, args, reqOrdering)
+	_n, err := newNode(scanOp, args, reqOrdering)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +52,7 @@ func (f *Factory) ConstructValues(
 		Rows:    rows,
 		Columns: columns,
 	}
-	_n, err := f.newNode(valuesOp, args, nil /* ordering */)
+	_n, err := newNode(valuesOp, args, nil /* ordering */)
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +79,7 @@ func (f *Factory) ConstructFilter(
 		Filter:      filter,
 		ReqOrdering: reqOrdering,
 	}
-	_n, err := f.newNode(filterOp, args, reqOrdering, inputNode)
+	_n, err := newNode(filterOp, args, reqOrdering, inputNode)
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +111,7 @@ func (f *Factory) ConstructInvertedFilter(
 		PreFiltererType: preFiltererType,
 		InvColumn:       invColumn,
 	}
-	_n, err := f.newNode(invertedFilterOp, args, nil /* ordering */, inputNode)
+	_n, err := newNode(invertedFilterOp, args, nil /* ordering */, inputNode)
 	if err != nil {
 		return nil, err
 	}
@@ -141,7 +141,7 @@ func (f *Factory) ConstructSimpleProject(
 		Cols:        cols,
 		ReqOrdering: reqOrdering,
 	}
-	_n, err := f.newNode(simpleProjectOp, args, reqOrdering, inputNode)
+	_n, err := newNode(simpleProjectOp, args, reqOrdering, inputNode)
 	if err != nil {
 		return nil, err
 	}
@@ -169,7 +169,7 @@ func (f *Factory) ConstructSerializingProject(
 		Cols:     cols,
 		ColNames: colNames,
 	}
-	_n, err := f.newNode(serializingProjectOp, args, nil /* ordering */, inputNode)
+	_n, err := newNode(serializingProjectOp, args, nil /* ordering */, inputNode)
 	if err != nil {
 		return nil, err
 	}
@@ -199,7 +199,7 @@ func (f *Factory) ConstructRender(
 		Exprs:       exprs,
 		ReqOrdering: reqOrdering,
 	}
-	_n, err := f.newNode(renderOp, args, reqOrdering, inputNode)
+	_n, err := newNode(renderOp, args, reqOrdering, inputNode)
 	if err != nil {
 		return nil, err
 	}
@@ -232,7 +232,7 @@ func (f *Factory) ConstructApplyJoin(
 		OnCond:          onCond,
 		PlanRightSideFn: planRightSideFn,
 	}
-	_n, err := f.newNode(applyJoinOp, args, nil /* ordering */, leftNode)
+	_n, err := newNode(applyJoinOp, args, nil /* ordering */, leftNode)
 	if err != nil {
 		return nil, err
 	}
@@ -273,7 +273,7 @@ func (f *Factory) ConstructHashJoin(
 		RightEqColsAreKey: rightEqColsAreKey,
 		ExtraOnCond:       extraOnCond,
 	}
-	_n, err := f.newNode(hashJoinOp, args, nil /* ordering */, leftNode, rightNode)
+	_n, err := newNode(hashJoinOp, args, nil /* ordering */, leftNode, rightNode)
 	if err != nil {
 		return nil, err
 	}
@@ -319,7 +319,7 @@ func (f *Factory) ConstructMergeJoin(
 		LeftEqColsAreKey:  leftEqColsAreKey,
 		RightEqColsAreKey: rightEqColsAreKey,
 	}
-	_n, err := f.newNode(mergeJoinOp, args, reqOrdering, leftNode, rightNode)
+	_n, err := newNode(mergeJoinOp, args, reqOrdering, leftNode, rightNode)
 	if err != nil {
 		return nil, err
 	}
@@ -362,7 +362,7 @@ func (f *Factory) ConstructGroupBy(
 		Aggregations:     aggregations,
 		ReqOrdering:      reqOrdering,
 	}
-	_n, err := f.newNode(groupByOp, args, reqOrdering, inputNode)
+	_n, err := newNode(groupByOp, args, reqOrdering, inputNode)
 	if err != nil {
 		return nil, err
 	}
@@ -390,7 +390,7 @@ func (f *Factory) ConstructScalarGroupBy(
 		Input:        inputNode,
 		Aggregations: aggregations,
 	}
-	_n, err := f.newNode(scalarGroupByOp, args, nil /* ordering */, inputNode)
+	_n, err := newNode(scalarGroupByOp, args, nil /* ordering */, inputNode)
 	if err != nil {
 		return nil, err
 	}
@@ -423,7 +423,7 @@ func (f *Factory) ConstructDistinct(
 		NullsAreDistinct: nullsAreDistinct,
 		ErrorOnDup:       errorOnDup,
 	}
-	_n, err := f.newNode(distinctOp, args, reqOrdering, inputNode)
+	_n, err := newNode(distinctOp, args, reqOrdering, inputNode)
 	if err != nil {
 		return nil, err
 	}
@@ -457,7 +457,7 @@ func (f *Factory) ConstructHashSetOp(
 		Left:  leftNode,
 		Right: rightNode,
 	}
-	_n, err := f.newNode(hashSetOpOp, args, nil /* ordering */, leftNode, rightNode)
+	_n, err := newNode(hashSetOpOp, args, nil /* ordering */, leftNode, rightNode)
 	if err != nil {
 		return nil, err
 	}
@@ -493,7 +493,7 @@ func (f *Factory) ConstructStreamingSetOp(
 		StreamingOrdering: streamingOrdering,
 		ReqOrdering:       reqOrdering,
 	}
-	_n, err := f.newNode(streamingSetOpOp, args, reqOrdering, leftNode, rightNode)
+	_n, err := newNode(streamingSetOpOp, args, reqOrdering, leftNode, rightNode)
 	if err != nil {
 		return nil, err
 	}
@@ -527,7 +527,7 @@ func (f *Factory) ConstructUnionAll(
 		ReqOrdering: reqOrdering,
 		HardLimit:   hardLimit,
 	}
-	_n, err := f.newNode(unionAllOp, args, reqOrdering, leftNode, rightNode)
+	_n, err := newNode(unionAllOp, args, reqOrdering, leftNode, rightNode)
 	if err != nil {
 		return nil, err
 	}
@@ -556,7 +556,7 @@ func (f *Factory) ConstructSort(
 		Ordering:             ordering,
 		AlreadyOrderedPrefix: alreadyOrderedPrefix,
 	}
-	_n, err := f.newNode(sortOp, args, ordering, inputNode)
+	_n, err := newNode(sortOp, args, ordering, inputNode)
 	if err != nil {
 		return nil, err
 	}
@@ -582,7 +582,7 @@ func (f *Factory) ConstructOrdinality(
 		Input:   inputNode,
 		ColName: colName,
 	}
-	_n, err := f.newNode(ordinalityOp, args, nil /* ordering */, inputNode)
+	_n, err := newNode(ordinalityOp, args, nil /* ordering */, inputNode)
 	if err != nil {
 		return nil, err
 	}
@@ -613,7 +613,7 @@ func (f *Factory) ConstructIndexJoin(
 		TableCols:   tableCols,
 		ReqOrdering: reqOrdering,
 	}
-	_n, err := f.newNode(indexJoinOp, args, reqOrdering, inputNode)
+	_n, err := newNode(indexJoinOp, args, reqOrdering, inputNode)
 	if err != nil {
 		return nil, err
 	}
@@ -663,7 +663,7 @@ func (f *Factory) ConstructLookupJoin(
 		ReqOrdering:                reqOrdering,
 		Locking:                    locking,
 	}
-	_n, err := f.newNode(lookupJoinOp, args, reqOrdering, inputNode)
+	_n, err := newNode(lookupJoinOp, args, reqOrdering, inputNode)
 	if err != nil {
 		return nil, err
 	}
@@ -715,7 +715,7 @@ func (f *Factory) ConstructInvertedJoin(
 		IsFirstJoinInPairedJoiner: isFirstJoinInPairedJoiner,
 		ReqOrdering:               reqOrdering,
 	}
-	_n, err := f.newNode(invertedJoinOp, args, reqOrdering, inputNode)
+	_n, err := newNode(invertedJoinOp, args, reqOrdering, inputNode)
 	if err != nil {
 		return nil, err
 	}
@@ -781,7 +781,7 @@ func (f *Factory) ConstructZigzagJoin(
 		OnCond:         onCond,
 		ReqOrdering:    reqOrdering,
 	}
-	_n, err := f.newNode(zigzagJoinOp, args, reqOrdering)
+	_n, err := newNode(zigzagJoinOp, args, reqOrdering)
 	if err != nil {
 		return nil, err
 	}
@@ -818,7 +818,7 @@ func (f *Factory) ConstructLimit(
 		Limit:  limit,
 		Offset: offset,
 	}
-	_n, err := f.newNode(limitOp, args, nil /* ordering */, inputNode)
+	_n, err := newNode(limitOp, args, nil /* ordering */, inputNode)
 	if err != nil {
 		return nil, err
 	}
@@ -848,7 +848,7 @@ func (f *Factory) ConstructTopK(
 		Ordering:             ordering,
 		AlreadyOrderedPrefix: alreadyOrderedPrefix,
 	}
-	_n, err := f.newNode(topKOp, args, ordering, inputNode)
+	_n, err := newNode(topKOp, args, ordering, inputNode)
 	if err != nil {
 		return nil, err
 	}
@@ -875,7 +875,7 @@ func (f *Factory) ConstructMax1Row(
 		Input:     inputNode,
 		ErrorText: errorText,
 	}
-	_n, err := f.newNode(max1RowOp, args, nil /* ordering */, inputNode)
+	_n, err := newNode(max1RowOp, args, nil /* ordering */, inputNode)
 	if err != nil {
 		return nil, err
 	}
@@ -904,7 +904,7 @@ func (f *Factory) ConstructProjectSet(
 		ZipCols:       zipCols,
 		NumColsPerGen: numColsPerGen,
 	}
-	_n, err := f.newNode(projectSetOp, args, nil /* ordering */, inputNode)
+	_n, err := newNode(projectSetOp, args, nil /* ordering */, inputNode)
 	if err != nil {
 		return nil, err
 	}
@@ -931,7 +931,7 @@ func (f *Factory) ConstructWindow(
 		Input:  inputNode,
 		Window: window,
 	}
-	_n, err := f.newNode(windowOp, args, nil /* ordering */, inputNode)
+	_n, err := newNode(windowOp, args, nil /* ordering */, inputNode)
 	if err != nil {
 		return nil, err
 	}
@@ -955,7 +955,7 @@ func (f *Factory) ConstructExplainOpt(
 		Plan:    plan,
 		EnvOpts: envOpts,
 	}
-	_n, err := f.newNode(explainOptOp, args, nil /* ordering */)
+	_n, err := newNode(explainOptOp, args, nil /* ordering */)
 	if err != nil {
 		return nil, err
 	}
@@ -981,7 +981,7 @@ func (f *Factory) ConstructExplain(
 		StmtType: stmtType,
 		BuildFn:  buildFn,
 	}
-	_n, err := f.newNode(explainOp, args, nil /* ordering */)
+	_n, err := newNode(explainOp, args, nil /* ordering */)
 	if err != nil {
 		return nil, err
 	}
@@ -1006,7 +1006,7 @@ func (f *Factory) ConstructShowTrace(
 		Typ:     typ,
 		Compact: compact,
 	}
-	_n, err := f.newNode(showTraceOp, args, nil /* ordering */)
+	_n, err := newNode(showTraceOp, args, nil /* ordering */)
 	if err != nil {
 		return nil, err
 	}
@@ -1047,7 +1047,7 @@ func (f *Factory) ConstructInsert(
 		CheckCols:          checkCols,
 		AutoCommit:         autoCommit,
 	}
-	_n, err := f.newNode(insertOp, args, nil /* ordering */, inputNode)
+	_n, err := newNode(insertOp, args, nil /* ordering */, inputNode)
 	if err != nil {
 		return nil, err
 	}
@@ -1089,7 +1089,7 @@ func (f *Factory) ConstructInsertFastPath(
 		FkChecks:   fkChecks,
 		AutoCommit: autoCommit,
 	}
-	_n, err := f.newNode(insertFastPathOp, args, nil /* ordering */)
+	_n, err := newNode(insertFastPathOp, args, nil /* ordering */)
 	if err != nil {
 		return nil, err
 	}
@@ -1132,7 +1132,7 @@ func (f *Factory) ConstructUpdate(
 		Passthrough: passthrough,
 		AutoCommit:  autoCommit,
 	}
-	_n, err := f.newNode(updateOp, args, nil /* ordering */, inputNode)
+	_n, err := newNode(updateOp, args, nil /* ordering */, inputNode)
 	if err != nil {
 		return nil, err
 	}
@@ -1185,7 +1185,7 @@ func (f *Factory) ConstructUpsert(
 		Checks:             checks,
 		AutoCommit:         autoCommit,
 	}
-	_n, err := f.newNode(upsertOp, args, nil /* ordering */, inputNode)
+	_n, err := newNode(upsertOp, args, nil /* ordering */, inputNode)
 	if err != nil {
 		return nil, err
 	}
@@ -1229,7 +1229,7 @@ func (f *Factory) ConstructDelete(
 		ReturnCols: returnCols,
 		AutoCommit: autoCommit,
 	}
-	_n, err := f.newNode(deleteOp, args, nil /* ordering */, inputNode)
+	_n, err := newNode(deleteOp, args, nil /* ordering */, inputNode)
 	if err != nil {
 		return nil, err
 	}
@@ -1265,7 +1265,7 @@ func (f *Factory) ConstructDeleteRange(
 		IndexConstraint: indexConstraint,
 		AutoCommit:      autoCommit,
 	}
-	_n, err := f.newNode(deleteRangeOp, args, nil /* ordering */)
+	_n, err := newNode(deleteRangeOp, args, nil /* ordering */)
 	if err != nil {
 		return nil, err
 	}
@@ -1291,7 +1291,7 @@ func (f *Factory) ConstructCreateTable(
 		Schema: schema,
 		Ct:     ct,
 	}
-	_n, err := f.newNode(createTableOp, args, nil /* ordering */)
+	_n, err := newNode(createTableOp, args, nil /* ordering */)
 	if err != nil {
 		return nil, err
 	}
@@ -1318,7 +1318,7 @@ func (f *Factory) ConstructCreateTableAs(
 		Schema: schema,
 		Ct:     ct,
 	}
-	_n, err := f.newNode(createTableAsOp, args, nil /* ordering */, inputNode)
+	_n, err := newNode(createTableAsOp, args, nil /* ordering */, inputNode)
 	if err != nil {
 		return nil, err
 	}
@@ -1359,7 +1359,7 @@ func (f *Factory) ConstructCreateView(
 		deps:         deps,
 		typeDeps:     typeDeps,
 	}
-	_n, err := f.newNode(createViewOp, args, nil /* ordering */)
+	_n, err := newNode(createViewOp, args, nil /* ordering */)
 	if err != nil {
 		return nil, err
 	}
@@ -1389,7 +1389,7 @@ func (f *Factory) ConstructSequenceSelect(
 	args := &sequenceSelectArgs{
 		Sequence: sequence,
 	}
-	_n, err := f.newNode(sequenceSelectOp, args, nil /* ordering */)
+	_n, err := newNode(sequenceSelectOp, args, nil /* ordering */)
 	if err != nil {
 		return nil, err
 	}
@@ -1415,7 +1415,7 @@ func (f *Factory) ConstructSaveTable(
 		Table:    table,
 		ColNames: colNames,
 	}
-	_n, err := f.newNode(saveTableOp, args, nil /* ordering */, inputNode)
+	_n, err := newNode(saveTableOp, args, nil /* ordering */, inputNode)
 	if err != nil {
 		return nil, err
 	}
@@ -1442,7 +1442,7 @@ func (f *Factory) ConstructErrorIfRows(
 		Input: inputNode,
 		MkErr: mkErr,
 	}
-	_n, err := f.newNode(errorIfRowsOp, args, nil /* ordering */, inputNode)
+	_n, err := newNode(errorIfRowsOp, args, nil /* ordering */, inputNode)
 	if err != nil {
 		return nil, err
 	}
@@ -1464,7 +1464,7 @@ func (f *Factory) ConstructOpaque(
 	args := &opaqueArgs{
 		Metadata: metadata,
 	}
-	_n, err := f.newNode(opaqueOp, args, nil /* ordering */)
+	_n, err := newNode(opaqueOp, args, nil /* ordering */)
 	if err != nil {
 		return nil, err
 	}
@@ -1490,7 +1490,7 @@ func (f *Factory) ConstructAlterTableSplit(
 		Input:      inputNode,
 		Expiration: expiration,
 	}
-	_n, err := f.newNode(alterTableSplitOp, args, nil /* ordering */, inputNode)
+	_n, err := newNode(alterTableSplitOp, args, nil /* ordering */, inputNode)
 	if err != nil {
 		return nil, err
 	}
@@ -1516,7 +1516,7 @@ func (f *Factory) ConstructAlterTableUnsplit(
 		Index: index,
 		Input: inputNode,
 	}
-	_n, err := f.newNode(alterTableUnsplitOp, args, nil /* ordering */, inputNode)
+	_n, err := newNode(alterTableUnsplitOp, args, nil /* ordering */, inputNode)
 	if err != nil {
 		return nil, err
 	}
@@ -1538,7 +1538,7 @@ func (f *Factory) ConstructAlterTableUnsplitAll(
 	args := &alterTableUnsplitAllArgs{
 		Index: index,
 	}
-	_n, err := f.newNode(alterTableUnsplitAllOp, args, nil /* ordering */)
+	_n, err := newNode(alterTableUnsplitAllOp, args, nil /* ordering */)
 	if err != nil {
 		return nil, err
 	}
@@ -1566,7 +1566,7 @@ func (f *Factory) ConstructAlterTableRelocate(
 		relocateLease:     relocateLease,
 		relocateNonVoters: relocateNonVoters,
 	}
-	_n, err := f.newNode(alterTableRelocateOp, args, nil /* ordering */, inputNode)
+	_n, err := newNode(alterTableRelocateOp, args, nil /* ordering */, inputNode)
 	if err != nil {
 		return nil, err
 	}
@@ -1593,7 +1593,7 @@ func (f *Factory) ConstructBuffer(
 		Input: inputNode,
 		Label: label,
 	}
-	_n, err := f.newNode(bufferOp, args, nil /* ordering */, inputNode)
+	_n, err := newNode(bufferOp, args, nil /* ordering */, inputNode)
 	if err != nil {
 		return nil, err
 	}
@@ -1618,7 +1618,7 @@ func (f *Factory) ConstructScanBuffer(
 		Ref:   refNode,
 		Label: label,
 	}
-	_n, err := f.newNode(scanBufferOp, args, nil /* ordering */)
+	_n, err := newNode(scanBufferOp, args, nil /* ordering */)
 	if err != nil {
 		return nil, err
 	}
@@ -1647,7 +1647,7 @@ func (f *Factory) ConstructRecursiveCTE(
 		Label:       label,
 		Deduplicate: deduplicate,
 	}
-	_n, err := f.newNode(recursiveCTEOp, args, nil /* ordering */, initialNode)
+	_n, err := newNode(recursiveCTEOp, args, nil /* ordering */, initialNode)
 	if err != nil {
 		return nil, err
 	}
@@ -1676,7 +1676,7 @@ func (f *Factory) ConstructControlJobs(
 		input:   inputNode,
 		Reason:  reason,
 	}
-	_n, err := f.newNode(controlJobsOp, args, nil /* ordering */, inputNode)
+	_n, err := newNode(controlJobsOp, args, nil /* ordering */, inputNode)
 	if err != nil {
 		return nil, err
 	}
@@ -1702,7 +1702,7 @@ func (f *Factory) ConstructControlSchedules(
 		Command: command,
 		input:   inputNode,
 	}
-	_n, err := f.newNode(controlSchedulesOp, args, nil /* ordering */, inputNode)
+	_n, err := newNode(controlSchedulesOp, args, nil /* ordering */, inputNode)
 	if err != nil {
 		return nil, err
 	}
@@ -1727,7 +1727,7 @@ func (f *Factory) ConstructCancelQueries(
 		Input:    inputNode,
 		IfExists: ifExists,
 	}
-	_n, err := f.newNode(cancelQueriesOp, args, nil /* ordering */, inputNode)
+	_n, err := newNode(cancelQueriesOp, args, nil /* ordering */, inputNode)
 	if err != nil {
 		return nil, err
 	}
@@ -1752,7 +1752,7 @@ func (f *Factory) ConstructCancelSessions(
 		Input:    inputNode,
 		IfExists: ifExists,
 	}
-	_n, err := f.newNode(cancelSessionsOp, args, nil /* ordering */, inputNode)
+	_n, err := newNode(cancelSessionsOp, args, nil /* ordering */, inputNode)
 	if err != nil {
 		return nil, err
 	}
@@ -1774,7 +1774,7 @@ func (f *Factory) ConstructCreateStatistics(
 	args := &createStatisticsArgs{
 		Cs: cs,
 	}
-	_n, err := f.newNode(createStatisticsOp, args, nil /* ordering */)
+	_n, err := newNode(createStatisticsOp, args, nil /* ordering */)
 	if err != nil {
 		return nil, err
 	}
@@ -1802,7 +1802,7 @@ func (f *Factory) ConstructExport(
 		FileFormat: fileFormat,
 		Options:    options,
 	}
-	_n, err := f.newNode(exportOp, args, nil /* ordering */, inputNode)
+	_n, err := newNode(exportOp, args, nil /* ordering */, inputNode)
 	if err != nil {
 		return nil, err
 	}
@@ -1880,6 +1880,7 @@ const (
 	cancelSessionsOp
 	createStatisticsOp
 	exportOp
+	numOperators
 )
 
 type scanArgs struct {
