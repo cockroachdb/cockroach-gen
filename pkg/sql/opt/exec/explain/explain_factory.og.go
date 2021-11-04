@@ -353,14 +353,18 @@ func (f *Factory) ConstructGroupBy(
 	// If set, the output must have this ordering, but it is guaranteed that
 	// ReqOrdering is a prefix of GroupColOrdering.
 	reqOrdering exec.OutputOrdering,
+	// The grouping column order type (Streaming, PartialStreaming, or
+	// NoStreaming).
+	groupingOrderType exec.GroupingOrderType,
 ) (exec.Node, error) {
 	inputNode := input.(*Node)
 	args := &groupByArgs{
-		Input:            inputNode,
-		GroupCols:        groupCols,
-		GroupColOrdering: groupColOrdering,
-		Aggregations:     aggregations,
-		ReqOrdering:      reqOrdering,
+		Input:             inputNode,
+		GroupCols:         groupCols,
+		GroupColOrdering:  groupColOrdering,
+		Aggregations:      aggregations,
+		ReqOrdering:       reqOrdering,
+		groupingOrderType: groupingOrderType,
 	}
 	_n, err := newNode(groupByOp, args, reqOrdering, inputNode)
 	if err != nil {
@@ -373,6 +377,7 @@ func (f *Factory) ConstructGroupBy(
 		groupColOrdering,
 		aggregations,
 		reqOrdering,
+		groupingOrderType,
 	)
 	if err != nil {
 		return nil, err
@@ -1960,11 +1965,12 @@ type mergeJoinArgs struct {
 }
 
 type groupByArgs struct {
-	Input            *Node
-	GroupCols        []exec.NodeColumnOrdinal
-	GroupColOrdering colinfo.ColumnOrdering
-	Aggregations     []exec.AggInfo
-	ReqOrdering      exec.OutputOrdering
+	Input             *Node
+	GroupCols         []exec.NodeColumnOrdinal
+	GroupColOrdering  colinfo.ColumnOrdering
+	Aggregations      []exec.AggInfo
+	ReqOrdering       exec.OutputOrdering
+	groupingOrderType exec.GroupingOrderType
 }
 
 type scalarGroupByArgs struct {

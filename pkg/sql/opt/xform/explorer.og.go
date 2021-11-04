@@ -3109,6 +3109,69 @@ func (_e *explorer) exploreLimit(
 ) (_fullyExplored bool) {
 	_fullyExplored = true
 
+	// [GenerateLimitedGroupByScans]
+	{
+		_partlyExplored := _rootOrd < _rootState.start
+		_state := _e.lookupExploreState(_root.Input)
+		if !_state.fullyExplored {
+			_fullyExplored = false
+		}
+		var _member memo.RelExpr
+		for _ord := 0; _ord < _state.end; _ord++ {
+			if _member == nil {
+				_member = _root.Input.FirstExpr()
+			} else {
+				_member = _member.NextExpr()
+			}
+			_partlyExplored := _partlyExplored && _ord < _state.start
+			_groupBy, _ := _member.(*memo.GroupByExpr)
+			if _groupBy != nil {
+				_state := _e.lookupExploreState(_groupBy.Input)
+				if !_state.fullyExplored {
+					_fullyExplored = false
+				}
+				var _member memo.RelExpr
+				for _ord := 0; _ord < _state.end; _ord++ {
+					if _member == nil {
+						_member = _groupBy.Input.FirstExpr()
+					} else {
+						_member = _member.NextExpr()
+					}
+					if !_partlyExplored || _ord >= _state.start {
+						_scan, _ := _member.(*memo.ScanExpr)
+						if _scan != nil {
+							scanPrivate := &_scan.ScanPrivate
+							if _e.funcs.IsCanonicalScan(scanPrivate) {
+								aggs := _groupBy.Aggregations
+								groupbyPrivate := &_groupBy.GroupingPrivate
+								if _e.funcs.IsCanonicalGroupBy(groupbyPrivate) {
+									limitExpr := _root.Limit
+									_const, _ := limitExpr.(*memo.ConstExpr)
+									if _const != nil {
+										limit := _const.Value
+										if _e.funcs.IsPositiveInt(limit) {
+											ordering := _root.Ordering
+											if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateLimitedGroupByScans) {
+												var _last memo.RelExpr
+												if _e.o.appliedRule != nil {
+													_last = memo.LastGroupMember(_root)
+												}
+												_e.funcs.GenerateLimitedGroupByScans(_root, scanPrivate, aggs, groupbyPrivate, _const, ordering)
+												if _e.o.appliedRule != nil {
+													_e.o.appliedRule(opt.GenerateLimitedGroupByScans, _root, _last.NextExpr())
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [GenerateLimitedScans]
 	{
 		_partlyExplored := _rootOrd < _rootState.start

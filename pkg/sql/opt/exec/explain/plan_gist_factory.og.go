@@ -218,6 +218,9 @@ func (f *PlanGistFactory) ConstructGroupBy(
 	// If set, the output must have this ordering, but it is guaranteed that
 	// ReqOrdering is a prefix of GroupColOrdering.
 	reqOrdering exec.OutputOrdering,
+	// The grouping column order type (Streaming, PartialStreaming, or
+	// NoStreaming).
+	groupingOrderType exec.GroupingOrderType,
 ) (exec.Node, error) {
 	f.encodeOperator(groupByOp)
 	f.encodeNodeColumnOrdinals(groupCols)
@@ -228,6 +231,7 @@ func (f *PlanGistFactory) ConstructGroupBy(
 		groupColOrdering,
 		aggregations,
 		reqOrdering,
+		groupingOrderType,
 	)
 	return node, err
 }

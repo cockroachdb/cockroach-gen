@@ -209,6 +209,9 @@ type Factory interface {
 		// If set, the output must have this ordering, but it is guaranteed that
 		// ReqOrdering is a prefix of GroupColOrdering.
 		reqOrdering OutputOrdering,
+		// The grouping column order type (Streaming, PartialStreaming, or
+		// NoStreaming).
+		groupingOrderType GroupingOrderType,
 	) (Node, error)
 
 	// ConstructScalarGroupBy creates a node for a ScalarGroupBy operation.
@@ -992,6 +995,7 @@ func (StubFactory) ConstructGroupBy(
 	groupColOrdering colinfo.ColumnOrdering,
 	aggregations []AggInfo,
 	reqOrdering OutputOrdering,
+	groupingOrderType GroupingOrderType,
 ) (Node, error) {
 	return struct{}{}, nil
 }

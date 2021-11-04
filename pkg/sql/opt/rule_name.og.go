@@ -289,6 +289,7 @@ const (
 	SplitGroupByScanIntoUnionScans
 	SplitGroupByFilteredScanIntoUnionScans
 	EliminateIndexJoinOrProjectInsideGroupBy
+	GenerateLimitedGroupByScans
 	ReorderJoins
 	CommuteLeftJoin
 	CommuteSemiJoin
