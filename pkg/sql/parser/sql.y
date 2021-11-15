@@ -2505,11 +2505,10 @@ role_spec:
 username_or_sconst:
   non_reserved_word
   {
-    // Username was entered as a SQL keyword, or as a SQL identifier
-    // already subject to case normalization and NFC reduction.
-    // (or is it? In fact, there is a bug here: https://github.com/cockroachdb/cockroach/issues/55396
-    // which needs to be fixed to make this fully correct.)
-    $$.val = security.MakeSQLUsernameFromPreNormalizedString($1)
+    // We use UsernameValidation because username_or_sconst and role_spec
+    // are only used for usernames of existing accounts, not when
+    // creating new users or roles.
+    $$.val, _ = security.MakeSQLUsernameFromUserInput($1, security.UsernameValidation)
   }
 | SCONST
   {
@@ -4945,9 +4944,9 @@ show_session_stmt:
 
 session_var:
   IDENT
-// Although ALL, SESSION_USER and DATABASE are identifiers for the
-// purpose of SHOW, they lex as separate token types, so they need
-// separate rules.
+// Although ALL, SESSION_USER, DATABASE, LC_COLLATE, and LC_CTYPE are
+// identifiers for the purpose of SHOW, they lex as separate token types, so
+// they need separate rules.
 | ALL
 | DATABASE
 // SET NAMES is standard SQL for SET client_encoding.
@@ -4955,6 +4954,8 @@ session_var:
 | NAMES { $$ = "client_encoding" }
 | ROLE
 | SESSION_USER
+| LC_COLLATE
+| LC_CTYPE
 // TIME ZONE is special: it is two tokens, but is really the identifier "TIME ZONE".
 | TIME ZONE { $$ = "timezone" }
 | TIME error // SHOW HELP: SHOW SESSION
