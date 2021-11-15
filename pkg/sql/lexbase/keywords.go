@@ -240,6 +240,9 @@ var KeywordsCategories = map[string]string{
 	"like":                           "T",
 	"limit":                          "R",
 	"linestring":                     "U",
+	"linestringm":                    "U",
+	"linestringz":                    "U",
+	"linestringzm":                   "U",
 	"list":                           "U",
 	"local":                          "U",
 	"locality":                       "U",
@@ -755,6 +758,9 @@ var KeywordNames = []string{
 	"like",
 	"limit",
 	"linestring",
+	"linestringm",
+	"linestringz",
+	"linestringzm",
 	"list",
 	"local",
 	"locality",
@@ -1512,6 +1518,12 @@ func GetKeywordID(k string) int32 {
 		return LIMIT
 	case "linestring":
 		return LINESTRING
+	case "linestringm":
+		return LINESTRINGM
+	case "linestringz":
+		return LINESTRINGZ
+	case "linestringzm":
+		return LINESTRINGZM
 	case "list":
 		return LIST
 	case "local":
