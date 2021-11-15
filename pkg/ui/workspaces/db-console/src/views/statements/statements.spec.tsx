@@ -445,7 +445,8 @@ describe("selectStatement", () => {
 
     assert.equal(result.statement, stmtA.key.key_data.query);
     assert.equal(result.stats.count.toNumber(), stmtA.stats.count.toNumber());
-    assert.deepEqual(result.app, [stmtA.key.key_data.app]);
+    // Statements with internal app prefix should have "(internal)" as app name
+    assert.deepEqual(result.app, ["(internal)"]);
     assert.deepEqual(result.distSQL, { numerator: 0, denominator: 1 });
     assert.deepEqual(result.vec, { numerator: 0, denominator: 1 });
     assert.deepEqual(result.opt, { numerator: 0, denominator: 1 });
@@ -496,6 +497,7 @@ function makeStats(): Required<StatementStatistics> {
     sensitive_info: makeEmptySensitiveInfo(),
     rows_read: makeStat(),
     bytes_read: makeStat(),
+    rows_written: makeStat(),
     exec_stats: makeExecStats(),
     sql_type: "DDL",
     last_exec_timestamp: {
@@ -596,6 +598,21 @@ function makeRoutePropsWithParams(params: { [key: string]: string }) {
   };
 }
 
+function makeRoutePropsWithSearchParams(params: { [key: string]: string }) {
+  const history = H.createHashHistory();
+  history.location.search = new URLSearchParams(params).toString();
+  return {
+    location: history.location,
+    history,
+    match: {
+      url: "",
+      path: history.location.pathname,
+      isExact: false,
+      params: {},
+    },
+  };
+}
+
 function makeEmptyRouteProps(): RouteComponentProps<any> {
   const history = H.createHashHistory();
   return {
@@ -611,7 +628,7 @@ function makeEmptyRouteProps(): RouteComponentProps<any> {
 }
 
 function makeRoutePropsWithApp(app: string) {
-  return makeRoutePropsWithParams({
+  return makeRoutePropsWithSearchParams({
     [appAttr]: app,
   });
 }
