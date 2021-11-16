@@ -2343,6 +2343,52 @@ func (_e *explorer) exploreScalarGroupBy(
 		}
 	}
 
+	// [EliminateIndexJoinOrProjectInsideGroupBy]
+	{
+		_partlyExplored := _rootOrd < _rootState.start
+		_state := _e.lookupExploreState(_root.Input)
+		if !_state.fullyExplored {
+			_fullyExplored = false
+		}
+		var _member memo.RelExpr
+		for _ord := 0; _ord < _state.end; _ord++ {
+			if _member == nil {
+				_member = _root.Input.FirstExpr()
+			} else {
+				_member = _member.NextExpr()
+			}
+			if !_partlyExplored || _ord >= _state.start {
+				if _member.Op() == opt.IndexJoinOp || _member.Op() == opt.ProjectOp {
+					input := _member.Child(0).(memo.RelExpr)
+					aggs := _root.Aggregations
+					private := &_root.GroupingPrivate
+					ordering := _e.funcs.GroupingOrdering(private)
+					inputCols := _e.funcs.OutputCols(input)
+					if _e.funcs.OrderingCanProjectCols(ordering, inputCols) {
+						groupingCols := _e.funcs.GroupingColumns(private)
+						if _e.funcs.ColsAreSubset(_e.funcs.UnionCols(groupingCols, _e.funcs.AggregationOuterCols(aggs)), inputCols) {
+							if _e.o.matchedRule == nil || _e.o.matchedRule(opt.EliminateIndexJoinOrProjectInsideGroupBy) {
+								_expr := &memo.ScalarGroupByExpr{
+									Input:           input,
+									Aggregations:    aggs,
+									GroupingPrivate: *_e.funcs.MakeGroupingPrivate(groupingCols, _e.funcs.PruneOrdering(ordering, inputCols), _e.funcs.NullsAreDistinct(private), _e.funcs.ErrorOnDup(private)),
+								}
+								_interned := _e.mem.AddScalarGroupByToGroup(_expr, _root)
+								if _e.o.appliedRule != nil {
+									if _interned != _expr {
+										_e.o.appliedRule(opt.EliminateIndexJoinOrProjectInsideGroupBy, _root, nil)
+									} else {
+										_e.o.appliedRule(opt.EliminateIndexJoinOrProjectInsideGroupBy, _root, _interned)
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	return _fullyExplored
 }
 
