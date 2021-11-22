@@ -152,7 +152,6 @@ var reservedKeywords = map[string]struct{}{
 	"varchar":                            {},
 	"variadic":                           {},
 	"virtual":                            {},
-	"visible":                            {},
 	"when":                               {},
 	"where":                              {},
 	"window":                             {},
