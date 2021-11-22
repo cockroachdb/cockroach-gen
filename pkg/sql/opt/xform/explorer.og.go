@@ -1939,7 +1939,7 @@ func (_e *explorer) exploreLookupJoin(
 			on := _root.On
 			private := &_root.LookupJoinPrivate
 			if _e.funcs.IsAntiJoin(private) {
-				localExpr, remoteExpr, ok := _e.funcs.GetLocalityOptimizedLookupJoinExprs(input, private)
+				localExpr, remoteExpr, ok := _e.funcs.GetLocalityOptimizedLookupJoinExprs(on, private)
 				if ok {
 					if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateLocalityOptimizedAntiJoin) {
 						_expr := &memo.LookupJoinExpr{
@@ -1972,7 +1972,7 @@ func (_e *explorer) exploreLookupJoin(
 			on := _root.On
 			private := &_root.LookupJoinPrivate
 			if !_e.funcs.IsAntiJoin(private) {
-				localExpr, remoteExpr, ok := _e.funcs.GetLocalityOptimizedLookupJoinExprs(input, private)
+				localExpr, remoteExpr, ok := _e.funcs.GetLocalityOptimizedLookupJoinExprs(on, private)
 				if ok {
 					if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateLocalityOptimizedLookupJoin) {
 						_expr := &memo.LookupJoinExpr{
