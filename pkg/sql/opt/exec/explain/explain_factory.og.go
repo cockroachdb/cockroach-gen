@@ -1825,6 +1825,40 @@ func (f *Factory) ConstructExport(
 	return _n, nil
 }
 
+func (f *Factory) ConstructAlterRangeRelocate(
+	input exec.Node,
+	relocateLease bool,
+	relocateNonVoters bool,
+	toStoreID int64,
+	fromStoreID int64,
+) (exec.Node, error) {
+	inputNode := input.(*Node)
+	args := &alterRangeRelocateArgs{
+		input:             inputNode,
+		relocateLease:     relocateLease,
+		relocateNonVoters: relocateNonVoters,
+		toStoreID:         toStoreID,
+		fromStoreID:       fromStoreID,
+	}
+	_n, err := newNode(alterRangeRelocateOp, args, nil /* ordering */, inputNode)
+	if err != nil {
+		return nil, err
+	}
+	// Build the "real" node.
+	wrapped, err := f.wrappedFactory.ConstructAlterRangeRelocate(
+		inputNode.WrappedNode(),
+		relocateLease,
+		relocateNonVoters,
+		toStoreID,
+		fromStoreID,
+	)
+	if err != nil {
+		return nil, err
+	}
+	_n.wrappedNode = wrapped
+	return _n, nil
+}
+
 type execOperator int
 
 const (
@@ -1885,6 +1919,7 @@ const (
 	cancelSessionsOp
 	createStatisticsOp
 	exportOp
+	alterRangeRelocateOp
 	numOperators
 )
 
@@ -2292,4 +2327,12 @@ type exportArgs struct {
 	FileName   tree.TypedExpr
 	FileFormat string
 	Options    []exec.KVOption
+}
+
+type alterRangeRelocateArgs struct {
+	input             *Node
+	relocateLease     bool
+	relocateNonVoters bool
+	toStoreID         int64
+	fromStoreID       int64
 }

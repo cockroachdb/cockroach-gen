@@ -18725,6 +18725,142 @@ type CreateStatisticsPrivate struct {
 	Syntax *tree.CreateStats
 }
 
+// AlterTableRelocateRange represents an `ALTER RANGE .. RELOCATE ..` statement.
+type AlterRangeRelocateExpr struct {
+	// The input expression provides range IDs as integers.
+	Input RelExpr
+	AlterRangeRelocatePrivate
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &AlterRangeRelocateExpr{}
+
+func (e *AlterRangeRelocateExpr) Op() opt.Operator {
+	return opt.AlterRangeRelocateOp
+}
+
+func (e *AlterRangeRelocateExpr) ChildCount() int {
+	return 1
+}
+
+func (e *AlterRangeRelocateExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *AlterRangeRelocateExpr) Private() interface{} {
+	return &e.AlterRangeRelocatePrivate
+}
+
+func (e *AlterRangeRelocateExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *AlterRangeRelocateExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(RelExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *AlterRangeRelocateExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *AlterRangeRelocateExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *AlterRangeRelocateExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *AlterRangeRelocateExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *AlterRangeRelocateExpr) RequiredPhysical() *physical.Required {
+	return e.grp.bestProps().required
+}
+
+func (e *AlterRangeRelocateExpr) ProvidedPhysical() *physical.Provided {
+	return &e.grp.bestProps().provided
+}
+
+func (e *AlterRangeRelocateExpr) Cost() Cost {
+	return e.grp.bestProps().cost
+}
+
+func (e *AlterRangeRelocateExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *AlterRangeRelocateExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
+}
+
+func (e *AlterRangeRelocateExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(errors.AssertionFailedf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *AlterRangeRelocateExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(errors.AssertionFailedf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type alterRangeRelocateGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	first AlterRangeRelocateExpr
+	best  bestProps
+}
+
+var _ exprGroup = &alterRangeRelocateGroup{}
+
+func (g *alterRangeRelocateGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *alterRangeRelocateGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *alterRangeRelocateGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *alterRangeRelocateGroup) bestProps() *bestProps {
+	return &g.best
+}
+
+type AlterRangeRelocatePrivate struct {
+	RelocateLease     bool
+	RelocateNonVoters bool
+	ToStoreID         int64
+	FromStoreID       int64
+
+	// Columns stores the column IDs for the statement result columns.
+	Columns opt.ColList
+
+	// Props stores the required physical properties for the input expression.
+	Props *physical.Required
+}
+
 func (m *Memo) MemoizeInsert(
 	input RelExpr,
 	uniqueChecks UniqueChecksExpr,
@@ -23266,6 +23402,30 @@ func (m *Memo) MemoizeCreateStatistics(
 	return interned.FirstExpr()
 }
 
+func (m *Memo) MemoizeAlterRangeRelocate(
+	input RelExpr,
+	alterRangeRelocatePrivate *AlterRangeRelocatePrivate,
+) RelExpr {
+	const size = int64(unsafe.Sizeof(alterRangeRelocateGroup{}))
+	grp := &alterRangeRelocateGroup{mem: m, first: AlterRangeRelocateExpr{
+		Input:                     input,
+		AlterRangeRelocatePrivate: *alterRangeRelocatePrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternAlterRangeRelocate(e)
+	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
+		m.logPropsBuilder.buildAlterRangeRelocateProps(e, &grp.rel)
+		grp.rel.Populated = true
+		m.memEstimate += size
+		m.CheckExpr(e)
+	}
+	return interned.FirstExpr()
+}
+
 func (m *Memo) AddInsertToGroup(e *InsertExpr, grp RelExpr) *InsertExpr {
 	const size = int64(unsafe.Sizeof(InsertExpr{}))
 	interned := m.interner.InternInsert(e)
@@ -24226,6 +24386,20 @@ func (m *Memo) AddCreateStatisticsToGroup(e *CreateStatisticsExpr, grp RelExpr) 
 	return interned
 }
 
+func (m *Memo) AddAlterRangeRelocateToGroup(e *AlterRangeRelocateExpr, grp RelExpr) *AlterRangeRelocateExpr {
+	const size = int64(unsafe.Sizeof(AlterRangeRelocateExpr{}))
+	interned := m.interner.InternAlterRangeRelocate(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.CheckExpr(e)
+	} else if interned.group() != grp.group() {
+		// This is a group collision, do nothing.
+		return nil
+	}
+	return interned
+}
+
 func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 	switch t := e.(type) {
 	case *InsertExpr:
@@ -24678,6 +24852,8 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternExport(t)
 	case *CreateStatisticsExpr:
 		return in.InternCreateStatistics(t)
+	case *AlterRangeRelocateExpr:
+		return in.InternAlterRangeRelocate(t)
 	default:
 		panic(errors.AssertionFailedf("unhandled op: %s", e.Op()))
 	}
@@ -29625,6 +29801,36 @@ func (in *interner) InternCreateStatistics(val *CreateStatisticsExpr) *CreateSta
 	return val
 }
 
+func (in *interner) InternAlterRangeRelocate(val *AlterRangeRelocateExpr) *AlterRangeRelocateExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.AlterRangeRelocateOp)
+	in.hasher.HashRelExpr(val.Input)
+	in.hasher.HashBool(val.RelocateLease)
+	in.hasher.HashBool(val.RelocateNonVoters)
+	in.hasher.HashInt64(val.ToStoreID)
+	in.hasher.HashInt64(val.FromStoreID)
+	in.hasher.HashColList(val.Columns)
+	in.hasher.HashPhysProps(val.Props)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*AlterRangeRelocateExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsBoolEqual(val.RelocateLease, existing.RelocateLease) &&
+				in.hasher.IsBoolEqual(val.RelocateNonVoters, existing.RelocateNonVoters) &&
+				in.hasher.IsInt64Equal(val.ToStoreID, existing.ToStoreID) &&
+				in.hasher.IsInt64Equal(val.FromStoreID, existing.FromStoreID) &&
+				in.hasher.IsColListEqual(val.Columns, existing.Columns) &&
+				in.hasher.IsPhysPropsEqual(val.Props, existing.Props) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
 func (b *logicalPropsBuilder) buildProps(e RelExpr, rel *props.Relational) {
 	switch t := e.(type) {
 	case *InsertExpr:
@@ -29763,6 +29969,8 @@ func (b *logicalPropsBuilder) buildProps(e RelExpr, rel *props.Relational) {
 		b.buildExportProps(t, rel)
 	case *CreateStatisticsExpr:
 		b.buildCreateStatisticsProps(t, rel)
+	case *AlterRangeRelocateExpr:
+		b.buildAlterRangeRelocateProps(t, rel)
 	default:
 		panic(errors.AssertionFailedf("unhandled type: %s", t.Op()))
 	}

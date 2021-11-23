@@ -876,6 +876,17 @@ type Factory interface {
 		fileFormat string,
 		options []KVOption,
 	) (Node, error)
+
+	// ConstructAlterRangeRelocate creates a node for a AlterRangeRelocate operation.
+	//
+	// AlterTableRelocate implements ALTER RANGE RELOCATE.
+	ConstructAlterRangeRelocate(
+		input Node,
+		relocateLease bool,
+		relocateNonVoters bool,
+		toStoreID int64,
+		fromStoreID int64,
+	) (Node, error)
 }
 
 // StubFactory is a do-nothing implementation of Factory, used for testing.
@@ -1407,6 +1418,16 @@ func (StubFactory) ConstructExport(
 	fileName tree.TypedExpr,
 	fileFormat string,
 	options []KVOption,
+) (Node, error) {
+	return struct{}{}, nil
+}
+
+func (StubFactory) ConstructAlterRangeRelocate(
+	input Node,
+	relocateLease bool,
+	relocateNonVoters bool,
+	toStoreID int64,
+	fromStoreID int64,
 ) (Node, error) {
 	return struct{}{}, nil
 }

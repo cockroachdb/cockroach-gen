@@ -371,6 +371,7 @@ var KeywordsCategories = map[string]string{
 	"regions":                      "U",
 	"reindex":                      "U",
 	"release":                      "U",
+	"relocate":                     "U",
 	"rename":                       "U",
 	"repeatable":                   "U",
 	"replace":                      "U",
@@ -889,6 +890,7 @@ var KeywordNames = []string{
 	"regions",
 	"reindex",
 	"release",
+	"relocate",
 	"rename",
 	"repeatable",
 	"replace",
@@ -1780,6 +1782,8 @@ func GetKeywordID(k string) int32 {
 		return REINDEX
 	case "release":
 		return RELEASE
+	case "relocate":
+		return RELOCATE
 	case "rename":
 		return RENAME
 	case "repeatable":

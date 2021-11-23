@@ -21590,6 +21590,27 @@ SKIP_RULES:
 	return expr
 }
 
+// ConstructAlterRangeRelocate constructs an expression for the AlterRangeRelocate operator.
+// AlterTableRelocateRange represents an `ALTER RANGE .. RELOCATE ..` statement.
+func (_f *Factory) ConstructAlterRangeRelocate(
+	input memo.RelExpr,
+	alterRangeRelocatePrivate *memo.AlterRangeRelocatePrivate,
+) memo.RelExpr {
+	_f.constructorStackDepth++
+	if _f.constructorStackDepth > maxConstructorStackDepth {
+		// If the constructor call stack depth exceeds the limit, call
+		// onMaxConstructorStackDepthExceeded and skip all rules.
+		_f.onMaxConstructorStackDepthExceeded()
+		goto SKIP_RULES
+	}
+
+SKIP_RULES:
+	e := _f.mem.MemoizeAlterRangeRelocate(input, alterRangeRelocatePrivate)
+	expr := _f.onConstructRelational(e)
+	_f.constructorStackDepth--
+	return expr
+}
+
 // Replace enables an expression subtree to be rewritten under the control of
 // the caller. It passes each child of the given expression to the replace
 // callback. The caller can continue traversing the expression tree within the
@@ -23169,6 +23190,13 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 	case *memo.CreateStatisticsExpr:
 		return t
 
+	case *memo.AlterRangeRelocateExpr:
+		input := replace(t.Input).(memo.RelExpr)
+		if input != t.Input {
+			return f.ConstructAlterRangeRelocate(input, &t.AlterRangeRelocatePrivate)
+		}
+		return t
+
 	}
 	panic(errors.AssertionFailedf("unhandled op %s", errors.Safe(e.Op())))
 }
@@ -24590,6 +24618,12 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 	case *memo.CreateStatisticsExpr:
 		return f.mem.MemoizeCreateStatistics(&t.CreateStatisticsPrivate)
 
+	case *memo.AlterRangeRelocateExpr:
+		return f.ConstructAlterRangeRelocate(
+			f.invokeReplace(t.Input, replace).(memo.RelExpr),
+			&t.AlterRangeRelocatePrivate,
+		)
+
 	case *memo.FKChecksExpr:
 		newVal := f.copyAndReplaceDefaultFKChecksExpr(*t, replace)
 		return &newVal
@@ -25763,6 +25797,11 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 	case opt.CreateStatisticsOp:
 		return f.ConstructCreateStatistics(
 			args[0].(*memo.CreateStatisticsPrivate),
+		)
+	case opt.AlterRangeRelocateOp:
+		return f.ConstructAlterRangeRelocate(
+			args[0].(memo.RelExpr),
+			args[1].(*memo.AlterRangeRelocatePrivate),
 		)
 	}
 	panic(errors.AssertionFailedf("cannot dynamically construct operator %s", errors.Safe(op)))

@@ -1048,6 +1048,24 @@ func (f *PlanGistFactory) ConstructExport(
 	return node, err
 }
 
+func (f *PlanGistFactory) ConstructAlterRangeRelocate(
+	input exec.Node,
+	relocateLease bool,
+	relocateNonVoters bool,
+	toStoreID int64,
+	fromStoreID int64,
+) (exec.Node, error) {
+	f.encodeOperator(alterRangeRelocateOp)
+	node, err := f.wrappedFactory.ConstructAlterRangeRelocate(
+		input,
+		relocateLease,
+		relocateNonVoters,
+		toStoreID,
+		fromStoreID,
+	)
+	return node, err
+}
+
 func (f *PlanGistFactory) decodeOperatorBody(op execOperator) (*Node, error) {
 	var _n *Node
 	var reqOrdering exec.OutputOrdering
@@ -1340,6 +1358,10 @@ func (f *PlanGistFactory) decodeOperatorBody(op execOperator) (*Node, error) {
 		var args exportArgs
 		args.Input = f.popChild()
 		_n, err = newNode(op, &args, reqOrdering, args.Input)
+	case alterRangeRelocateOp:
+		var args alterRangeRelocateArgs
+		args.input = f.popChild()
+		_n, err = newNode(op, &args, reqOrdering, args.input)
 	default:
 		return nil, errors.Newf("invalid op: %d", op)
 	}
