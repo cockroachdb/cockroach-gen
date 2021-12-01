@@ -198,6 +198,7 @@ var KeywordsCategories = map[string]string{
 	"including":                    "U",
 	"increment":                    "U",
 	"incremental":                  "U",
+	"incremental_storage":          "U",
 	"index":                        "R",
 	"indexes":                      "U",
 	"inherits":                     "U",
@@ -717,6 +718,7 @@ var KeywordNames = []string{
 	"including",
 	"increment",
 	"incremental",
+	"incremental_storage",
 	"index",
 	"indexes",
 	"inherits",
@@ -1436,6 +1438,8 @@ func GetKeywordID(k string) int32 {
 		return INCREMENT
 	case "incremental":
 		return INCREMENTAL
+	case "incremental_storage":
+		return INCREMENTAL_STORAGE
 	case "index":
 		return INDEX
 	case "indexes":
