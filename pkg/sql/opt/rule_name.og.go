@@ -97,6 +97,7 @@ const (
 	FoldUnary
 	FoldComparison
 	FoldCast
+	FoldAssignmentCast
 	FoldIndirection
 	FoldColumnAccess
 	FoldFunctionWithNullArg
@@ -188,6 +189,7 @@ const (
 	MergeProjects
 	MergeProjectWithValues
 	PushColumnRemappingIntoValues
+	PushAssignmentCastsIntoValues
 	FoldTupleAccessIntoValues
 	FoldJSONAccessIntoValues
 	ConvertZipArraysToValues
@@ -224,6 +226,7 @@ const (
 	EliminateCoalesce
 	SimplifyCoalesce
 	EliminateCast
+	EliminateAssignmentCast
 	NormalizeInConst
 	FoldInNull
 	SimplifyInSingleElement

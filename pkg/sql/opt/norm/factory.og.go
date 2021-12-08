@@ -1496,6 +1496,24 @@ func (_f *Factory) ConstructProject(
 		}
 	}
 
+	// [PushAssignmentCastsIntoValues]
+	{
+		_values, _ := input.(*memo.ValuesExpr)
+		if _values != nil {
+			castCols := _f.funcs.IntersectionCols(_f.funcs.AssignmentCastCols(projections), _f.funcs.OutputCols(_values))
+			if !_f.funcs.ColsAreEmpty(castCols) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.PushAssignmentCastsIntoValues) {
+					_expr := _f.funcs.PushAssignmentCastsIntoValues(_values, projections, passthrough, castCols).(memo.RelExpr)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.PushAssignmentCastsIntoValues, nil, _expr)
+					}
+					_f.constructorStackDepth--
+					return _expr
+				}
+			}
+		}
+	}
+
 	// [FoldTupleAccessIntoValues]
 	{
 		_values, _ := input.(*memo.ValuesExpr)
@@ -19462,6 +19480,40 @@ func (_f *Factory) ConstructAssignmentCast(
 		// onMaxConstructorStackDepthExceeded and skip all rules.
 		_f.onMaxConstructorStackDepthExceeded()
 		goto SKIP_RULES
+	}
+
+	// [FoldAssignmentCast]
+	{
+		if _f.funcs.IsConstValueOrGroupOfConstValues(input) {
+			result, ok := _f.funcs.FoldAssignmentCast(input, typ)
+			if ok {
+				if _f.matchedRule == nil || _f.matchedRule(opt.FoldAssignmentCast) {
+					_expr := result.(opt.ScalarExpr)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.FoldAssignmentCast, nil, _expr)
+					}
+					_f.constructorStackDepth--
+					return _expr
+				}
+			}
+		}
+	}
+
+	// [EliminateAssignmentCast]
+	{
+		targetTyp := typ
+		if _f.funcs.HasColType(input, targetTyp) {
+			if _f.funcs.AssignmentCastIsNoop(targetTyp) {
+				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateAssignmentCast) {
+					_expr := input
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.EliminateAssignmentCast, nil, _expr)
+					}
+					_f.constructorStackDepth--
+					return _expr
+				}
+			}
+		}
 	}
 
 SKIP_RULES:
