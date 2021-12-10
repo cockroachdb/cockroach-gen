@@ -1037,6 +1037,7 @@ func (f *PlanGistFactory) ConstructExport(
 	fileName tree.TypedExpr,
 	fileFormat string,
 	options []exec.KVOption,
+	notNullCols exec.NodeColumnOrdinalSet,
 ) (exec.Node, error) {
 	f.encodeOperator(exportOp)
 	node, err := f.wrappedFactory.ConstructExport(
@@ -1044,6 +1045,7 @@ func (f *PlanGistFactory) ConstructExport(
 		fileName,
 		fileFormat,
 		options,
+		notNullCols,
 	)
 	return node, err
 }

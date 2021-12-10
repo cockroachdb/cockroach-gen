@@ -875,6 +875,7 @@ type Factory interface {
 		fileName tree.TypedExpr,
 		fileFormat string,
 		options []KVOption,
+		notNullCols NodeColumnOrdinalSet,
 	) (Node, error)
 
 	// ConstructAlterRangeRelocate creates a node for a AlterRangeRelocate operation.
@@ -1418,6 +1419,7 @@ func (StubFactory) ConstructExport(
 	fileName tree.TypedExpr,
 	fileFormat string,
 	options []KVOption,
+	notNullCols NodeColumnOrdinalSet,
 ) (Node, error) {
 	return struct{}{}, nil
 }

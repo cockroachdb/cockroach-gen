@@ -1799,13 +1799,15 @@ func (f *Factory) ConstructExport(
 	fileName tree.TypedExpr,
 	fileFormat string,
 	options []exec.KVOption,
+	notNullCols exec.NodeColumnOrdinalSet,
 ) (exec.Node, error) {
 	inputNode := input.(*Node)
 	args := &exportArgs{
-		Input:      inputNode,
-		FileName:   fileName,
-		FileFormat: fileFormat,
-		Options:    options,
+		Input:       inputNode,
+		FileName:    fileName,
+		FileFormat:  fileFormat,
+		Options:     options,
+		NotNullCols: notNullCols,
 	}
 	_n, err := newNode(exportOp, args, nil /* ordering */, inputNode)
 	if err != nil {
@@ -1817,6 +1819,7 @@ func (f *Factory) ConstructExport(
 		fileName,
 		fileFormat,
 		options,
+		notNullCols,
 	)
 	if err != nil {
 		return nil, err
@@ -2323,10 +2326,11 @@ type createStatisticsArgs struct {
 }
 
 type exportArgs struct {
-	Input      *Node
-	FileName   tree.TypedExpr
-	FileFormat string
-	Options    []exec.KVOption
+	Input       *Node
+	FileName    tree.TypedExpr
+	FileFormat  string
+	Options     []exec.KVOption
+	NotNullCols exec.NodeColumnOrdinalSet
 }
 
 type alterRangeRelocateArgs struct {
