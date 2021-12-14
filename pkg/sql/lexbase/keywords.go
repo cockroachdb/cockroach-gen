@@ -290,7 +290,7 @@ var KeywordsCategories = map[string]string{
 	"nologin":                      "U",
 	"nomodifyclustersetting":       "U",
 	"none":                         "T",
-	"non_voters":                   "U",
+	"nonvoters":                    "U",
 	"normal":                       "U",
 	"not":                          "R",
 	"nothing":                      "R",
@@ -811,7 +811,7 @@ var KeywordNames = []string{
 	"nologin",
 	"nomodifyclustersetting",
 	"none",
-	"non_voters",
+	"nonvoters",
 	"normal",
 	"not",
 	"nothing",
@@ -1624,8 +1624,8 @@ func GetKeywordID(k string) int32 {
 		return NOMODIFYCLUSTERSETTING
 	case "none":
 		return NONE
-	case "non_voters":
-		return NON_VOTERS
+	case "nonvoters":
+		return NONVOTERS
 	case "normal":
 		return NORMAL
 	case "not":

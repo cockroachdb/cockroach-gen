@@ -785,8 +785,7 @@ type Factory interface {
 	ConstructAlterTableRelocate(
 		index cat.Index,
 		input Node,
-		relocateLease bool,
-		relocateNonVoters bool,
+		subjectReplicas tree.RelocateSubject,
 	) (Node, error)
 
 	// ConstructBuffer creates a node for a Buffer operation.
@@ -883,8 +882,7 @@ type Factory interface {
 	// AlterTableRelocate implements ALTER RANGE RELOCATE.
 	ConstructAlterRangeRelocate(
 		input Node,
-		relocateLease bool,
-		relocateNonVoters bool,
+		subjectReplicas tree.RelocateSubject,
 		toStoreID int64,
 		fromStoreID int64,
 	) (Node, error)
@@ -1350,8 +1348,7 @@ func (StubFactory) ConstructAlterTableUnsplitAll(
 func (StubFactory) ConstructAlterTableRelocate(
 	index cat.Index,
 	input Node,
-	relocateLease bool,
-	relocateNonVoters bool,
+	subjectReplicas tree.RelocateSubject,
 ) (Node, error) {
 	return struct{}{}, nil
 }
@@ -1426,8 +1423,7 @@ func (StubFactory) ConstructExport(
 
 func (StubFactory) ConstructAlterRangeRelocate(
 	input Node,
-	relocateLease bool,
-	relocateNonVoters bool,
+	subjectReplicas tree.RelocateSubject,
 	toStoreID int64,
 	fromStoreID int64,
 ) (Node, error) {

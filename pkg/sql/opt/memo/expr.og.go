@@ -17932,8 +17932,7 @@ func (g *alterTableRelocateGroup) bestProps() *bestProps {
 }
 
 type AlterTableRelocatePrivate struct {
-	RelocateLease     bool
-	RelocateNonVoters bool
+	SubjectReplicas tree.RelocateSubject
 	AlterTableSplitPrivate
 }
 
@@ -18849,10 +18848,9 @@ func (g *alterRangeRelocateGroup) bestProps() *bestProps {
 }
 
 type AlterRangeRelocatePrivate struct {
-	RelocateLease     bool
-	RelocateNonVoters bool
-	ToStoreID         int64
-	FromStoreID       int64
+	SubjectReplicas tree.RelocateSubject
+	ToStoreID       int64
+	FromStoreID     int64
 
 	// Columns stores the column IDs for the statement result columns.
 	Columns opt.ColList
@@ -29639,8 +29637,7 @@ func (in *interner) InternAlterTableRelocate(val *AlterTableRelocateExpr) *Alter
 	in.hasher.Init()
 	in.hasher.HashOperator(opt.AlterTableRelocateOp)
 	in.hasher.HashRelExpr(val.Input)
-	in.hasher.HashBool(val.RelocateLease)
-	in.hasher.HashBool(val.RelocateNonVoters)
+	in.hasher.HashRelocateSubject(val.SubjectReplicas)
 	in.hasher.HashTableID(val.Table)
 	in.hasher.HashIndexOrdinal(val.Index)
 	in.hasher.HashPhysProps(val.Props)
@@ -29650,8 +29647,7 @@ func (in *interner) InternAlterTableRelocate(val *AlterTableRelocateExpr) *Alter
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*AlterTableRelocateExpr); ok {
 			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
-				in.hasher.IsBoolEqual(val.RelocateLease, existing.RelocateLease) &&
-				in.hasher.IsBoolEqual(val.RelocateNonVoters, existing.RelocateNonVoters) &&
+				in.hasher.IsRelocateSubjectEqual(val.SubjectReplicas, existing.SubjectReplicas) &&
 				in.hasher.IsTableIDEqual(val.Table, existing.Table) &&
 				in.hasher.IsIndexOrdinalEqual(val.Index, existing.Index) &&
 				in.hasher.IsPhysPropsEqual(val.Props, existing.Props) &&
@@ -29805,8 +29801,7 @@ func (in *interner) InternAlterRangeRelocate(val *AlterRangeRelocateExpr) *Alter
 	in.hasher.Init()
 	in.hasher.HashOperator(opt.AlterRangeRelocateOp)
 	in.hasher.HashRelExpr(val.Input)
-	in.hasher.HashBool(val.RelocateLease)
-	in.hasher.HashBool(val.RelocateNonVoters)
+	in.hasher.HashRelocateSubject(val.SubjectReplicas)
 	in.hasher.HashInt64(val.ToStoreID)
 	in.hasher.HashInt64(val.FromStoreID)
 	in.hasher.HashColList(val.Columns)
@@ -29816,8 +29811,7 @@ func (in *interner) InternAlterRangeRelocate(val *AlterRangeRelocateExpr) *Alter
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*AlterRangeRelocateExpr); ok {
 			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
-				in.hasher.IsBoolEqual(val.RelocateLease, existing.RelocateLease) &&
-				in.hasher.IsBoolEqual(val.RelocateNonVoters, existing.RelocateNonVoters) &&
+				in.hasher.IsRelocateSubjectEqual(val.SubjectReplicas, existing.SubjectReplicas) &&
 				in.hasher.IsInt64Equal(val.ToStoreID, existing.ToStoreID) &&
 				in.hasher.IsInt64Equal(val.FromStoreID, existing.FromStoreID) &&
 				in.hasher.IsColListEqual(val.Columns, existing.Columns) &&

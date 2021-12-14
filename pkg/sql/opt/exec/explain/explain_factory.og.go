@@ -1561,15 +1561,13 @@ func (f *Factory) ConstructAlterTableUnsplitAll(
 func (f *Factory) ConstructAlterTableRelocate(
 	index cat.Index,
 	input exec.Node,
-	relocateLease bool,
-	relocateNonVoters bool,
+	subjectReplicas tree.RelocateSubject,
 ) (exec.Node, error) {
 	inputNode := input.(*Node)
 	args := &alterTableRelocateArgs{
-		Index:             index,
-		input:             inputNode,
-		relocateLease:     relocateLease,
-		relocateNonVoters: relocateNonVoters,
+		Index:           index,
+		input:           inputNode,
+		subjectReplicas: subjectReplicas,
 	}
 	_n, err := newNode(alterTableRelocateOp, args, nil /* ordering */, inputNode)
 	if err != nil {
@@ -1579,8 +1577,7 @@ func (f *Factory) ConstructAlterTableRelocate(
 	wrapped, err := f.wrappedFactory.ConstructAlterTableRelocate(
 		index,
 		inputNode.WrappedNode(),
-		relocateLease,
-		relocateNonVoters,
+		subjectReplicas,
 	)
 	if err != nil {
 		return nil, err
@@ -1830,18 +1827,16 @@ func (f *Factory) ConstructExport(
 
 func (f *Factory) ConstructAlterRangeRelocate(
 	input exec.Node,
-	relocateLease bool,
-	relocateNonVoters bool,
+	subjectReplicas tree.RelocateSubject,
 	toStoreID int64,
 	fromStoreID int64,
 ) (exec.Node, error) {
 	inputNode := input.(*Node)
 	args := &alterRangeRelocateArgs{
-		input:             inputNode,
-		relocateLease:     relocateLease,
-		relocateNonVoters: relocateNonVoters,
-		toStoreID:         toStoreID,
-		fromStoreID:       fromStoreID,
+		input:           inputNode,
+		subjectReplicas: subjectReplicas,
+		toStoreID:       toStoreID,
+		fromStoreID:     fromStoreID,
 	}
 	_n, err := newNode(alterRangeRelocateOp, args, nil /* ordering */, inputNode)
 	if err != nil {
@@ -1850,8 +1845,7 @@ func (f *Factory) ConstructAlterRangeRelocate(
 	// Build the "real" node.
 	wrapped, err := f.wrappedFactory.ConstructAlterRangeRelocate(
 		inputNode.WrappedNode(),
-		relocateLease,
-		relocateNonVoters,
+		subjectReplicas,
 		toStoreID,
 		fromStoreID,
 	)
@@ -2277,10 +2271,9 @@ type alterTableUnsplitAllArgs struct {
 }
 
 type alterTableRelocateArgs struct {
-	Index             cat.Index
-	input             *Node
-	relocateLease     bool
-	relocateNonVoters bool
+	Index           cat.Index
+	input           *Node
+	subjectReplicas tree.RelocateSubject
 }
 
 type bufferArgs struct {
@@ -2334,9 +2327,8 @@ type exportArgs struct {
 }
 
 type alterRangeRelocateArgs struct {
-	input             *Node
-	relocateLease     bool
-	relocateNonVoters bool
-	toStoreID         int64
-	fromStoreID       int64
+	input           *Node
+	subjectReplicas tree.RelocateSubject
+	toStoreID       int64
+	fromStoreID     int64
 }

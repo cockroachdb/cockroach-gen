@@ -917,8 +917,7 @@ func (f *PlanGistFactory) ConstructAlterTableUnsplitAll(
 func (f *PlanGistFactory) ConstructAlterTableRelocate(
 	index cat.Index,
 	input exec.Node,
-	relocateLease bool,
-	relocateNonVoters bool,
+	subjectReplicas tree.RelocateSubject,
 ) (exec.Node, error) {
 	f.encodeOperator(alterTableRelocateOp)
 	f.encodeDataSource(index.Table().ID(), index.Table().Name())
@@ -926,8 +925,7 @@ func (f *PlanGistFactory) ConstructAlterTableRelocate(
 	node, err := f.wrappedFactory.ConstructAlterTableRelocate(
 		index,
 		input,
-		relocateLease,
-		relocateNonVoters,
+		subjectReplicas,
 	)
 	return node, err
 }
@@ -1052,16 +1050,14 @@ func (f *PlanGistFactory) ConstructExport(
 
 func (f *PlanGistFactory) ConstructAlterRangeRelocate(
 	input exec.Node,
-	relocateLease bool,
-	relocateNonVoters bool,
+	subjectReplicas tree.RelocateSubject,
 	toStoreID int64,
 	fromStoreID int64,
 ) (exec.Node, error) {
 	f.encodeOperator(alterRangeRelocateOp)
 	node, err := f.wrappedFactory.ConstructAlterRangeRelocate(
 		input,
-		relocateLease,
-		relocateNonVoters,
+		subjectReplicas,
 		toStoreID,
 		fromStoreID,
 	)
