@@ -18724,10 +18724,16 @@ type CreateStatisticsPrivate struct {
 	Syntax *tree.CreateStats
 }
 
-// AlterTableRelocateRange represents an `ALTER RANGE .. RELOCATE ..` statement.
+// AlterRangeRelocateExpr represents an `ALTER RANGE .. RELOCATE ..` statement.
 type AlterRangeRelocateExpr struct {
 	// The input expression provides range IDs as integers.
 	Input RelExpr
+
+	// ToStoreID is the destination store ID.
+	ToStoreID opt.ScalarExpr
+
+	// FromStoreID is the origin store ID, set to NULL when transfering the leaseholder (subject LEASE).
+	FromStoreID opt.ScalarExpr
 	AlterRangeRelocatePrivate
 
 	grp  exprGroup
@@ -18741,13 +18747,17 @@ func (e *AlterRangeRelocateExpr) Op() opt.Operator {
 }
 
 func (e *AlterRangeRelocateExpr) ChildCount() int {
-	return 1
+	return 3
 }
 
 func (e *AlterRangeRelocateExpr) Child(nth int) opt.Expr {
 	switch nth {
 	case 0:
 		return e.Input
+	case 1:
+		return e.ToStoreID
+	case 2:
+		return e.FromStoreID
 	}
 	panic(errors.AssertionFailedf("child index out of range"))
 }
@@ -18766,6 +18776,12 @@ func (e *AlterRangeRelocateExpr) SetChild(nth int, child opt.Expr) {
 	switch nth {
 	case 0:
 		e.Input = child.(RelExpr)
+		return
+	case 1:
+		e.ToStoreID = child.(opt.ScalarExpr)
+		return
+	case 2:
+		e.FromStoreID = child.(opt.ScalarExpr)
 		return
 	}
 	panic(errors.AssertionFailedf("child index out of range"))
@@ -18848,9 +18864,8 @@ func (g *alterRangeRelocateGroup) bestProps() *bestProps {
 }
 
 type AlterRangeRelocatePrivate struct {
+	// The subject indicates which replicas will be relocated.
 	SubjectReplicas tree.RelocateSubject
-	ToStoreID       int64
-	FromStoreID     int64
 
 	// Columns stores the column IDs for the statement result columns.
 	Columns opt.ColList
@@ -23402,11 +23417,15 @@ func (m *Memo) MemoizeCreateStatistics(
 
 func (m *Memo) MemoizeAlterRangeRelocate(
 	input RelExpr,
+	toStoreID opt.ScalarExpr,
+	fromStoreID opt.ScalarExpr,
 	alterRangeRelocatePrivate *AlterRangeRelocatePrivate,
 ) RelExpr {
 	const size = int64(unsafe.Sizeof(alterRangeRelocateGroup{}))
 	grp := &alterRangeRelocateGroup{mem: m, first: AlterRangeRelocateExpr{
 		Input:                     input,
+		ToStoreID:                 toStoreID,
+		FromStoreID:               fromStoreID,
 		AlterRangeRelocatePrivate: *alterRangeRelocatePrivate,
 	}}
 	e := &grp.first
@@ -29801,9 +29820,9 @@ func (in *interner) InternAlterRangeRelocate(val *AlterRangeRelocateExpr) *Alter
 	in.hasher.Init()
 	in.hasher.HashOperator(opt.AlterRangeRelocateOp)
 	in.hasher.HashRelExpr(val.Input)
+	in.hasher.HashScalarExpr(val.ToStoreID)
+	in.hasher.HashScalarExpr(val.FromStoreID)
 	in.hasher.HashRelocateSubject(val.SubjectReplicas)
-	in.hasher.HashInt64(val.ToStoreID)
-	in.hasher.HashInt64(val.FromStoreID)
 	in.hasher.HashColList(val.Columns)
 	in.hasher.HashPhysProps(val.Props)
 
@@ -29811,9 +29830,9 @@ func (in *interner) InternAlterRangeRelocate(val *AlterRangeRelocateExpr) *Alter
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*AlterRangeRelocateExpr); ok {
 			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsScalarExprEqual(val.ToStoreID, existing.ToStoreID) &&
+				in.hasher.IsScalarExprEqual(val.FromStoreID, existing.FromStoreID) &&
 				in.hasher.IsRelocateSubjectEqual(val.SubjectReplicas, existing.SubjectReplicas) &&
-				in.hasher.IsInt64Equal(val.ToStoreID, existing.ToStoreID) &&
-				in.hasher.IsInt64Equal(val.FromStoreID, existing.FromStoreID) &&
 				in.hasher.IsColListEqual(val.Columns, existing.Columns) &&
 				in.hasher.IsPhysPropsEqual(val.Props, existing.Props) {
 				return existing

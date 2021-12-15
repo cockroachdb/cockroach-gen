@@ -39,7 +39,7 @@ const (
 	// the grouping operator.
 	AggregationsItemOp
 
-	// AlterTableRelocateRange represents an `ALTER RANGE .. RELOCATE ..` statement.
+	// AlterRangeRelocate represents an `ALTER RANGE .. RELOCATE ..` statement.
 	AlterRangeRelocateOp
 
 	AlterRangeRelocatePrivateOp

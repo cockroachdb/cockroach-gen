@@ -883,8 +883,8 @@ type Factory interface {
 	ConstructAlterRangeRelocate(
 		input Node,
 		subjectReplicas tree.RelocateSubject,
-		toStoreID int64,
-		fromStoreID int64,
+		toStoreID tree.TypedExpr,
+		fromStoreID tree.TypedExpr,
 	) (Node, error)
 }
 
@@ -1424,8 +1424,8 @@ func (StubFactory) ConstructExport(
 func (StubFactory) ConstructAlterRangeRelocate(
 	input Node,
 	subjectReplicas tree.RelocateSubject,
-	toStoreID int64,
-	fromStoreID int64,
+	toStoreID tree.TypedExpr,
+	fromStoreID tree.TypedExpr,
 ) (Node, error) {
 	return struct{}{}, nil
 }

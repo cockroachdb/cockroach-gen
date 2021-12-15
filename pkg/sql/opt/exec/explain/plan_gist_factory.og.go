@@ -1051,8 +1051,8 @@ func (f *PlanGistFactory) ConstructExport(
 func (f *PlanGistFactory) ConstructAlterRangeRelocate(
 	input exec.Node,
 	subjectReplicas tree.RelocateSubject,
-	toStoreID int64,
-	fromStoreID int64,
+	toStoreID tree.TypedExpr,
+	fromStoreID tree.TypedExpr,
 ) (exec.Node, error) {
 	f.encodeOperator(alterRangeRelocateOp)
 	node, err := f.wrappedFactory.ConstructAlterRangeRelocate(

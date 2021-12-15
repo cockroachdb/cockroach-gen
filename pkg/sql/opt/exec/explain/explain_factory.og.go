@@ -1828,8 +1828,8 @@ func (f *Factory) ConstructExport(
 func (f *Factory) ConstructAlterRangeRelocate(
 	input exec.Node,
 	subjectReplicas tree.RelocateSubject,
-	toStoreID int64,
-	fromStoreID int64,
+	toStoreID tree.TypedExpr,
+	fromStoreID tree.TypedExpr,
 ) (exec.Node, error) {
 	inputNode := input.(*Node)
 	args := &alterRangeRelocateArgs{
@@ -2329,6 +2329,6 @@ type exportArgs struct {
 type alterRangeRelocateArgs struct {
 	input           *Node
 	subjectReplicas tree.RelocateSubject
-	toStoreID       int64
-	fromStoreID     int64
+	toStoreID       tree.TypedExpr
+	fromStoreID     tree.TypedExpr
 }

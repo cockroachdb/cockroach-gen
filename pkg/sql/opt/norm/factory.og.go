@@ -21643,9 +21643,11 @@ SKIP_RULES:
 }
 
 // ConstructAlterRangeRelocate constructs an expression for the AlterRangeRelocate operator.
-// AlterTableRelocateRange represents an `ALTER RANGE .. RELOCATE ..` statement.
+// AlterRangeRelocate represents an `ALTER RANGE .. RELOCATE ..` statement.
 func (_f *Factory) ConstructAlterRangeRelocate(
 	input memo.RelExpr,
+	toStoreID opt.ScalarExpr,
+	fromStoreID opt.ScalarExpr,
 	alterRangeRelocatePrivate *memo.AlterRangeRelocatePrivate,
 ) memo.RelExpr {
 	_f.constructorStackDepth++
@@ -21657,7 +21659,7 @@ func (_f *Factory) ConstructAlterRangeRelocate(
 	}
 
 SKIP_RULES:
-	e := _f.mem.MemoizeAlterRangeRelocate(input, alterRangeRelocatePrivate)
+	e := _f.mem.MemoizeAlterRangeRelocate(input, toStoreID, fromStoreID, alterRangeRelocatePrivate)
 	expr := _f.onConstructRelational(e)
 	_f.constructorStackDepth--
 	return expr
@@ -23244,8 +23246,10 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 
 	case *memo.AlterRangeRelocateExpr:
 		input := replace(t.Input).(memo.RelExpr)
-		if input != t.Input {
-			return f.ConstructAlterRangeRelocate(input, &t.AlterRangeRelocatePrivate)
+		toStoreID := replace(t.ToStoreID).(opt.ScalarExpr)
+		fromStoreID := replace(t.FromStoreID).(opt.ScalarExpr)
+		if input != t.Input || toStoreID != t.ToStoreID || fromStoreID != t.FromStoreID {
+			return f.ConstructAlterRangeRelocate(input, toStoreID, fromStoreID, &t.AlterRangeRelocatePrivate)
 		}
 		return t
 
@@ -24673,6 +24677,8 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 	case *memo.AlterRangeRelocateExpr:
 		return f.ConstructAlterRangeRelocate(
 			f.invokeReplace(t.Input, replace).(memo.RelExpr),
+			f.invokeReplace(t.ToStoreID, replace).(opt.ScalarExpr),
+			f.invokeReplace(t.FromStoreID, replace).(opt.ScalarExpr),
 			&t.AlterRangeRelocatePrivate,
 		)
 
@@ -25853,7 +25859,9 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 	case opt.AlterRangeRelocateOp:
 		return f.ConstructAlterRangeRelocate(
 			args[0].(memo.RelExpr),
-			args[1].(*memo.AlterRangeRelocatePrivate),
+			args[1].(opt.ScalarExpr),
+			args[2].(opt.ScalarExpr),
+			args[3].(*memo.AlterRangeRelocatePrivate),
 		)
 	}
 	panic(errors.AssertionFailedf("cannot dynamically construct operator %s", errors.Safe(op)))
