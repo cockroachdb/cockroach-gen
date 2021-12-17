@@ -226,7 +226,6 @@ const (
 	EliminateCoalesce
 	SimplifyCoalesce
 	EliminateCast
-	EliminateAssignmentCast
 	NormalizeInConst
 	FoldInNull
 	SimplifyInSingleElement

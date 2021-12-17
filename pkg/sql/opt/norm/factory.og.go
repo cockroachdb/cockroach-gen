@@ -19401,6 +19401,21 @@ func (_f *Factory) ConstructCast(
 		goto SKIP_RULES
 	}
 
+	// [EliminateCast]
+	{
+		targetTyp := typ
+		if _f.funcs.HasColType(input, targetTyp) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateCast) {
+				_expr := input
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.EliminateCast, nil, _expr)
+				}
+				_f.constructorStackDepth--
+				return _expr
+			}
+		}
+	}
+
 	// [FoldNullCast]
 	{
 		_null, _ := input.(*memo.NullExpr)
@@ -19436,21 +19451,6 @@ func (_f *Factory) ConstructCast(
 		}
 	}
 
-	// [EliminateCast]
-	{
-		targetTyp := typ
-		if _f.funcs.HasColType(input, targetTyp) {
-			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateCast) {
-				_expr := input
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EliminateCast, nil, _expr)
-				}
-				_f.constructorStackDepth--
-				return _expr
-			}
-		}
-	}
-
 SKIP_RULES:
 	e := _f.mem.MemoizeCast(input, typ)
 	expr := _f.onConstructScalar(e)
@@ -19482,6 +19482,21 @@ func (_f *Factory) ConstructAssignmentCast(
 		goto SKIP_RULES
 	}
 
+	// [EliminateCast]
+	{
+		targetTyp := typ
+		if _f.funcs.HasColType(input, targetTyp) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateCast) {
+				_expr := input
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.EliminateCast, nil, _expr)
+				}
+				_f.constructorStackDepth--
+				return _expr
+			}
+		}
+	}
+
 	// [FoldAssignmentCast]
 	{
 		if _f.funcs.IsConstValueOrGroupOfConstValues(input) {
@@ -19491,23 +19506,6 @@ func (_f *Factory) ConstructAssignmentCast(
 					_expr := result.(opt.ScalarExpr)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.FoldAssignmentCast, nil, _expr)
-					}
-					_f.constructorStackDepth--
-					return _expr
-				}
-			}
-		}
-	}
-
-	// [EliminateAssignmentCast]
-	{
-		targetTyp := typ
-		if _f.funcs.HasColType(input, targetTyp) {
-			if _f.funcs.AssignmentCastIsNoop(targetTyp) {
-				if _f.matchedRule == nil || _f.matchedRule(opt.EliminateAssignmentCast) {
-					_expr := input
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.EliminateAssignmentCast, nil, _expr)
 					}
 					_f.constructorStackDepth--
 					return _expr
