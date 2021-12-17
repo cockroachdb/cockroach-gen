@@ -6518,17 +6518,20 @@ func (g *offsetGroup) bestProps() *bestProps {
 	return &g.best
 }
 
-// TopKExpr returns the top K, where K is a constant, rows from the input set according to its
-// sort ordering, discarding the remaining rows. The Limit is a constant
-// positive integer; the operator returns at most Limit rows. Rows can be sorted by one
-// or more of the input columns, each of which can be sorted in either ascending
-// or descending order. See the Ordering field in the PhysicalProps struct.
+// TopKExpr returns the top K, where K is a constant, rows from the input set
+// according to its sort ordering, discarding the remaining rows. The Limit is a
+// constant positive integer; the operator returns at most Limit rows. Rows can
+// be sorted by one or more of the input columns, each of which can be sorted in
+// either ascending or descending order. See the Ordering field in the
+// PhysicalProps struct.
 //
 // Unlike the Limit relational operator, TopK does not require its input to be
-// ordered. TopK can be used to substitute a Limit that requires its input to be
-// ordered and performs best when the input is not already ordered. TopK scans the
-// input, storing the K rows that best meet the ordering requirement in a max
-// heap, then sorts the K rows.
+// ordered. However, if the input is known to have a partial ordering of the
+// required ordering, TopK can take advantage of optimizations. TopK can be used
+// to substitute a Limit that requires its input to be ordered and performs best
+// when the input is not already fully ordered. TopK scans the input, storing the
+// K rows that best meet the ordering requirement in a max heap, then sorts the K
+// rows.
 type TopKExpr struct {
 	Input RelExpr
 	TopKPrivate
@@ -6651,8 +6654,15 @@ func (g *topKGroup) bestProps() *bestProps {
 }
 
 type TopKPrivate struct {
-	K        int64
+	K int64
+
+	// Ordering is the required order in which the K rows should be sorted when output.
 	Ordering props.OrderingChoice
+
+	// PartialOrdering is an optional ordering imposed on the input that is
+	// a partial order of Ordering and allows TopK to take advantage of partial
+	// ordering optimizations.
+	PartialOrdering props.OrderingChoice
 }
 
 // Max1RowExpr enforces that its input must return at most one row. If the input
@@ -26212,13 +26222,15 @@ func (in *interner) InternTopK(val *TopKExpr) *TopKExpr {
 	in.hasher.HashRelExpr(val.Input)
 	in.hasher.HashInt64(val.K)
 	in.hasher.HashOrderingChoice(val.Ordering)
+	in.hasher.HashOrderingChoice(val.PartialOrdering)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*TopKExpr); ok {
 			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
 				in.hasher.IsInt64Equal(val.K, existing.K) &&
-				in.hasher.IsOrderingChoiceEqual(val.Ordering, existing.Ordering) {
+				in.hasher.IsOrderingChoiceEqual(val.Ordering, existing.Ordering) &&
+				in.hasher.IsOrderingChoiceEqual(val.PartialOrdering, existing.PartialOrdering) {
 				return existing
 			}
 		}

@@ -58,6 +58,8 @@ func (_e *explorer) exploreGroupMember(
 		return _e.exploreExceptAll(state, t, ordinal)
 	case *memo.LimitExpr:
 		return _e.exploreLimit(state, t, ordinal)
+	case *memo.TopKExpr:
+		return _e.exploreTopK(state, t, ordinal)
 	}
 
 	// No rules for other operator types.
@@ -3392,6 +3394,70 @@ func (_e *explorer) exploreLimit(
 							}
 						}
 					}
+				}
+			}
+		}
+	}
+
+	return _fullyExplored
+}
+
+func (_e *explorer) exploreTopK(
+	_rootState *exploreState,
+	_root *memo.TopKExpr,
+	_rootOrd int,
+) (_fullyExplored bool) {
+	_fullyExplored = true
+
+	// [GenerateLimitedTopKScans]
+	{
+		_partlyExplored := _rootOrd < _rootState.start
+		_state := _e.lookupExploreState(_root.Input)
+		if !_state.fullyExplored {
+			_fullyExplored = false
+		}
+		var _member memo.RelExpr
+		for _ord := 0; _ord < _state.end; _ord++ {
+			if _member == nil {
+				_member = _root.Input.FirstExpr()
+			} else {
+				_member = _member.NextExpr()
+			}
+			if !_partlyExplored || _ord >= _state.start {
+				_scan, _ := _member.(*memo.ScanExpr)
+				if _scan != nil {
+					scanPrivate := &_scan.ScanPrivate
+					if _e.funcs.IsCanonicalScan(scanPrivate) {
+						topKPrivate := &_root.TopKPrivate
+						if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateLimitedTopKScans) {
+							var _last memo.RelExpr
+							if _e.o.appliedRule != nil {
+								_last = memo.LastGroupMember(_root)
+							}
+							_e.funcs.GenerateLimitedTopKScans(_root, scanPrivate, topKPrivate)
+							if _e.o.appliedRule != nil {
+								_e.o.appliedRule(opt.GenerateLimitedTopKScans, _root, _last.NextExpr())
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [GeneratePartialOrderTopK]
+	{
+		if _rootOrd >= _rootState.start {
+			input := _root.Input
+			private := &_root.TopKPrivate
+			if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GeneratePartialOrderTopK) {
+				var _last memo.RelExpr
+				if _e.o.appliedRule != nil {
+					_last = memo.LastGroupMember(_root)
+				}
+				_e.funcs.GeneratePartialOrderTopK(_root, input, private)
+				if _e.o.appliedRule != nil {
+					_e.o.appliedRule(opt.GeneratePartialOrderTopK, _root, _last.NextExpr())
 				}
 			}
 		}

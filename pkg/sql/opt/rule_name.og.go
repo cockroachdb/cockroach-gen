@@ -313,6 +313,8 @@ const (
 	PushLimitIntoIndexJoin
 	SplitLimitedScanIntoUnionScans
 	GenerateTopK
+	GenerateLimitedTopKScans
+	GeneratePartialOrderTopK
 	EliminateIndexJoinInsideProject
 	GenerateIndexScans
 	GenerateLocalityOptimizedScan

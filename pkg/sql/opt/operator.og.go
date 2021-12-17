@@ -1131,17 +1131,20 @@ const (
 
 	SumIntOp
 
-	// TopK returns the top K, where K is a constant, rows from the input set according to its
-	// sort ordering, discarding the remaining rows. The Limit is a constant
-	// positive integer; the operator returns at most Limit rows. Rows can be sorted by one
-	// or more of the input columns, each of which can be sorted in either ascending
-	// or descending order. See the Ordering field in the PhysicalProps struct.
+	// TopK returns the top K, where K is a constant, rows from the input set
+	// according to its sort ordering, discarding the remaining rows. The Limit is a
+	// constant positive integer; the operator returns at most Limit rows. Rows can
+	// be sorted by one or more of the input columns, each of which can be sorted in
+	// either ascending or descending order. See the Ordering field in the
+	// PhysicalProps struct.
 	//
 	// Unlike the Limit relational operator, TopK does not require its input to be
-	// ordered. TopK can be used to substitute a Limit that requires its input to be
-	// ordered and performs best when the input is not already ordered. TopK scans the
-	// input, storing the K rows that best meet the ordering requirement in a max
-	// heap, then sorts the K rows.
+	// ordered. However, if the input is known to have a partial ordering of the
+	// required ordering, TopK can take advantage of optimizations. TopK can be used
+	// to substitute a Limit that requires its input to be ordered and performs best
+	// when the input is not already fully ordered. TopK scans the input, storing the
+	// K rows that best meet the ordering requirement in a max heap, then sorts the K
+	// rows.
 	TopKOp
 
 	TopKPrivateOp
