@@ -19485,21 +19485,6 @@ func (_f *Factory) ConstructAssignmentCast(
 		goto SKIP_RULES
 	}
 
-	// [EliminateCast]
-	{
-		targetTyp := typ
-		if _f.funcs.HasColType(input, targetTyp) {
-			if _f.matchedRule == nil || _f.matchedRule(opt.EliminateCast) {
-				_expr := input
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.EliminateCast, nil, _expr)
-				}
-				_f.constructorStackDepth--
-				return _expr
-			}
-		}
-	}
-
 	// [FoldAssignmentCast]
 	{
 		if _f.funcs.IsConstValueOrGroupOfConstValues(input) {
