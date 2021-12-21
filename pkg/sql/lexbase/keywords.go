@@ -122,6 +122,7 @@ var KeywordsCategories = map[string]string{
 	"drop":                           "U",
 	"else":                           "R",
 	"encoding":                       "U",
+	"encrypted":                      "U",
 	"encryption_passphrase":          "U",
 	"end":                            "R",
 	"enum":                           "U",
@@ -640,6 +641,7 @@ var KeywordNames = []string{
 	"drop",
 	"else",
 	"encoding",
+	"encrypted",
 	"encryption_passphrase",
 	"end",
 	"enum",
@@ -1282,6 +1284,8 @@ func GetKeywordID(k string) int32 {
 		return ELSE
 	case "encoding":
 		return ENCODING
+	case "encrypted":
+		return ENCRYPTED
 	case "encryption_passphrase":
 		return ENCRYPTION_PASSPHRASE
 	case "end":
