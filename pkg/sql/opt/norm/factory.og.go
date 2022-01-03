@@ -1500,7 +1500,7 @@ func (_f *Factory) ConstructProject(
 	{
 		_values, _ := input.(*memo.ValuesExpr)
 		if _values != nil {
-			castCols := _f.funcs.IntersectionCols(_f.funcs.AssignmentCastCols(projections), _f.funcs.OutputCols(_values))
+			castCols := _f.funcs.IntersectionCols(_f.funcs.DifferenceCols(_f.funcs.AssignmentCastCols(projections), passthrough), _f.funcs.OutputCols(_values))
 			if !_f.funcs.ColsAreEmpty(castCols) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.PushAssignmentCastsIntoValues) {
 					_expr := _f.funcs.PushAssignmentCastsIntoValues(_values, projections, passthrough, castCols).(memo.RelExpr)
