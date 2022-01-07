@@ -135,12 +135,7 @@ type Record struct {
 	// Target holds information about what this Record protects. The Record can
 	// either protect the entire cluster, a subset of tenants, or individual
 	// schema objects (database and table).
-	//
-	// Types that are valid to be assigned to Target:
-	//	*Record_SchemaObjects
-	//	*Record_Tenants
-	//	*Record_Cluster
-	Target isRecord_Target `protobuf_oneof:"target"`
+	Target *Target `protobuf:"bytes,8,opt,name=target,proto3" json:"target,omitempty"`
 }
 
 func (m *Record) Reset()         { *m = Record{} }
@@ -171,164 +166,6 @@ func (m *Record) XXX_DiscardUnknown() {
 }
 
 var xxx_messageInfo_Record proto.InternalMessageInfo
-
-type isRecord_Target interface {
-	isRecord_Target()
-	MarshalTo([]byte) (int, error)
-	Size() int
-}
-
-type Record_SchemaObjects struct {
-	SchemaObjects *Record_SchemaObjectsTarget `protobuf:"bytes,8,opt,name=schema_objects,json=schemaObjects,proto3,oneof" json:"schema_objects,omitempty"`
-}
-type Record_Tenants struct {
-	Tenants *Record_TenantsTarget `protobuf:"bytes,9,opt,name=tenants,proto3,oneof" json:"tenants,omitempty"`
-}
-type Record_Cluster struct {
-	Cluster *Record_ClusterTarget `protobuf:"bytes,10,opt,name=cluster,proto3,oneof" json:"cluster,omitempty"`
-}
-
-func (*Record_SchemaObjects) isRecord_Target() {}
-func (*Record_Tenants) isRecord_Target()       {}
-func (*Record_Cluster) isRecord_Target()       {}
-
-func (m *Record) GetTarget() isRecord_Target {
-	if m != nil {
-		return m.Target
-	}
-	return nil
-}
-
-func (m *Record) GetSchemaObjects() *Record_SchemaObjectsTarget {
-	if x, ok := m.GetTarget().(*Record_SchemaObjects); ok {
-		return x.SchemaObjects
-	}
-	return nil
-}
-
-func (m *Record) GetTenants() *Record_TenantsTarget {
-	if x, ok := m.GetTarget().(*Record_Tenants); ok {
-		return x.Tenants
-	}
-	return nil
-}
-
-func (m *Record) GetCluster() *Record_ClusterTarget {
-	if x, ok := m.GetTarget().(*Record_Cluster); ok {
-		return x.Cluster
-	}
-	return nil
-}
-
-// XXX_OneofWrappers is for the internal use of the proto package.
-func (*Record) XXX_OneofWrappers() []interface{} {
-	return []interface{}{
-		(*Record_SchemaObjects)(nil),
-		(*Record_Tenants)(nil),
-		(*Record_Cluster)(nil),
-	}
-}
-
-type Record_SchemaObjectsTarget struct {
-	// IDs are the descriptor IDs of the schema objects being protected by this
-	// Record. This field will only contain database and table IDs.
-	IDs []github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID `protobuf:"varint,1,rep,packed,name=ids,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"ids,omitempty"`
-}
-
-func (m *Record_SchemaObjectsTarget) Reset()         { *m = Record_SchemaObjectsTarget{} }
-func (m *Record_SchemaObjectsTarget) String() string { return proto.CompactTextString(m) }
-func (*Record_SchemaObjectsTarget) ProtoMessage()    {}
-func (*Record_SchemaObjectsTarget) Descriptor() ([]byte, []int) {
-	return fileDescriptor_785be6b93040d650, []int{1, 0}
-}
-func (m *Record_SchemaObjectsTarget) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *Record_SchemaObjectsTarget) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	b = b[:cap(b)]
-	n, err := m.MarshalToSizedBuffer(b)
-	if err != nil {
-		return nil, err
-	}
-	return b[:n], nil
-}
-func (m *Record_SchemaObjectsTarget) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Record_SchemaObjectsTarget.Merge(m, src)
-}
-func (m *Record_SchemaObjectsTarget) XXX_Size() int {
-	return m.Size()
-}
-func (m *Record_SchemaObjectsTarget) XXX_DiscardUnknown() {
-	xxx_messageInfo_Record_SchemaObjectsTarget.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Record_SchemaObjectsTarget proto.InternalMessageInfo
-
-type Record_TenantsTarget struct {
-	// IDs correspond to the tenant keyspacs being protected by this Record.
-	IDs []*roachpb.TenantID `protobuf:"bytes,1,rep,name=ids,proto3" json:"ids,omitempty"`
-}
-
-func (m *Record_TenantsTarget) Reset()         { *m = Record_TenantsTarget{} }
-func (m *Record_TenantsTarget) String() string { return proto.CompactTextString(m) }
-func (*Record_TenantsTarget) ProtoMessage()    {}
-func (*Record_TenantsTarget) Descriptor() ([]byte, []int) {
-	return fileDescriptor_785be6b93040d650, []int{1, 1}
-}
-func (m *Record_TenantsTarget) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *Record_TenantsTarget) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	b = b[:cap(b)]
-	n, err := m.MarshalToSizedBuffer(b)
-	if err != nil {
-		return nil, err
-	}
-	return b[:n], nil
-}
-func (m *Record_TenantsTarget) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Record_TenantsTarget.Merge(m, src)
-}
-func (m *Record_TenantsTarget) XXX_Size() int {
-	return m.Size()
-}
-func (m *Record_TenantsTarget) XXX_DiscardUnknown() {
-	xxx_messageInfo_Record_TenantsTarget.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Record_TenantsTarget proto.InternalMessageInfo
-
-type Record_ClusterTarget struct {
-}
-
-func (m *Record_ClusterTarget) Reset()         { *m = Record_ClusterTarget{} }
-func (m *Record_ClusterTarget) String() string { return proto.CompactTextString(m) }
-func (*Record_ClusterTarget) ProtoMessage()    {}
-func (*Record_ClusterTarget) Descriptor() ([]byte, []int) {
-	return fileDescriptor_785be6b93040d650, []int{1, 2}
-}
-func (m *Record_ClusterTarget) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *Record_ClusterTarget) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	b = b[:cap(b)]
-	n, err := m.MarshalToSizedBuffer(b)
-	if err != nil {
-		return nil, err
-	}
-	return b[:n], nil
-}
-func (m *Record_ClusterTarget) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Record_ClusterTarget.Merge(m, src)
-}
-func (m *Record_ClusterTarget) XXX_Size() int {
-	return m.Size()
-}
-func (m *Record_ClusterTarget) XXX_DiscardUnknown() {
-	xxx_messageInfo_Record_ClusterTarget.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Record_ClusterTarget proto.InternalMessageInfo
 
 // State is the complete system state.
 type State struct {
@@ -365,14 +202,212 @@ func (m *State) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_State proto.InternalMessageInfo
 
+// Target is the format of the message encoded in the target column of the
+// system.protectedts_records table.
+type Target struct {
+	// Types that are valid to be assigned to Union:
+	//	*Target_SchemaObjects
+	//	*Target_Tenants
+	//	*Target_Cluster
+	Union isTarget_Union `protobuf_oneof:"union"`
+}
+
+func (m *Target) Reset()         { *m = Target{} }
+func (m *Target) String() string { return proto.CompactTextString(m) }
+func (*Target) ProtoMessage()    {}
+func (*Target) Descriptor() ([]byte, []int) {
+	return fileDescriptor_785be6b93040d650, []int{3}
+}
+func (m *Target) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *Target) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	b = b[:cap(b)]
+	n, err := m.MarshalToSizedBuffer(b)
+	if err != nil {
+		return nil, err
+	}
+	return b[:n], nil
+}
+func (m *Target) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Target.Merge(m, src)
+}
+func (m *Target) XXX_Size() int {
+	return m.Size()
+}
+func (m *Target) XXX_DiscardUnknown() {
+	xxx_messageInfo_Target.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Target proto.InternalMessageInfo
+
+type isTarget_Union interface {
+	isTarget_Union()
+	MarshalTo([]byte) (int, error)
+	Size() int
+}
+
+type Target_SchemaObjects struct {
+	SchemaObjects *Target_SchemaObjectsTarget `protobuf:"bytes,1,opt,name=schema_objects,json=schemaObjects,proto3,oneof" json:"schema_objects,omitempty"`
+}
+type Target_Tenants struct {
+	Tenants *Target_TenantsTarget `protobuf:"bytes,2,opt,name=tenants,proto3,oneof" json:"tenants,omitempty"`
+}
+type Target_Cluster struct {
+	Cluster *Target_ClusterTarget `protobuf:"bytes,3,opt,name=cluster,proto3,oneof" json:"cluster,omitempty"`
+}
+
+func (*Target_SchemaObjects) isTarget_Union() {}
+func (*Target_Tenants) isTarget_Union()       {}
+func (*Target_Cluster) isTarget_Union()       {}
+
+func (m *Target) GetUnion() isTarget_Union {
+	if m != nil {
+		return m.Union
+	}
+	return nil
+}
+
+func (m *Target) GetSchemaObjects() *Target_SchemaObjectsTarget {
+	if x, ok := m.GetUnion().(*Target_SchemaObjects); ok {
+		return x.SchemaObjects
+	}
+	return nil
+}
+
+func (m *Target) GetTenants() *Target_TenantsTarget {
+	if x, ok := m.GetUnion().(*Target_Tenants); ok {
+		return x.Tenants
+	}
+	return nil
+}
+
+func (m *Target) GetCluster() *Target_ClusterTarget {
+	if x, ok := m.GetUnion().(*Target_Cluster); ok {
+		return x.Cluster
+	}
+	return nil
+}
+
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*Target) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
+		(*Target_SchemaObjects)(nil),
+		(*Target_Tenants)(nil),
+		(*Target_Cluster)(nil),
+	}
+}
+
+type Target_SchemaObjectsTarget struct {
+	// IDs are the descriptor IDs of the schema objects being protected by this
+	// Record. This field will only contain database and table IDs.
+	IDs []github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID `protobuf:"varint,1,rep,packed,name=ids,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"ids,omitempty"`
+}
+
+func (m *Target_SchemaObjectsTarget) Reset()         { *m = Target_SchemaObjectsTarget{} }
+func (m *Target_SchemaObjectsTarget) String() string { return proto.CompactTextString(m) }
+func (*Target_SchemaObjectsTarget) ProtoMessage()    {}
+func (*Target_SchemaObjectsTarget) Descriptor() ([]byte, []int) {
+	return fileDescriptor_785be6b93040d650, []int{3, 0}
+}
+func (m *Target_SchemaObjectsTarget) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *Target_SchemaObjectsTarget) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	b = b[:cap(b)]
+	n, err := m.MarshalToSizedBuffer(b)
+	if err != nil {
+		return nil, err
+	}
+	return b[:n], nil
+}
+func (m *Target_SchemaObjectsTarget) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Target_SchemaObjectsTarget.Merge(m, src)
+}
+func (m *Target_SchemaObjectsTarget) XXX_Size() int {
+	return m.Size()
+}
+func (m *Target_SchemaObjectsTarget) XXX_DiscardUnknown() {
+	xxx_messageInfo_Target_SchemaObjectsTarget.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Target_SchemaObjectsTarget proto.InternalMessageInfo
+
+type Target_TenantsTarget struct {
+	// IDs correspond to the tenant keyspaces being protected by this Record.
+	IDs []roachpb.TenantID `protobuf:"bytes,1,rep,name=ids,proto3" json:"ids"`
+}
+
+func (m *Target_TenantsTarget) Reset()         { *m = Target_TenantsTarget{} }
+func (m *Target_TenantsTarget) String() string { return proto.CompactTextString(m) }
+func (*Target_TenantsTarget) ProtoMessage()    {}
+func (*Target_TenantsTarget) Descriptor() ([]byte, []int) {
+	return fileDescriptor_785be6b93040d650, []int{3, 1}
+}
+func (m *Target_TenantsTarget) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *Target_TenantsTarget) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	b = b[:cap(b)]
+	n, err := m.MarshalToSizedBuffer(b)
+	if err != nil {
+		return nil, err
+	}
+	return b[:n], nil
+}
+func (m *Target_TenantsTarget) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Target_TenantsTarget.Merge(m, src)
+}
+func (m *Target_TenantsTarget) XXX_Size() int {
+	return m.Size()
+}
+func (m *Target_TenantsTarget) XXX_DiscardUnknown() {
+	xxx_messageInfo_Target_TenantsTarget.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Target_TenantsTarget proto.InternalMessageInfo
+
+type Target_ClusterTarget struct {
+}
+
+func (m *Target_ClusterTarget) Reset()         { *m = Target_ClusterTarget{} }
+func (m *Target_ClusterTarget) String() string { return proto.CompactTextString(m) }
+func (*Target_ClusterTarget) ProtoMessage()    {}
+func (*Target_ClusterTarget) Descriptor() ([]byte, []int) {
+	return fileDescriptor_785be6b93040d650, []int{3, 2}
+}
+func (m *Target_ClusterTarget) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *Target_ClusterTarget) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	b = b[:cap(b)]
+	n, err := m.MarshalToSizedBuffer(b)
+	if err != nil {
+		return nil, err
+	}
+	return b[:n], nil
+}
+func (m *Target_ClusterTarget) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Target_ClusterTarget.Merge(m, src)
+}
+func (m *Target_ClusterTarget) XXX_Size() int {
+	return m.Size()
+}
+func (m *Target_ClusterTarget) XXX_DiscardUnknown() {
+	xxx_messageInfo_Target_ClusterTarget.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Target_ClusterTarget proto.InternalMessageInfo
+
 func init() {
 	proto.RegisterEnum("cockroach.protectedts.ProtectionMode", ProtectionMode_name, ProtectionMode_value)
 	proto.RegisterType((*Metadata)(nil), "cockroach.protectedts.Metadata")
 	proto.RegisterType((*Record)(nil), "cockroach.protectedts.Record")
-	proto.RegisterType((*Record_SchemaObjectsTarget)(nil), "cockroach.protectedts.Record.SchemaObjectsTarget")
-	proto.RegisterType((*Record_TenantsTarget)(nil), "cockroach.protectedts.Record.TenantsTarget")
-	proto.RegisterType((*Record_ClusterTarget)(nil), "cockroach.protectedts.Record.ClusterTarget")
 	proto.RegisterType((*State)(nil), "cockroach.protectedts.State")
+	proto.RegisterType((*Target)(nil), "cockroach.protectedts.Target")
+	proto.RegisterType((*Target_SchemaObjectsTarget)(nil), "cockroach.protectedts.Target.SchemaObjectsTarget")
+	proto.RegisterType((*Target_TenantsTarget)(nil), "cockroach.protectedts.Target.TenantsTarget")
+	proto.RegisterType((*Target_ClusterTarget)(nil), "cockroach.protectedts.Target.ClusterTarget")
 }
 
 func init() {
@@ -380,54 +415,55 @@ func init() {
 }
 
 var fileDescriptor_785be6b93040d650 = []byte{
-	// 738 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x54, 0xcd, 0x6e, 0xdb, 0x46,
-	0x10, 0x26, 0x25, 0x59, 0xa2, 0x56, 0x95, 0xed, 0x6e, 0x5b, 0x94, 0x90, 0x5b, 0x52, 0x30, 0xd0,
-	0x42, 0x6d, 0x01, 0x12, 0x55, 0x8b, 0x02, 0x0d, 0x90, 0x00, 0xa6, 0xa5, 0xd8, 0x3a, 0x38, 0x36,
-	0x68, 0x01, 0x01, 0x7c, 0x11, 0x96, 0xe4, 0x86, 0x62, 0x44, 0x72, 0x19, 0xee, 0x52, 0x80, 0xcf,
-	0xb9, 0xe4, 0x12, 0x20, 0xef, 0x90, 0x07, 0xc8, 0x6b, 0xf8, 0xe8, 0xa3, 0x4f, 0x42, 0x22, 0xbf,
-	0x85, 0x4f, 0xc1, 0x2e, 0xa9, 0x1f, 0x27, 0x76, 0xe0, 0xdb, 0xec, 0xec, 0x7c, 0x1f, 0xf7, 0xfb,
-	0x66, 0x86, 0xc0, 0x98, 0x4c, 0xcd, 0xc9, 0x94, 0xe2, 0x74, 0x8a, 0x53, 0x33, 0x49, 0x09, 0xc3,
-	0x2e, 0xc3, 0x1e, 0xa3, 0x66, 0xc2, 0x12, 0x67, 0x3d, 0x61, 0xf0, 0x98, 0xc0, 0x9f, 0x5c, 0xe2,
-	0x4e, 0x52, 0x82, 0xdc, 0xb1, 0xb1, 0x76, 0xd9, 0xfa, 0xd1, 0x27, 0x3e, 0x11, 0x15, 0x26, 0x8f,
-	0xf2, 0xe2, 0xd6, 0x2f, 0x3e, 0x21, 0x7e, 0x88, 0x4d, 0x94, 0x04, 0x26, 0x8a, 0x63, 0xc2, 0x10,
-	0x0b, 0x48, 0x5c, 0x50, 0xb5, 0xa0, 0xa0, 0x49, 0x1c, 0xd3, 0x43, 0x0c, 0x15, 0x39, 0x35, 0x63,
-	0x41, 0x68, 0x8e, 0x43, 0xd7, 0x64, 0x41, 0x84, 0x29, 0x43, 0x51, 0x92, 0xdf, 0xec, 0xbe, 0x96,
-	0x81, 0x72, 0x84, 0x19, 0xe2, 0xc5, 0x50, 0x05, 0xb5, 0x29, 0x4e, 0x69, 0x40, 0x62, 0x55, 0x6e,
-	0xcb, 0x9d, 0x8a, 0xbd, 0x38, 0x42, 0x1d, 0x34, 0xe2, 0x2c, 0x1a, 0xa5, 0xd8, 0x25, 0xa9, 0x47,
-	0xd5, 0x92, 0xb8, 0x05, 0x71, 0x16, 0xd9, 0x79, 0x06, 0xee, 0x80, 0x3a, 0x2f, 0xa0, 0x09, 0x8a,
-	0xa9, 0x5a, 0x16, 0xd7, 0x4a, 0x9c, 0x45, 0xa7, 0xfc, 0xcc, 0xd1, 0x8c, 0x30, 0x14, 0x8e, 0x9c,
-	0x73, 0x86, 0xa9, 0x5a, 0xc9, 0xd1, 0x22, 0x65, 0xf1, 0xcc, 0xee, 0x87, 0x2a, 0xa8, 0xe6, 0x4c,
-	0xf0, 0x19, 0x28, 0x05, 0x9e, 0xf8, 0xfc, 0x77, 0xd6, 0x93, 0xf9, 0x4c, 0x2f, 0x0d, 0x7a, 0x37,
-	0x33, 0xfd, 0x5f, 0x3f, 0x60, 0xe3, 0xcc, 0x31, 0x5c, 0x12, 0x99, 0x4b, 0xab, 0x3c, 0x67, 0x15,
-	0x9b, 0xc9, 0xc4, 0x37, 0x85, 0xca, 0x2c, 0x0b, 0x3c, 0x43, 0xd0, 0xda, 0xa5, 0xc0, 0x83, 0x7b,
-	0xa0, 0xbe, 0xd4, 0x2c, 0xde, 0xdd, 0xe8, 0xfe, 0x6a, 0xac, 0xdc, 0xe6, 0x10, 0x63, 0x1c, 0xba,
-	0xc6, 0x70, 0x51, 0x64, 0x55, 0x2e, 0x66, 0xba, 0x64, 0xaf, 0x50, 0xf0, 0x7f, 0x50, 0x89, 0x88,
-	0x87, 0x85, 0xac, 0xcd, 0xee, 0x6f, 0xc6, 0x9d, 0xbd, 0x32, 0x4e, 0xf2, 0x38, 0x20, 0xf1, 0x11,
-	0xf1, 0xb0, 0x2d, 0x20, 0xdc, 0x96, 0x08, 0x33, 0x34, 0x62, 0xe7, 0x09, 0x16, 0xba, 0xeb, 0xb6,
-	0xc2, 0x13, 0xc3, 0xf3, 0x04, 0x43, 0x08, 0x2a, 0x3c, 0x56, 0x37, 0xb8, 0x58, 0x5b, 0xc4, 0xb0,
-	0x05, 0x94, 0x29, 0x4e, 0x83, 0x17, 0x01, 0xf6, 0xd4, 0x6a, 0x5b, 0xee, 0x28, 0xf6, 0xf2, 0x0c,
-	0x0f, 0xc1, 0xb6, 0x87, 0x93, 0x14, 0xbb, 0x88, 0x61, 0xaf, 0xb0, 0xba, 0xd6, 0x2e, 0x77, 0x1a,
-	0xdd, 0x9f, 0xd7, 0xde, 0x54, 0xb4, 0xdf, 0xe0, 0xd6, 0x17, 0x5a, 0xb6, 0x56, 0xb0, 0xbc, 0x21,
-	0x67, 0x60, 0x93, 0xba, 0x63, 0x1c, 0xa1, 0x11, 0x71, 0x5e, 0x62, 0x97, 0x51, 0x55, 0x11, 0xce,
-	0xfc, 0x7d, 0x8f, 0xb6, 0xbc, 0x37, 0xc6, 0xa9, 0xc0, 0x1c, 0xe7, 0x90, 0x21, 0x4a, 0x7d, 0xcc,
-	0x0e, 0x25, 0xbb, 0x49, 0xd7, 0xd3, 0xf0, 0x00, 0xd4, 0x18, 0x8e, 0x51, 0xcc, 0xa8, 0x5a, 0x17,
-	0xa4, 0x7f, 0x7d, 0x9b, 0x74, 0x98, 0x17, 0x2f, 0xe9, 0x16, 0x68, 0x4e, 0xe4, 0x86, 0x19, 0x65,
-	0x38, 0x55, 0xc1, 0x43, 0x88, 0xf6, 0xf3, 0xe2, 0x15, 0x51, 0x81, 0x6e, 0xc5, 0xe0, 0x87, 0x3b,
-	0x5e, 0x0e, 0x9f, 0x83, 0x72, 0xe0, 0x51, 0x55, 0x6e, 0x97, 0x3b, 0x4d, 0xab, 0x3f, 0x9f, 0xe9,
-	0xe5, 0x41, 0x8f, 0xde, 0xcc, 0xf4, 0x47, 0x0f, 0x9a, 0x35, 0xfa, 0x2a, 0x34, 0x5d, 0xc4, 0x50,
-	0x48, 0x7c, 0xd3, 0xc3, 0xd4, 0x4d, 0x1c, 0x63, 0xd0, 0xb3, 0x39, 0x63, 0xeb, 0x00, 0x34, 0x6f,
-	0x89, 0x82, 0xff, 0xad, 0xbe, 0xd4, 0xe8, 0xee, 0xdc, 0xd1, 0xab, 0xbc, 0x7c, 0xd0, 0xb3, 0x6a,
-	0xc5, 0x33, 0x72, 0xa2, 0x2d, 0xd0, 0xbc, 0x25, 0xca, 0x52, 0x40, 0x95, 0x89, 0x68, 0xf7, 0xad,
-	0x0c, 0x36, 0x4e, 0x19, 0x62, 0x18, 0xf6, 0x81, 0x98, 0x28, 0xbe, 0xc0, 0x62, 0x6d, 0x1a, 0x5d,
-	0xfd, 0x1e, 0x9f, 0x16, 0x7b, 0x6e, 0x29, 0x7c, 0x2a, 0x2e, 0x67, 0xba, 0x6c, 0x2f, 0xa1, 0xf0,
-	0x31, 0xa8, 0xad, 0xb6, 0xbb, 0xfc, 0xc5, 0x96, 0x7c, 0xed, 0x76, 0x31, 0x59, 0x0b, 0xcc, 0x9f,
-	0x7f, 0x80, 0xcd, 0xdb, 0x0b, 0x00, 0xbf, 0x07, 0xcd, 0x13, 0xfb, 0x78, 0xd8, 0xdf, 0x1f, 0x8e,
-	0xf6, 0x9e, 0x0e, 0xfb, 0xf6, 0xb6, 0xd4, 0xaa, 0xbc, 0x79, 0xaf, 0x49, 0xd6, 0xef, 0x17, 0x9f,
-	0x34, 0xe9, 0x62, 0xae, 0xc9, 0x97, 0x73, 0x4d, 0xbe, 0x9a, 0x6b, 0xf2, 0xc7, 0xb9, 0x26, 0xbf,
-	0xbb, 0xd6, 0xa4, 0xcb, 0x6b, 0x4d, 0xba, 0xba, 0xd6, 0xa4, 0xb3, 0x0a, 0xff, 0x4b, 0x3a, 0x55,
-	0xf1, 0x87, 0xfa, 0xe7, 0x73, 0x00, 0x00, 0x00, 0xff, 0xff, 0xa7, 0x73, 0x0c, 0x7f, 0x4c, 0x05,
-	0x00, 0x00,
+	// 756 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x54, 0xcf, 0x6b, 0xdb, 0x48,
+	0x14, 0x96, 0x2c, 0xc7, 0x76, 0xc6, 0xeb, 0x24, 0x3b, 0xbb, 0xcb, 0x0a, 0x67, 0x57, 0x0a, 0x86,
+	0x5d, 0xbc, 0xbb, 0x20, 0xb1, 0xde, 0xed, 0xa1, 0x81, 0x16, 0xa2, 0xd8, 0x6d, 0x4c, 0x49, 0x13,
+	0x14, 0x43, 0x21, 0x17, 0x33, 0x92, 0xa6, 0xb2, 0x6a, 0x49, 0xa3, 0x6a, 0x46, 0x86, 0x9c, 0x7b,
+	0xe9, 0xa5, 0xd0, 0xff, 0xa1, 0xfd, 0x63, 0x72, 0x29, 0xe4, 0x98, 0x93, 0x69, 0x9d, 0xff, 0x22,
+	0xa7, 0x32, 0x23, 0xf9, 0x47, 0x68, 0x9a, 0xf6, 0xf6, 0xe6, 0xcd, 0xf7, 0x7d, 0x7a, 0xdf, 0x7b,
+	0x4f, 0x03, 0x8c, 0xf1, 0xc4, 0x1c, 0x4f, 0x28, 0x4e, 0x27, 0x38, 0x35, 0x93, 0x94, 0x30, 0xec,
+	0x32, 0xec, 0x31, 0x6a, 0x26, 0x2c, 0x71, 0x56, 0x13, 0x06, 0x8f, 0x09, 0xfc, 0xc5, 0x25, 0xee,
+	0x38, 0x25, 0xc8, 0x1d, 0x19, 0x2b, 0x97, 0xcd, 0x9f, 0x7d, 0xe2, 0x13, 0x81, 0x30, 0x79, 0x94,
+	0x83, 0x9b, 0xbf, 0xf9, 0x84, 0xf8, 0x21, 0x36, 0x51, 0x12, 0x98, 0x28, 0x8e, 0x09, 0x43, 0x2c,
+	0x20, 0x71, 0x21, 0xd5, 0x84, 0x42, 0x26, 0x71, 0x4c, 0x0f, 0x31, 0x54, 0xe4, 0xd4, 0x8c, 0x05,
+	0xa1, 0x39, 0x0a, 0x5d, 0x93, 0x05, 0x11, 0xa6, 0x0c, 0x45, 0x49, 0x7e, 0xd3, 0x7a, 0x25, 0x83,
+	0xda, 0x21, 0x66, 0x88, 0x83, 0xa1, 0x0a, 0xaa, 0x13, 0x9c, 0xd2, 0x80, 0xc4, 0xaa, 0xbc, 0x23,
+	0xb7, 0xcb, 0xf6, 0xfc, 0x08, 0x75, 0x50, 0x8f, 0xb3, 0x68, 0x98, 0x62, 0x97, 0xa4, 0x1e, 0x55,
+	0x4b, 0xe2, 0x16, 0xc4, 0x59, 0x64, 0xe7, 0x19, 0xb8, 0x0d, 0xd6, 0x39, 0x80, 0x26, 0x28, 0xa6,
+	0xaa, 0x22, 0xae, 0x6b, 0x71, 0x16, 0x9d, 0xf0, 0x33, 0x67, 0x33, 0xc2, 0x50, 0x38, 0x74, 0xce,
+	0x18, 0xa6, 0x6a, 0x39, 0x67, 0x8b, 0x94, 0xc5, 0x33, 0xad, 0xf7, 0x0a, 0xa8, 0xe4, 0x4a, 0xf0,
+	0x29, 0x28, 0x05, 0x9e, 0xf8, 0xfc, 0x0f, 0xd6, 0xc3, 0xd9, 0x54, 0x2f, 0xf5, 0xbb, 0xd7, 0x53,
+	0xfd, 0x7f, 0x3f, 0x60, 0xa3, 0xcc, 0x31, 0x5c, 0x12, 0x99, 0x8b, 0x56, 0x79, 0xce, 0x32, 0x36,
+	0x93, 0xb1, 0x6f, 0x0a, 0x97, 0x59, 0x16, 0x78, 0x86, 0x90, 0xb5, 0x4b, 0x81, 0x07, 0xf7, 0xc0,
+	0xfa, 0xc2, 0xb3, 0xa8, 0xbb, 0xde, 0xf9, 0xdd, 0x58, 0x76, 0x9b, 0x53, 0x8c, 0x51, 0xe8, 0x1a,
+	0x83, 0x39, 0xc8, 0x2a, 0x9f, 0x4f, 0x75, 0xc9, 0x5e, 0xb2, 0xe0, 0x7d, 0x50, 0x8e, 0x88, 0x87,
+	0x85, 0xad, 0x8d, 0xce, 0x1f, 0xc6, 0xad, 0xb3, 0x32, 0x8e, 0xf3, 0x38, 0x20, 0xf1, 0x21, 0xf1,
+	0xb0, 0x2d, 0x28, 0xbc, 0x2d, 0x11, 0x66, 0x68, 0xc8, 0xce, 0x12, 0x2c, 0x7c, 0xaf, 0xdb, 0x35,
+	0x9e, 0x18, 0x9c, 0x25, 0x18, 0x42, 0x50, 0xe6, 0xb1, 0xba, 0xc6, 0xcd, 0xda, 0x22, 0x86, 0x4d,
+	0x50, 0x9b, 0xe0, 0x34, 0x78, 0x1e, 0x60, 0x4f, 0xad, 0xec, 0xc8, 0xed, 0x9a, 0xbd, 0x38, 0xc3,
+	0x03, 0xb0, 0xe5, 0xe1, 0x24, 0xc5, 0x2e, 0x62, 0xd8, 0x2b, 0x5a, 0x5d, 0xdd, 0x51, 0xda, 0xf5,
+	0xce, 0xaf, 0x2b, 0x35, 0x15, 0xe3, 0x37, 0x78, 0xeb, 0x0b, 0x2f, 0x9b, 0x4b, 0x5a, 0x3e, 0x90,
+	0x7b, 0xa0, 0xc2, 0x50, 0xea, 0x63, 0xa6, 0xd6, 0xbe, 0xe8, 0xc8, 0xaa, 0xa7, 0x81, 0x00, 0xd9,
+	0x05, 0xb8, 0xf5, 0x46, 0x06, 0x6b, 0x27, 0x0c, 0x31, 0x0c, 0x7b, 0x40, 0xd8, 0xe0, 0x5b, 0x23,
+	0x66, 0x55, 0xef, 0xe8, 0x5f, 0x91, 0x98, 0x2f, 0x97, 0x55, 0xe3, 0xa5, 0x5c, 0x4c, 0x75, 0xd9,
+	0x5e, 0x50, 0xe1, 0x03, 0x50, 0x5d, 0xae, 0x94, 0x72, 0x47, 0x21, 0xf9, 0x72, 0x14, 0x76, 0xe6,
+	0x9c, 0xd6, 0x07, 0x05, 0x54, 0xf2, 0x12, 0xe1, 0x29, 0xd8, 0xa0, 0xee, 0x08, 0x47, 0x68, 0x48,
+	0x9c, 0x17, 0xd8, 0x65, 0xb4, 0x28, 0xeb, 0xdf, 0x3b, 0x9d, 0x19, 0x27, 0x82, 0x73, 0x94, 0x53,
+	0xf2, 0xdc, 0x81, 0x64, 0x37, 0xe8, 0x6a, 0x1a, 0x3e, 0x06, 0x55, 0x86, 0x63, 0x14, 0x33, 0x5a,
+	0x2c, 0xd0, 0x3f, 0x77, 0x8b, 0x0e, 0x72, 0xf0, 0x42, 0x6e, 0xce, 0xe6, 0x42, 0x6e, 0x98, 0x51,
+	0x86, 0x53, 0xb1, 0x4b, 0xdf, 0x14, 0xda, 0xcf, 0xc1, 0x4b, 0xa1, 0x82, 0xdd, 0x8c, 0xc1, 0x4f,
+	0xb7, 0x54, 0x0e, 0x9f, 0x01, 0x25, 0xf0, 0xb8, 0x73, 0xa5, 0xdd, 0xb0, 0x7a, 0xb3, 0xa9, 0xae,
+	0xf4, 0xbb, 0xf4, 0x7a, 0xaa, 0xef, 0x7e, 0xd7, 0xdf, 0x43, 0x5f, 0x86, 0xa6, 0x8b, 0x18, 0x0a,
+	0x89, 0x6f, 0x7a, 0x98, 0xba, 0x89, 0x63, 0xf4, 0xbb, 0x36, 0x57, 0x6c, 0x3e, 0x01, 0x8d, 0x1b,
+	0xa6, 0xe0, 0xee, 0xf2, 0x4b, 0xf5, 0xce, 0xf6, 0x2d, 0xdb, 0x97, 0xc3, 0xfb, 0x5d, 0xab, 0xce,
+	0x47, 0x56, 0x94, 0x92, 0x8b, 0x6d, 0x82, 0xc6, 0x0d, 0x63, 0x56, 0x15, 0xac, 0x65, 0x71, 0x40,
+	0xe2, 0xbf, 0xff, 0x02, 0x1b, 0x37, 0xff, 0x22, 0xf8, 0x23, 0x68, 0x1c, 0xdb, 0x47, 0x83, 0xde,
+	0xfe, 0x60, 0xb8, 0xf7, 0x68, 0xd0, 0xb3, 0xb7, 0xa4, 0x66, 0xf9, 0xf5, 0x3b, 0x4d, 0xb2, 0xfe,
+	0x3c, 0xff, 0xa4, 0x49, 0xe7, 0x33, 0x4d, 0xbe, 0x98, 0x69, 0xf2, 0xe5, 0x4c, 0x93, 0x3f, 0xce,
+	0x34, 0xf9, 0xed, 0x95, 0x26, 0x5d, 0x5c, 0x69, 0xd2, 0xe5, 0x95, 0x26, 0x9d, 0x96, 0xf9, 0x53,
+	0xeb, 0x54, 0xc4, 0x33, 0xf7, 0xdf, 0xe7, 0x00, 0x00, 0x00, 0xff, 0xff, 0x76, 0x75, 0x36, 0x57,
+	0x91, 0x05, 0x00, 0x00,
 }
 
 func (m *Metadata) Marshal() (dAtA []byte, err error) {
@@ -495,12 +531,15 @@ func (m *Record) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = l
 	if m.Target != nil {
 		{
-			size := m.Target.Size()
-			i -= size
-			if _, err := m.Target.MarshalTo(dAtA[i:]); err != nil {
+			size, err := m.Target.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
 				return 0, err
 			}
+			i -= size
+			i = encodeVarintProtectedts(dAtA, i, uint64(size))
 		}
+		i--
+		dAtA[i] = 0x42
 	}
 	if len(m.DeprecatedSpans) > 0 {
 		for iNdEx := len(m.DeprecatedSpans) - 1; iNdEx >= 0; iNdEx-- {
@@ -565,170 +604,6 @@ func (m *Record) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *Record_SchemaObjects) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *Record_SchemaObjects) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	if m.SchemaObjects != nil {
-		{
-			size, err := m.SchemaObjects.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintProtectedts(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x42
-	}
-	return len(dAtA) - i, nil
-}
-func (m *Record_Tenants) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *Record_Tenants) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	if m.Tenants != nil {
-		{
-			size, err := m.Tenants.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintProtectedts(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x4a
-	}
-	return len(dAtA) - i, nil
-}
-func (m *Record_Cluster) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *Record_Cluster) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	if m.Cluster != nil {
-		{
-			size, err := m.Cluster.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintProtectedts(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x52
-	}
-	return len(dAtA) - i, nil
-}
-func (m *Record_SchemaObjectsTarget) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *Record_SchemaObjectsTarget) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *Record_SchemaObjectsTarget) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.IDs) > 0 {
-		dAtA6 := make([]byte, len(m.IDs)*10)
-		var j5 int
-		for _, num := range m.IDs {
-			for num >= 1<<7 {
-				dAtA6[j5] = uint8(uint64(num)&0x7f | 0x80)
-				num >>= 7
-				j5++
-			}
-			dAtA6[j5] = uint8(num)
-			j5++
-		}
-		i -= j5
-		copy(dAtA[i:], dAtA6[:j5])
-		i = encodeVarintProtectedts(dAtA, i, uint64(j5))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *Record_TenantsTarget) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *Record_TenantsTarget) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *Record_TenantsTarget) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.IDs) > 0 {
-		for iNdEx := len(m.IDs) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.IDs[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintProtectedts(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0xa
-		}
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *Record_ClusterTarget) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *Record_ClusterTarget) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *Record_ClusterTarget) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	return len(dAtA) - i, nil
-}
-
 func (m *State) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -773,6 +648,202 @@ func (m *State) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	}
 	i--
 	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
+}
+
+func (m *Target) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *Target) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Target) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Union != nil {
+		{
+			size := m.Union.Size()
+			i -= size
+			if _, err := m.Union.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
+		}
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *Target_SchemaObjects) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Target_SchemaObjects) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.SchemaObjects != nil {
+		{
+			size, err := m.SchemaObjects.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintProtectedts(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+func (m *Target_Tenants) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Target_Tenants) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.Tenants != nil {
+		{
+			size, err := m.Tenants.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintProtectedts(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
+	return len(dAtA) - i, nil
+}
+func (m *Target_Cluster) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Target_Cluster) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.Cluster != nil {
+		{
+			size, err := m.Cluster.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintProtectedts(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1a
+	}
+	return len(dAtA) - i, nil
+}
+func (m *Target_SchemaObjectsTarget) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *Target_SchemaObjectsTarget) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Target_SchemaObjectsTarget) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.IDs) > 0 {
+		dAtA8 := make([]byte, len(m.IDs)*10)
+		var j7 int
+		for _, num := range m.IDs {
+			for num >= 1<<7 {
+				dAtA8[j7] = uint8(uint64(num)&0x7f | 0x80)
+				num >>= 7
+				j7++
+			}
+			dAtA8[j7] = uint8(num)
+			j7++
+		}
+		i -= j7
+		copy(dAtA[i:], dAtA8[:j7])
+		i = encodeVarintProtectedts(dAtA, i, uint64(j7))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *Target_TenantsTarget) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *Target_TenantsTarget) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Target_TenantsTarget) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.IDs) > 0 {
+		for iNdEx := len(m.IDs) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.IDs[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintProtectedts(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0xa
+		}
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *Target_ClusterTarget) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *Target_ClusterTarget) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Target_ClusterTarget) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
 	return len(dAtA) - i, nil
 }
 
@@ -841,84 +912,9 @@ func (m *Record) Size() (n int) {
 		}
 	}
 	if m.Target != nil {
-		n += m.Target.Size()
-	}
-	return n
-}
-
-func (m *Record_SchemaObjects) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.SchemaObjects != nil {
-		l = m.SchemaObjects.Size()
+		l = m.Target.Size()
 		n += 1 + l + sovProtectedts(uint64(l))
 	}
-	return n
-}
-func (m *Record_Tenants) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.Tenants != nil {
-		l = m.Tenants.Size()
-		n += 1 + l + sovProtectedts(uint64(l))
-	}
-	return n
-}
-func (m *Record_Cluster) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.Cluster != nil {
-		l = m.Cluster.Size()
-		n += 1 + l + sovProtectedts(uint64(l))
-	}
-	return n
-}
-func (m *Record_SchemaObjectsTarget) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if len(m.IDs) > 0 {
-		l = 0
-		for _, e := range m.IDs {
-			l += sovProtectedts(uint64(e))
-		}
-		n += 1 + sovProtectedts(uint64(l)) + l
-	}
-	return n
-}
-
-func (m *Record_TenantsTarget) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if len(m.IDs) > 0 {
-		for _, e := range m.IDs {
-			l = e.Size()
-			n += 1 + l + sovProtectedts(uint64(l))
-		}
-	}
-	return n
-}
-
-func (m *Record_ClusterTarget) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
 	return n
 }
 
@@ -936,6 +932,94 @@ func (m *State) Size() (n int) {
 			n += 1 + l + sovProtectedts(uint64(l))
 		}
 	}
+	return n
+}
+
+func (m *Target) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Union != nil {
+		n += m.Union.Size()
+	}
+	return n
+}
+
+func (m *Target_SchemaObjects) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.SchemaObjects != nil {
+		l = m.SchemaObjects.Size()
+		n += 1 + l + sovProtectedts(uint64(l))
+	}
+	return n
+}
+func (m *Target_Tenants) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Tenants != nil {
+		l = m.Tenants.Size()
+		n += 1 + l + sovProtectedts(uint64(l))
+	}
+	return n
+}
+func (m *Target_Cluster) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Cluster != nil {
+		l = m.Cluster.Size()
+		n += 1 + l + sovProtectedts(uint64(l))
+	}
+	return n
+}
+func (m *Target_SchemaObjectsTarget) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if len(m.IDs) > 0 {
+		l = 0
+		for _, e := range m.IDs {
+			l += sovProtectedts(uint64(e))
+		}
+		n += 1 + sovProtectedts(uint64(l)) + l
+	}
+	return n
+}
+
+func (m *Target_TenantsTarget) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if len(m.IDs) > 0 {
+		for _, e := range m.IDs {
+			l = e.Size()
+			n += 1 + l + sovProtectedts(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *Target_ClusterTarget) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
 	return n
 }
 
@@ -1308,6 +1392,209 @@ func (m *Record) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 8:
 			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Target", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtectedts
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthProtectedts
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthProtectedts
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Target == nil {
+				m.Target = &Target{}
+			}
+			if err := m.Target.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipProtectedts(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthProtectedts
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *State) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowProtectedts
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: State: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: State: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Metadata", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtectedts
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthProtectedts
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthProtectedts
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Metadata.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Records", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtectedts
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthProtectedts
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthProtectedts
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Records = append(m.Records, Record{})
+			if err := m.Records[len(m.Records)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipProtectedts(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthProtectedts
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *Target) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowProtectedts
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: Target: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: Target: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field SchemaObjects", wireType)
 			}
 			var msglen int
@@ -1335,13 +1622,13 @@ func (m *Record) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &Record_SchemaObjectsTarget{}
+			v := &Target_SchemaObjectsTarget{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Target = &Record_SchemaObjects{v}
+			m.Union = &Target_SchemaObjects{v}
 			iNdEx = postIndex
-		case 9:
+		case 2:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Tenants", wireType)
 			}
@@ -1370,13 +1657,13 @@ func (m *Record) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &Record_TenantsTarget{}
+			v := &Target_TenantsTarget{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Target = &Record_Tenants{v}
+			m.Union = &Target_Tenants{v}
 			iNdEx = postIndex
-		case 10:
+		case 3:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Cluster", wireType)
 			}
@@ -1405,11 +1692,11 @@ func (m *Record) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &Record_ClusterTarget{}
+			v := &Target_ClusterTarget{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Target = &Record_Cluster{v}
+			m.Union = &Target_Cluster{v}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -1432,7 +1719,7 @@ func (m *Record) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *Record_SchemaObjectsTarget) Unmarshal(dAtA []byte) error {
+func (m *Target_SchemaObjectsTarget) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1558,7 +1845,7 @@ func (m *Record_SchemaObjectsTarget) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *Record_TenantsTarget) Unmarshal(dAtA []byte) error {
+func (m *Target_TenantsTarget) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1616,7 +1903,7 @@ func (m *Record_TenantsTarget) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.IDs = append(m.IDs, &roachpb.TenantID{})
+			m.IDs = append(m.IDs, roachpb.TenantID{})
 			if err := m.IDs[len(m.IDs)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -1642,7 +1929,7 @@ func (m *Record_TenantsTarget) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *Record_ClusterTarget) Unmarshal(dAtA []byte) error {
+func (m *Target_ClusterTarget) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1671,123 +1958,6 @@ func (m *Record_ClusterTarget) Unmarshal(dAtA []byte) error {
 			return fmt.Errorf("proto: ClusterTarget: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
-		default:
-			iNdEx = preIndex
-			skippy, err := skipProtectedts(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthProtectedts
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *State) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowProtectedts
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: State: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: State: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Metadata", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowProtectedts
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthProtectedts
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthProtectedts
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.Metadata.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Records", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowProtectedts
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthProtectedts
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthProtectedts
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Records = append(m.Records, Record{})
-			if err := m.Records[len(m.Records)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipProtectedts(dAtA[iNdEx:])
