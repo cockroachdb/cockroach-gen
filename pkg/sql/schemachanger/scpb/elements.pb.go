@@ -5,8 +5,10 @@ package scpb
 
 import (
 	fmt "fmt"
+	catpb "github.com/cockroachdb/cockroach/pkg/sql/catalog/catpb"
+	github_com_cockroachdb_cockroach_pkg_sql_catalog_catpb "github.com/cockroachdb/cockroach/pkg/sql/catalog/catpb"
 	descpb "github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb"
-	github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb "github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb"
+	github_com_cockroachdb_cockroach_pkg_sql_sem_catid "github.com/cockroachdb/cockroach/pkg/sql/sem/catid"
 	types "github.com/cockroachdb/cockroach/pkg/sql/types"
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
@@ -200,23 +202,23 @@ func (m *ElementProto) XXX_DiscardUnknown() {
 var xxx_messageInfo_ElementProto proto.InternalMessageInfo
 
 type Column struct {
-	TableID                           github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID                      `protobuf:"varint,1,opt,name=table_id,json=tableId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"table_id,omitempty"`
-	ColumnID                          github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID                `protobuf:"varint,3,opt,name=column_id,json=columnId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ColumnID" json:"column_id,omitempty"`
-	FamilyID                          github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.FamilyID                `protobuf:"varint,4,opt,name=family_id,json=familyId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.FamilyID" json:"family_id,omitempty"`
-	FamilyName                        string                                                                          `protobuf:"bytes,5,opt,name=family_name,json=familyName,proto3" json:"family_name,omitempty"`
-	Type                              *types.T                                                                        `protobuf:"bytes,6,opt,name=type,proto3" json:"type,omitempty"`
-	Nullable                          bool                                                                            `protobuf:"varint,7,opt,name=nullable,proto3" json:"nullable,omitempty"`
-	DefaultExpr                       string                                                                          `protobuf:"bytes,8,opt,name=default_expr,json=defaultExpr,proto3" json:"default_expr,omitempty"`
-	OnUpdateExpr                      string                                                                          `protobuf:"bytes,9,opt,name=on_update_expr,json=onUpdateExpr,proto3" json:"on_update_expr,omitempty"`
-	Hidden                            bool                                                                            `protobuf:"varint,10,opt,name=hidden,proto3" json:"hidden,omitempty"`
-	Inaccessible                      bool                                                                            `protobuf:"varint,11,opt,name=inaccessible,proto3" json:"inaccessible,omitempty"`
-	GeneratedAsIdentityType           github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.GeneratedAsIdentityType `protobuf:"varint,12,opt,name=generated_as_identity_type,json=generatedAsIdentityType,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.GeneratedAsIdentityType" json:"generated_as_identity_type,omitempty"`
-	GeneratedAsIdentitySequenceOption string                                                                          `protobuf:"bytes,13,opt,name=generated_as_identity_sequence_option,json=generatedAsIdentitySequenceOption,proto3" json:"generated_as_identity_sequence_option,omitempty"`
-	UsesSequenceIds                   []github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID                    `protobuf:"varint,14,rep,packed,name=uses_sequence_ids,json=usesSequenceIds,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"uses_sequence_ids,omitempty"`
-	ComputerExpr                      string                                                                          `protobuf:"bytes,15,opt,name=computerExpr,proto3" json:"computerExpr,omitempty"`
-	PgAttributeNum                    uint32                                                                          `protobuf:"varint,16,opt,name=pg_attribute_num,json=pgAttributeNum,proto3" json:"pg_attribute_num,omitempty"`
-	SystemColumnKind                  github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.SystemColumnKind        `protobuf:"varint,17,opt,name=system_column_kind,json=systemColumnKind,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.SystemColumnKind" json:"system_column_kind,omitempty"`
-	Virtual                           bool                                                                            `protobuf:"varint,18,opt,name=virtual,proto3" json:"virtual,omitempty"`
+	TableID                           github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID                      `protobuf:"varint,1,opt,name=table_id,json=tableId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.DescID" json:"table_id,omitempty"`
+	ColumnID                          github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID                    `protobuf:"varint,3,opt,name=column_id,json=columnId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.ColumnID" json:"column_id,omitempty"`
+	FamilyID                          github_com_cockroachdb_cockroach_pkg_sql_sem_catid.FamilyID                    `protobuf:"varint,4,opt,name=family_id,json=familyId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.FamilyID" json:"family_id,omitempty"`
+	FamilyName                        string                                                                         `protobuf:"bytes,5,opt,name=family_name,json=familyName,proto3" json:"family_name,omitempty"`
+	Type                              *types.T                                                                       `protobuf:"bytes,6,opt,name=type,proto3" json:"type,omitempty"`
+	Nullable                          bool                                                                           `protobuf:"varint,7,opt,name=nullable,proto3" json:"nullable,omitempty"`
+	DefaultExpr                       string                                                                         `protobuf:"bytes,8,opt,name=default_expr,json=defaultExpr,proto3" json:"default_expr,omitempty"`
+	OnUpdateExpr                      string                                                                         `protobuf:"bytes,9,opt,name=on_update_expr,json=onUpdateExpr,proto3" json:"on_update_expr,omitempty"`
+	Hidden                            bool                                                                           `protobuf:"varint,10,opt,name=hidden,proto3" json:"hidden,omitempty"`
+	Inaccessible                      bool                                                                           `protobuf:"varint,11,opt,name=inaccessible,proto3" json:"inaccessible,omitempty"`
+	GeneratedAsIdentityType           github_com_cockroachdb_cockroach_pkg_sql_catalog_catpb.GeneratedAsIdentityType `protobuf:"varint,12,opt,name=generated_as_identity_type,json=generatedAsIdentityType,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/catpb.GeneratedAsIdentityType" json:"generated_as_identity_type,omitempty"`
+	GeneratedAsIdentitySequenceOption string                                                                         `protobuf:"bytes,13,opt,name=generated_as_identity_sequence_option,json=generatedAsIdentitySequenceOption,proto3" json:"generated_as_identity_sequence_option,omitempty"`
+	UsesSequenceIds                   []github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID                    `protobuf:"varint,14,rep,packed,name=uses_sequence_ids,json=usesSequenceIds,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.DescID" json:"uses_sequence_ids,omitempty"`
+	ComputerExpr                      string                                                                         `protobuf:"bytes,15,opt,name=computerExpr,proto3" json:"computerExpr,omitempty"`
+	PgAttributeNum                    uint32                                                                         `protobuf:"varint,16,opt,name=pg_attribute_num,json=pgAttributeNum,proto3" json:"pg_attribute_num,omitempty"`
+	SystemColumnKind                  github_com_cockroachdb_cockroach_pkg_sql_catalog_catpb.SystemColumnKind        `protobuf:"varint,17,opt,name=system_column_kind,json=systemColumnKind,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/catpb.SystemColumnKind" json:"system_column_kind,omitempty"`
+	Virtual                           bool                                                                           `protobuf:"varint,18,opt,name=virtual,proto3" json:"virtual,omitempty"`
 }
 
 func (m *Column) Reset()         { *m = Column{} }
@@ -249,20 +251,20 @@ func (m *Column) XXX_DiscardUnknown() {
 var xxx_messageInfo_Column proto.InternalMessageInfo
 
 type PrimaryIndex struct {
-	TableID             github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID         `protobuf:"varint,1,opt,name=table_id,json=tableId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"table_id,omitempty"`
-	IndexID             github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.IndexID    `protobuf:"varint,2,opt,name=index_id,json=indexId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.IndexID" json:"index_id,omitempty"`
-	Unique              bool                                                               `protobuf:"varint,3,opt,name=unique,proto3" json:"unique,omitempty"`
-	KeyColumnIDs        []github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID `protobuf:"varint,4,rep,packed,name=key_column_ids,json=keyColumnIds,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ColumnID" json:"key_column_ids,omitempty"`
-	KeyColumnDirections []PrimaryIndex_Direction                                           `protobuf:"varint,5,rep,packed,name=key_column_direction,json=keyColumnDirection,proto3,enum=cockroach.sql.schemachanger.scpb.PrimaryIndex_Direction" json:"key_column_direction,omitempty"`
-	KeySuffixColumnIDs  []github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID `protobuf:"varint,6,rep,packed,name=key_suffix_column_ids,json=keySuffixColumnIds,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ColumnID" json:"key_suffix_column_ids,omitempty"`
-	ShardedDescriptor   *descpb.ShardedDescriptor                                          `protobuf:"bytes,7,opt,name=sharded_descriptor,json=shardedDescriptor,proto3" json:"sharded_descriptor,omitempty"`
-	StoringColumnIDs    []github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID `protobuf:"varint,8,rep,packed,name=storing_column_ids,json=storingColumnIds,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ColumnID" json:"storing_column_ids,omitempty"`
-	CompositeColumnIDs  []github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID `protobuf:"varint,9,rep,packed,name=composite_column_ids,json=compositeColumnIds,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ColumnID" json:"composite_column_ids,omitempty"`
-	Inverted            bool                                                               `protobuf:"varint,10,opt,name=inverted,proto3" json:"inverted,omitempty"`
-	Concurrently        bool                                                               `protobuf:"varint,11,opt,name=concurrently,proto3" json:"concurrently,omitempty"`
+	TableID             github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID     `protobuf:"varint,1,opt,name=table_id,json=tableId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.DescID" json:"table_id,omitempty"`
+	IndexID             github_com_cockroachdb_cockroach_pkg_sql_sem_catid.IndexID    `protobuf:"varint,2,opt,name=index_id,json=indexId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.IndexID" json:"index_id,omitempty"`
+	Unique              bool                                                          `protobuf:"varint,3,opt,name=unique,proto3" json:"unique,omitempty"`
+	KeyColumnIDs        []github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID `protobuf:"varint,4,rep,packed,name=key_column_ids,json=keyColumnIds,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.ColumnID" json:"key_column_ids,omitempty"`
+	KeyColumnDirections []PrimaryIndex_Direction                                      `protobuf:"varint,5,rep,packed,name=key_column_direction,json=keyColumnDirection,proto3,enum=cockroach.sql.schemachanger.scpb.PrimaryIndex_Direction" json:"key_column_direction,omitempty"`
+	KeySuffixColumnIDs  []github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID `protobuf:"varint,6,rep,packed,name=key_suffix_column_ids,json=keySuffixColumnIds,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.ColumnID" json:"key_suffix_column_ids,omitempty"`
+	ShardedDescriptor   *catpb.ShardedDescriptor                                      `protobuf:"bytes,7,opt,name=sharded_descriptor,json=shardedDescriptor,proto3" json:"sharded_descriptor,omitempty"`
+	StoringColumnIDs    []github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID `protobuf:"varint,8,rep,packed,name=storing_column_ids,json=storingColumnIds,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.ColumnID" json:"storing_column_ids,omitempty"`
+	CompositeColumnIDs  []github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID `protobuf:"varint,9,rep,packed,name=composite_column_ids,json=compositeColumnIds,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.ColumnID" json:"composite_column_ids,omitempty"`
+	Inverted            bool                                                          `protobuf:"varint,10,opt,name=inverted,proto3" json:"inverted,omitempty"`
+	Concurrently        bool                                                          `protobuf:"varint,11,opt,name=concurrently,proto3" json:"concurrently,omitempty"`
 	// SourceIndexID refers to the primary index which will be used to
 	// to backfill this index.
-	SourceIndexID github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.IndexID `protobuf:"varint,12,opt,name=source_index_id,json=sourceIndexId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.IndexID" json:"source_index_id,omitempty"`
+	SourceIndexID github_com_cockroachdb_cockroach_pkg_sql_sem_catid.IndexID `protobuf:"varint,12,opt,name=source_index_id,json=sourceIndexId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.IndexID" json:"source_index_id,omitempty"`
 }
 
 func (m *PrimaryIndex) Reset()         { *m = PrimaryIndex{} }
@@ -295,20 +297,20 @@ func (m *PrimaryIndex) XXX_DiscardUnknown() {
 var xxx_messageInfo_PrimaryIndex proto.InternalMessageInfo
 
 type SecondaryIndex struct {
-	TableID             github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID         `protobuf:"varint,1,opt,name=table_id,json=tableId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"table_id,omitempty"`
-	IndexID             github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.IndexID    `protobuf:"varint,2,opt,name=index_id,json=indexId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.IndexID" json:"index_id,omitempty"`
-	Unique              bool                                                               `protobuf:"varint,3,opt,name=unique,proto3" json:"unique,omitempty"`
-	KeyColumnIDs        []github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID `protobuf:"varint,4,rep,packed,name=key_column_ids,json=keyColumnIds,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ColumnID" json:"key_column_ids,omitempty"`
-	KeyColumnDirections []SecondaryIndex_Direction                                         `protobuf:"varint,5,rep,packed,name=key_column_direction,json=keyColumnDirection,proto3,enum=cockroach.sql.schemachanger.scpb.SecondaryIndex_Direction" json:"key_column_direction,omitempty"`
-	KeySuffixColumnIDs  []github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID `protobuf:"varint,6,rep,packed,name=key_suffix_column_ids,json=keySuffixColumnIds,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ColumnID" json:"key_suffix_column_ids,omitempty"`
-	ShardedDescriptor   *descpb.ShardedDescriptor                                          `protobuf:"bytes,7,opt,name=sharded_descriptor,json=shardedDescriptor,proto3" json:"sharded_descriptor,omitempty"`
-	StoringColumnIDs    []github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID `protobuf:"varint,8,rep,packed,name=storing_column_ids,json=storingColumnIds,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ColumnID" json:"storing_column_ids,omitempty"`
-	CompositeColumnIDs  []github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID `protobuf:"varint,9,rep,packed,name=composite_column_ids,json=compositeColumnIds,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ColumnID" json:"composite_column_ids,omitempty"`
-	Inverted            bool                                                               `protobuf:"varint,10,opt,name=inverted,proto3" json:"inverted,omitempty"`
-	Concurrently        bool                                                               `protobuf:"varint,11,opt,name=concurrently,proto3" json:"concurrently,omitempty"`
+	TableID             github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID     `protobuf:"varint,1,opt,name=table_id,json=tableId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.DescID" json:"table_id,omitempty"`
+	IndexID             github_com_cockroachdb_cockroach_pkg_sql_sem_catid.IndexID    `protobuf:"varint,2,opt,name=index_id,json=indexId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.IndexID" json:"index_id,omitempty"`
+	Unique              bool                                                          `protobuf:"varint,3,opt,name=unique,proto3" json:"unique,omitempty"`
+	KeyColumnIDs        []github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID `protobuf:"varint,4,rep,packed,name=key_column_ids,json=keyColumnIds,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.ColumnID" json:"key_column_ids,omitempty"`
+	KeyColumnDirections []SecondaryIndex_Direction                                    `protobuf:"varint,5,rep,packed,name=key_column_direction,json=keyColumnDirection,proto3,enum=cockroach.sql.schemachanger.scpb.SecondaryIndex_Direction" json:"key_column_direction,omitempty"`
+	KeySuffixColumnIDs  []github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID `protobuf:"varint,6,rep,packed,name=key_suffix_column_ids,json=keySuffixColumnIds,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.ColumnID" json:"key_suffix_column_ids,omitempty"`
+	ShardedDescriptor   *catpb.ShardedDescriptor                                      `protobuf:"bytes,7,opt,name=sharded_descriptor,json=shardedDescriptor,proto3" json:"sharded_descriptor,omitempty"`
+	StoringColumnIDs    []github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID `protobuf:"varint,8,rep,packed,name=storing_column_ids,json=storingColumnIds,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.ColumnID" json:"storing_column_ids,omitempty"`
+	CompositeColumnIDs  []github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID `protobuf:"varint,9,rep,packed,name=composite_column_ids,json=compositeColumnIds,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.ColumnID" json:"composite_column_ids,omitempty"`
+	Inverted            bool                                                          `protobuf:"varint,10,opt,name=inverted,proto3" json:"inverted,omitempty"`
+	Concurrently        bool                                                          `protobuf:"varint,11,opt,name=concurrently,proto3" json:"concurrently,omitempty"`
 	// SourceIndexID refers to the primary index which will be used to
 	// to backfill this index.
-	SourceIndexID github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.IndexID `protobuf:"varint,12,opt,name=source_index_id,json=sourceIndexId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.IndexID" json:"source_index_id,omitempty"`
+	SourceIndexID github_com_cockroachdb_cockroach_pkg_sql_sem_catid.IndexID `protobuf:"varint,12,opt,name=source_index_id,json=sourceIndexId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.IndexID" json:"source_index_id,omitempty"`
 }
 
 func (m *SecondaryIndex) Reset()         { *m = SecondaryIndex{} }
@@ -341,10 +343,10 @@ func (m *SecondaryIndex) XXX_DiscardUnknown() {
 var xxx_messageInfo_SecondaryIndex proto.InternalMessageInfo
 
 type SequenceDependency struct {
-	TableID    github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID       `protobuf:"varint,1,opt,name=table_id,json=tableId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"table_id,omitempty"`
-	ColumnID   github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID `protobuf:"varint,2,opt,name=column_id,json=columnId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ColumnID" json:"column_id,omitempty"`
-	SequenceID github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID       `protobuf:"varint,3,opt,name=sequence_id,json=sequenceId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"sequence_id,omitempty"`
-	Type       SequenceDependency_Type                                          `protobuf:"varint,4,opt,name=type,proto3,enum=cockroach.sql.schemachanger.scpb.SequenceDependency_Type" json:"type,omitempty"`
+	TableID    github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID   `protobuf:"varint,1,opt,name=table_id,json=tableId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.DescID" json:"table_id,omitempty"`
+	ColumnID   github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID `protobuf:"varint,2,opt,name=column_id,json=columnId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.ColumnID" json:"column_id,omitempty"`
+	SequenceID github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID   `protobuf:"varint,3,opt,name=sequence_id,json=sequenceId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.DescID" json:"sequence_id,omitempty"`
+	Type       SequenceDependency_Type                                     `protobuf:"varint,4,opt,name=type,proto3,enum=cockroach.sql.schemachanger.scpb.SequenceDependency_Type" json:"type,omitempty"`
 }
 
 func (m *SequenceDependency) Reset()         { *m = SequenceDependency{} }
@@ -377,11 +379,11 @@ func (m *SequenceDependency) XXX_DiscardUnknown() {
 var xxx_messageInfo_SequenceDependency proto.InternalMessageInfo
 
 type UniqueConstraint struct {
-	ConstraintType    ConstraintType                                                     `protobuf:"varint,1,opt,name=constraint_type,json=constraintType,proto3,enum=cockroach.sql.schemachanger.scpb.ConstraintType" json:"constraint_type,omitempty"`
-	ConstraintOrdinal uint32                                                             `protobuf:"varint,2,opt,name=constraint_ordinal,json=constraintOrdinal,proto3" json:"constraint_ordinal,omitempty"`
-	TableID           github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID         `protobuf:"varint,3,opt,name=table_id,json=tableId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"table_id,omitempty"`
-	IndexID           github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.IndexID    `protobuf:"varint,4,opt,name=index_id,json=indexId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.IndexID" json:"index_id,omitempty"`
-	ColumnIDs         []github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID `protobuf:"varint,5,rep,packed,name=column_ids,json=columnIds,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ColumnID" json:"column_ids,omitempty"`
+	ConstraintType    ConstraintType                                                `protobuf:"varint,1,opt,name=constraint_type,json=constraintType,proto3,enum=cockroach.sql.schemachanger.scpb.ConstraintType" json:"constraint_type,omitempty"`
+	ConstraintOrdinal uint32                                                        `protobuf:"varint,2,opt,name=constraint_ordinal,json=constraintOrdinal,proto3" json:"constraint_ordinal,omitempty"`
+	TableID           github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID     `protobuf:"varint,3,opt,name=table_id,json=tableId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.DescID" json:"table_id,omitempty"`
+	IndexID           github_com_cockroachdb_cockroach_pkg_sql_sem_catid.IndexID    `protobuf:"varint,4,opt,name=index_id,json=indexId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.IndexID" json:"index_id,omitempty"`
+	ColumnIDs         []github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID `protobuf:"varint,5,rep,packed,name=column_ids,json=columnIds,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.ColumnID" json:"column_ids,omitempty"`
 }
 
 func (m *UniqueConstraint) Reset()         { *m = UniqueConstraint{} }
@@ -414,13 +416,13 @@ func (m *UniqueConstraint) XXX_DiscardUnknown() {
 var xxx_messageInfo_UniqueConstraint proto.InternalMessageInfo
 
 type CheckConstraint struct {
-	ConstraintType    ConstraintType                                                     `protobuf:"varint,1,opt,name=constraint_type,json=constraintType,proto3,enum=cockroach.sql.schemachanger.scpb.ConstraintType" json:"constraint_type,omitempty"`
-	ConstraintOrdinal uint32                                                             `protobuf:"varint,2,opt,name=constraint_ordinal,json=constraintOrdinal,proto3" json:"constraint_ordinal,omitempty"`
-	TableID           github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID         `protobuf:"varint,3,opt,name=table_id,json=tableId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"table_id,omitempty"`
-	Name              string                                                             `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
-	Expr              string                                                             `protobuf:"bytes,5,opt,name=expr,proto3" json:"expr,omitempty"`
-	ColumnIDs         []github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID `protobuf:"varint,6,rep,packed,name=column_ids,json=columnIds,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ColumnID" json:"column_ids,omitempty"`
-	Validated         bool                                                               `protobuf:"varint,7,opt,name=validated,proto3" json:"validated,omitempty"`
+	ConstraintType    ConstraintType                                                `protobuf:"varint,1,opt,name=constraint_type,json=constraintType,proto3,enum=cockroach.sql.schemachanger.scpb.ConstraintType" json:"constraint_type,omitempty"`
+	ConstraintOrdinal uint32                                                        `protobuf:"varint,2,opt,name=constraint_ordinal,json=constraintOrdinal,proto3" json:"constraint_ordinal,omitempty"`
+	TableID           github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID     `protobuf:"varint,3,opt,name=table_id,json=tableId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.DescID" json:"table_id,omitempty"`
+	Name              string                                                        `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
+	Expr              string                                                        `protobuf:"bytes,5,opt,name=expr,proto3" json:"expr,omitempty"`
+	ColumnIDs         []github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID `protobuf:"varint,6,rep,packed,name=column_ids,json=columnIds,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.ColumnID" json:"column_ids,omitempty"`
+	Validated         bool                                                          `protobuf:"varint,7,opt,name=validated,proto3" json:"validated,omitempty"`
 }
 
 func (m *CheckConstraint) Reset()         { *m = CheckConstraint{} }
@@ -453,7 +455,7 @@ func (m *CheckConstraint) XXX_DiscardUnknown() {
 var xxx_messageInfo_CheckConstraint proto.InternalMessageInfo
 
 type Sequence struct {
-	SequenceID github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID `protobuf:"varint,1,opt,name=sequence_id,json=sequenceId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"sequence_id,omitempty"`
+	SequenceID github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID `protobuf:"varint,1,opt,name=sequence_id,json=sequenceId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.DescID" json:"sequence_id,omitempty"`
 }
 
 func (m *Sequence) Reset()         { *m = Sequence{} }
@@ -486,10 +488,10 @@ func (m *Sequence) XXX_DiscardUnknown() {
 var xxx_messageInfo_Sequence proto.InternalMessageInfo
 
 type DefaultExpression struct {
-	TableID         github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID       `protobuf:"varint,1,opt,name=table_id,json=tableId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"table_id,omitempty"`
-	ColumnID        github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID `protobuf:"varint,2,opt,name=column_id,json=columnId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ColumnID" json:"column_id,omitempty"`
-	UsesSequenceIDs []github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID     `protobuf:"varint,3,rep,packed,name=usesSequenceIDs,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"usesSequenceIDs,omitempty"`
-	DefaultExpr     string                                                           `protobuf:"bytes,4,opt,name=default_expr,json=defaultExpr,proto3" json:"default_expr,omitempty"`
+	TableID         github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID   `protobuf:"varint,1,opt,name=table_id,json=tableId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.DescID" json:"table_id,omitempty"`
+	ColumnID        github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID `protobuf:"varint,2,opt,name=column_id,json=columnId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.ColumnID" json:"column_id,omitempty"`
+	UsesSequenceIDs []github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID `protobuf:"varint,3,rep,packed,name=usesSequenceIDs,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.DescID" json:"usesSequenceIDs,omitempty"`
+	DefaultExpr     string                                                      `protobuf:"bytes,4,opt,name=default_expr,json=defaultExpr,proto3" json:"default_expr,omitempty"`
 }
 
 func (m *DefaultExpression) Reset()         { *m = DefaultExpression{} }
@@ -522,7 +524,7 @@ func (m *DefaultExpression) XXX_DiscardUnknown() {
 var xxx_messageInfo_DefaultExpression proto.InternalMessageInfo
 
 type View struct {
-	TableID github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID `protobuf:"varint,1,opt,name=table_id,json=tableId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"table_id,omitempty"`
+	TableID github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID `protobuf:"varint,1,opt,name=table_id,json=tableId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.DescID" json:"table_id,omitempty"`
 }
 
 func (m *View) Reset()         { *m = View{} }
@@ -555,7 +557,7 @@ func (m *View) XXX_DiscardUnknown() {
 var xxx_messageInfo_View proto.InternalMessageInfo
 
 type Table struct {
-	TableID github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID `protobuf:"varint,1,opt,name=table_id,json=tableId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"table_id,omitempty"`
+	TableID github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID `protobuf:"varint,1,opt,name=table_id,json=tableId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.DescID" json:"table_id,omitempty"`
 }
 
 func (m *Table) Reset()         { *m = Table{} }
@@ -588,9 +590,9 @@ func (m *Table) XXX_DiscardUnknown() {
 var xxx_messageInfo_Table proto.InternalMessageInfo
 
 type OnUpdateExprTypeReference struct {
-	TableID  github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID       `protobuf:"varint,1,opt,name=table_id,json=tableId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"table_id,omitempty"`
-	ColumnID github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID `protobuf:"varint,2,opt,name=column_id,json=columnId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ColumnID" json:"column_id,omitempty"`
-	TypeID   github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID       `protobuf:"varint,3,opt,name=type_id,json=typeId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"type_id,omitempty"`
+	TableID  github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID   `protobuf:"varint,1,opt,name=table_id,json=tableId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.DescID" json:"table_id,omitempty"`
+	ColumnID github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID `protobuf:"varint,2,opt,name=column_id,json=columnId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.ColumnID" json:"column_id,omitempty"`
+	TypeID   github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID   `protobuf:"varint,3,opt,name=type_id,json=typeId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.DescID" json:"type_id,omitempty"`
 }
 
 func (m *OnUpdateExprTypeReference) Reset()         { *m = OnUpdateExprTypeReference{} }
@@ -623,9 +625,9 @@ func (m *OnUpdateExprTypeReference) XXX_DiscardUnknown() {
 var xxx_messageInfo_OnUpdateExprTypeReference proto.InternalMessageInfo
 
 type ComputedExprTypeReference struct {
-	TableID  github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID       `protobuf:"varint,1,opt,name=table_id,json=tableId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"table_id,omitempty"`
-	ColumnID github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID `protobuf:"varint,2,opt,name=column_id,json=columnId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ColumnID" json:"column_id,omitempty"`
-	TypeID   github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID       `protobuf:"varint,3,opt,name=type_id,json=typeId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"type_id,omitempty"`
+	TableID  github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID   `protobuf:"varint,1,opt,name=table_id,json=tableId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.DescID" json:"table_id,omitempty"`
+	ColumnID github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID `protobuf:"varint,2,opt,name=column_id,json=columnId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.ColumnID" json:"column_id,omitempty"`
+	TypeID   github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID   `protobuf:"varint,3,opt,name=type_id,json=typeId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.DescID" json:"type_id,omitempty"`
 }
 
 func (m *ComputedExprTypeReference) Reset()         { *m = ComputedExprTypeReference{} }
@@ -658,9 +660,9 @@ func (m *ComputedExprTypeReference) XXX_DiscardUnknown() {
 var xxx_messageInfo_ComputedExprTypeReference proto.InternalMessageInfo
 
 type DefaultExprTypeReference struct {
-	TableID  github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID       `protobuf:"varint,1,opt,name=table_id,json=tableId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"table_id,omitempty"`
-	ColumnID github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID `protobuf:"varint,2,opt,name=column_id,json=columnId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ColumnID" json:"column_id,omitempty"`
-	TypeID   github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID       `protobuf:"varint,3,opt,name=type_id,json=typeId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"type_id,omitempty"`
+	TableID  github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID   `protobuf:"varint,1,opt,name=table_id,json=tableId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.DescID" json:"table_id,omitempty"`
+	ColumnID github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID `protobuf:"varint,2,opt,name=column_id,json=columnId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.ColumnID" json:"column_id,omitempty"`
+	TypeID   github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID   `protobuf:"varint,3,opt,name=type_id,json=typeId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.DescID" json:"type_id,omitempty"`
 }
 
 func (m *DefaultExprTypeReference) Reset()         { *m = DefaultExprTypeReference{} }
@@ -693,9 +695,9 @@ func (m *DefaultExprTypeReference) XXX_DiscardUnknown() {
 var xxx_messageInfo_DefaultExprTypeReference proto.InternalMessageInfo
 
 type ColumnTypeReference struct {
-	TableID  github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID       `protobuf:"varint,1,opt,name=table_id,json=tableId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"table_id,omitempty"`
-	ColumnID github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID `protobuf:"varint,2,opt,name=column_id,json=columnId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ColumnID" json:"column_id,omitempty"`
-	TypeID   github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID       `protobuf:"varint,3,opt,name=type_id,json=typeId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"type_id,omitempty"`
+	TableID  github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID   `protobuf:"varint,1,opt,name=table_id,json=tableId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.DescID" json:"table_id,omitempty"`
+	ColumnID github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID `protobuf:"varint,2,opt,name=column_id,json=columnId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.ColumnID" json:"column_id,omitempty"`
+	TypeID   github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID   `protobuf:"varint,3,opt,name=type_id,json=typeId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.DescID" json:"type_id,omitempty"`
 }
 
 func (m *ColumnTypeReference) Reset()         { *m = ColumnTypeReference{} }
@@ -728,9 +730,9 @@ func (m *ColumnTypeReference) XXX_DiscardUnknown() {
 var xxx_messageInfo_ColumnTypeReference proto.InternalMessageInfo
 
 type CheckConstraintTypeReference struct {
-	TableID           github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID `protobuf:"varint,1,opt,name=table_id,json=tableId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"table_id,omitempty"`
-	ConstraintOrdinal uint32                                                     `protobuf:"varint,2,opt,name=constraint_ordinal,json=constraintOrdinal,proto3" json:"constraint_ordinal,omitempty"`
-	TypeID            github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID `protobuf:"varint,3,opt,name=type_id,json=typeId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"type_id,omitempty"`
+	TableID           github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID `protobuf:"varint,1,opt,name=table_id,json=tableId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.DescID" json:"table_id,omitempty"`
+	ConstraintOrdinal uint32                                                    `protobuf:"varint,2,opt,name=constraint_ordinal,json=constraintOrdinal,proto3" json:"constraint_ordinal,omitempty"`
+	TypeID            github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID `protobuf:"varint,3,opt,name=type_id,json=typeId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.DescID" json:"type_id,omitempty"`
 }
 
 func (m *CheckConstraintTypeReference) Reset()         { *m = CheckConstraintTypeReference{} }
@@ -763,8 +765,8 @@ func (m *CheckConstraintTypeReference) XXX_DiscardUnknown() {
 var xxx_messageInfo_CheckConstraintTypeReference proto.InternalMessageInfo
 
 type ViewDependsOnType struct {
-	TableID github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID `protobuf:"varint,1,opt,name=table_id,json=tableId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"table_id,omitempty"`
-	TypeID  github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID `protobuf:"varint,3,opt,name=type_id,json=typeId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"type_id,omitempty"`
+	TableID github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID `protobuf:"varint,1,opt,name=table_id,json=tableId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.DescID" json:"table_id,omitempty"`
+	TypeID  github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID `protobuf:"varint,3,opt,name=type_id,json=typeId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.DescID" json:"type_id,omitempty"`
 }
 
 func (m *ViewDependsOnType) Reset()         { *m = ViewDependsOnType{} }
@@ -797,13 +799,13 @@ func (m *ViewDependsOnType) XXX_DiscardUnknown() {
 var xxx_messageInfo_ViewDependsOnType proto.InternalMessageInfo
 
 type ForeignKey struct {
-	OriginID         github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID                         `protobuf:"varint,1,opt,name=origin_id,json=originId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"origin_id,omitempty"`
-	OriginColumns    []github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID                 `protobuf:"varint,3,rep,packed,name=origin_columns,json=originColumns,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ColumnID" json:"origin_columns,omitempty"`
-	ReferenceID      github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID                         `protobuf:"varint,4,opt,name=reference_id,json=referenceId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"reference_id,omitempty"`
-	ReferenceColumns []github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID                 `protobuf:"varint,5,rep,packed,name=reference_columns,json=referenceColumns,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ColumnID" json:"reference_columns,omitempty"`
-	OnUpdate         github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ForeignKeyReference_Action `protobuf:"varint,6,opt,name=on_update,json=onUpdate,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ForeignKeyReference_Action" json:"on_update,omitempty"`
-	OnDelete         github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ForeignKeyReference_Action `protobuf:"varint,7,opt,name=on_delete,json=onDelete,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ForeignKeyReference_Action" json:"on_delete,omitempty"`
-	Name             string                                                                             `protobuf:"bytes,8,opt,name=name,proto3" json:"name,omitempty"`
+	OriginID         github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID               `protobuf:"varint,1,opt,name=origin_id,json=originId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.DescID" json:"origin_id,omitempty"`
+	OriginColumns    []github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID           `protobuf:"varint,3,rep,packed,name=origin_columns,json=originColumns,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.ColumnID" json:"origin_columns,omitempty"`
+	ReferenceID      github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID               `protobuf:"varint,4,opt,name=reference_id,json=referenceId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.DescID" json:"reference_id,omitempty"`
+	ReferenceColumns []github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID           `protobuf:"varint,5,rep,packed,name=reference_columns,json=referenceColumns,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.ColumnID" json:"reference_columns,omitempty"`
+	OnUpdate         github_com_cockroachdb_cockroach_pkg_sql_catalog_catpb.ForeignKeyAction `protobuf:"varint,6,opt,name=on_update,json=onUpdate,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/catpb.ForeignKeyAction" json:"on_update,omitempty"`
+	OnDelete         github_com_cockroachdb_cockroach_pkg_sql_catalog_catpb.ForeignKeyAction `protobuf:"varint,7,opt,name=on_delete,json=onDelete,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/catpb.ForeignKeyAction" json:"on_delete,omitempty"`
+	Name             string                                                                  `protobuf:"bytes,8,opt,name=name,proto3" json:"name,omitempty"`
 }
 
 func (m *ForeignKey) Reset()         { *m = ForeignKey{} }
@@ -836,13 +838,13 @@ func (m *ForeignKey) XXX_DiscardUnknown() {
 var xxx_messageInfo_ForeignKey proto.InternalMessageInfo
 
 type ForeignKeyBackReference struct {
-	OriginID         github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID                         `protobuf:"varint,1,opt,name=origin_id,json=originId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"origin_id,omitempty"`
-	OriginColumns    []github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID                 `protobuf:"varint,3,rep,packed,name=origin_columns,json=originColumns,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ColumnID" json:"origin_columns,omitempty"`
-	ReferenceID      github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID                         `protobuf:"varint,4,opt,name=reference_id,json=referenceId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"reference_id,omitempty"`
-	ReferenceColumns []github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID                 `protobuf:"varint,5,rep,packed,name=reference_columns,json=referenceColumns,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ColumnID" json:"reference_columns,omitempty"`
-	OnUpdate         github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ForeignKeyReference_Action `protobuf:"varint,6,opt,name=on_update,json=onUpdate,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ForeignKeyReference_Action" json:"on_update,omitempty"`
-	OnDelete         github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ForeignKeyReference_Action `protobuf:"varint,7,opt,name=on_delete,json=onDelete,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ForeignKeyReference_Action" json:"on_delete,omitempty"`
-	Name             string                                                                             `protobuf:"bytes,8,opt,name=name,proto3" json:"name,omitempty"`
+	OriginID         github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID               `protobuf:"varint,1,opt,name=origin_id,json=originId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.DescID" json:"origin_id,omitempty"`
+	OriginColumns    []github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID           `protobuf:"varint,3,rep,packed,name=origin_columns,json=originColumns,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.ColumnID" json:"origin_columns,omitempty"`
+	ReferenceID      github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID               `protobuf:"varint,4,opt,name=reference_id,json=referenceId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.DescID" json:"reference_id,omitempty"`
+	ReferenceColumns []github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID           `protobuf:"varint,5,rep,packed,name=reference_columns,json=referenceColumns,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.ColumnID" json:"reference_columns,omitempty"`
+	OnUpdate         github_com_cockroachdb_cockroach_pkg_sql_catalog_catpb.ForeignKeyAction `protobuf:"varint,6,opt,name=on_update,json=onUpdate,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/catpb.ForeignKeyAction" json:"on_update,omitempty"`
+	OnDelete         github_com_cockroachdb_cockroach_pkg_sql_catalog_catpb.ForeignKeyAction `protobuf:"varint,7,opt,name=on_delete,json=onDelete,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/catpb.ForeignKeyAction" json:"on_delete,omitempty"`
+	Name             string                                                                  `protobuf:"bytes,8,opt,name=name,proto3" json:"name,omitempty"`
 }
 
 func (m *ForeignKeyBackReference) Reset()         { *m = ForeignKeyBackReference{} }
@@ -875,8 +877,8 @@ func (m *ForeignKeyBackReference) XXX_DiscardUnknown() {
 var xxx_messageInfo_ForeignKeyBackReference proto.InternalMessageInfo
 
 type SequenceOwnedBy struct {
-	SequenceID   github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID `protobuf:"varint,1,opt,name=sequence_id,json=sequenceId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"sequence_id,omitempty"`
-	OwnerTableID github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID `protobuf:"varint,2,opt,name=owner_table_id,json=ownerTableId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"owner_table_id,omitempty"`
+	SequenceID   github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID `protobuf:"varint,1,opt,name=sequence_id,json=sequenceId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.DescID" json:"sequence_id,omitempty"`
+	OwnerTableID github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID `protobuf:"varint,2,opt,name=owner_table_id,json=ownerTableId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.DescID" json:"owner_table_id,omitempty"`
 }
 
 func (m *SequenceOwnedBy) Reset()         { *m = SequenceOwnedBy{} }
@@ -909,9 +911,9 @@ func (m *SequenceOwnedBy) XXX_DiscardUnknown() {
 var xxx_messageInfo_SequenceOwnedBy proto.InternalMessageInfo
 
 type RelationDependedOnBy struct {
-	TableID      github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID       `protobuf:"varint,1,opt,name=table_id,json=tableId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"table_id,omitempty"`
-	DependedOnBy github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID       `protobuf:"varint,2,opt,name=dependedOn,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"dependedOn,omitempty"`
-	ColumnID     github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID `protobuf:"varint,3,opt,name=columnID,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ColumnID" json:"columnID,omitempty"`
+	TableID      github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID   `protobuf:"varint,1,opt,name=table_id,json=tableId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.DescID" json:"table_id,omitempty"`
+	DependedOnBy github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID   `protobuf:"varint,2,opt,name=dependedOn,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.DescID" json:"dependedOn,omitempty"`
+	ColumnID     github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID `protobuf:"varint,3,opt,name=columnID,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.ColumnID" json:"columnID,omitempty"`
 }
 
 func (m *RelationDependedOnBy) Reset()         { *m = RelationDependedOnBy{} }
@@ -944,7 +946,7 @@ func (m *RelationDependedOnBy) XXX_DiscardUnknown() {
 var xxx_messageInfo_RelationDependedOnBy proto.InternalMessageInfo
 
 type Type struct {
-	TypeID github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID `protobuf:"varint,1,opt,name=type_id,json=typeId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"type_id,omitempty"`
+	TypeID github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID `protobuf:"varint,1,opt,name=type_id,json=typeId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.DescID" json:"type_id,omitempty"`
 }
 
 func (m *Type) Reset()         { *m = Type{} }
@@ -977,8 +979,8 @@ func (m *Type) XXX_DiscardUnknown() {
 var xxx_messageInfo_Type proto.InternalMessageInfo
 
 type Schema struct {
-	SchemaID         github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID   `protobuf:"varint,1,opt,name=schema_id,json=schemaId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"schema_id,omitempty"`
-	DependentObjects []github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID `protobuf:"varint,3,rep,packed,name=dependentObjects,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"dependentObjects,omitempty"`
+	SchemaID         github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID   `protobuf:"varint,1,opt,name=schema_id,json=schemaId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.DescID" json:"schema_id,omitempty"`
+	DependentObjects []github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID `protobuf:"varint,3,rep,packed,name=dependentObjects,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.DescID" json:"dependentObjects,omitempty"`
 }
 
 func (m *Schema) Reset()         { *m = Schema{} }
@@ -1011,8 +1013,8 @@ func (m *Schema) XXX_DiscardUnknown() {
 var xxx_messageInfo_Schema proto.InternalMessageInfo
 
 type Database struct {
-	DatabaseID       github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID   `protobuf:"varint,1,opt,name=database_id,json=databaseId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"database_id,omitempty"`
-	DependentObjects []github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID `protobuf:"varint,3,rep,packed,name=dependentObjects,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"dependentObjects,omitempty"`
+	DatabaseID       github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID   `protobuf:"varint,1,opt,name=database_id,json=databaseId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.DescID" json:"database_id,omitempty"`
+	DependentObjects []github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID `protobuf:"varint,3,rep,packed,name=dependentObjects,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.DescID" json:"dependentObjects,omitempty"`
 }
 
 func (m *Database) Reset()         { *m = Database{} }
@@ -1114,11 +1116,11 @@ func (m *RangePartitions) XXX_DiscardUnknown() {
 var xxx_messageInfo_RangePartitions proto.InternalMessageInfo
 
 type Partitioning struct {
-	TableID         github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID      `protobuf:"varint,1,opt,name=table_id,json=tableId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"table_id,omitempty"`
-	IndexID         github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.IndexID `protobuf:"varint,2,opt,name=index_id,json=indexId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.IndexID" json:"index_id,omitempty"`
-	Fields          []string                                                        `protobuf:"bytes,3,rep,name=fields,proto3" json:"fields,omitempty"`
-	ListPartitions  []*ListPartition                                                `protobuf:"bytes,4,rep,name=list_partitions,json=listPartitions,proto3" json:"list_partitions,omitempty"`
-	RangePartitions []*RangePartitions                                              `protobuf:"bytes,5,rep,name=range_partitions,json=rangePartitions,proto3" json:"range_partitions,omitempty"`
+	TableID         github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID  `protobuf:"varint,1,opt,name=table_id,json=tableId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.DescID" json:"table_id,omitempty"`
+	IndexID         github_com_cockroachdb_cockroach_pkg_sql_sem_catid.IndexID `protobuf:"varint,2,opt,name=index_id,json=indexId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.IndexID" json:"index_id,omitempty"`
+	Fields          []string                                                   `protobuf:"bytes,3,rep,name=fields,proto3" json:"fields,omitempty"`
+	ListPartitions  []*ListPartition                                           `protobuf:"bytes,4,rep,name=list_partitions,json=listPartitions,proto3" json:"list_partitions,omitempty"`
+	RangePartitions []*RangePartitions                                         `protobuf:"bytes,5,rep,name=range_partitions,json=rangePartitions,proto3" json:"range_partitions,omitempty"`
 }
 
 func (m *Partitioning) Reset()         { *m = Partitioning{} }
@@ -1151,10 +1153,10 @@ func (m *Partitioning) XXX_DiscardUnknown() {
 var xxx_messageInfo_Partitioning proto.InternalMessageInfo
 
 type Namespace struct {
-	DatabaseID   github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID `protobuf:"varint,1,opt,name=database_id,json=databaseId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"database_id,omitempty"`
-	SchemaID     github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID `protobuf:"varint,2,opt,name=schema_id,json=schemaId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"schema_id,omitempty"`
-	DescriptorID github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID `protobuf:"varint,3,opt,name=descriptor_id,json=descriptorId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"descriptor_id,omitempty"`
-	Name         string                                                     `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
+	DatabaseID   github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID `protobuf:"varint,1,opt,name=database_id,json=databaseId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.DescID" json:"database_id,omitempty"`
+	SchemaID     github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID `protobuf:"varint,2,opt,name=schema_id,json=schemaId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.DescID" json:"schema_id,omitempty"`
+	DescriptorID github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID `protobuf:"varint,3,opt,name=descriptor_id,json=descriptorId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.DescID" json:"descriptor_id,omitempty"`
+	Name         string                                                    `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
 }
 
 func (m *Namespace) Reset()         { *m = Namespace{} }
@@ -1187,8 +1189,8 @@ func (m *Namespace) XXX_DiscardUnknown() {
 var xxx_messageInfo_Namespace proto.InternalMessageInfo
 
 type Owner struct {
-	DescriptorID github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID `protobuf:"varint,1,opt,name=descriptor_id,json=descriptorId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"descriptor_id,omitempty"`
-	Owner        string                                                     `protobuf:"bytes,2,opt,name=owner,proto3" json:"owner,omitempty"`
+	DescriptorID github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID `protobuf:"varint,1,opt,name=descriptor_id,json=descriptorId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.DescID" json:"descriptor_id,omitempty"`
+	Owner        string                                                    `protobuf:"bytes,2,opt,name=owner,proto3" json:"owner,omitempty"`
 }
 
 func (m *Owner) Reset()         { *m = Owner{} }
@@ -1221,9 +1223,9 @@ func (m *Owner) XXX_DiscardUnknown() {
 var xxx_messageInfo_Owner proto.InternalMessageInfo
 
 type UserPrivileges struct {
-	DescriptorID github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID `protobuf:"varint,1,opt,name=descriptor_id,json=descriptorId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"descriptor_id,omitempty"`
-	Username     string                                                     `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
-	Privileges   uint32                                                     `protobuf:"varint,3,opt,name=privileges,proto3" json:"privileges,omitempty"`
+	DescriptorID github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID `protobuf:"varint,1,opt,name=descriptor_id,json=descriptorId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.DescID" json:"descriptor_id,omitempty"`
+	Username     string                                                    `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
+	Privileges   uint32                                                    `protobuf:"varint,3,opt,name=privileges,proto3" json:"privileges,omitempty"`
 }
 
 func (m *UserPrivileges) Reset()         { *m = UserPrivileges{} }
@@ -1256,8 +1258,8 @@ func (m *UserPrivileges) XXX_DiscardUnknown() {
 var xxx_messageInfo_UserPrivileges proto.InternalMessageInfo
 
 type Locality struct {
-	DescriptorID github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID                              `protobuf:"varint,1,opt,name=descriptor_id,json=descriptorId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"descriptor_id,omitempty"`
-	Locality     *github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.TableDescriptor_LocalityConfig `protobuf:"bytes,2,opt,name=Locality,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.TableDescriptor_LocalityConfig" json:"Locality,omitempty"`
+	DescriptorID github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID              `protobuf:"varint,1,opt,name=descriptor_id,json=descriptorId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.DescID" json:"descriptor_id,omitempty"`
+	Locality     *github_com_cockroachdb_cockroach_pkg_sql_catalog_catpb.LocalityConfig `protobuf:"bytes,2,opt,name=Locality,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/catpb.LocalityConfig" json:"Locality,omitempty"`
 }
 
 func (m *Locality) Reset()         { *m = Locality{} }
@@ -1290,9 +1292,9 @@ func (m *Locality) XXX_DiscardUnknown() {
 var xxx_messageInfo_Locality proto.InternalMessageInfo
 
 type ColumnName struct {
-	TableID  github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID       `protobuf:"varint,1,opt,name=table_id,json=tableId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"table_id,omitempty"`
-	ColumnID github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID `protobuf:"varint,2,opt,name=column_id,json=columnId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ColumnID" json:"column_id,omitempty"`
-	Name     string                                                           `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	TableID  github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID   `protobuf:"varint,1,opt,name=table_id,json=tableId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.DescID" json:"table_id,omitempty"`
+	ColumnID github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID `protobuf:"varint,2,opt,name=column_id,json=columnId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.ColumnID" json:"column_id,omitempty"`
+	Name     string                                                      `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
 }
 
 func (m *ColumnName) Reset()         { *m = ColumnName{} }
@@ -1325,9 +1327,9 @@ func (m *ColumnName) XXX_DiscardUnknown() {
 var xxx_messageInfo_ColumnName proto.InternalMessageInfo
 
 type IndexName struct {
-	TableID github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID      `protobuf:"varint,1,opt,name=table_id,json=tableId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"table_id,omitempty"`
-	IndexID github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.IndexID `protobuf:"varint,2,opt,name=index_id,json=indexId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.IndexID" json:"index_id,omitempty"`
-	Name    string                                                          `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	TableID github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID  `protobuf:"varint,1,opt,name=table_id,json=tableId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.DescID" json:"table_id,omitempty"`
+	IndexID github_com_cockroachdb_cockroach_pkg_sql_sem_catid.IndexID `protobuf:"varint,2,opt,name=index_id,json=indexId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.IndexID" json:"index_id,omitempty"`
+	Name    string                                                     `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
 }
 
 func (m *IndexName) Reset()         { *m = IndexName{} }
@@ -1360,10 +1362,10 @@ func (m *IndexName) XXX_DiscardUnknown() {
 var xxx_messageInfo_IndexName proto.InternalMessageInfo
 
 type ConstraintName struct {
-	TableID           github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID `protobuf:"varint,1,opt,name=table_id,json=tableId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"table_id,omitempty"`
-	ConstraintType    ConstraintType                                             `protobuf:"varint,2,opt,name=constraint_type,json=constraintType,proto3,enum=cockroach.sql.schemachanger.scpb.ConstraintType" json:"constraint_type,omitempty"`
-	ConstraintOrdinal uint32                                                     `protobuf:"varint,3,opt,name=constraint_ordinal,json=constraintOrdinal,proto3" json:"constraint_ordinal,omitempty"`
-	Name              string                                                     `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
+	TableID           github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID `protobuf:"varint,1,opt,name=table_id,json=tableId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.DescID" json:"table_id,omitempty"`
+	ConstraintType    ConstraintType                                            `protobuf:"varint,2,opt,name=constraint_type,json=constraintType,proto3,enum=cockroach.sql.schemachanger.scpb.ConstraintType" json:"constraint_type,omitempty"`
+	ConstraintOrdinal uint32                                                    `protobuf:"varint,3,opt,name=constraint_ordinal,json=constraintOrdinal,proto3" json:"constraint_ordinal,omitempty"`
+	Name              string                                                    `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
 }
 
 func (m *ConstraintName) Reset()         { *m = ConstraintName{} }
@@ -1396,7 +1398,7 @@ func (m *ConstraintName) XXX_DiscardUnknown() {
 var xxx_messageInfo_ConstraintName proto.InternalMessageInfo
 
 type DefaultPrivilege struct {
-	DescriptorID github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID `protobuf:"varint,1,opt,name=descriptor_id,json=descriptorId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"descriptor_id,omitempty"`
+	DescriptorID github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID `protobuf:"varint,1,opt,name=descriptor_id,json=descriptorId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.DescID" json:"descriptor_id,omitempty"`
 	// Types that are valid to be assigned to Role:
 	//	*DefaultPrivilege_ExplicitRole
 	//	*DefaultPrivilege_ForAllRoles
@@ -1514,8 +1516,8 @@ func (m *DefaultPrivilege_DefaultObjectPrivilege) XXX_DiscardUnknown() {
 var xxx_messageInfo_DefaultPrivilege_DefaultObjectPrivilege proto.InternalMessageInfo
 
 type DatabaseSchemaEntry struct {
-	DatabaseID github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID `protobuf:"varint,1,opt,name=database_id,json=databaseId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"database_id,omitempty"`
-	SchemaID   github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID `protobuf:"varint,2,opt,name=schema_id,json=schemaId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"schema_id,omitempty"`
+	DatabaseID github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID `protobuf:"varint,1,opt,name=database_id,json=databaseId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.DescID" json:"database_id,omitempty"`
+	SchemaID   github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID `protobuf:"varint,2,opt,name=schema_id,json=schemaId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/sem/catid.DescID" json:"schema_id,omitempty"`
 }
 
 func (m *DatabaseSchemaEntry) Reset()         { *m = DatabaseSchemaEntry{} }
@@ -1597,215 +1599,215 @@ func init() {
 }
 
 var fileDescriptor_49b58fafa7b67c5d = []byte{
-	// 3320 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xec, 0x5c, 0xdd, 0x6f, 0x23, 0x57,
-	0x15, 0xdf, 0xb1, 0x1d, 0xc7, 0x3e, 0xb1, 0x1d, 0xe7, 0x26, 0xbb, 0x3b, 0x1b, 0xb6, 0x99, 0xd4,
-	0xa8, 0xed, 0x52, 0xb6, 0x4e, 0xd9, 0x7e, 0xa8, 0x84, 0x52, 0xba, 0x4e, 0x76, 0xa9, 0xd9, 0x36,
-	0x49, 0x27, 0xd9, 0x2d, 0xf4, 0xc5, 0x4c, 0x66, 0x6e, 0x9c, 0x69, 0xc6, 0x33, 0xde, 0xb9, 0xe3,
-	0xec, 0xba, 0x14, 0x2a, 0x28, 0x45, 0x20, 0x41, 0x55, 0x10, 0xe2, 0x01, 0xf5, 0x01, 0x1e, 0x78,
-	0xe4, 0x0f, 0x40, 0x3c, 0x20, 0x1e, 0x90, 0xfa, 0x58, 0x09, 0x09, 0x95, 0x97, 0x51, 0x71, 0x85,
-	0x84, 0x10, 0x3c, 0x90, 0x07, 0x24, 0x96, 0x17, 0x74, 0xef, 0x9d, 0x4f, 0xdb, 0xd9, 0x38, 0x5f,
-	0x5e, 0xb4, 0xcd, 0x4b, 0xe4, 0xb9, 0xf7, 0x9e, 0xf3, 0x3b, 0xf7, 0xdc, 0x7b, 0xce, 0x3d, 0xe7,
-	0x7e, 0x04, 0x1e, 0x22, 0x37, 0x8d, 0x39, 0xa2, 0x6e, 0xe2, 0x86, 0xa2, 0x6e, 0x2a, 0x66, 0x1d,
-	0xdb, 0x73, 0x44, 0x6d, 0xae, 0xcf, 0x61, 0x03, 0x37, 0xb0, 0xe9, 0x90, 0x72, 0xd3, 0xb6, 0x1c,
-	0x0b, 0xcd, 0xaa, 0x96, 0xba, 0x65, 0x5b, 0x8a, 0xba, 0x59, 0x26, 0x37, 0x8d, 0x72, 0x8c, 0xa0,
-	0x4c, 0x09, 0xa6, 0x3f, 0x4d, 0x19, 0xa9, 0x8a, 0xa3, 0x18, 0x56, 0x7d, 0x4e, 0xc3, 0x8c, 0x09,
-	0x71, 0xec, 0x96, 0xea, 0xb4, 0x6c, 0xac, 0x71, 0x36, 0xd3, 0xa7, 0x69, 0x23, 0xa7, 0xdd, 0xc4,
-	0x84, 0xff, 0xf5, 0x8a, 0x4b, 0x7d, 0x68, 0x9b, 0xb6, 0xbe, 0xad, 0x1b, 0xb8, 0x8e, 0xbd, 0x36,
-	0x53, 0x75, 0xab, 0x6e, 0xb1, 0x9f, 0x73, 0xf4, 0x17, 0x2f, 0x2d, 0xfd, 0xfa, 0x3c, 0xe4, 0xae,
-	0x70, 0x51, 0x57, 0x98, 0xa0, 0x6b, 0x90, 0x56, 0x2d, 0xa3, 0xd5, 0x30, 0x45, 0x61, 0x56, 0xb8,
-	0x30, 0x76, 0xe9, 0x42, 0x79, 0x2f, 0xc9, 0xcb, 0x0b, 0xac, 0x7d, 0x05, 0xed, 0xb8, 0x52, 0xa1,
-	0xa9, 0xd8, 0xd8, 0x74, 0xe6, 0x4b, 0x6b, 0xca, 0xba, 0x81, 0x4b, 0xb2, 0xc7, 0x0b, 0xd5, 0x21,
-	0xdf, 0xb4, 0xf5, 0x86, 0x62, 0xb7, 0x6b, 0xba, 0xa9, 0xe1, 0xdb, 0x62, 0x82, 0x31, 0x2f, 0xef,
-	0xcd, 0x7c, 0x85, 0x93, 0x55, 0x29, 0x55, 0x5f, 0x88, 0x5c, 0x33, 0xd2, 0x02, 0x35, 0x60, 0x9c,
-	0x60, 0xd5, 0x32, 0xb5, 0x10, 0x2a, 0xc9, 0xa0, 0x1e, 0xdf, 0x1b, 0x6a, 0xd5, 0x27, 0xdc, 0x1d,
-	0xac, 0x40, 0x62, 0x6d, 0xd0, 0xb7, 0x05, 0x98, 0x24, 0xf8, 0x66, 0x0b, 0x9b, 0x2a, 0xae, 0x69,
-	0xb8, 0x89, 0x4d, 0x0d, 0x9b, 0x6a, 0x5b, 0x4c, 0x31, 0xcc, 0x27, 0x07, 0xc1, 0xe4, 0xc4, 0x8b,
-	0x01, 0x6d, 0x65, 0x7a, 0xc7, 0x95, 0xce, 0xf8, 0xb8, 0x5c, 0xb7, 0x17, 0x67, 0x3d, 0x7c, 0x44,
-	0x7a, 0xda, 0xa3, 0xb7, 0x04, 0x98, 0x68, 0x99, 0xfa, 0xcd, 0x16, 0xae, 0xa9, 0x96, 0x49, 0x1c,
-	0x5b, 0xd1, 0x4d, 0x47, 0x1c, 0x61, 0x12, 0x5c, 0xda, 0x5b, 0x82, 0xeb, 0x8c, 0x74, 0x21, 0xa0,
-	0xac, 0x94, 0x76, 0x5c, 0x69, 0xc6, 0xc7, 0x8f, 0xeb, 0x24, 0x90, 0xa3, 0xd8, 0xea, 0xa2, 0x42,
-	0x4d, 0x28, 0xaa, 0x9b, 0x58, 0xdd, 0x8a, 0xca, 0x90, 0x66, 0x32, 0x7c, 0x6e, 0x80, 0x19, 0x44,
-	0x29, 0x23, 0x22, 0xf4, 0x53, 0xfd, 0xb8, 0x1a, 0x6f, 0x84, 0xae, 0x42, 0xc6, 0xd7, 0x86, 0x38,
-	0xca, 0x90, 0x1e, 0x1d, 0x5c, 0xdf, 0x72, 0x40, 0x8b, 0x6e, 0x01, 0xd2, 0xf0, 0x86, 0xd2, 0x32,
-	0x9c, 0x1a, 0xbe, 0xdd, 0xb4, 0x31, 0x21, 0xba, 0x65, 0x8a, 0x19, 0xc6, 0xf1, 0x89, 0xbd, 0x39,
-	0x2e, 0x72, 0xda, 0x2b, 0x01, 0x69, 0x65, 0x72, 0xc7, 0x95, 0xc6, 0xe3, 0x03, 0x58, 0x92, 0x27,
-	0xb4, 0xee, 0x76, 0x68, 0x1e, 0x52, 0xdb, 0x3a, 0xbe, 0x25, 0x66, 0x19, 0xd4, 0xc3, 0x7b, 0x43,
-	0xdd, 0xd0, 0xf1, 0x2d, 0x99, 0xd1, 0xa0, 0x2f, 0xc2, 0x88, 0x43, 0xf5, 0x22, 0x02, 0x23, 0x7e,
-	0x64, 0x6f, 0x62, 0xa6, 0x46, 0x99, 0x53, 0xa1, 0x0d, 0xc8, 0x5b, 0x2d, 0xe7, 0xaa, 0x65, 0x63,
-	0xbd, 0x6e, 0x5e, 0xc3, 0x6d, 0x71, 0x8c, 0xb1, 0xb9, 0xb8, 0x37, 0x9b, 0x90, 0xa6, 0xef, 0x28,
-	0xc5, 0xd9, 0xa2, 0x9b, 0x90, 0xd3, 0xcd, 0x08, 0x4c, 0x8e, 0xc1, 0x7c, 0x7e, 0x5f, 0x30, 0x8a,
-	0xba, 0x25, 0xe3, 0x0d, 0x6c, 0xd3, 0xc1, 0xea, 0xef, 0x01, 0xa2, 0x10, 0xe8, 0xbb, 0x02, 0x4c,
-	0xd9, 0xd8, 0x50, 0x1c, 0xdd, 0x32, 0x3d, 0x2b, 0xd1, 0x96, 0xcd, 0x4a, 0x5b, 0xcc, 0x33, 0xec,
-	0xa7, 0xf7, 0xc6, 0x96, 0xfb, 0x50, 0x57, 0xc4, 0x1d, 0x57, 0x9a, 0x8a, 0x01, 0x5f, 0x9c, 0xa5,
-	0xe3, 0x51, 0x92, 0xfb, 0xa2, 0xa1, 0x6d, 0xc8, 0xfb, 0x33, 0x6c, 0xf9, 0x96, 0x89, 0x6d, 0xf1,
-	0xb1, 0x41, 0x8d, 0x61, 0x35, 0x42, 0xa6, 0x55, 0xda, 0x95, 0x07, 0x76, 0x5c, 0xe9, 0x5c, 0xb7,
-	0x3f, 0xf0, 0x1b, 0x95, 0xe4, 0x38, 0x0c, 0x9d, 0x54, 0x74, 0x65, 0x10, 0xc7, 0x07, 0x9d, 0x54,
-	0x6b, 0xed, 0x26, 0x96, 0x19, 0x0d, 0x7a, 0x1e, 0xd2, 0xbc, 0x81, 0x58, 0x1c, 0xd4, 0xf7, 0xaf,
-	0xb2, 0x22, 0xd9, 0xa3, 0xa3, 0x36, 0xa9, 0x29, 0x8e, 0xb2, 0xae, 0x10, 0x2c, 0x4e, 0x0c, 0x6a,
-	0x93, 0x8b, 0x1e, 0x85, 0x1c, 0xd0, 0xa2, 0x6f, 0x42, 0xae, 0xa9, 0xd8, 0x8e, 0x4e, 0xd5, 0xaa,
-	0x9b, 0x75, 0x11, 0x0d, 0xbc, 0x5c, 0x44, 0xa8, 0x2a, 0x9f, 0xd9, 0x71, 0xa5, 0x87, 0x7c, 0xcd,
-	0x45, 0x17, 0x12, 0xaa, 0xbf, 0xa8, 0x5f, 0xa3, 0xab, 0x48, 0x84, 0x10, 0xbd, 0x2d, 0x40, 0xd6,
-	0x54, 0x1a, 0x98, 0x34, 0x15, 0x15, 0x8b, 0x93, 0x0c, 0xfc, 0xb3, 0x7b, 0x83, 0x2f, 0xf9, 0x24,
-	0x95, 0xf9, 0x1d, 0x57, 0x7a, 0xba, 0xcf, 0x6c, 0x09, 0x07, 0xee, 0xe2, 0xac, 0xdf, 0xed, 0x8b,
-	0xb3, 0x5c, 0x89, 0x17, 0x67, 0xe9, 0x50, 0x94, 0xe4, 0x10, 0x19, 0x11, 0x18, 0xb1, 0xd8, 0xe4,
-	0x99, 0x1a, 0xd4, 0xca, 0xd9, 0x24, 0xa8, 0x3c, 0xb9, 0xe3, 0x4a, 0x8f, 0xef, 0x13, 0xbe, 0x24,
-	0x73, 0x2c, 0xf4, 0x8e, 0x00, 0x85, 0xeb, 0x04, 0xdb, 0x2b, 0x7e, 0x00, 0x41, 0xc4, 0xd3, 0x83,
-	0x2e, 0xa1, 0x71, 0xba, 0x03, 0xca, 0xd1, 0x85, 0x8e, 0x14, 0x00, 0x1e, 0x46, 0x50, 0xfd, 0x8a,
-	0x67, 0x06, 0xf5, 0x54, 0x0b, 0x01, 0x4d, 0x7f, 0x8f, 0x1c, 0x61, 0x8a, 0x5e, 0x85, 0x8c, 0x61,
-	0xa9, 0x8a, 0xa1, 0x3b, 0x6d, 0xf1, 0xec, 0xa0, 0xf3, 0xf6, 0x45, 0x8f, 0xa2, 0xaf, 0x53, 0x0a,
-	0xf8, 0x21, 0x07, 0xb2, 0x2c, 0x10, 0x61, 0xd2, 0x8b, 0x83, 0xce, 0xa5, 0xaa, 0x4f, 0xb2, 0x9f,
-	0x59, 0x1c, 0x02, 0xa1, 0xef, 0x0b, 0x50, 0x08, 0x97, 0x62, 0x86, 0x7d, 0x6e, 0xd0, 0x51, 0x5c,
-	0x88, 0xd1, 0x55, 0xca, 0x3b, 0xae, 0xf4, 0xa8, 0x2f, 0x40, 0x77, 0xb8, 0x70, 0x71, 0xb6, 0x6b,
-	0xf1, 0x2e, 0xc9, 0x5d, 0xb8, 0xd4, 0x9a, 0x50, 0x64, 0xf5, 0x63, 0x0e, 0x07, 0x6f, 0x88, 0xd3,
-	0x4c, 0x9c, 0xf9, 0x7d, 0xad, 0xb0, 0x1e, 0xad, 0xb7, 0x18, 0x9c, 0xdb, 0x71, 0xa5, 0xd3, 0x3d,
-	0x91, 0x12, 0x33, 0xa2, 0x3e, 0x80, 0xe8, 0x87, 0x02, 0x9c, 0xb6, 0xcc, 0xeb, 0x4d, 0x4d, 0x71,
-	0x70, 0x8c, 0x91, 0xf8, 0x29, 0x26, 0xca, 0x17, 0x06, 0x30, 0x2f, 0x8f, 0x7c, 0x5f, 0xb2, 0xf4,
-	0x07, 0x45, 0x3f, 0x15, 0xe0, 0x9c, 0x6a, 0x35, 0x9a, 0x2d, 0x07, 0x6b, 0x3d, 0xfc, 0xc4, 0xf3,
-	0x83, 0x8a, 0xb4, 0xb0, 0x1b, 0x8b, 0xbb, 0x89, 0xb4, 0x3b, 0x30, 0x7a, 0x1d, 0x26, 0x68, 0x84,
-	0xc1, 0x17, 0x33, 0xb2, 0x6c, 0xd2, 0x5a, 0xf1, 0x81, 0x41, 0xa3, 0xa1, 0x1b, 0xdd, 0xa4, 0x95,
-	0xb3, 0x3b, 0xae, 0x34, 0xe9, 0x4b, 0xc1, 0x8d, 0x9f, 0xcb, 0xd0, 0x0b, 0x83, 0xbe, 0x23, 0xc0,
-	0x24, 0xb7, 0xca, 0xb8, 0x32, 0x66, 0x18, 0xfc, 0x53, 0x83, 0xda, 0xfc, 0xc0, 0x6a, 0xe8, 0x07,
-	0x86, 0xb6, 0x61, 0x8c, 0x73, 0xbe, 0x62, 0x3a, 0x76, 0x5b, 0x94, 0x06, 0xc5, 0xf6, 0x1d, 0xd9,
-	0x6a, 0x48, 0x1c, 0x5f, 0xbb, 0x7b, 0x3d, 0x5d, 0x14, 0x08, 0xbd, 0x27, 0xc0, 0xf9, 0xae, 0x18,
-	0x37, 0xae, 0x85, 0x59, 0x26, 0xc9, 0x73, 0xfb, 0x0e, 0xa7, 0xe3, 0xea, 0xe8, 0x17, 0xc8, 0x70,
-	0x6d, 0xdc, 0x15, 0x7d, 0x3e, 0xf5, 0xfe, 0x2f, 0x24, 0xa1, 0xf4, 0x87, 0x2c, 0xa4, 0xb9, 0x0e,
-	0x91, 0x06, 0x19, 0x16, 0x4c, 0xd6, 0x74, 0x8d, 0xe5, 0x8a, 0xf9, 0x4a, 0xb5, 0xe3, 0x4a, 0xa3,
-	0x8c, 0x65, 0x75, 0xf1, 0x8e, 0x2b, 0xcd, 0xd7, 0x75, 0x67, 0xb3, 0xb5, 0x5e, 0x56, 0xad, 0xc6,
-	0x5c, 0x20, 0xb3, 0xb6, 0x1e, 0xfe, 0x9e, 0x6b, 0x6e, 0xd5, 0xe7, 0x7a, 0x53, 0xd7, 0x72, 0x75,
-	0x51, 0x1e, 0x65, 0xac, 0xab, 0x1a, 0x6a, 0x40, 0x96, 0x0f, 0x12, 0x85, 0x49, 0x32, 0x98, 0x95,
-	0x8e, 0x2b, 0x65, 0xb8, 0x10, 0x0c, 0xe7, 0xf9, 0x83, 0xe2, 0xf8, 0x3c, 0xe4, 0x0c, 0x87, 0xe0,
-	0x70, 0x1b, 0x4a, 0x43, 0x37, 0xda, 0x14, 0x2e, 0x15, 0xc2, 0x5d, 0x65, 0x85, 0x87, 0x83, 0xf3,
-	0x79, 0xc8, 0x19, 0x0e, 0x51, 0xd5, 0x90, 0x04, 0x63, 0x1e, 0x1c, 0x5d, 0xf4, 0x59, 0xd2, 0x96,
-	0x95, 0x81, 0x17, 0x31, 0xdf, 0x59, 0xf6, 0xc2, 0x39, 0x9e, 0x4a, 0x4d, 0x77, 0x8f, 0x3d, 0x6e,
-	0x94, 0xf9, 0x3e, 0xc0, 0x9a, 0x17, 0xc2, 0x4d, 0x43, 0xc6, 0x6c, 0x19, 0x06, 0x4b, 0x0d, 0x68,
-	0x52, 0x94, 0x91, 0x83, 0x6f, 0x74, 0x09, 0x72, 0xd1, 0x44, 0x87, 0xa5, 0x38, 0xd9, 0xca, 0x78,
-	0xc7, 0x95, 0xc6, 0x22, 0x2e, 0x56, 0x1e, 0x8b, 0xb8, 0x4e, 0xf4, 0x34, 0x14, 0x2c, 0xb3, 0xd6,
-	0x62, 0xee, 0x8b, 0x53, 0x65, 0x19, 0x55, 0xb1, 0xe3, 0x4a, 0xb9, 0xa8, 0x37, 0x94, 0x73, 0x56,
-	0xe4, 0x0b, 0x9d, 0x81, 0xf4, 0xa6, 0xae, 0x69, 0xd8, 0x64, 0x09, 0x4a, 0x46, 0xf6, 0xbe, 0x50,
-	0x89, 0x26, 0x04, 0x8a, 0xaa, 0xd2, 0x14, 0x88, 0xca, 0x38, 0xc6, 0x6a, 0x63, 0x65, 0xe8, 0x5d,
-	0x01, 0xa6, 0xeb, 0xd8, 0xc4, 0xb6, 0xe2, 0x60, 0xad, 0xa6, 0x90, 0x9a, 0xae, 0x61, 0xd3, 0xd1,
-	0x9d, 0x76, 0x8d, 0xa9, 0x22, 0xc7, 0x46, 0x65, 0xf5, 0x8e, 0x2b, 0x2d, 0x1f, 0x74, 0x24, 0xbe,
-	0xec, 0x73, 0xbf, 0x4c, 0xaa, 0x1e, 0x6f, 0x36, 0xd9, 0xcf, 0xd6, 0xfb, 0x57, 0xa0, 0x15, 0x78,
-	0xa8, 0xbf, 0x44, 0x41, 0xf2, 0x6f, 0x35, 0x69, 0xf0, 0xc8, 0x92, 0x8c, 0xac, 0xfc, 0x60, 0x1f,
-	0x3e, 0x41, 0x58, 0xcf, 0x1a, 0xa2, 0xd7, 0x60, 0xa2, 0x45, 0x30, 0x09, 0x19, 0xe8, 0x1a, 0x11,
-	0x0b, 0xb3, 0xc9, 0x0b, 0xf9, 0xca, 0x73, 0x87, 0xb4, 0x9d, 0x71, 0xca, 0xd8, 0x87, 0xab, 0x6a,
-	0x84, 0x2a, 0xdd, 0xf3, 0xf7, 0x36, 0x1d, 0x1c, 0x96, 0x1b, 0x64, 0xe5, 0x58, 0x19, 0x7a, 0x16,
-	0x8a, 0xcd, 0x7a, 0x4d, 0x71, 0x1c, 0x5b, 0x5f, 0x6f, 0x39, 0xb8, 0x66, 0xb6, 0x1a, 0x2c, 0x0b,
-	0xc8, 0x57, 0x50, 0xc7, 0x95, 0x0a, 0x2b, 0xf5, 0xcb, 0x7e, 0xd5, 0x52, 0xab, 0x21, 0x17, 0x9a,
-	0xb1, 0x6f, 0x1a, 0x33, 0x22, 0xd2, 0x26, 0x0e, 0x6e, 0xd4, 0x3c, 0x6b, 0xdd, 0xd2, 0x4d, 0x8d,
-	0xa5, 0x00, 0xf9, 0xca, 0xd7, 0x3b, 0xae, 0x54, 0x5c, 0x65, 0xb5, 0xdc, 0xe2, 0xae, 0xe9, 0xa6,
-	0x76, 0xc7, 0x95, 0x5e, 0x38, 0x68, 0x1f, 0xbb, 0x79, 0xc9, 0x45, 0xd2, 0x55, 0x82, 0x44, 0x18,
-	0xdd, 0xd6, 0x6d, 0xa7, 0xa5, 0x18, 0x2c, 0x77, 0xc8, 0xc8, 0xfe, 0xe7, 0x7c, 0xea, 0x6f, 0xd4,
-	0x8f, 0xfd, 0x12, 0x20, 0x17, 0x8d, 0xa5, 0x86, 0xe4, 0xcd, 0x74, 0xc8, 0xb0, 0x10, 0x8d, 0xa2,
-	0x24, 0x18, 0xca, 0x12, 0x45, 0x61, 0x22, 0x30, 0x94, 0x2f, 0x1d, 0x18, 0x85, 0xb3, 0x90, 0x47,
-	0x19, 0xff, 0xaa, 0x86, 0x4a, 0x90, 0xe6, 0x9b, 0x34, 0xcc, 0x6b, 0x66, 0x2a, 0xd0, 0x71, 0xa5,
-	0x34, 0x8f, 0xde, 0x64, 0xaf, 0x06, 0xbd, 0x0e, 0x85, 0x2d, 0xdc, 0xae, 0x05, 0x0e, 0x96, 0x88,
-	0x29, 0x36, 0x03, 0xd7, 0xa8, 0x75, 0x5f, 0xc3, 0x6d, 0xdf, 0x41, 0x92, 0x23, 0xf1, 0xb2, 0xb9,
-	0xad, 0x80, 0xa3, 0x46, 0xd0, 0x5b, 0x02, 0x4c, 0x45, 0xc0, 0x35, 0xdd, 0xc6, 0x2a, 0x33, 0xa1,
-	0x91, 0xd9, 0xe4, 0x85, 0xc2, 0xa5, 0x67, 0xf6, 0xb7, 0x35, 0x58, 0x5e, 0xf4, 0xe9, 0x2b, 0x67,
-	0x3b, 0xae, 0x34, 0x19, 0x08, 0x1f, 0x94, 0x13, 0x19, 0x6d, 0xf5, 0x14, 0xa2, 0x1f, 0x09, 0x70,
-	0x9a, 0x4a, 0x41, 0x5a, 0x1b, 0x1b, 0xfa, 0xed, 0xa8, 0x26, 0xd2, 0x4c, 0x13, 0xaf, 0x76, 0x5c,
-	0x09, 0x5d, 0xc3, 0xed, 0x55, 0x56, 0x7f, 0xb4, 0xfa, 0xa0, 0xf2, 0xc4, 0xf8, 0x6a, 0x04, 0x99,
-	0x80, 0xc8, 0xa6, 0x62, 0x6b, 0x58, 0xab, 0xd1, 0xe6, 0xb6, 0xde, 0x74, 0x2c, 0xdb, 0xdb, 0xde,
-	0xea, 0x49, 0xc7, 0x6f, 0x1a, 0x34, 0x9c, 0x28, 0xaf, 0x72, 0x82, 0xc5, 0xa0, 0x7d, 0xe5, 0x74,
-	0xc7, 0x95, 0x26, 0x7a, 0x8a, 0xe5, 0x09, 0xd2, 0x5d, 0x84, 0xbe, 0x47, 0x0d, 0xd7, 0xb1, 0x6c,
-	0xdd, 0xac, 0x47, 0x3b, 0x9f, 0x61, 0x9d, 0xff, 0x2a, 0x33, 0x5c, 0x5e, 0x7b, 0xb4, 0x5d, 0x2f,
-	0x92, 0x18, 0x57, 0x8d, 0xd0, 0xe0, 0x7c, 0x8a, 0x3a, 0x24, 0x8b, 0xe8, 0x0e, 0x8e, 0x8a, 0x92,
-	0x0d, 0xc7, 0x61, 0xc1, 0xaf, 0x3f, 0xe2, 0x71, 0x50, 0xbb, 0xf8, 0x6a, 0x04, 0x5d, 0xa0, 0x86,
-	0xba, 0x8d, 0x6d, 0x07, 0x6b, 0x7c, 0x05, 0xab, 0xe4, 0x68, 0x18, 0x50, 0xf5, 0xca, 0xe4, 0xa0,
-	0x16, 0x3d, 0x49, 0x9d, 0xab, 0xa9, 0xb6, 0x6c, 0x1a, 0x51, 0x19, 0x7c, 0x27, 0x2d, 0xc3, 0xd7,
-	0xc7, 0x85, 0x48, 0xb9, 0x1c, 0x6b, 0x85, 0xde, 0x80, 0x71, 0x62, 0xb5, 0x6c, 0xea, 0xf7, 0x7d,
-	0x7f, 0xc0, 0xd7, 0x35, 0x6a, 0x7a, 0xf9, 0x55, 0x56, 0x75, 0x84, 0x5e, 0x21, 0x4f, 0x22, 0x1c,
-	0xb5, 0xd2, 0x0c, 0x64, 0x43, 0x13, 0x18, 0x85, 0xe4, 0xe5, 0xd5, 0x85, 0xe2, 0x29, 0x94, 0x81,
-	0xd4, 0xe2, 0x95, 0xd5, 0x85, 0xa2, 0xe0, 0xf9, 0xc8, 0x5f, 0x01, 0x14, 0xe2, 0x19, 0xe6, 0x89,
-	0x97, 0x1c, 0xb6, 0x97, 0x7c, 0xfb, 0xee, 0x5e, 0x72, 0x7e, 0xbf, 0xa7, 0x1a, 0x27, 0x7e, 0xf2,
-	0xc4, 0x4f, 0x9e, 0xf8, 0xc9, 0xa3, 0xf5, 0x93, 0x7f, 0x4a, 0x02, 0xea, 0x3d, 0xc7, 0xbb, 0x17,
-	0xf9, 0x71, 0x62, 0x08, 0xf9, 0xf1, 0x58, 0x24, 0x63, 0xf1, 0x12, 0xf2, 0x17, 0x3b, 0xae, 0x04,
-	0x41, 0xc2, 0x71, 0xd8, 0xae, 0x01, 0x09, 0x52, 0x17, 0xf4, 0x92, 0x97, 0xfe, 0xd2, 0x4c, 0xbc,
-	0x30, 0xc8, 0xb9, 0x51, 0xef, 0x38, 0x44, 0x0e, 0x38, 0x4a, 0x8f, 0x40, 0x8a, 0xa5, 0x73, 0x63,
-	0x30, 0x7a, 0x7d, 0xe9, 0xda, 0xd2, 0xf2, 0x2b, 0x4b, 0x7c, 0x38, 0xaf, 0xaf, 0x5e, 0x59, 0x2d,
-	0x0a, 0xf4, 0xd7, 0xf2, 0x2b, 0x4b, 0xab, 0xc5, 0x84, 0x37, 0xb0, 0x7f, 0x4d, 0x42, 0xb1, 0x7b,
-	0xbf, 0x13, 0x7d, 0x0d, 0xc6, 0xc3, 0xfd, 0x4d, 0x9e, 0x91, 0x0a, 0x4c, 0xba, 0x7d, 0x6d, 0xac,
-	0x32, 0xa1, 0x22, 0x1b, 0xa5, 0x4c, 0xac, 0xc7, 0x00, 0x45, 0x58, 0x5b, 0xb6, 0xa6, 0x9b, 0x8a,
-	0xc1, 0x07, 0x55, 0x9e, 0x08, 0x6b, 0x96, 0x79, 0x45, 0x6c, 0x82, 0x25, 0x87, 0xb2, 0x18, 0xa7,
-	0x8e, 0x77, 0x31, 0x6e, 0xfa, 0x1b, 0xfd, 0xcc, 0xa1, 0x8d, 0x30, 0x87, 0xf6, 0x72, 0xc7, 0x95,
-	0xb2, 0x47, 0xeb, 0xc7, 0xb2, 0xfe, 0x6c, 0x26, 0xde, 0x38, 0xff, 0x2e, 0x09, 0xe3, 0x5d, 0x7b,
-	0x66, 0x9f, 0xb8, 0x61, 0x46, 0x90, 0x62, 0x5b, 0x50, 0x29, 0xb6, 0x37, 0xc0, 0x7e, 0xd3, 0x32,
-	0xb6, 0xe5, 0xc3, 0xb7, 0xa5, 0xd8, 0xef, 0xae, 0x31, 0x4a, 0x1f, 0xff, 0x18, 0xa1, 0xf3, 0x90,
-	0xdd, 0x56, 0x0c, 0x5d, 0x53, 0xe8, 0x1a, 0xc3, 0xf7, 0xb4, 0xc2, 0x02, 0x6f, 0x04, 0xdf, 0x84,
-	0x8c, 0x6f, 0xf9, 0xdd, 0x2e, 0x4a, 0x38, 0x5e, 0x17, 0xe5, 0x09, 0xf0, 0x4e, 0x12, 0x26, 0x7a,
-	0x6e, 0x02, 0xdc, 0x9f, 0x4b, 0xc0, 0x37, 0x20, 0xbe, 0xc1, 0xb4, 0x48, 0xc4, 0x64, 0x30, 0x0d,
-	0xc6, 0xaf, 0xc7, 0xab, 0x8e, 0x74, 0x2b, 0x6b, 0x91, 0xa0, 0x07, 0xbb, 0xf6, 0x30, 0xf9, 0x74,
-	0x8d, 0x6e, 0x59, 0x7a, 0x03, 0x62, 0x43, 0xea, 0x86, 0x8e, 0x6f, 0x0d, 0x67, 0x08, 0x3c, 0x4c,
-	0x02, 0x23, 0x8c, 0xef, 0x50, 0x41, 0xff, 0x9c, 0x80, 0x73, 0xbb, 0x1e, 0x4b, 0xdd, 0x9f, 0x33,
-	0x50, 0x81, 0x51, 0xea, 0x90, 0x43, 0x87, 0xf8, 0x02, 0xcd, 0xda, 0x68, 0xc7, 0x0f, 0xdd, 0xa5,
-	0x34, 0x65, 0x1c, 0xd3, 0xed, 0xae, 0xe7, 0x6b, 0x27, 0xba, 0x3d, 0x94, 0x6e, 0x3f, 0x4c, 0x80,
-	0xb8, 0xdb, 0xc9, 0xee, 0x89, 0x6a, 0x0f, 0xa5, 0xda, 0x3f, 0x26, 0x60, 0xb2, 0xcf, 0x49, 0xe8,
-	0x89, 0x56, 0x0f, 0xa5, 0xd5, 0xf7, 0x12, 0x70, 0xfe, 0x6e, 0x27, 0xab, 0x43, 0x52, 0xef, 0x3e,
-	0xa3, 0xc7, 0xa1, 0xa9, 0xa7, 0x23, 0xc0, 0x44, 0xcf, 0xe9, 0xff, 0x90, 0x74, 0x32, 0xb4, 0x4e,
-	0xfe, 0x20, 0x0d, 0x10, 0xb9, 0x6b, 0x58, 0x87, 0xac, 0x65, 0xeb, 0x75, 0xdd, 0x0c, 0xbb, 0xf7,
-	0x15, 0x3a, 0xd5, 0x97, 0x59, 0xe1, 0xa1, 0xb1, 0x33, 0x9c, 0x79, 0x55, 0x43, 0x6f, 0x40, 0xc1,
-	0x03, 0xe2, 0xf3, 0xde, 0x0f, 0xb9, 0xae, 0x77, 0x5c, 0x29, 0xcf, 0xd1, 0xb8, 0x69, 0x1c, 0x4d,
-	0xf4, 0x9d, 0xb7, 0xa2, 0x2c, 0x51, 0x13, 0x72, 0xb6, 0x3f, 0xcb, 0xc3, 0x34, 0xf0, 0xa5, 0x8e,
-	0x2b, 0x8d, 0x05, 0xb3, 0xff, 0xd0, 0x9d, 0x1d, 0x0b, 0x20, 0xaa, 0x1a, 0x7a, 0x5b, 0x80, 0x89,
-	0x10, 0xd2, 0xef, 0xf3, 0x48, 0xb8, 0xdb, 0x16, 0xe0, 0x1e, 0x65, 0xb7, 0x8b, 0x76, 0x17, 0x57,
-	0xf4, 0x26, 0x64, 0x83, 0xe3, 0x6f, 0x76, 0x06, 0x9f, 0xaf, 0xac, 0xb3, 0x01, 0xf6, 0x02, 0xae,
-	0x3b, 0xae, 0x24, 0x1f, 0xf8, 0x3a, 0x40, 0x30, 0x8f, 0x82, 0xce, 0xd4, 0x2e, 0xb3, 0xad, 0x26,
-	0x39, 0xe3, 0x9f, 0xa5, 0x7b, 0x02, 0x68, 0xd8, 0xc0, 0x0e, 0x3f, 0xd0, 0x0f, 0x04, 0x58, 0x64,
-	0x65, 0xc7, 0x27, 0x00, 0xe7, 0x1f, 0xe4, 0x85, 0x99, 0x30, 0x2f, 0xf4, 0x6c, 0xe1, 0x67, 0x69,
-	0x38, 0xbb, 0xcb, 0x35, 0xdd, 0x13, 0xc3, 0x38, 0x31, 0x8c, 0x4f, 0xae, 0x61, 0xfc, 0x5b, 0x80,
-	0xf1, 0xae, 0x4b, 0xdc, 0x43, 0xde, 0x94, 0x40, 0x0e, 0x14, 0xd8, 0x65, 0xde, 0x5a, 0xb0, 0xf8,
-	0x86, 0xe7, 0x68, 0x39, 0x76, 0x47, 0xf8, 0x68, 0x56, 0xe0, 0x9c, 0x15, 0xf2, 0xd2, 0x4a, 0x1f,
-	0x25, 0x60, 0xaa, 0xdf, 0xe5, 0xf9, 0x21, 0x45, 0x01, 0x26, 0x80, 0x16, 0xa0, 0x46, 0x3b, 0x1c,
-	0x95, 0xe5, 0xb0, 0x4a, 0x0e, 0x11, 0x90, 0x01, 0x7e, 0x14, 0xba, 0x78, 0xec, 0x37, 0xd3, 0x16,
-	0xbd, 0xb9, 0xa5, 0x7b, 0x3b, 0xd8, 0x91, 0x88, 0x47, 0x38, 0x9e, 0x88, 0xa7, 0xf4, 0x2f, 0x01,
-	0xd2, 0xfc, 0xa2, 0x22, 0x75, 0xe7, 0x7c, 0x9b, 0xb3, 0xcb, 0x9d, 0xf3, 0xea, 0xc3, 0xbb, 0x73,
-	0xce, 0xbc, 0xaa, 0xa1, 0x6f, 0x41, 0xd1, 0x7f, 0x45, 0xe5, 0x2c, 0xaf, 0xbf, 0x86, 0x55, 0xc7,
-	0x77, 0xe8, 0x32, 0x75, 0x6e, 0x8b, 0x5d, 0x75, 0x87, 0xc4, 0xed, 0xc1, 0x2a, 0xfd, 0x47, 0x80,
-	0x8c, 0x7f, 0x4d, 0x93, 0xda, 0xac, 0xff, 0x20, 0xa1, 0xcb, 0x66, 0xfd, 0x26, 0x87, 0xb7, 0x59,
-	0x1f, 0xe0, 0xff, 0xa0, 0xef, 0x2f, 0x43, 0xfe, 0x45, 0x9d, 0x38, 0xc1, 0x0b, 0x0a, 0x74, 0xde,
-	0xf3, 0x70, 0x02, 0xbb, 0xf1, 0x97, 0xe9, 0xb8, 0x52, 0x6a, 0x49, 0x69, 0x60, 0x6f, 0x73, 0xf8,
-	0xbc, 0xb7, 0x39, 0x9c, 0x98, 0x4d, 0xfa, 0xb5, 0xec, 0x1e, 0x20, 0x2b, 0xf5, 0x66, 0xeb, 0x16,
-	0x8c, 0xcb, 0x8a, 0x59, 0xc7, 0x01, 0x4f, 0xb2, 0x07, 0xd3, 0x33, 0x90, 0x58, 0xb3, 0x3c, 0x96,
-	0xe9, 0x8e, 0x2b, 0x25, 0xd6, 0x2c, 0x39, 0xb1, 0x66, 0x51, 0xaa, 0xab, 0xb6, 0xd5, 0x60, 0xfa,
-	0xf0, 0xa8, 0xe8, 0xb7, 0xcc, 0xfe, 0x7a, 0x60, 0x7f, 0x4f, 0x42, 0x2e, 0xfa, 0xfc, 0xe3, 0xbe,
-	0xbc, 0xac, 0xb0, 0xa1, 0x63, 0x43, 0x23, 0x9e, 0x1e, 0xd8, 0x65, 0x85, 0xab, 0xac, 0x44, 0xf6,
-	0x6a, 0x90, 0x01, 0xe3, 0x86, 0x4e, 0x9c, 0x5a, 0xf0, 0x9e, 0x85, 0xdf, 0x56, 0x18, 0xbb, 0x34,
-	0x37, 0xc0, 0x83, 0x86, 0xe8, 0xf0, 0xf3, 0x7b, 0x7f, 0xb1, 0x22, 0x22, 0x17, 0x8c, 0xd8, 0x37,
-	0xba, 0x09, 0x45, 0x9b, 0x32, 0x88, 0xc2, 0x8d, 0x30, 0xb8, 0x01, 0x1e, 0x3a, 0x75, 0x4d, 0x8d,
-	0xca, 0x64, 0xc7, 0x95, 0xba, 0xe7, 0x8b, 0x3c, 0x6e, 0xc7, 0x0b, 0xbc, 0xc1, 0xfe, 0x47, 0x02,
-	0xb2, 0xc1, 0x73, 0x9b, 0x61, 0x5b, 0x6a, 0xcc, 0x1d, 0x26, 0x8e, 0xd1, 0x1d, 0x12, 0xc8, 0x87,
-	0xb7, 0x1b, 0xc2, 0xec, 0xd6, 0x5b, 0xd4, 0xfc, 0x8a, 0xc3, 0xaf, 0xe2, 0x21, 0x48, 0xff, 0x93,
-	0xa0, 0xd2, 0x4f, 0x04, 0x18, 0xe1, 0xef, 0xcb, 0x7a, 0x44, 0x12, 0x86, 0x20, 0xd2, 0x94, 0xff,
-	0x0e, 0x2a, 0xc1, 0x64, 0xe2, 0x1f, 0xa5, 0xdf, 0xf7, 0x3c, 0x54, 0xba, 0x37, 0xd2, 0x4d, 0x43,
-	0xa6, 0x45, 0xb0, 0xcd, 0x94, 0xc6, 0x05, 0x0c, 0xbe, 0xd1, 0x0c, 0x40, 0x33, 0x7c, 0x47, 0xc5,
-	0x86, 0x4f, 0x8e, 0x94, 0x94, 0x7e, 0x9b, 0x80, 0x8c, 0xff, 0x8e, 0xe8, 0xde, 0x48, 0xff, 0x1b,
-	0x21, 0x94, 0xc0, 0x7b, 0x96, 0xfd, 0xd4, 0x2e, 0x17, 0x68, 0x98, 0xe7, 0x0c, 0x05, 0x09, 0x1e,
-	0x40, 0x2d, 0x58, 0xe6, 0x86, 0x5e, 0xaf, 0x6c, 0x50, 0x1b, 0xf0, 0xcb, 0xee, 0xb8, 0xd2, 0x8d,
-	0x83, 0xca, 0xd8, 0x85, 0x53, 0x8b, 0xe3, 0xc8, 0x01, 0x46, 0xe9, 0xbf, 0x02, 0x40, 0xf8, 0xcc,
-	0xeb, 0xfe, 0xdc, 0xdf, 0xf4, 0xcd, 0x31, 0xd9, 0x2f, 0xcf, 0xc8, 0x06, 0xcf, 0xc4, 0xee, 0xbf,
-	0xd5, 0x6e, 0xf7, 0x8e, 0xff, 0x3c, 0x01, 0x85, 0xf8, 0x1b, 0xb5, 0x21, 0xf5, 0xbe, 0xcf, 0xa5,
-	0x80, 0xc4, 0xb1, 0x5e, 0x0a, 0x48, 0xee, 0xb6, 0xad, 0xdb, 0xc7, 0x49, 0xfb, 0xfb, 0xb0, 0x23,
-	0x50, 0xf4, 0xce, 0x55, 0x02, 0xc7, 0x78, 0x6f, 0x3c, 0x8b, 0x0a, 0x79, 0x7c, 0xbb, 0x69, 0xe8,
-	0xaa, 0xee, 0xd4, 0x6c, 0xcb, 0xc0, 0x9e, 0x77, 0x79, 0x76, 0x17, 0xef, 0xd2, 0x2d, 0x34, 0xb9,
-	0x6a, 0xd9, 0xb2, 0x65, 0xe0, 0xf2, 0x15, 0x8f, 0x09, 0xfd, 0x78, 0xe1, 0x94, 0x9c, 0xc3, 0x91,
-	0x6f, 0xb4, 0x05, 0xf9, 0x0d, 0xcb, 0xae, 0x29, 0x86, 0xc1, 0x30, 0x88, 0xf7, 0xef, 0x1e, 0xae,
-	0xec, 0x17, 0xe4, 0xaa, 0x65, 0x5f, 0x36, 0x0c, 0xfa, 0x93, 0xac, 0x10, 0xdc, 0xd2, 0x2c, 0x0f,
-	0x6d, 0x6c, 0x23, 0xac, 0x40, 0x6f, 0xc2, 0xe9, 0xd0, 0x77, 0xd7, 0x9a, 0xd8, 0xae, 0x59, 0x2c,
-	0x78, 0xf6, 0x42, 0xac, 0x6b, 0x03, 0xbf, 0x65, 0x0c, 0xf0, 0xcb, 0xa1, 0x24, 0x2b, 0xd8, 0xe6,
-	0xa1, 0x38, 0x7b, 0x0e, 0x26, 0x4f, 0x36, 0x7b, 0x6b, 0xa6, 0x5f, 0x83, 0x33, 0x1e, 0x07, 0x5e,
-	0x10, 0x8e, 0xf0, 0x4a, 0x6c, 0xa1, 0x11, 0x98, 0x3c, 0xfb, 0x7e, 0xb0, 0x1b, 0x5d, 0x9a, 0xa6,
-	0x7f, 0x2c, 0x80, 0xb8, 0x9b, 0x74, 0xa8, 0x08, 0xc9, 0x2d, 0xdc, 0xe6, 0xd3, 0x48, 0xa6, 0x3f,
-	0x51, 0x0d, 0x46, 0xb6, 0x15, 0xa3, 0xe5, 0x8f, 0x72, 0xf5, 0x00, 0xba, 0xe8, 0xdf, 0x35, 0x99,
-	0xf3, 0x9d, 0x4f, 0x3c, 0x23, 0x54, 0xd2, 0x90, 0xa2, 0xa3, 0x5c, 0xfa, 0xa7, 0x00, 0x93, 0x7d,
-	0xde, 0xdb, 0xdd, 0xaf, 0x81, 0xe0, 0xa3, 0xcf, 0x47, 0x1d, 0x9e, 0x7f, 0x85, 0xad, 0x6a, 0xb2,
-	0x6b, 0x30, 0xc5, 0x53, 0xe8, 0x0c, 0x20, 0x7e, 0x4f, 0xed, 0x15, 0xdd, 0xd9, 0xb4, 0x5a, 0x0e,
-	0xf3, 0xa5, 0x45, 0x01, 0x65, 0x61, 0x84, 0x9d, 0x58, 0x15, 0x13, 0x95, 0x87, 0xdf, 0xff, 0xcb,
-	0xcc, 0xa9, 0xf7, 0x3b, 0x33, 0xc2, 0x07, 0x9d, 0x19, 0xe1, 0xc3, 0xce, 0x8c, 0xf0, 0x51, 0x67,
-	0x46, 0x78, 0xf7, 0xe3, 0x99, 0x53, 0x1f, 0x7c, 0x3c, 0x73, 0xea, 0xc3, 0x8f, 0x67, 0x4e, 0xbd,
-	0x9a, 0xa2, 0xb0, 0xeb, 0x69, 0xf6, 0x7f, 0x61, 0x9e, 0xf8, 0x5f, 0x00, 0x00, 0x00, 0xff, 0xff,
-	0x4a, 0xe9, 0x3f, 0xe3, 0xd8, 0x46, 0x00, 0x00,
+	// 3314 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xec, 0x5c, 0xdd, 0x6f, 0x1b, 0xc7,
+	0xb5, 0xf7, 0x92, 0xfa, 0x20, 0x8f, 0x48, 0x8a, 0x1a, 0xc9, 0xf6, 0x5a, 0xd7, 0xd1, 0x2a, 0x04,
+	0x92, 0xf8, 0x26, 0x0e, 0x95, 0xeb, 0xe4, 0x06, 0x89, 0x92, 0x5c, 0xc4, 0x14, 0xe5, 0x84, 0x70,
+	0x22, 0x29, 0x2b, 0x3b, 0xc6, 0xcd, 0x0b, 0xbb, 0xda, 0x1d, 0x51, 0x1b, 0x2d, 0x77, 0xa9, 0x9d,
+	0xa5, 0x6c, 0x06, 0x48, 0xdb, 0x34, 0x0d, 0x92, 0x87, 0xf4, 0x23, 0x40, 0x5f, 0x5a, 0x14, 0x6d,
+	0xff, 0x81, 0x3e, 0x17, 0x7d, 0xeb, 0x63, 0x1e, 0x0a, 0x34, 0xed, 0x53, 0xda, 0x87, 0x45, 0xc2,
+	0x14, 0x68, 0x8b, 0x3e, 0xb4, 0x10, 0x5a, 0x14, 0xf0, 0x53, 0x31, 0x33, 0xfb, 0x4d, 0xca, 0xa2,
+	0x3e, 0x0d, 0xb8, 0x7a, 0xb1, 0xb9, 0x33, 0x73, 0xce, 0xef, 0xcc, 0x39, 0x33, 0x67, 0xce, 0x99,
+	0x0f, 0xc1, 0x23, 0x64, 0xcb, 0x98, 0x23, 0xea, 0x06, 0x6e, 0x2a, 0xea, 0x86, 0x62, 0x36, 0xb0,
+	0x3d, 0x47, 0xd4, 0xd6, 0xda, 0x1c, 0x36, 0x70, 0x13, 0x9b, 0x0e, 0x29, 0xb7, 0x6c, 0xcb, 0xb1,
+	0xd0, 0xac, 0x6a, 0xa9, 0x9b, 0xb6, 0xa5, 0xa8, 0x1b, 0x65, 0xb2, 0x65, 0x94, 0x63, 0x04, 0x65,
+	0x4a, 0x30, 0x2d, 0x51, 0x46, 0xaa, 0xe2, 0x28, 0x86, 0xd5, 0xa0, 0xff, 0xb7, 0xd6, 0xfc, 0x2f,
+	0xce, 0x62, 0xba, 0x14, 0x6d, 0xa0, 0x61, 0x86, 0xd2, 0xb2, 0xf5, 0x6d, 0xdd, 0xc0, 0x0d, 0xec,
+	0xb5, 0x39, 0x4b, 0xdb, 0x38, 0x9d, 0x16, 0x26, 0xfc, 0x5f, 0xaf, 0x78, 0xaa, 0x61, 0x35, 0x2c,
+	0xf6, 0x73, 0x8e, 0xfe, 0xe2, 0xa5, 0xa5, 0x9f, 0x5f, 0x84, 0xdc, 0x22, 0x17, 0x73, 0x85, 0x09,
+	0x79, 0x03, 0x46, 0x54, 0xcb, 0x68, 0x37, 0x4d, 0x51, 0x98, 0x15, 0x2e, 0x8d, 0x5d, 0xb9, 0x54,
+	0xde, 0x4b, 0xea, 0xf2, 0x02, 0x6b, 0x5f, 0x41, 0x3b, 0xae, 0x54, 0x68, 0x29, 0x36, 0x36, 0x9d,
+	0xf9, 0xd2, 0x0d, 0x65, 0xcd, 0xc0, 0x25, 0xd9, 0xe3, 0x85, 0x1a, 0x90, 0x6f, 0xd9, 0x7a, 0x53,
+	0xb1, 0x3b, 0x75, 0xdd, 0xd4, 0xf0, 0x1d, 0x31, 0xc5, 0x98, 0x97, 0xf7, 0x66, 0xbe, 0xc2, 0xc9,
+	0x6a, 0x94, 0xaa, 0x2f, 0x44, 0xae, 0x15, 0x69, 0x81, 0x9a, 0x30, 0x4e, 0xb0, 0x6a, 0x99, 0x5a,
+	0x08, 0x95, 0x66, 0x50, 0x4f, 0xed, 0x0d, 0xb5, 0xea, 0x13, 0xee, 0x0e, 0x56, 0x20, 0xb1, 0x36,
+	0xe8, 0x3d, 0x01, 0x26, 0x09, 0xde, 0x6a, 0x63, 0x53, 0xc5, 0x75, 0x0d, 0xb7, 0xb0, 0xa9, 0x61,
+	0x53, 0xed, 0x88, 0x43, 0x0c, 0xf3, 0x99, 0x41, 0x30, 0x39, 0x71, 0x35, 0xa0, 0xad, 0x4c, 0xef,
+	0xb8, 0xd2, 0x39, 0x1f, 0x97, 0xeb, 0xf6, 0xf2, 0xac, 0x87, 0x8f, 0x48, 0x4f, 0x7b, 0xf4, 0xbe,
+	0x00, 0x13, 0x6d, 0x53, 0xdf, 0x6a, 0xe3, 0xba, 0x6a, 0x99, 0xc4, 0xb1, 0x15, 0xdd, 0x74, 0xc4,
+	0x61, 0x26, 0xc1, 0x95, 0xbd, 0x25, 0xb8, 0xc9, 0x48, 0x17, 0x02, 0xca, 0x4a, 0x69, 0xc7, 0x95,
+	0x66, 0x7c, 0xfc, 0xb8, 0x4e, 0x02, 0x39, 0x8a, 0xed, 0x04, 0x15, 0x6a, 0x41, 0x51, 0xdd, 0xc0,
+	0xea, 0x66, 0x54, 0x86, 0x11, 0x26, 0xc3, 0xff, 0x0c, 0x30, 0x82, 0x28, 0x65, 0x44, 0x84, 0x7e,
+	0xaa, 0x1f, 0x57, 0xe3, 0x8d, 0xd0, 0x35, 0xc8, 0xf8, 0xda, 0x10, 0x47, 0x19, 0xd2, 0xe3, 0x83,
+	0xeb, 0x5b, 0x0e, 0x68, 0xd1, 0x6d, 0x40, 0x1a, 0x5e, 0x57, 0xda, 0x86, 0x53, 0xc7, 0x77, 0x5a,
+	0x36, 0x26, 0x44, 0xb7, 0x4c, 0x31, 0xc3, 0x38, 0x3e, 0xbd, 0x37, 0xc7, 0x2a, 0xa7, 0x5d, 0x0c,
+	0x48, 0x2b, 0x93, 0x3b, 0xae, 0x34, 0x1e, 0x37, 0x60, 0x49, 0x9e, 0xd0, 0x92, 0xed, 0xd0, 0x3c,
+	0x0c, 0x6d, 0xeb, 0xf8, 0xb6, 0x98, 0x65, 0x50, 0x8f, 0xee, 0x0d, 0xf5, 0xa6, 0x8e, 0x6f, 0xcb,
+	0x8c, 0x06, 0xbd, 0x04, 0xc3, 0x0e, 0xd5, 0x8b, 0x08, 0x8c, 0xf8, 0xb1, 0xbd, 0x89, 0x99, 0x1a,
+	0x65, 0x4e, 0x85, 0xd6, 0x21, 0x6f, 0xb5, 0x9d, 0x6b, 0x96, 0x8d, 0xf5, 0x86, 0x79, 0x1d, 0x77,
+	0xc4, 0x31, 0xc6, 0xe6, 0xf2, 0xde, 0x6c, 0x42, 0x9a, 0xbe, 0x56, 0x8a, 0xb3, 0x45, 0x5b, 0x90,
+	0xd3, 0xcd, 0x08, 0x4c, 0x8e, 0xc1, 0x3c, 0xbf, 0x2f, 0x18, 0x45, 0xdd, 0x94, 0xf1, 0x3a, 0xb6,
+	0xa9, 0xb1, 0xfa, 0x7b, 0x80, 0x28, 0x04, 0xfa, 0xb6, 0x00, 0x53, 0x36, 0x36, 0x14, 0x47, 0xb7,
+	0x4c, 0x6f, 0x96, 0x68, 0xcb, 0x66, 0xa5, 0x23, 0xe6, 0x19, 0xf6, 0xb3, 0x7b, 0x63, 0xcb, 0x7d,
+	0xa8, 0x2b, 0xe2, 0x8e, 0x2b, 0x4d, 0xc5, 0x80, 0x2f, 0xcf, 0x52, 0x7b, 0x94, 0xe4, 0xbe, 0x68,
+	0x68, 0x1b, 0xf2, 0xfe, 0x08, 0x5b, 0xbe, 0x6d, 0x62, 0x5b, 0x7c, 0x72, 0xd0, 0xc9, 0xb0, 0x1a,
+	0x21, 0xd3, 0x2a, 0x9d, 0xca, 0x43, 0x3b, 0xae, 0x74, 0x21, 0xe9, 0x0f, 0xfc, 0x46, 0x25, 0x39,
+	0x0e, 0x43, 0x07, 0x15, 0xf5, 0xfa, 0xe2, 0xf8, 0xa0, 0x83, 0xea, 0x46, 0xa7, 0x85, 0x65, 0x46,
+	0x83, 0x5e, 0x86, 0x11, 0xde, 0x40, 0x2c, 0x0e, 0xea, 0xfb, 0x57, 0x59, 0x91, 0xec, 0xd1, 0xd1,
+	0x39, 0xa9, 0x29, 0x8e, 0xb2, 0xa6, 0x10, 0x2c, 0x4e, 0x0c, 0x3a, 0x27, 0xab, 0x1e, 0x85, 0x1c,
+	0xd0, 0xa2, 0x77, 0x21, 0xd7, 0x52, 0x6c, 0x47, 0xa7, 0x6a, 0xd5, 0xcd, 0x86, 0x88, 0x06, 0x5e,
+	0x2e, 0x22, 0x54, 0x95, 0xff, 0xde, 0x71, 0xa5, 0x47, 0x7c, 0xcd, 0x45, 0x17, 0x12, 0xaa, 0xbf,
+	0xa8, 0x5f, 0xa3, 0xab, 0x48, 0x84, 0x10, 0x7d, 0x20, 0x40, 0xd6, 0x54, 0x9a, 0x98, 0xb4, 0x14,
+	0x15, 0x8b, 0x93, 0x0c, 0xfc, 0x89, 0xbd, 0xc1, 0x97, 0x7c, 0x92, 0xca, 0xfc, 0x8e, 0x2b, 0x3d,
+	0xdb, 0x67, 0xb4, 0x84, 0x86, 0xbb, 0x3c, 0xeb, 0x77, 0xfb, 0xf2, 0x2c, 0x57, 0xe2, 0xe5, 0x59,
+	0x6a, 0x8a, 0x92, 0x1c, 0x22, 0x23, 0x02, 0xc3, 0x16, 0x1b, 0x3c, 0x53, 0x83, 0xce, 0x72, 0x36,
+	0x08, 0x2a, 0xcf, 0xec, 0xb8, 0xd2, 0x53, 0xfb, 0x84, 0x2f, 0xc9, 0x1c, 0x0b, 0x7d, 0x57, 0x80,
+	0xc2, 0x4d, 0x82, 0xed, 0x15, 0x3f, 0xae, 0x20, 0xe2, 0xd9, 0x41, 0x97, 0xd0, 0x38, 0xdd, 0x01,
+	0xe5, 0x48, 0xa0, 0x23, 0x05, 0x80, 0x87, 0x11, 0x54, 0xbf, 0xe2, 0xb9, 0x41, 0x3d, 0xd5, 0x42,
+	0x40, 0xd3, 0xdf, 0x23, 0x47, 0x98, 0xa2, 0xb7, 0x20, 0x63, 0x58, 0xaa, 0x62, 0xe8, 0x4e, 0x47,
+	0x3c, 0x3f, 0xe8, 0xb8, 0x7d, 0xcd, 0xa3, 0xe8, 0xeb, 0x94, 0x02, 0x7e, 0xc8, 0x81, 0x2c, 0x0b,
+	0x44, 0x98, 0xf4, 0xe2, 0xa0, 0x63, 0xa9, 0xe6, 0x93, 0xec, 0x67, 0x14, 0x87, 0x40, 0xe8, 0x23,
+	0x01, 0x0a, 0xe1, 0x52, 0xcc, 0xb0, 0x2f, 0x0c, 0x6a, 0xc5, 0x85, 0x18, 0x5d, 0xa5, 0xbc, 0xe3,
+	0x4a, 0x8f, 0xfb, 0x02, 0x24, 0xc3, 0x85, 0xcb, 0xb3, 0x89, 0xc5, 0xbb, 0x24, 0x27, 0x70, 0xe9,
+	0x6c, 0x42, 0x91, 0xd5, 0x8f, 0x39, 0x1c, 0xbc, 0x2e, 0x4e, 0x33, 0x71, 0xe6, 0xf7, 0xb5, 0xc2,
+	0x7a, 0xb4, 0xde, 0x62, 0x70, 0x61, 0xc7, 0x95, 0xce, 0xf6, 0x44, 0x4a, 0x6c, 0x12, 0xf5, 0x01,
+	0x44, 0x1f, 0x0b, 0x70, 0xd6, 0x32, 0x6f, 0xb6, 0x34, 0xc5, 0xc1, 0x31, 0x46, 0xe2, 0x7f, 0x31,
+	0x51, 0x5e, 0x18, 0x60, 0x7a, 0x79, 0xe4, 0xfb, 0x92, 0xa5, 0x3f, 0x28, 0xfa, 0x81, 0x00, 0x17,
+	0x54, 0xab, 0xd9, 0x6a, 0x3b, 0x58, 0xeb, 0xe1, 0x27, 0x5e, 0x1c, 0x54, 0xa4, 0x85, 0xdd, 0x58,
+	0xdc, 0x4b, 0xa4, 0xdd, 0x81, 0xd1, 0x3b, 0x30, 0x41, 0x23, 0x0c, 0xbe, 0x98, 0x91, 0x65, 0x93,
+	0xd6, 0x8a, 0x0f, 0x0d, 0x1a, 0x0d, 0xbd, 0x99, 0x24, 0xad, 0x9c, 0xdf, 0x71, 0xa5, 0x49, 0x5f,
+	0x0a, 0x3e, 0xf9, 0xb9, 0x0c, 0xbd, 0x30, 0xe8, 0x5b, 0x02, 0x4c, 0xf2, 0x59, 0x19, 0x57, 0xc6,
+	0x0c, 0x83, 0xff, 0xdf, 0x41, 0xe7, 0xfc, 0xc0, 0x6a, 0xe8, 0x07, 0x86, 0xb6, 0x61, 0x8c, 0x73,
+	0x5e, 0x34, 0x1d, 0xbb, 0x23, 0x4a, 0x83, 0x62, 0xfb, 0x8e, 0x6c, 0x35, 0x24, 0x8e, 0xaf, 0xdd,
+	0xbd, 0x9e, 0x2e, 0x0a, 0x84, 0x7e, 0x2c, 0xc0, 0xc5, 0x44, 0x8c, 0x1b, 0xd7, 0xc2, 0x2c, 0x93,
+	0xe4, 0xff, 0xf6, 0x1d, 0x4e, 0xc7, 0xd5, 0xd1, 0x2f, 0x90, 0xe1, 0xda, 0xb8, 0x27, 0xfa, 0xfc,
+	0xd0, 0xa7, 0x3f, 0x93, 0x84, 0xd2, 0x2f, 0xb2, 0x30, 0xc2, 0x75, 0x88, 0x54, 0xc8, 0xb0, 0x60,
+	0xb2, 0xae, 0x6b, 0x2c, 0x57, 0xcc, 0x57, 0x5e, 0xed, 0xba, 0xd2, 0x28, 0x63, 0x59, 0xab, 0xde,
+	0x75, 0xa5, 0xe7, 0x1b, 0xba, 0xb3, 0xd1, 0x5e, 0x2b, 0xab, 0x56, 0x73, 0x2e, 0x90, 0x59, 0x5b,
+	0x0b, 0x7f, 0xcf, 0xb5, 0x36, 0x1b, 0x73, 0x2c, 0x77, 0xc6, 0x4d, 0x9a, 0xd5, 0xea, 0x5a, 0xb9,
+	0x8a, 0x89, 0x5a, 0xab, 0xca, 0xa3, 0x8c, 0x73, 0x4d, 0x43, 0x1b, 0x90, 0xe5, 0x36, 0xa2, 0x28,
+	0x69, 0x86, 0x72, 0xbd, 0xeb, 0x4a, 0x19, 0x2e, 0x03, 0x83, 0x79, 0xe1, 0x00, 0x30, 0x3e, 0xb9,
+	0x9c, 0xe1, 0xdc, 0x39, 0xd2, 0xba, 0xd2, 0xd4, 0x8d, 0x0e, 0x45, 0x1a, 0x0a, 0x91, 0xae, 0xb1,
+	0xc2, 0x03, 0x23, 0xf9, 0xe4, 0x72, 0x86, 0x73, 0xaf, 0x69, 0x48, 0x82, 0x31, 0x0f, 0x89, 0xae,
+	0xf4, 0x2c, 0x53, 0xcb, 0xca, 0xc0, 0x8b, 0x98, 0xc3, 0x2c, 0x7b, 0x31, 0x1c, 0xcf, 0x9f, 0xa6,
+	0x93, 0x06, 0xc7, 0xcd, 0x32, 0x4f, 0xec, 0x6f, 0x78, 0x71, 0xdb, 0x34, 0x64, 0xcc, 0xb6, 0x61,
+	0xb0, 0x7c, 0x80, 0x66, 0x42, 0x19, 0x39, 0xf8, 0x46, 0x57, 0x20, 0x17, 0xcd, 0x6e, 0x58, 0x5e,
+	0x93, 0xad, 0x8c, 0x77, 0x5d, 0x69, 0x2c, 0xe2, 0x57, 0xe5, 0xb1, 0x88, 0xbf, 0x44, 0xcf, 0x42,
+	0xc1, 0x32, 0xeb, 0x6d, 0xe6, 0xb3, 0x38, 0x55, 0x96, 0x51, 0x15, 0xbb, 0xae, 0x94, 0x8b, 0xba,
+	0x40, 0x39, 0x67, 0x45, 0xbe, 0xd0, 0x39, 0x18, 0xd9, 0xd0, 0x35, 0x0d, 0x9b, 0x2c, 0x2b, 0xc9,
+	0xc8, 0xde, 0x17, 0x2a, 0xd1, 0x2c, 0x40, 0x51, 0x55, 0x9a, 0xf7, 0x50, 0x19, 0xc7, 0x58, 0x6d,
+	0xac, 0x0c, 0x7d, 0x4f, 0x80, 0xe9, 0x06, 0x36, 0xb1, 0xad, 0x38, 0x58, 0xab, 0x2b, 0xa4, 0xae,
+	0x6b, 0xd8, 0x74, 0x74, 0xa7, 0x53, 0x67, 0xaa, 0xc8, 0x31, 0x83, 0xc8, 0x77, 0x5d, 0x69, 0x69,
+	0x60, 0x23, 0xc4, 0x36, 0x52, 0xca, 0xaf, 0xf8, 0xcc, 0xaf, 0x92, 0x9a, 0xc7, 0x9a, 0x0d, 0xf0,
+	0xf3, 0x8d, 0xfe, 0x15, 0x68, 0x05, 0x1e, 0xe9, 0x2f, 0x50, 0x90, 0xf0, 0x5b, 0x2d, 0x1a, 0x30,
+	0xb2, 0xc4, 0x22, 0x2b, 0x3f, 0xdc, 0x87, 0x4f, 0x10, 0xca, 0xb3, 0x86, 0x48, 0x87, 0x89, 0x36,
+	0xc1, 0x24, 0x64, 0xa0, 0x6b, 0x44, 0x2c, 0xcc, 0xa6, 0x2f, 0xe5, 0x2b, 0x2f, 0x1d, 0x6e, 0xbe,
+	0x8c, 0x53, 0xbe, 0x3e, 0x5a, 0x4d, 0x23, 0x54, 0xe5, 0x9e, 0x8b, 0xb7, 0xa9, 0x69, 0x58, 0x3a,
+	0x90, 0x95, 0x63, 0x65, 0xe8, 0x45, 0x28, 0xb6, 0x1a, 0x75, 0xc5, 0x71, 0x6c, 0x7d, 0xad, 0xed,
+	0xe0, 0xba, 0xd9, 0x6e, 0xb2, 0xc0, 0x3f, 0x5f, 0x41, 0x5d, 0x57, 0x2a, 0xac, 0x34, 0xae, 0xfa,
+	0x55, 0x4b, 0xed, 0xa6, 0x5c, 0x68, 0xc5, 0xbe, 0xd1, 0x77, 0x04, 0x40, 0xa4, 0x43, 0x1c, 0xdc,
+	0xac, 0x7b, 0x33, 0x74, 0x53, 0x37, 0x35, 0x16, 0xf5, 0xe7, 0x2b, 0xf5, 0xae, 0x2b, 0x15, 0x57,
+	0x59, 0x2d, 0x9f, 0x6a, 0xd7, 0x75, 0x53, 0xbb, 0xeb, 0x4a, 0xaf, 0x1c, 0xd0, 0x78, 0x49, 0x56,
+	0x72, 0x91, 0x24, 0x4a, 0x90, 0x08, 0xa3, 0xdb, 0xba, 0xed, 0xb4, 0x15, 0x83, 0x65, 0x0b, 0x19,
+	0xd9, 0xff, 0x9c, 0x1f, 0xfa, 0x33, 0xf5, 0x5c, 0x1f, 0x01, 0xe4, 0xa2, 0xd1, 0xd3, 0xc9, 0xf8,
+	0x2f, 0x0d, 0x32, 0x2c, 0x26, 0xa3, 0x20, 0x29, 0x06, 0x52, 0xa3, 0x20, 0x4c, 0x02, 0x06, 0x32,
+	0x7f, 0x00, 0x10, 0x8f, 0x5a, 0x1e, 0x65, 0xac, 0x6b, 0x1a, 0x2a, 0xc1, 0x08, 0xdf, 0x90, 0x61,
+	0x2e, 0x32, 0x53, 0x81, 0xae, 0x2b, 0x8d, 0xf0, 0x48, 0x4d, 0xf6, 0x6a, 0x50, 0x1b, 0x0a, 0x9b,
+	0xb8, 0x53, 0x0f, 0xbc, 0x29, 0x11, 0x87, 0xd8, 0xc8, 0x5b, 0xa6, 0x93, 0xfa, 0x3a, 0xee, 0xf8,
+	0x2e, 0x91, 0x1c, 0xd6, 0xa5, 0xe6, 0x36, 0x03, 0x66, 0x1a, 0x41, 0xef, 0x0b, 0x30, 0x15, 0xc1,
+	0xd5, 0x74, 0x1b, 0xab, 0x6c, 0xd6, 0x0c, 0xcf, 0xa6, 0x2f, 0x15, 0xae, 0x3c, 0xb7, 0xbf, 0x1d,
+	0xc0, 0x72, 0xd5, 0xa7, 0xaf, 0x9c, 0xef, 0xba, 0xd2, 0x64, 0x20, 0x77, 0x50, 0x4e, 0x64, 0xb4,
+	0xd9, 0x53, 0x48, 0xa3, 0xe1, 0xb3, 0x54, 0x0a, 0xd2, 0x5e, 0x5f, 0xd7, 0xef, 0x44, 0x95, 0x30,
+	0xc2, 0x94, 0x70, 0xb3, 0xeb, 0x4a, 0xe8, 0x3a, 0xee, 0xac, 0xb2, 0xfa, 0x23, 0x53, 0x05, 0x15,
+	0x25, 0xc6, 0x52, 0x23, 0xc8, 0x01, 0x44, 0x36, 0x14, 0x5b, 0xc3, 0x5a, 0x5d, 0xc3, 0x44, 0xb5,
+	0xf5, 0x96, 0x63, 0xd9, 0xde, 0x06, 0x56, 0x32, 0xc1, 0xf5, 0x37, 0x7f, 0xbd, 0x49, 0xc0, 0xc9,
+	0xaa, 0x01, 0x55, 0xe5, 0x6c, 0xd7, 0x95, 0x26, 0x7a, 0x8a, 0xe5, 0x09, 0x92, 0x2c, 0x42, 0xef,
+	0xd1, 0xd9, 0xea, 0x58, 0xb6, 0x6e, 0x36, 0xa2, 0xbd, 0xcf, 0xb0, 0xde, 0xaf, 0xb2, 0xd9, 0xca,
+	0x6b, 0x8f, 0xac, 0xef, 0x45, 0x12, 0x63, 0xa8, 0x11, 0xf4, 0xa1, 0x00, 0x53, 0xd4, 0x01, 0x59,
+	0x44, 0x77, 0x70, 0x54, 0x8a, 0x6c, 0x68, 0x83, 0x05, 0xbf, 0xfe, 0xe8, 0x6c, 0xa0, 0x26, 0x58,
+	0x6a, 0x04, 0x5d, 0xa2, 0xb3, 0x72, 0x1b, 0xdb, 0x0e, 0xd6, 0xf8, 0x52, 0x55, 0xc9, 0xd1, 0xa5,
+	0xbe, 0xe6, 0x95, 0xc9, 0x41, 0x2d, 0x7a, 0x86, 0xfa, 0x51, 0x53, 0x6d, 0xdb, 0x34, 0x5e, 0x32,
+	0xf8, 0x3e, 0x59, 0x86, 0x2f, 0x84, 0x0b, 0x91, 0x72, 0x39, 0xd6, 0x0a, 0xdd, 0x86, 0x71, 0x62,
+	0xb5, 0x6d, 0xea, 0xe1, 0xfd, 0xc9, 0xcf, 0x17, 0x30, 0x3a, 0xd9, 0xf2, 0xab, 0xac, 0xea, 0x68,
+	0x5c, 0x40, 0x9e, 0x44, 0x98, 0x69, 0xa5, 0x19, 0xc8, 0x86, 0x83, 0x7e, 0x14, 0xd2, 0x57, 0x57,
+	0x17, 0x8a, 0x67, 0x50, 0x06, 0x86, 0xaa, 0x8b, 0xab, 0x0b, 0x45, 0xc1, 0x73, 0x85, 0x1f, 0x03,
+	0x14, 0xe2, 0xa9, 0xe3, 0xa9, 0x33, 0x3c, 0x11, 0x67, 0xf8, 0xc1, 0xbd, 0x9d, 0xe1, 0xfc, 0x7e,
+	0xcf, 0x28, 0x4e, 0xdd, 0xe1, 0xa9, 0x3b, 0x3c, 0x75, 0x87, 0x87, 0x75, 0x87, 0xbf, 0x49, 0x03,
+	0xea, 0x3d, 0x87, 0xbb, 0x0f, 0xf9, 0x6d, 0xea, 0x38, 0xf3, 0x5b, 0x03, 0xc6, 0x22, 0x79, 0x47,
+	0x24, 0x97, 0x86, 0x20, 0x6f, 0x38, 0x64, 0xa7, 0x80, 0x04, 0x09, 0x08, 0x7a, 0xdd, 0x4b, 0x61,
+	0x69, 0x22, 0x5d, 0x18, 0xe4, 0xc0, 0xa7, 0xd7, 0x00, 0x91, 0x93, 0x89, 0xd2, 0x63, 0x30, 0xc4,
+	0x72, 0xb2, 0x31, 0x18, 0xbd, 0xb9, 0x74, 0x7d, 0x69, 0xf9, 0xd6, 0x12, 0xb7, 0xe3, 0xcd, 0xd5,
+	0xc5, 0xd5, 0xa2, 0x40, 0x7f, 0x2d, 0xdf, 0x5a, 0x5a, 0x2d, 0xa6, 0x3c, 0x8b, 0xfe, 0x21, 0x0d,
+	0xc5, 0xe4, 0x46, 0x25, 0xfa, 0x7f, 0x18, 0x0f, 0x37, 0x26, 0x79, 0x56, 0x29, 0x30, 0xe9, 0xf6,
+	0xb5, 0x23, 0xca, 0x84, 0x8a, 0xec, 0x70, 0x32, 0xb1, 0x9e, 0x04, 0x14, 0x61, 0x6d, 0xd9, 0x9a,
+	0x6e, 0x2a, 0x06, 0x37, 0xa7, 0x3c, 0x11, 0xd6, 0x2c, 0xf3, 0x8a, 0xd8, 0xc8, 0x4a, 0x9f, 0xc4,
+	0x62, 0x3b, 0x74, 0x6c, 0x8b, 0xed, 0xa6, 0xbf, 0x37, 0xcf, 0x3c, 0xd7, 0x30, 0xf3, 0x5c, 0xaf,
+	0x75, 0x5d, 0x29, 0x7b, 0x64, 0x0e, 0x2b, 0xeb, 0x8f, 0x60, 0xe2, 0x19, 0xf7, 0x97, 0x69, 0x18,
+	0x4f, 0xec, 0x70, 0xfd, 0xa7, 0xd9, 0x16, 0xc1, 0x10, 0xdb, 0x3a, 0x1a, 0x62, 0x59, 0x3d, 0xfb,
+	0x4d, 0xcb, 0xd8, 0x56, 0x0d, 0xdf, 0x4e, 0x62, 0xbf, 0x13, 0xd6, 0x19, 0x39, 0x56, 0xeb, 0xa0,
+	0x8b, 0x90, 0xdd, 0x56, 0x0c, 0x5d, 0x53, 0xe8, 0x32, 0xc2, 0xb7, 0xa1, 0xc2, 0x02, 0xcf, 0x76,
+	0x5f, 0x87, 0x8c, 0x3f, 0xd1, 0x93, 0x0e, 0x49, 0x38, 0x56, 0x87, 0xe4, 0xe1, 0x7f, 0x98, 0x86,
+	0x89, 0x9e, 0x03, 0xfb, 0x07, 0xcd, 0xd3, 0xbf, 0x03, 0xf1, 0xed, 0xa0, 0x2a, 0x11, 0xd3, 0xcc,
+	0xf4, 0x2b, 0x5d, 0x57, 0x1a, 0xbf, 0x19, 0xaf, 0x3a, 0xca, 0x7d, 0xa7, 0x2a, 0x41, 0x0f, 0x27,
+	0xb6, 0x1b, 0xf9, 0x08, 0x8d, 0xee, 0x2e, 0x7a, 0x96, 0xd8, 0x82, 0xa1, 0x37, 0x75, 0x7c, 0xfb,
+	0x44, 0x74, 0xef, 0x41, 0xda, 0x30, 0xcc, 0xd8, 0x9e, 0x24, 0xe6, 0xef, 0x52, 0x70, 0x61, 0xd7,
+	0x43, 0xa3, 0x07, 0x6d, 0xe0, 0x7d, 0x0d, 0x46, 0xa9, 0xeb, 0x0d, 0x5d, 0xdf, 0x2b, 0x34, 0xf5,
+	0xa2, 0x5d, 0x3e, 0x6c, 0x67, 0x46, 0x28, 0xdf, 0x98, 0x52, 0x77, 0x3d, 0xf6, 0x3a, 0x55, 0xea,
+	0xc1, 0x94, 0xfa, 0xdb, 0x14, 0x88, 0xbb, 0x9d, 0xb4, 0x9e, 0xea, 0xf4, 0x60, 0x3a, 0xfd, 0x75,
+	0x0a, 0x26, 0xfb, 0x1c, 0x49, 0x9e, 0xaa, 0xf3, 0x60, 0xea, 0xfc, 0x51, 0x0a, 0x2e, 0xde, 0xeb,
+	0x6c, 0xf3, 0x64, 0xf4, 0xba, 0xcf, 0x80, 0xf0, 0xa4, 0x94, 0xf3, 0x85, 0x00, 0x13, 0x3d, 0xa7,
+	0xef, 0x27, 0xa3, 0x91, 0x93, 0xea, 0xe2, 0x9f, 0x86, 0x01, 0x22, 0x37, 0xfd, 0xd6, 0x21, 0x6b,
+	0xd9, 0x7a, 0x43, 0x37, 0xc3, 0xce, 0xd1, 0x14, 0x27, 0xb3, 0xcc, 0x0a, 0x0f, 0x0b, 0x9d, 0xe1,
+	0xbc, 0x6b, 0x1a, 0xba, 0x0d, 0x05, 0x0f, 0x87, 0x8f, 0xf8, 0x68, 0x38, 0x95, 0xe7, 0x60, 0x7c,
+	0x52, 0x1c, 0x3a, 0x9a, 0xce, 0x5b, 0x51, 0x6e, 0xc8, 0x82, 0x9c, 0xed, 0x8f, 0xed, 0x30, 0x8d,
+	0xa3, 0x01, 0xfc, 0x58, 0x30, 0xe6, 0x0f, 0xdb, 0xcd, 0xb1, 0x00, 0xa1, 0xa6, 0xa1, 0x6f, 0x0a,
+	0x30, 0x11, 0x22, 0xfa, 0xbd, 0x1d, 0x0e, 0x77, 0xc5, 0x02, 0xd8, 0x23, 0xea, 0x70, 0xd1, 0x4e,
+	0x30, 0x44, 0x0e, 0x64, 0x83, 0xb3, 0x67, 0x76, 0x00, 0x9e, 0xaf, 0xdc, 0x62, 0x46, 0xf5, 0x82,
+	0xa8, 0x43, 0x1c, 0x22, 0x86, 0x43, 0xe7, 0x2a, 0xdb, 0x11, 0x92, 0x33, 0xfe, 0xe9, 0xb5, 0x87,
+	0xaa, 0x61, 0x03, 0x3b, 0xfc, 0x08, 0x3d, 0x40, 0xad, 0xb2, 0xb2, 0x23, 0x46, 0xe5, 0x4c, 0x83,
+	0x34, 0x2e, 0x13, 0xa6, 0x71, 0xde, 0x48, 0xff, 0xc7, 0x30, 0x9c, 0xdf, 0xe5, 0x0a, 0xec, 0xe9,
+	0xb0, 0x3f, 0x1d, 0xf6, 0x0f, 0xec, 0xb0, 0x17, 0x60, 0x3c, 0x71, 0xfd, 0xf9, 0x64, 0xb7, 0x09,
+	0x10, 0x81, 0x02, 0xbb, 0x05, 0x5b, 0x0f, 0x56, 0x4d, 0x1e, 0x39, 0xbd, 0xce, 0xae, 0xbe, 0xd0,
+	0x9a, 0x23, 0x59, 0x3a, 0x73, 0x56, 0xc8, 0x4a, 0x2b, 0xfd, 0x3e, 0x05, 0x53, 0xfd, 0x2e, 0x9d,
+	0x9f, 0xcc, 0xea, 0xdd, 0x04, 0xd0, 0x02, 0xd0, 0x68, 0x77, 0xa3, 0xa2, 0x1c, 0x52, 0xc3, 0x21,
+	0x00, 0x6a, 0x80, 0x1f, 0x38, 0x56, 0x8f, 0xf3, 0x42, 0x57, 0xd5, 0x1b, 0x52, 0x1b, 0xde, 0xce,
+	0x71, 0x24, 0x46, 0x11, 0x8e, 0x25, 0x46, 0x29, 0xfd, 0x4d, 0x80, 0x11, 0x7e, 0xb1, 0x8f, 0xba,
+	0x68, 0xbe, 0xd1, 0x98, 0x70, 0xd1, 0xbc, 0xfa, 0xd0, 0x2e, 0x9a, 0xf3, 0xae, 0x69, 0xe8, 0x5d,
+	0x28, 0xfa, 0x8f, 0x8e, 0x9c, 0xe5, 0xb5, 0xb7, 0xb1, 0xea, 0xf8, 0x4e, 0xfa, 0x0d, 0xea, 0xb6,
+	0xaa, 0x89, 0xba, 0xc3, 0xc1, 0xf6, 0x40, 0x95, 0xfe, 0x25, 0x40, 0xc6, 0xbf, 0xd4, 0x48, 0xe7,
+	0xa9, 0x7f, 0x7d, 0x3f, 0x31, 0x4f, 0xfd, 0x26, 0x87, 0x9e, 0xa7, 0x3e, 0xff, 0xfb, 0xdf, 0xf3,
+	0x37, 0x20, 0xff, 0x9a, 0x4e, 0x9c, 0xe0, 0xb5, 0x01, 0xba, 0xe8, 0xf9, 0x34, 0x81, 0x5d, 0x94,
+	0xcb, 0x74, 0x5d, 0x69, 0x68, 0x49, 0x69, 0x62, 0x6f, 0x6f, 0xf6, 0xa2, 0xb7, 0x37, 0x9b, 0x9a,
+	0x4d, 0xfb, 0xb5, 0xec, 0xfa, 0x1c, 0x2b, 0xf5, 0x06, 0xea, 0x26, 0x8c, 0xcb, 0x8a, 0xd9, 0xc0,
+	0x01, 0x4f, 0xb2, 0x07, 0xd3, 0x73, 0x90, 0xba, 0x61, 0x79, 0x2c, 0x47, 0xba, 0xae, 0x94, 0xba,
+	0x61, 0xc9, 0xa9, 0x1b, 0x16, 0xa5, 0xba, 0x66, 0x5b, 0x4d, 0xa6, 0x0e, 0x8f, 0x8a, 0x7e, 0xcb,
+	0xec, 0x5f, 0x0f, 0xec, 0x8f, 0x69, 0xc8, 0x45, 0x9f, 0x4a, 0x3c, 0x60, 0xe7, 0xff, 0xeb, 0x3a,
+	0x36, 0x34, 0xe2, 0x69, 0x80, 0x9d, 0xff, 0x5f, 0x63, 0x25, 0xb2, 0x57, 0x83, 0x0c, 0x18, 0x37,
+	0x74, 0xe2, 0xd4, 0x83, 0x57, 0x1f, 0xfc, 0x02, 0xc0, 0xd8, 0x95, 0xb9, 0x01, 0xae, 0xfd, 0x47,
+	0x0d, 0xcf, 0xaf, 0xca, 0xc5, 0x8a, 0x88, 0x5c, 0x30, 0x62, 0xdf, 0x68, 0x0b, 0x8a, 0x36, 0x65,
+	0x10, 0x85, 0x1b, 0x66, 0x70, 0x03, 0x3c, 0x07, 0x4a, 0x0c, 0x8a, 0xca, 0x64, 0xd7, 0x95, 0x92,
+	0x23, 0x45, 0x1e, 0xb7, 0xe3, 0x05, 0x9e, 0x99, 0xff, 0x92, 0x82, 0x6c, 0xf0, 0x28, 0xe5, 0x84,
+	0x67, 0x68, 0xcc, 0x07, 0xa6, 0x8e, 0xcf, 0x07, 0xda, 0x90, 0x0f, 0x2f, 0x0e, 0x84, 0x29, 0xa8,
+	0xb7, 0x82, 0xf9, 0x15, 0x87, 0x5e, 0xb0, 0x43, 0x8c, 0xfe, 0xe7, 0x2f, 0xa5, 0x4f, 0x04, 0x18,
+	0xe6, 0x4f, 0xb0, 0x7a, 0x24, 0x12, 0x8e, 0x5f, 0xa2, 0x29, 0xff, 0xa5, 0x50, 0x8a, 0x89, 0xc4,
+	0x3f, 0x4a, 0xbf, 0xea, 0x79, 0xca, 0x73, 0x5f, 0x84, 0x9b, 0x86, 0x4c, 0x9b, 0x60, 0x9b, 0xa9,
+	0x8c, 0xcb, 0x17, 0x7c, 0xa3, 0x19, 0x80, 0x56, 0xf8, 0xd0, 0x88, 0xd9, 0x4e, 0x8e, 0x94, 0x94,
+	0x7e, 0x9a, 0x82, 0x8c, 0xff, 0xd0, 0xe6, 0xbe, 0x08, 0xff, 0x13, 0x21, 0x14, 0xc0, 0x7b, 0xb6,
+	0xfc, 0xc4, 0x3d, 0xef, 0xa5, 0xf8, 0x8d, 0x17, 0x2c, 0x73, 0x5d, 0x6f, 0xb0, 0x7b, 0x1c, 0x01,
+	0x83, 0xbb, 0xae, 0xb4, 0x78, 0xc0, 0x80, 0x3a, 0xce, 0x56, 0x0e, 0x58, 0x96, 0xfe, 0x29, 0x00,
+	0x84, 0x6f, 0x9d, 0x1e, 0xb4, 0xbd, 0x45, 0x7f, 0xaa, 0xa5, 0x7b, 0x92, 0x85, 0xbf, 0x0b, 0x90,
+	0x0d, 0x5e, 0x49, 0x3d, 0x48, 0x0b, 0xd8, 0xee, 0x5d, 0xfe, 0x61, 0x0a, 0x0a, 0xf1, 0xc7, 0x59,
+	0x27, 0xd3, 0xef, 0x3e, 0xc7, 0xeb, 0xa9, 0x63, 0x3d, 0x5e, 0x4f, 0xef, 0xb6, 0x9b, 0xda, 0xc7,
+	0xf3, 0x7a, 0xba, 0xf9, 0x72, 0x18, 0x8a, 0xde, 0xf9, 0x45, 0xe0, 0xee, 0xee, 0x8b, 0xc3, 0x50,
+	0x21, 0x8f, 0xef, 0xb4, 0x0c, 0x5d, 0xd5, 0x9d, 0xba, 0x6d, 0x19, 0xd8, 0x73, 0x1a, 0x2f, 0x26,
+	0x55, 0xb5, 0x65, 0xd0, 0x95, 0xb2, 0x9c, 0x94, 0x99, 0x5c, 0xb3, 0x6c, 0xd9, 0x32, 0x70, 0x79,
+	0xd1, 0x63, 0x42, 0x3f, 0x5e, 0x3d, 0x23, 0xe7, 0x70, 0xe4, 0x1b, 0x6d, 0x42, 0x7e, 0xdd, 0xb2,
+	0xeb, 0x8a, 0x61, 0x30, 0x0c, 0xe2, 0xfd, 0x95, 0x83, 0xc5, 0xfd, 0x82, 0x5c, 0xb3, 0xec, 0xab,
+	0x86, 0x41, 0x7f, 0x92, 0x15, 0x82, 0xdb, 0x9a, 0xe5, 0xa1, 0x8d, 0xad, 0x87, 0x15, 0xe8, 0x1b,
+	0x70, 0x36, 0xf4, 0xc8, 0xf5, 0x16, 0xb6, 0xeb, 0x16, 0x8b, 0x83, 0xbd, 0x98, 0xe9, 0xfa, 0xc0,
+	0x4f, 0xf8, 0x02, 0xfc, 0x72, 0x28, 0xc9, 0x0a, 0xb6, 0x79, 0x54, 0xcd, 0x5e, 0x41, 0xc9, 0x93,
+	0xad, 0xde, 0x9a, 0xe9, 0xb7, 0xe1, 0x9c, 0xc7, 0x81, 0x17, 0x84, 0x06, 0x5e, 0x89, 0x2d, 0x1f,
+	0x02, 0x93, 0x67, 0xdf, 0xef, 0x54, 0xa3, 0x0b, 0xce, 0xf4, 0x27, 0x02, 0x88, 0xbb, 0x49, 0x87,
+	0x8a, 0x90, 0xde, 0xc4, 0x1d, 0x3e, 0x8a, 0x64, 0xfa, 0x13, 0xd5, 0x61, 0x78, 0x5b, 0x31, 0xda,
+	0xbe, 0x95, 0x6b, 0x07, 0xd0, 0x45, 0xff, 0xae, 0xc9, 0x9c, 0xef, 0x7c, 0xea, 0x39, 0xa1, 0x32,
+	0x02, 0x43, 0xd4, 0xca, 0xa5, 0xbf, 0x0a, 0x30, 0xd9, 0xe7, 0x99, 0xd9, 0x83, 0x19, 0xd9, 0x3d,
+	0xfe, 0x72, 0xd4, 0xd9, 0xf9, 0xd7, 0xbf, 0x6a, 0x26, 0xbb, 0x53, 0x52, 0x3c, 0x83, 0xce, 0x01,
+	0xe2, 0x77, 0xbc, 0x6e, 0xe9, 0xce, 0x86, 0xd5, 0x76, 0x98, 0x1f, 0x2d, 0x0a, 0x28, 0x0b, 0xc3,
+	0xec, 0x90, 0xa8, 0x98, 0xaa, 0x3c, 0xfa, 0xe9, 0x97, 0x33, 0x67, 0x3e, 0xed, 0xce, 0x08, 0x9f,
+	0x75, 0x67, 0x84, 0xcf, 0xbb, 0x33, 0xc2, 0x17, 0xdd, 0x19, 0xe1, 0xfb, 0x5f, 0xcd, 0x9c, 0xf9,
+	0xec, 0xab, 0x99, 0x33, 0x9f, 0x7f, 0x35, 0x73, 0xe6, 0xad, 0x21, 0x6a, 0x92, 0xb5, 0x11, 0xf6,
+	0xc7, 0x50, 0x9e, 0xfe, 0x77, 0x00, 0x00, 0x00, 0xff, 0xff, 0x99, 0x6a, 0xf3, 0xb2, 0xc9, 0x45,
+	0x00, 0x00,
 }
 
 func (this *Column) Equal(that interface{}) bool {
@@ -7763,7 +7765,7 @@ func (m *Column) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.TableID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+				m.TableID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -7782,7 +7784,7 @@ func (m *Column) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.ColumnID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID(b&0x7F) << shift
+				m.ColumnID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -7801,7 +7803,7 @@ func (m *Column) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.FamilyID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.FamilyID(b&0x7F) << shift
+				m.FamilyID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.FamilyID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -8012,7 +8014,7 @@ func (m *Column) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.GeneratedAsIdentityType |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.GeneratedAsIdentityType(b&0x7F) << shift
+				m.GeneratedAsIdentityType |= github_com_cockroachdb_cockroach_pkg_sql_catalog_catpb.GeneratedAsIdentityType(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -8051,7 +8053,7 @@ func (m *Column) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 14:
 			if wireType == 0 {
-				var v github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID
+				var v github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID
 				for shift := uint(0); ; shift += 7 {
 					if shift >= 64 {
 						return ErrIntOverflowElements
@@ -8061,7 +8063,7 @@ func (m *Column) Unmarshal(dAtA []byte) error {
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					v |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+					v |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
@@ -8102,10 +8104,10 @@ func (m *Column) Unmarshal(dAtA []byte) error {
 				}
 				elementCount = count
 				if elementCount != 0 && len(m.UsesSequenceIds) == 0 {
-					m.UsesSequenceIds = make([]github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID, 0, elementCount)
+					m.UsesSequenceIds = make([]github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID, 0, elementCount)
 				}
 				for iNdEx < postIndex {
-					var v github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID
+					var v github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID
 					for shift := uint(0); ; shift += 7 {
 						if shift >= 64 {
 							return ErrIntOverflowElements
@@ -8115,7 +8117,7 @@ func (m *Column) Unmarshal(dAtA []byte) error {
 						}
 						b := dAtA[iNdEx]
 						iNdEx++
-						v |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+						v |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 						if b < 0x80 {
 							break
 						}
@@ -8190,7 +8192,7 @@ func (m *Column) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.SystemColumnKind |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.SystemColumnKind(b&0x7F) << shift
+				m.SystemColumnKind |= github_com_cockroachdb_cockroach_pkg_sql_catalog_catpb.SystemColumnKind(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -8279,7 +8281,7 @@ func (m *PrimaryIndex) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.TableID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+				m.TableID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -8298,7 +8300,7 @@ func (m *PrimaryIndex) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.IndexID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.IndexID(b&0x7F) << shift
+				m.IndexID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.IndexID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -8325,7 +8327,7 @@ func (m *PrimaryIndex) Unmarshal(dAtA []byte) error {
 			m.Unique = bool(v != 0)
 		case 4:
 			if wireType == 0 {
-				var v github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID
+				var v github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID
 				for shift := uint(0); ; shift += 7 {
 					if shift >= 64 {
 						return ErrIntOverflowElements
@@ -8335,7 +8337,7 @@ func (m *PrimaryIndex) Unmarshal(dAtA []byte) error {
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					v |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID(b&0x7F) << shift
+					v |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
@@ -8376,10 +8378,10 @@ func (m *PrimaryIndex) Unmarshal(dAtA []byte) error {
 				}
 				elementCount = count
 				if elementCount != 0 && len(m.KeyColumnIDs) == 0 {
-					m.KeyColumnIDs = make([]github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID, 0, elementCount)
+					m.KeyColumnIDs = make([]github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID, 0, elementCount)
 				}
 				for iNdEx < postIndex {
-					var v github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID
+					var v github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID
 					for shift := uint(0); ; shift += 7 {
 						if shift >= 64 {
 							return ErrIntOverflowElements
@@ -8389,7 +8391,7 @@ func (m *PrimaryIndex) Unmarshal(dAtA []byte) error {
 						}
 						b := dAtA[iNdEx]
 						iNdEx++
-						v |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID(b&0x7F) << shift
+						v |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID(b&0x7F) << shift
 						if b < 0x80 {
 							break
 						}
@@ -8470,7 +8472,7 @@ func (m *PrimaryIndex) Unmarshal(dAtA []byte) error {
 			}
 		case 6:
 			if wireType == 0 {
-				var v github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID
+				var v github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID
 				for shift := uint(0); ; shift += 7 {
 					if shift >= 64 {
 						return ErrIntOverflowElements
@@ -8480,7 +8482,7 @@ func (m *PrimaryIndex) Unmarshal(dAtA []byte) error {
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					v |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID(b&0x7F) << shift
+					v |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
@@ -8521,10 +8523,10 @@ func (m *PrimaryIndex) Unmarshal(dAtA []byte) error {
 				}
 				elementCount = count
 				if elementCount != 0 && len(m.KeySuffixColumnIDs) == 0 {
-					m.KeySuffixColumnIDs = make([]github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID, 0, elementCount)
+					m.KeySuffixColumnIDs = make([]github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID, 0, elementCount)
 				}
 				for iNdEx < postIndex {
-					var v github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID
+					var v github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID
 					for shift := uint(0); ; shift += 7 {
 						if shift >= 64 {
 							return ErrIntOverflowElements
@@ -8534,7 +8536,7 @@ func (m *PrimaryIndex) Unmarshal(dAtA []byte) error {
 						}
 						b := dAtA[iNdEx]
 						iNdEx++
-						v |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID(b&0x7F) << shift
+						v |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID(b&0x7F) << shift
 						if b < 0x80 {
 							break
 						}
@@ -8574,7 +8576,7 @@ func (m *PrimaryIndex) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.ShardedDescriptor == nil {
-				m.ShardedDescriptor = &descpb.ShardedDescriptor{}
+				m.ShardedDescriptor = &catpb.ShardedDescriptor{}
 			}
 			if err := m.ShardedDescriptor.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -8582,7 +8584,7 @@ func (m *PrimaryIndex) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 8:
 			if wireType == 0 {
-				var v github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID
+				var v github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID
 				for shift := uint(0); ; shift += 7 {
 					if shift >= 64 {
 						return ErrIntOverflowElements
@@ -8592,7 +8594,7 @@ func (m *PrimaryIndex) Unmarshal(dAtA []byte) error {
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					v |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID(b&0x7F) << shift
+					v |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
@@ -8633,10 +8635,10 @@ func (m *PrimaryIndex) Unmarshal(dAtA []byte) error {
 				}
 				elementCount = count
 				if elementCount != 0 && len(m.StoringColumnIDs) == 0 {
-					m.StoringColumnIDs = make([]github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID, 0, elementCount)
+					m.StoringColumnIDs = make([]github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID, 0, elementCount)
 				}
 				for iNdEx < postIndex {
-					var v github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID
+					var v github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID
 					for shift := uint(0); ; shift += 7 {
 						if shift >= 64 {
 							return ErrIntOverflowElements
@@ -8646,7 +8648,7 @@ func (m *PrimaryIndex) Unmarshal(dAtA []byte) error {
 						}
 						b := dAtA[iNdEx]
 						iNdEx++
-						v |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID(b&0x7F) << shift
+						v |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID(b&0x7F) << shift
 						if b < 0x80 {
 							break
 						}
@@ -8658,7 +8660,7 @@ func (m *PrimaryIndex) Unmarshal(dAtA []byte) error {
 			}
 		case 9:
 			if wireType == 0 {
-				var v github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID
+				var v github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID
 				for shift := uint(0); ; shift += 7 {
 					if shift >= 64 {
 						return ErrIntOverflowElements
@@ -8668,7 +8670,7 @@ func (m *PrimaryIndex) Unmarshal(dAtA []byte) error {
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					v |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID(b&0x7F) << shift
+					v |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
@@ -8709,10 +8711,10 @@ func (m *PrimaryIndex) Unmarshal(dAtA []byte) error {
 				}
 				elementCount = count
 				if elementCount != 0 && len(m.CompositeColumnIDs) == 0 {
-					m.CompositeColumnIDs = make([]github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID, 0, elementCount)
+					m.CompositeColumnIDs = make([]github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID, 0, elementCount)
 				}
 				for iNdEx < postIndex {
-					var v github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID
+					var v github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID
 					for shift := uint(0); ; shift += 7 {
 						if shift >= 64 {
 							return ErrIntOverflowElements
@@ -8722,7 +8724,7 @@ func (m *PrimaryIndex) Unmarshal(dAtA []byte) error {
 						}
 						b := dAtA[iNdEx]
 						iNdEx++
-						v |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID(b&0x7F) << shift
+						v |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID(b&0x7F) << shift
 						if b < 0x80 {
 							break
 						}
@@ -8786,7 +8788,7 @@ func (m *PrimaryIndex) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.SourceIndexID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.IndexID(b&0x7F) << shift
+				m.SourceIndexID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.IndexID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -8855,7 +8857,7 @@ func (m *SecondaryIndex) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.TableID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+				m.TableID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -8874,7 +8876,7 @@ func (m *SecondaryIndex) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.IndexID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.IndexID(b&0x7F) << shift
+				m.IndexID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.IndexID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -8901,7 +8903,7 @@ func (m *SecondaryIndex) Unmarshal(dAtA []byte) error {
 			m.Unique = bool(v != 0)
 		case 4:
 			if wireType == 0 {
-				var v github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID
+				var v github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID
 				for shift := uint(0); ; shift += 7 {
 					if shift >= 64 {
 						return ErrIntOverflowElements
@@ -8911,7 +8913,7 @@ func (m *SecondaryIndex) Unmarshal(dAtA []byte) error {
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					v |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID(b&0x7F) << shift
+					v |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
@@ -8952,10 +8954,10 @@ func (m *SecondaryIndex) Unmarshal(dAtA []byte) error {
 				}
 				elementCount = count
 				if elementCount != 0 && len(m.KeyColumnIDs) == 0 {
-					m.KeyColumnIDs = make([]github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID, 0, elementCount)
+					m.KeyColumnIDs = make([]github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID, 0, elementCount)
 				}
 				for iNdEx < postIndex {
-					var v github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID
+					var v github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID
 					for shift := uint(0); ; shift += 7 {
 						if shift >= 64 {
 							return ErrIntOverflowElements
@@ -8965,7 +8967,7 @@ func (m *SecondaryIndex) Unmarshal(dAtA []byte) error {
 						}
 						b := dAtA[iNdEx]
 						iNdEx++
-						v |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID(b&0x7F) << shift
+						v |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID(b&0x7F) << shift
 						if b < 0x80 {
 							break
 						}
@@ -9046,7 +9048,7 @@ func (m *SecondaryIndex) Unmarshal(dAtA []byte) error {
 			}
 		case 6:
 			if wireType == 0 {
-				var v github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID
+				var v github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID
 				for shift := uint(0); ; shift += 7 {
 					if shift >= 64 {
 						return ErrIntOverflowElements
@@ -9056,7 +9058,7 @@ func (m *SecondaryIndex) Unmarshal(dAtA []byte) error {
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					v |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID(b&0x7F) << shift
+					v |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
@@ -9097,10 +9099,10 @@ func (m *SecondaryIndex) Unmarshal(dAtA []byte) error {
 				}
 				elementCount = count
 				if elementCount != 0 && len(m.KeySuffixColumnIDs) == 0 {
-					m.KeySuffixColumnIDs = make([]github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID, 0, elementCount)
+					m.KeySuffixColumnIDs = make([]github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID, 0, elementCount)
 				}
 				for iNdEx < postIndex {
-					var v github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID
+					var v github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID
 					for shift := uint(0); ; shift += 7 {
 						if shift >= 64 {
 							return ErrIntOverflowElements
@@ -9110,7 +9112,7 @@ func (m *SecondaryIndex) Unmarshal(dAtA []byte) error {
 						}
 						b := dAtA[iNdEx]
 						iNdEx++
-						v |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID(b&0x7F) << shift
+						v |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID(b&0x7F) << shift
 						if b < 0x80 {
 							break
 						}
@@ -9150,7 +9152,7 @@ func (m *SecondaryIndex) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.ShardedDescriptor == nil {
-				m.ShardedDescriptor = &descpb.ShardedDescriptor{}
+				m.ShardedDescriptor = &catpb.ShardedDescriptor{}
 			}
 			if err := m.ShardedDescriptor.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -9158,7 +9160,7 @@ func (m *SecondaryIndex) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 8:
 			if wireType == 0 {
-				var v github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID
+				var v github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID
 				for shift := uint(0); ; shift += 7 {
 					if shift >= 64 {
 						return ErrIntOverflowElements
@@ -9168,7 +9170,7 @@ func (m *SecondaryIndex) Unmarshal(dAtA []byte) error {
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					v |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID(b&0x7F) << shift
+					v |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
@@ -9209,10 +9211,10 @@ func (m *SecondaryIndex) Unmarshal(dAtA []byte) error {
 				}
 				elementCount = count
 				if elementCount != 0 && len(m.StoringColumnIDs) == 0 {
-					m.StoringColumnIDs = make([]github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID, 0, elementCount)
+					m.StoringColumnIDs = make([]github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID, 0, elementCount)
 				}
 				for iNdEx < postIndex {
-					var v github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID
+					var v github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID
 					for shift := uint(0); ; shift += 7 {
 						if shift >= 64 {
 							return ErrIntOverflowElements
@@ -9222,7 +9224,7 @@ func (m *SecondaryIndex) Unmarshal(dAtA []byte) error {
 						}
 						b := dAtA[iNdEx]
 						iNdEx++
-						v |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID(b&0x7F) << shift
+						v |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID(b&0x7F) << shift
 						if b < 0x80 {
 							break
 						}
@@ -9234,7 +9236,7 @@ func (m *SecondaryIndex) Unmarshal(dAtA []byte) error {
 			}
 		case 9:
 			if wireType == 0 {
-				var v github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID
+				var v github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID
 				for shift := uint(0); ; shift += 7 {
 					if shift >= 64 {
 						return ErrIntOverflowElements
@@ -9244,7 +9246,7 @@ func (m *SecondaryIndex) Unmarshal(dAtA []byte) error {
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					v |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID(b&0x7F) << shift
+					v |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
@@ -9285,10 +9287,10 @@ func (m *SecondaryIndex) Unmarshal(dAtA []byte) error {
 				}
 				elementCount = count
 				if elementCount != 0 && len(m.CompositeColumnIDs) == 0 {
-					m.CompositeColumnIDs = make([]github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID, 0, elementCount)
+					m.CompositeColumnIDs = make([]github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID, 0, elementCount)
 				}
 				for iNdEx < postIndex {
-					var v github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID
+					var v github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID
 					for shift := uint(0); ; shift += 7 {
 						if shift >= 64 {
 							return ErrIntOverflowElements
@@ -9298,7 +9300,7 @@ func (m *SecondaryIndex) Unmarshal(dAtA []byte) error {
 						}
 						b := dAtA[iNdEx]
 						iNdEx++
-						v |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID(b&0x7F) << shift
+						v |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID(b&0x7F) << shift
 						if b < 0x80 {
 							break
 						}
@@ -9362,7 +9364,7 @@ func (m *SecondaryIndex) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.SourceIndexID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.IndexID(b&0x7F) << shift
+				m.SourceIndexID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.IndexID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -9431,7 +9433,7 @@ func (m *SequenceDependency) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.TableID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+				m.TableID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -9450,7 +9452,7 @@ func (m *SequenceDependency) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.ColumnID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID(b&0x7F) << shift
+				m.ColumnID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -9469,7 +9471,7 @@ func (m *SequenceDependency) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.SequenceID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+				m.SequenceID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -9595,7 +9597,7 @@ func (m *UniqueConstraint) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.TableID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+				m.TableID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -9614,14 +9616,14 @@ func (m *UniqueConstraint) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.IndexID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.IndexID(b&0x7F) << shift
+				m.IndexID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.IndexID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
 		case 5:
 			if wireType == 0 {
-				var v github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID
+				var v github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID
 				for shift := uint(0); ; shift += 7 {
 					if shift >= 64 {
 						return ErrIntOverflowElements
@@ -9631,7 +9633,7 @@ func (m *UniqueConstraint) Unmarshal(dAtA []byte) error {
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					v |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID(b&0x7F) << shift
+					v |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
@@ -9672,10 +9674,10 @@ func (m *UniqueConstraint) Unmarshal(dAtA []byte) error {
 				}
 				elementCount = count
 				if elementCount != 0 && len(m.ColumnIDs) == 0 {
-					m.ColumnIDs = make([]github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID, 0, elementCount)
+					m.ColumnIDs = make([]github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID, 0, elementCount)
 				}
 				for iNdEx < postIndex {
-					var v github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID
+					var v github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID
 					for shift := uint(0); ; shift += 7 {
 						if shift >= 64 {
 							return ErrIntOverflowElements
@@ -9685,7 +9687,7 @@ func (m *UniqueConstraint) Unmarshal(dAtA []byte) error {
 						}
 						b := dAtA[iNdEx]
 						iNdEx++
-						v |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID(b&0x7F) << shift
+						v |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID(b&0x7F) << shift
 						if b < 0x80 {
 							break
 						}
@@ -9797,7 +9799,7 @@ func (m *CheckConstraint) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.TableID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+				m.TableID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -9868,7 +9870,7 @@ func (m *CheckConstraint) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 6:
 			if wireType == 0 {
-				var v github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID
+				var v github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID
 				for shift := uint(0); ; shift += 7 {
 					if shift >= 64 {
 						return ErrIntOverflowElements
@@ -9878,7 +9880,7 @@ func (m *CheckConstraint) Unmarshal(dAtA []byte) error {
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					v |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID(b&0x7F) << shift
+					v |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
@@ -9919,10 +9921,10 @@ func (m *CheckConstraint) Unmarshal(dAtA []byte) error {
 				}
 				elementCount = count
 				if elementCount != 0 && len(m.ColumnIDs) == 0 {
-					m.ColumnIDs = make([]github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID, 0, elementCount)
+					m.ColumnIDs = make([]github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID, 0, elementCount)
 				}
 				for iNdEx < postIndex {
-					var v github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID
+					var v github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID
 					for shift := uint(0); ; shift += 7 {
 						if shift >= 64 {
 							return ErrIntOverflowElements
@@ -9932,7 +9934,7 @@ func (m *CheckConstraint) Unmarshal(dAtA []byte) error {
 						}
 						b := dAtA[iNdEx]
 						iNdEx++
-						v |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID(b&0x7F) << shift
+						v |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID(b&0x7F) << shift
 						if b < 0x80 {
 							break
 						}
@@ -10026,7 +10028,7 @@ func (m *Sequence) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.SequenceID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+				m.SequenceID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -10095,7 +10097,7 @@ func (m *DefaultExpression) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.TableID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+				m.TableID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -10114,14 +10116,14 @@ func (m *DefaultExpression) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.ColumnID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID(b&0x7F) << shift
+				m.ColumnID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
 		case 3:
 			if wireType == 0 {
-				var v github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID
+				var v github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID
 				for shift := uint(0); ; shift += 7 {
 					if shift >= 64 {
 						return ErrIntOverflowElements
@@ -10131,7 +10133,7 @@ func (m *DefaultExpression) Unmarshal(dAtA []byte) error {
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					v |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+					v |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
@@ -10172,10 +10174,10 @@ func (m *DefaultExpression) Unmarshal(dAtA []byte) error {
 				}
 				elementCount = count
 				if elementCount != 0 && len(m.UsesSequenceIDs) == 0 {
-					m.UsesSequenceIDs = make([]github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID, 0, elementCount)
+					m.UsesSequenceIDs = make([]github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID, 0, elementCount)
 				}
 				for iNdEx < postIndex {
-					var v github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID
+					var v github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID
 					for shift := uint(0); ; shift += 7 {
 						if shift >= 64 {
 							return ErrIntOverflowElements
@@ -10185,7 +10187,7 @@ func (m *DefaultExpression) Unmarshal(dAtA []byte) error {
 						}
 						b := dAtA[iNdEx]
 						iNdEx++
-						v |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+						v |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 						if b < 0x80 {
 							break
 						}
@@ -10291,7 +10293,7 @@ func (m *View) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.TableID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+				m.TableID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -10360,7 +10362,7 @@ func (m *Table) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.TableID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+				m.TableID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -10429,7 +10431,7 @@ func (m *OnUpdateExprTypeReference) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.TableID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+				m.TableID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -10448,7 +10450,7 @@ func (m *OnUpdateExprTypeReference) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.ColumnID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID(b&0x7F) << shift
+				m.ColumnID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -10467,7 +10469,7 @@ func (m *OnUpdateExprTypeReference) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.TypeID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+				m.TypeID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -10536,7 +10538,7 @@ func (m *ComputedExprTypeReference) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.TableID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+				m.TableID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -10555,7 +10557,7 @@ func (m *ComputedExprTypeReference) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.ColumnID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID(b&0x7F) << shift
+				m.ColumnID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -10574,7 +10576,7 @@ func (m *ComputedExprTypeReference) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.TypeID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+				m.TypeID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -10643,7 +10645,7 @@ func (m *DefaultExprTypeReference) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.TableID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+				m.TableID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -10662,7 +10664,7 @@ func (m *DefaultExprTypeReference) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.ColumnID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID(b&0x7F) << shift
+				m.ColumnID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -10681,7 +10683,7 @@ func (m *DefaultExprTypeReference) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.TypeID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+				m.TypeID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -10750,7 +10752,7 @@ func (m *ColumnTypeReference) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.TableID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+				m.TableID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -10769,7 +10771,7 @@ func (m *ColumnTypeReference) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.ColumnID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID(b&0x7F) << shift
+				m.ColumnID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -10788,7 +10790,7 @@ func (m *ColumnTypeReference) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.TypeID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+				m.TypeID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -10857,7 +10859,7 @@ func (m *CheckConstraintTypeReference) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.TableID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+				m.TableID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -10895,7 +10897,7 @@ func (m *CheckConstraintTypeReference) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.TypeID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+				m.TypeID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -10964,7 +10966,7 @@ func (m *ViewDependsOnType) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.TableID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+				m.TableID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -10983,7 +10985,7 @@ func (m *ViewDependsOnType) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.TypeID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+				m.TypeID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -11052,14 +11054,14 @@ func (m *ForeignKey) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.OriginID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+				m.OriginID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
 		case 3:
 			if wireType == 0 {
-				var v github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID
+				var v github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID
 				for shift := uint(0); ; shift += 7 {
 					if shift >= 64 {
 						return ErrIntOverflowElements
@@ -11069,7 +11071,7 @@ func (m *ForeignKey) Unmarshal(dAtA []byte) error {
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					v |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID(b&0x7F) << shift
+					v |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
@@ -11110,10 +11112,10 @@ func (m *ForeignKey) Unmarshal(dAtA []byte) error {
 				}
 				elementCount = count
 				if elementCount != 0 && len(m.OriginColumns) == 0 {
-					m.OriginColumns = make([]github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID, 0, elementCount)
+					m.OriginColumns = make([]github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID, 0, elementCount)
 				}
 				for iNdEx < postIndex {
-					var v github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID
+					var v github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID
 					for shift := uint(0); ; shift += 7 {
 						if shift >= 64 {
 							return ErrIntOverflowElements
@@ -11123,7 +11125,7 @@ func (m *ForeignKey) Unmarshal(dAtA []byte) error {
 						}
 						b := dAtA[iNdEx]
 						iNdEx++
-						v |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID(b&0x7F) << shift
+						v |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID(b&0x7F) << shift
 						if b < 0x80 {
 							break
 						}
@@ -11147,14 +11149,14 @@ func (m *ForeignKey) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.ReferenceID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+				m.ReferenceID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
 		case 5:
 			if wireType == 0 {
-				var v github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID
+				var v github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID
 				for shift := uint(0); ; shift += 7 {
 					if shift >= 64 {
 						return ErrIntOverflowElements
@@ -11164,7 +11166,7 @@ func (m *ForeignKey) Unmarshal(dAtA []byte) error {
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					v |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID(b&0x7F) << shift
+					v |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
@@ -11205,10 +11207,10 @@ func (m *ForeignKey) Unmarshal(dAtA []byte) error {
 				}
 				elementCount = count
 				if elementCount != 0 && len(m.ReferenceColumns) == 0 {
-					m.ReferenceColumns = make([]github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID, 0, elementCount)
+					m.ReferenceColumns = make([]github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID, 0, elementCount)
 				}
 				for iNdEx < postIndex {
-					var v github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID
+					var v github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID
 					for shift := uint(0); ; shift += 7 {
 						if shift >= 64 {
 							return ErrIntOverflowElements
@@ -11218,7 +11220,7 @@ func (m *ForeignKey) Unmarshal(dAtA []byte) error {
 						}
 						b := dAtA[iNdEx]
 						iNdEx++
-						v |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID(b&0x7F) << shift
+						v |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID(b&0x7F) << shift
 						if b < 0x80 {
 							break
 						}
@@ -11242,7 +11244,7 @@ func (m *ForeignKey) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.OnUpdate |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ForeignKeyReference_Action(b&0x7F) << shift
+				m.OnUpdate |= github_com_cockroachdb_cockroach_pkg_sql_catalog_catpb.ForeignKeyAction(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -11261,7 +11263,7 @@ func (m *ForeignKey) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.OnDelete |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ForeignKeyReference_Action(b&0x7F) << shift
+				m.OnDelete |= github_com_cockroachdb_cockroach_pkg_sql_catalog_catpb.ForeignKeyAction(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -11362,14 +11364,14 @@ func (m *ForeignKeyBackReference) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.OriginID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+				m.OriginID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
 		case 3:
 			if wireType == 0 {
-				var v github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID
+				var v github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID
 				for shift := uint(0); ; shift += 7 {
 					if shift >= 64 {
 						return ErrIntOverflowElements
@@ -11379,7 +11381,7 @@ func (m *ForeignKeyBackReference) Unmarshal(dAtA []byte) error {
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					v |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID(b&0x7F) << shift
+					v |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
@@ -11420,10 +11422,10 @@ func (m *ForeignKeyBackReference) Unmarshal(dAtA []byte) error {
 				}
 				elementCount = count
 				if elementCount != 0 && len(m.OriginColumns) == 0 {
-					m.OriginColumns = make([]github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID, 0, elementCount)
+					m.OriginColumns = make([]github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID, 0, elementCount)
 				}
 				for iNdEx < postIndex {
-					var v github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID
+					var v github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID
 					for shift := uint(0); ; shift += 7 {
 						if shift >= 64 {
 							return ErrIntOverflowElements
@@ -11433,7 +11435,7 @@ func (m *ForeignKeyBackReference) Unmarshal(dAtA []byte) error {
 						}
 						b := dAtA[iNdEx]
 						iNdEx++
-						v |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID(b&0x7F) << shift
+						v |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID(b&0x7F) << shift
 						if b < 0x80 {
 							break
 						}
@@ -11457,14 +11459,14 @@ func (m *ForeignKeyBackReference) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.ReferenceID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+				m.ReferenceID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
 		case 5:
 			if wireType == 0 {
-				var v github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID
+				var v github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID
 				for shift := uint(0); ; shift += 7 {
 					if shift >= 64 {
 						return ErrIntOverflowElements
@@ -11474,7 +11476,7 @@ func (m *ForeignKeyBackReference) Unmarshal(dAtA []byte) error {
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					v |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID(b&0x7F) << shift
+					v |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
@@ -11515,10 +11517,10 @@ func (m *ForeignKeyBackReference) Unmarshal(dAtA []byte) error {
 				}
 				elementCount = count
 				if elementCount != 0 && len(m.ReferenceColumns) == 0 {
-					m.ReferenceColumns = make([]github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID, 0, elementCount)
+					m.ReferenceColumns = make([]github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID, 0, elementCount)
 				}
 				for iNdEx < postIndex {
-					var v github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID
+					var v github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID
 					for shift := uint(0); ; shift += 7 {
 						if shift >= 64 {
 							return ErrIntOverflowElements
@@ -11528,7 +11530,7 @@ func (m *ForeignKeyBackReference) Unmarshal(dAtA []byte) error {
 						}
 						b := dAtA[iNdEx]
 						iNdEx++
-						v |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID(b&0x7F) << shift
+						v |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID(b&0x7F) << shift
 						if b < 0x80 {
 							break
 						}
@@ -11552,7 +11554,7 @@ func (m *ForeignKeyBackReference) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.OnUpdate |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ForeignKeyReference_Action(b&0x7F) << shift
+				m.OnUpdate |= github_com_cockroachdb_cockroach_pkg_sql_catalog_catpb.ForeignKeyAction(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -11571,7 +11573,7 @@ func (m *ForeignKeyBackReference) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.OnDelete |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ForeignKeyReference_Action(b&0x7F) << shift
+				m.OnDelete |= github_com_cockroachdb_cockroach_pkg_sql_catalog_catpb.ForeignKeyAction(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -11672,7 +11674,7 @@ func (m *SequenceOwnedBy) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.SequenceID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+				m.SequenceID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -11691,7 +11693,7 @@ func (m *SequenceOwnedBy) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.OwnerTableID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+				m.OwnerTableID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -11760,7 +11762,7 @@ func (m *RelationDependedOnBy) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.TableID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+				m.TableID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -11779,7 +11781,7 @@ func (m *RelationDependedOnBy) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.DependedOnBy |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+				m.DependedOnBy |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -11798,7 +11800,7 @@ func (m *RelationDependedOnBy) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.ColumnID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID(b&0x7F) << shift
+				m.ColumnID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -11867,7 +11869,7 @@ func (m *Type) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.TypeID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+				m.TypeID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -11936,14 +11938,14 @@ func (m *Schema) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.SchemaID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+				m.SchemaID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
 		case 3:
 			if wireType == 0 {
-				var v github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID
+				var v github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID
 				for shift := uint(0); ; shift += 7 {
 					if shift >= 64 {
 						return ErrIntOverflowElements
@@ -11953,7 +11955,7 @@ func (m *Schema) Unmarshal(dAtA []byte) error {
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					v |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+					v |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
@@ -11994,10 +11996,10 @@ func (m *Schema) Unmarshal(dAtA []byte) error {
 				}
 				elementCount = count
 				if elementCount != 0 && len(m.DependentObjects) == 0 {
-					m.DependentObjects = make([]github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID, 0, elementCount)
+					m.DependentObjects = make([]github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID, 0, elementCount)
 				}
 				for iNdEx < postIndex {
-					var v github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID
+					var v github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID
 					for shift := uint(0); ; shift += 7 {
 						if shift >= 64 {
 							return ErrIntOverflowElements
@@ -12007,7 +12009,7 @@ func (m *Schema) Unmarshal(dAtA []byte) error {
 						}
 						b := dAtA[iNdEx]
 						iNdEx++
-						v |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+						v |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 						if b < 0x80 {
 							break
 						}
@@ -12081,14 +12083,14 @@ func (m *Database) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.DatabaseID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+				m.DatabaseID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
 		case 3:
 			if wireType == 0 {
-				var v github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID
+				var v github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID
 				for shift := uint(0); ; shift += 7 {
 					if shift >= 64 {
 						return ErrIntOverflowElements
@@ -12098,7 +12100,7 @@ func (m *Database) Unmarshal(dAtA []byte) error {
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					v |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+					v |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
@@ -12139,10 +12141,10 @@ func (m *Database) Unmarshal(dAtA []byte) error {
 				}
 				elementCount = count
 				if elementCount != 0 && len(m.DependentObjects) == 0 {
-					m.DependentObjects = make([]github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID, 0, elementCount)
+					m.DependentObjects = make([]github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID, 0, elementCount)
 				}
 				for iNdEx < postIndex {
-					var v github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID
+					var v github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID
 					for shift := uint(0); ; shift += 7 {
 						if shift >= 64 {
 							return ErrIntOverflowElements
@@ -12152,7 +12154,7 @@ func (m *Database) Unmarshal(dAtA []byte) error {
 						}
 						b := dAtA[iNdEx]
 						iNdEx++
-						v |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+						v |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 						if b < 0x80 {
 							break
 						}
@@ -12486,7 +12488,7 @@ func (m *Partitioning) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.TableID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+				m.TableID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -12505,7 +12507,7 @@ func (m *Partitioning) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.IndexID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.IndexID(b&0x7F) << shift
+				m.IndexID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.IndexID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -12674,7 +12676,7 @@ func (m *Namespace) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.DatabaseID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+				m.DatabaseID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -12693,7 +12695,7 @@ func (m *Namespace) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.SchemaID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+				m.SchemaID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -12712,7 +12714,7 @@ func (m *Namespace) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.DescriptorID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+				m.DescriptorID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -12813,7 +12815,7 @@ func (m *Owner) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.DescriptorID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+				m.DescriptorID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -12914,7 +12916,7 @@ func (m *UserPrivileges) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.DescriptorID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+				m.DescriptorID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -13034,7 +13036,7 @@ func (m *Locality) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.DescriptorID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+				m.DescriptorID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -13069,7 +13071,7 @@ func (m *Locality) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Locality == nil {
-				m.Locality = &github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.TableDescriptor_LocalityConfig{}
+				m.Locality = &github_com_cockroachdb_cockroach_pkg_sql_catalog_catpb.LocalityConfig{}
 			}
 			if err := m.Locality.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -13139,7 +13141,7 @@ func (m *ColumnName) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.TableID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+				m.TableID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -13158,7 +13160,7 @@ func (m *ColumnName) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.ColumnID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ColumnID(b&0x7F) << shift
+				m.ColumnID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.ColumnID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -13259,7 +13261,7 @@ func (m *IndexName) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.TableID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+				m.TableID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -13278,7 +13280,7 @@ func (m *IndexName) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.IndexID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.IndexID(b&0x7F) << shift
+				m.IndexID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.IndexID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -13379,7 +13381,7 @@ func (m *ConstraintName) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.TableID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+				m.TableID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -13518,7 +13520,7 @@ func (m *DefaultPrivilege) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.DescriptorID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+				m.DescriptorID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -13856,7 +13858,7 @@ func (m *DatabaseSchemaEntry) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.DatabaseID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+				m.DatabaseID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -13875,7 +13877,7 @@ func (m *DatabaseSchemaEntry) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.SchemaID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID(b&0x7F) << shift
+				m.SchemaID |= github_com_cockroachdb_cockroach_pkg_sql_sem_catid.DescID(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
