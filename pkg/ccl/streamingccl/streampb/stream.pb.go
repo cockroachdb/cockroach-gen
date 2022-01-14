@@ -5,7 +5,9 @@ package streampb
 
 import (
 	fmt "fmt"
+	github_com_cockroachdb_cockroach_pkg_roachpb "github.com/cockroachdb/cockroach/pkg/roachpb"
 	roachpb "github.com/cockroachdb/cockroach/pkg/roachpb"
+	util "github.com/cockroachdb/cockroach/pkg/util"
 	hlc "github.com/cockroachdb/cockroach/pkg/util/hlc"
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
@@ -28,6 +30,42 @@ var _ = time.Kitchen
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
+
+type StreamReplicationStatus_StreamStatus int32
+
+const (
+	// Stream is running. Consumers should continue to heartbeat.
+	StreamReplicationStatus_STREAM_ACTIVE StreamReplicationStatus_StreamStatus = 0
+	// Stream stopped running. Consumers should stop heartbeating and
+	// optionally start a new replication stream.
+	StreamReplicationStatus_STREAM_INACTIVE StreamReplicationStatus_StreamStatus = 1
+	// Stream replication is paused. Consumers can resume the job and start heartbeating.
+	StreamReplicationStatus_STREAM_PAUSED StreamReplicationStatus_StreamStatus = 2
+	// Stream status is unknown. Consumers should retry heartbeating.
+	StreamReplicationStatus_UNKNOWN_STREAM_STATUS_RETRY StreamReplicationStatus_StreamStatus = 4
+)
+
+var StreamReplicationStatus_StreamStatus_name = map[int32]string{
+	0: "STREAM_ACTIVE",
+	1: "STREAM_INACTIVE",
+	2: "STREAM_PAUSED",
+	4: "UNKNOWN_STREAM_STATUS_RETRY",
+}
+
+var StreamReplicationStatus_StreamStatus_value = map[string]int32{
+	"STREAM_ACTIVE":               0,
+	"STREAM_INACTIVE":             1,
+	"STREAM_PAUSED":               2,
+	"UNKNOWN_STREAM_STATUS_RETRY": 4,
+}
+
+func (x StreamReplicationStatus_StreamStatus) String() string {
+	return proto.EnumName(StreamReplicationStatus_StreamStatus_name, int32(x))
+}
+
+func (StreamReplicationStatus_StreamStatus) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor_44eb106be4866a3a, []int{3, 0}
+}
 
 // StreamPartitionSpec is the stream partition specification.
 type StreamPartitionSpec struct {
@@ -108,6 +146,79 @@ func (m *StreamPartitionSpec_ExecutionConfig) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_StreamPartitionSpec_ExecutionConfig proto.InternalMessageInfo
 
+type ReplicationStreamSpec struct {
+	Partitions []ReplicationStreamSpec_Partition `protobuf:"bytes,1,rep,name=partitions,proto3" json:"partitions"`
+}
+
+func (m *ReplicationStreamSpec) Reset()         { *m = ReplicationStreamSpec{} }
+func (m *ReplicationStreamSpec) String() string { return proto.CompactTextString(m) }
+func (*ReplicationStreamSpec) ProtoMessage()    {}
+func (*ReplicationStreamSpec) Descriptor() ([]byte, []int) {
+	return fileDescriptor_44eb106be4866a3a, []int{1}
+}
+func (m *ReplicationStreamSpec) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ReplicationStreamSpec) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	b = b[:cap(b)]
+	n, err := m.MarshalToSizedBuffer(b)
+	if err != nil {
+		return nil, err
+	}
+	return b[:n], nil
+}
+func (m *ReplicationStreamSpec) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ReplicationStreamSpec.Merge(m, src)
+}
+func (m *ReplicationStreamSpec) XXX_Size() int {
+	return m.Size()
+}
+func (m *ReplicationStreamSpec) XXX_DiscardUnknown() {
+	xxx_messageInfo_ReplicationStreamSpec.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ReplicationStreamSpec proto.InternalMessageInfo
+
+type ReplicationStreamSpec_Partition struct {
+	// ID of the node this partition resides
+	NodeID github_com_cockroachdb_cockroach_pkg_roachpb.NodeID `protobuf:"varint,1,opt,name=node_id,json=nodeId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/roachpb.NodeID" json:"node_id,omitempty"`
+	// The SQL address of the node.
+	SQLAddress util.UnresolvedAddr `protobuf:"bytes,2,opt,name=sql_address,json=sqlAddress,proto3" json:"sql_address"`
+	// Locality of the node
+	Locality roachpb.Locality `protobuf:"bytes,3,opt,name=locality,proto3" json:"locality"`
+	// The spec of the processor responsible for streaming this partition
+	PartitionSpec *StreamPartitionSpec `protobuf:"bytes,4,opt,name=partition_spec,json=partitionSpec,proto3" json:"partition_spec,omitempty"`
+}
+
+func (m *ReplicationStreamSpec_Partition) Reset()         { *m = ReplicationStreamSpec_Partition{} }
+func (m *ReplicationStreamSpec_Partition) String() string { return proto.CompactTextString(m) }
+func (*ReplicationStreamSpec_Partition) ProtoMessage()    {}
+func (*ReplicationStreamSpec_Partition) Descriptor() ([]byte, []int) {
+	return fileDescriptor_44eb106be4866a3a, []int{1, 0}
+}
+func (m *ReplicationStreamSpec_Partition) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ReplicationStreamSpec_Partition) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	b = b[:cap(b)]
+	n, err := m.MarshalToSizedBuffer(b)
+	if err != nil {
+		return nil, err
+	}
+	return b[:n], nil
+}
+func (m *ReplicationStreamSpec_Partition) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ReplicationStreamSpec_Partition.Merge(m, src)
+}
+func (m *ReplicationStreamSpec_Partition) XXX_Size() int {
+	return m.Size()
+}
+func (m *ReplicationStreamSpec_Partition) XXX_DiscardUnknown() {
+	xxx_messageInfo_ReplicationStreamSpec_Partition.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ReplicationStreamSpec_Partition proto.InternalMessageInfo
+
 // StreamEvent describes a replication stream event
 type StreamEvent struct {
 	// Only 1 field ought to be set.
@@ -119,7 +230,7 @@ func (m *StreamEvent) Reset()         { *m = StreamEvent{} }
 func (m *StreamEvent) String() string { return proto.CompactTextString(m) }
 func (*StreamEvent) ProtoMessage()    {}
 func (*StreamEvent) Descriptor() ([]byte, []int) {
-	return fileDescriptor_44eb106be4866a3a, []int{1}
+	return fileDescriptor_44eb106be4866a3a, []int{2}
 }
 func (m *StreamEvent) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -152,7 +263,7 @@ func (m *StreamEvent_Batch) Reset()         { *m = StreamEvent_Batch{} }
 func (m *StreamEvent_Batch) String() string { return proto.CompactTextString(m) }
 func (*StreamEvent_Batch) ProtoMessage()    {}
 func (*StreamEvent_Batch) Descriptor() ([]byte, []int) {
-	return fileDescriptor_44eb106be4866a3a, []int{1, 0}
+	return fileDescriptor_44eb106be4866a3a, []int{2, 0}
 }
 func (m *StreamEvent_Batch) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -188,7 +299,7 @@ func (m *StreamEvent_SpanCheckpoint) Reset()         { *m = StreamEvent_SpanChec
 func (m *StreamEvent_SpanCheckpoint) String() string { return proto.CompactTextString(m) }
 func (*StreamEvent_SpanCheckpoint) ProtoMessage()    {}
 func (*StreamEvent_SpanCheckpoint) Descriptor() ([]byte, []int) {
-	return fileDescriptor_44eb106be4866a3a, []int{1, 1}
+	return fileDescriptor_44eb106be4866a3a, []int{2, 1}
 }
 func (m *StreamEvent_SpanCheckpoint) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -222,7 +333,7 @@ func (m *StreamEvent_StreamCheckpoint) Reset()         { *m = StreamEvent_Stream
 func (m *StreamEvent_StreamCheckpoint) String() string { return proto.CompactTextString(m) }
 func (*StreamEvent_StreamCheckpoint) ProtoMessage()    {}
 func (*StreamEvent_StreamCheckpoint) Descriptor() ([]byte, []int) {
-	return fileDescriptor_44eb106be4866a3a, []int{1, 2}
+	return fileDescriptor_44eb106be4866a3a, []int{2, 2}
 }
 func (m *StreamEvent_StreamCheckpoint) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -247,13 +358,53 @@ func (m *StreamEvent_StreamCheckpoint) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_StreamEvent_StreamCheckpoint proto.InternalMessageInfo
 
+type StreamReplicationStatus struct {
+	StreamStatus StreamReplicationStatus_StreamStatus `protobuf:"varint,1,opt,name=stream_status,json=streamStatus,proto3,enum=cockroach.ccl.streamingccl.StreamReplicationStatus_StreamStatus" json:"stream_status,omitempty"`
+	// Current protected timestamp for spans being replicated. It is absent
+	// when the replication stream is 'STOPPED'.
+	ProtectedTimestamp *hlc.Timestamp `protobuf:"bytes,2,opt,name=protected_timestamp,json=protectedTimestamp,proto3" json:"protected_timestamp,omitempty"`
+}
+
+func (m *StreamReplicationStatus) Reset()         { *m = StreamReplicationStatus{} }
+func (m *StreamReplicationStatus) String() string { return proto.CompactTextString(m) }
+func (*StreamReplicationStatus) ProtoMessage()    {}
+func (*StreamReplicationStatus) Descriptor() ([]byte, []int) {
+	return fileDescriptor_44eb106be4866a3a, []int{3}
+}
+func (m *StreamReplicationStatus) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *StreamReplicationStatus) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	b = b[:cap(b)]
+	n, err := m.MarshalToSizedBuffer(b)
+	if err != nil {
+		return nil, err
+	}
+	return b[:n], nil
+}
+func (m *StreamReplicationStatus) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_StreamReplicationStatus.Merge(m, src)
+}
+func (m *StreamReplicationStatus) XXX_Size() int {
+	return m.Size()
+}
+func (m *StreamReplicationStatus) XXX_DiscardUnknown() {
+	xxx_messageInfo_StreamReplicationStatus.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_StreamReplicationStatus proto.InternalMessageInfo
+
 func init() {
+	proto.RegisterEnum("cockroach.ccl.streamingccl.StreamReplicationStatus_StreamStatus", StreamReplicationStatus_StreamStatus_name, StreamReplicationStatus_StreamStatus_value)
 	proto.RegisterType((*StreamPartitionSpec)(nil), "cockroach.ccl.streamingccl.StreamPartitionSpec")
 	proto.RegisterType((*StreamPartitionSpec_ExecutionConfig)(nil), "cockroach.ccl.streamingccl.StreamPartitionSpec.ExecutionConfig")
+	proto.RegisterType((*ReplicationStreamSpec)(nil), "cockroach.ccl.streamingccl.ReplicationStreamSpec")
+	proto.RegisterType((*ReplicationStreamSpec_Partition)(nil), "cockroach.ccl.streamingccl.ReplicationStreamSpec.Partition")
 	proto.RegisterType((*StreamEvent)(nil), "cockroach.ccl.streamingccl.StreamEvent")
 	proto.RegisterType((*StreamEvent_Batch)(nil), "cockroach.ccl.streamingccl.StreamEvent.Batch")
 	proto.RegisterType((*StreamEvent_SpanCheckpoint)(nil), "cockroach.ccl.streamingccl.StreamEvent.SpanCheckpoint")
 	proto.RegisterType((*StreamEvent_StreamCheckpoint)(nil), "cockroach.ccl.streamingccl.StreamEvent.StreamCheckpoint")
+	proto.RegisterType((*StreamReplicationStatus)(nil), "cockroach.ccl.streamingccl.StreamReplicationStatus")
 }
 
 func init() {
@@ -261,44 +412,65 @@ func init() {
 }
 
 var fileDescriptor_44eb106be4866a3a = []byte{
-	// 583 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x54, 0xcf, 0x6e, 0xd3, 0x4e,
-	0x10, 0x8e, 0x9b, 0xa6, 0x6a, 0xb7, 0xfa, 0xfd, 0x8a, 0x16, 0x54, 0x8c, 0x11, 0x6e, 0xd5, 0x43,
-	0x55, 0x21, 0xb1, 0x16, 0xad, 0x84, 0x7a, 0x03, 0x5c, 0x5a, 0x09, 0x71, 0xa9, 0x1c, 0x84, 0x10,
-	0x52, 0x65, 0xad, 0xb7, 0x1b, 0x67, 0x95, 0xf5, 0xae, 0xb1, 0xd7, 0x15, 0xe9, 0x03, 0x70, 0xe6,
-	0xc8, 0xf3, 0x70, 0xca, 0xb1, 0xe2, 0xd4, 0x13, 0x7f, 0x92, 0x0b, 0x8f, 0x81, 0xbc, 0x5e, 0xc7,
-	0x69, 0x55, 0xd4, 0xdc, 0x66, 0x76, 0xe6, 0x9b, 0x99, 0x6f, 0xe6, 0xb3, 0xc1, 0x36, 0x21, 0xdc,
-	0xcb, 0x55, 0x46, 0x71, 0xc2, 0x44, 0xdc, 0x38, 0x69, 0x64, 0x0c, 0x94, 0x66, 0x52, 0x49, 0xe8,
-	0x10, 0x49, 0x06, 0x99, 0xc4, 0xa4, 0x8f, 0x08, 0xe1, 0x68, 0x16, 0xe1, 0x40, 0xfd, 0x9e, 0x46,
-	0xde, 0x29, 0x56, 0xb8, 0xca, 0x77, 0xec, 0x42, 0x31, 0xee, 0xf5, 0x39, 0xf1, 0x14, 0x4b, 0x68,
-	0xae, 0x70, 0x92, 0x9a, 0xc8, 0xbd, 0x58, 0xc6, 0x52, 0x9b, 0x5e, 0x69, 0x99, 0x57, 0x37, 0x96,
-	0x32, 0xe6, 0xd4, 0xd3, 0x5e, 0x54, 0xf4, 0xbc, 0xd3, 0x22, 0xc3, 0x8a, 0x49, 0x51, 0xc5, 0xb7,
-	0xbe, 0xb5, 0xc1, 0xdd, 0xae, 0x6e, 0x7a, 0x8c, 0x33, 0xc5, 0xca, 0x48, 0x37, 0xa5, 0x04, 0xfa,
-	0x00, 0xe4, 0x0a, 0x67, 0x2a, 0xec, 0x65, 0x32, 0xb1, 0xad, 0x4d, 0x6b, 0x67, 0x75, 0xf7, 0x11,
-	0x6a, 0x86, 0x2d, 0xc7, 0x40, 0x7d, 0x4e, 0xd0, 0xdb, 0x7a, 0x0c, 0x7f, 0x71, 0xf4, 0x63, 0xa3,
-	0x15, 0xac, 0x68, 0xd8, 0x51, 0x26, 0x13, 0xb8, 0x07, 0x3a, 0x79, 0x8a, 0x45, 0x6e, 0x2f, 0x6c,
-	0xb6, 0x77, 0x56, 0x77, 0xef, 0xcf, 0xc0, 0x0d, 0x33, 0xd4, 0x4d, 0xb1, 0x30, 0xc0, 0x2a, 0x17,
-	0x9e, 0x80, 0x25, 0x22, 0x45, 0x8f, 0xc5, 0x76, 0x5b, 0x37, 0x7d, 0x8e, 0xfe, 0xbd, 0x21, 0x74,
-	0xc3, 0xe4, 0xe8, 0xf0, 0x13, 0x25, 0x45, 0xe9, 0x1d, 0xe8, 0x32, 0xa6, 0xba, 0x29, 0xea, 0x7c,
-	0xb7, 0xc0, 0xda, 0xb5, 0x0c, 0xb8, 0x0f, 0x6c, 0x26, 0x98, 0x62, 0x98, 0x87, 0x39, 0xc1, 0x22,
-	0x4c, 0x71, 0x86, 0x39, 0xa7, 0x9c, 0xe5, 0x15, 0xf3, 0x4e, 0xb0, 0x6e, 0xe2, 0x5d, 0x82, 0xc5,
-	0x71, 0x13, 0x85, 0x27, 0xc0, 0x4e, 0x98, 0x08, 0x49, 0x9f, 0x92, 0x41, 0x2a, 0x99, 0x28, 0xd7,
-	0x45, 0x3f, 0x16, 0x54, 0x90, 0xa1, 0xbd, 0xa0, 0xc7, 0x7f, 0x80, 0xaa, 0x03, 0xa0, 0xfa, 0x00,
-	0xe8, 0x95, 0x39, 0x80, 0xbf, 0x5c, 0x0e, 0xf6, 0xf5, 0xe7, 0x86, 0x15, 0xac, 0x27, 0x4c, 0x1c,
-	0x4c, 0x6b, 0x1c, 0xd5, 0x25, 0xe0, 0x36, 0x58, 0x8b, 0xb0, 0x22, 0xfd, 0x30, 0x1a, 0x2a, 0x1a,
-	0xe6, 0xec, 0x9c, 0xea, 0xa5, 0xb4, 0x83, 0xff, 0xf4, 0xb3, 0x3f, 0x54, 0xb4, 0xcb, 0xce, 0xe9,
-	0xd6, 0x9f, 0x36, 0x58, 0xad, 0x56, 0x71, 0x78, 0x46, 0x85, 0x82, 0x07, 0xa0, 0xa3, 0x13, 0xcc,
-	0xdd, 0x9e, 0xdc, 0xbe, 0x42, 0x8d, 0x43, 0x7e, 0x09, 0x0a, 0x2a, 0x2c, 0x7c, 0x0f, 0x40, 0xc3,
-	0xcb, 0xb0, 0xd9, 0x9f, 0xb7, 0x52, 0x65, 0x37, 0x9c, 0x82, 0x99, 0x5a, 0xce, 0x6b, 0xd0, 0xd1,
-	0x9d, 0xe0, 0x0b, 0x00, 0x06, 0x74, 0x18, 0x9e, 0x61, 0x5e, 0xd0, 0xdc, 0xb6, 0xb4, 0x4a, 0x1e,
-	0xde, 0xa0, 0x92, 0x37, 0x74, 0xf8, 0xae, 0xcc, 0xa9, 0x25, 0x36, 0x30, 0x7e, 0xee, 0x7c, 0xb6,
-	0xc0, 0xff, 0xa5, 0x86, 0x9a, 0x4e, 0xf0, 0x29, 0x58, 0x2c, 0x95, 0x64, 0xb8, 0xdf, 0x22, 0x3a,
-	0x9d, 0x0a, 0x5f, 0x82, 0x95, 0xe9, 0xd7, 0x64, 0x98, 0xce, 0xa7, 0xf5, 0x29, 0xca, 0xe9, 0x81,
-	0x3b, 0xd7, 0x39, 0xc3, 0xa0, 0xd6, 0x7f, 0xc5, 0xec, 0xd9, 0xdc, 0xcb, 0xbb, 0x42, 0xe8, 0xca,
-	0xe7, 0xe1, 0x3f, 0x1e, 0xfd, 0x76, 0x5b, 0xa3, 0xb1, 0x6b, 0x5d, 0x8c, 0x5d, 0xeb, 0x72, 0xec,
-	0x5a, 0xbf, 0xc6, 0xae, 0xf5, 0x65, 0xe2, 0xb6, 0x2e, 0x26, 0x6e, 0xeb, 0x72, 0xe2, 0xb6, 0x3e,
-	0x2c, 0xd7, 0x3f, 0x9a, 0x68, 0x49, 0x6b, 0x6e, 0xef, 0x6f, 0x00, 0x00, 0x00, 0xff, 0xff, 0xf5,
-	0xf9, 0xbe, 0xc6, 0x8c, 0x04, 0x00, 0x00,
+	// 921 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x55, 0x4f, 0x6f, 0x1b, 0x45,
+	0x14, 0xf7, 0xda, 0x49, 0x48, 0x5e, 0xea, 0x24, 0x9d, 0x40, 0x6a, 0x5c, 0xb1, 0xae, 0x7c, 0xa8,
+	0x2a, 0x24, 0x76, 0x45, 0x22, 0xa1, 0x4a, 0x08, 0x51, 0x3b, 0x71, 0x25, 0xab, 0xc5, 0x84, 0x5d,
+	0xa7, 0x40, 0xa5, 0x6a, 0x35, 0x9e, 0x9d, 0xd8, 0x83, 0xd7, 0x3b, 0x9b, 0x9d, 0x71, 0x84, 0xfb,
+	0x01, 0x38, 0x73, 0xe4, 0xc3, 0x70, 0xe2, 0x94, 0x63, 0xc5, 0xa9, 0x27, 0x03, 0x8e, 0x84, 0xf8,
+	0x0c, 0x9c, 0xd0, 0xce, 0xce, 0xae, 0x9d, 0x10, 0x48, 0x72, 0x9b, 0xf7, 0xe7, 0xf7, 0x9b, 0xf7,
+	0x7e, 0xf3, 0xf6, 0x2d, 0x3c, 0x24, 0x24, 0xb0, 0x85, 0x8c, 0x29, 0x1e, 0xb1, 0xb0, 0x3f, 0x37,
+	0xa2, 0x9e, 0x3e, 0x58, 0x51, 0xcc, 0x25, 0x47, 0x55, 0xc2, 0xc9, 0x30, 0xe6, 0x98, 0x0c, 0x2c,
+	0x42, 0x02, 0x6b, 0x11, 0x51, 0x45, 0xca, 0x1f, 0xf5, 0x6c, 0x1f, 0x4b, 0x9c, 0xe6, 0x57, 0x77,
+	0x32, 0xdf, 0x88, 0x4a, 0xbc, 0xe0, 0xaf, 0x8c, 0x25, 0x0b, 0xec, 0x41, 0x40, 0x6c, 0xc9, 0x46,
+	0x54, 0x48, 0x3c, 0x8a, 0x74, 0xa4, 0xaa, 0x22, 0xe3, 0x30, 0xa6, 0x82, 0x07, 0xa7, 0xd4, 0xf7,
+	0xb0, 0xef, 0xc7, 0x3a, 0xf6, 0x6e, 0x9f, 0xf7, 0xb9, 0x3a, 0xda, 0xc9, 0x49, 0x7b, 0xcd, 0x3e,
+	0xe7, 0xfd, 0x80, 0xda, 0xca, 0xea, 0x8d, 0x8f, 0x6d, 0x7f, 0x1c, 0x63, 0xc9, 0x78, 0x98, 0xc6,
+	0xeb, 0xbf, 0x94, 0x60, 0xdb, 0x55, 0x85, 0x1e, 0xe2, 0x58, 0xb2, 0x24, 0xe2, 0x46, 0x94, 0xa0,
+	0x26, 0x80, 0x90, 0x38, 0x96, 0xde, 0x71, 0xcc, 0x47, 0x15, 0xe3, 0x81, 0xf1, 0x68, 0x7d, 0xf7,
+	0x03, 0x6b, 0xde, 0x60, 0x52, 0x88, 0x35, 0x08, 0x88, 0xd5, 0xcd, 0x4a, 0x6c, 0x2e, 0x9d, 0x4d,
+	0x6b, 0x05, 0x67, 0x4d, 0xc1, 0x9e, 0xc6, 0x7c, 0x84, 0xf6, 0x60, 0x59, 0x44, 0x38, 0x14, 0x95,
+	0xe2, 0x83, 0xd2, 0xa3, 0xf5, 0xdd, 0x7b, 0x0b, 0x70, 0xdd, 0xb9, 0xe5, 0x46, 0x38, 0xd4, 0xc0,
+	0x34, 0x17, 0xbd, 0x82, 0x15, 0xc2, 0xc3, 0x63, 0xd6, 0xaf, 0x94, 0xd4, 0xa5, 0x9f, 0x5b, 0xff,
+	0xad, 0xaa, 0x75, 0x45, 0xe5, 0x56, 0xeb, 0x7b, 0x4a, 0xc6, 0x89, 0xb5, 0xaf, 0x68, 0x34, 0xbb,
+	0x26, 0xad, 0xfe, 0x6a, 0xc0, 0xe6, 0xa5, 0x0c, 0xf4, 0x18, 0x2a, 0x2c, 0x64, 0x92, 0xe1, 0xc0,
+	0x13, 0x04, 0x87, 0x5e, 0x84, 0x63, 0x1c, 0x04, 0x34, 0x60, 0x22, 0xed, 0x7c, 0xd9, 0xd9, 0xd1,
+	0x71, 0x97, 0xe0, 0xf0, 0x70, 0x1e, 0x45, 0xaf, 0xa0, 0x32, 0x62, 0xa1, 0x47, 0x06, 0x94, 0x0c,
+	0x23, 0xce, 0xc2, 0x44, 0x2e, 0x7a, 0x32, 0xa6, 0x21, 0x99, 0x54, 0x8a, 0xaa, 0xfc, 0xf7, 0xad,
+	0xf4, 0x01, 0xac, 0xec, 0x01, 0xac, 0x03, 0xfd, 0x00, 0xcd, 0xd5, 0xa4, 0xb0, 0x9f, 0x7e, 0xab,
+	0x19, 0xce, 0xce, 0x88, 0x85, 0xfb, 0x39, 0xc7, 0xd3, 0x8c, 0x02, 0x3d, 0x84, 0xcd, 0x1e, 0x96,
+	0x64, 0xe0, 0xf5, 0x26, 0x92, 0x7a, 0x82, 0xbd, 0xa6, 0x4a, 0x94, 0x92, 0x53, 0x56, 0xee, 0xe6,
+	0x44, 0x52, 0x97, 0xbd, 0xa6, 0xf5, 0xf3, 0x12, 0xbc, 0xe7, 0xd0, 0x28, 0x60, 0x44, 0x31, 0xa7,
+	0xaa, 0xa8, 0x67, 0xc4, 0x00, 0x51, 0xa6, 0x8e, 0xa8, 0x18, 0xea, 0x1d, 0x3e, 0xfd, 0x3f, 0x45,
+	0xaf, 0xa4, 0xb1, 0x72, 0x85, 0xb5, 0x9a, 0x0b, 0xa4, 0xd5, 0x3f, 0x8b, 0xb0, 0x96, 0xc7, 0xd1,
+	0x4b, 0x78, 0x27, 0xe4, 0x3e, 0xf5, 0x98, 0x9f, 0x4a, 0xd7, 0x6c, 0xcc, 0xa6, 0xb5, 0x95, 0x0e,
+	0xf7, 0x69, 0xfb, 0xe0, 0xef, 0x69, 0x6d, 0xaf, 0xcf, 0xe4, 0x60, 0xdc, 0xb3, 0x08, 0x1f, 0xd9,
+	0x79, 0x15, 0x7e, 0x6f, 0x7e, 0xb6, 0xa3, 0x61, 0xdf, 0xce, 0xa6, 0x23, 0x85, 0x39, 0x2b, 0x09,
+	0x63, 0xdb, 0x47, 0x2e, 0xac, 0x8b, 0x93, 0x40, 0xcd, 0x3c, 0x15, 0x42, 0x0b, 0x6c, 0x5e, 0x1e,
+	0xca, 0xa3, 0xfc, 0xeb, 0x68, 0xf8, 0x7e, 0xdc, 0x44, 0x49, 0xc1, 0xb3, 0x69, 0x0d, 0xdc, 0xaf,
+	0x9e, 0x37, 0x52, 0xa4, 0x03, 0xe2, 0x24, 0xd0, 0x67, 0xf4, 0x19, 0xac, 0x06, 0x9c, 0xe0, 0x80,
+	0xc9, 0x89, 0x9e, 0xb8, 0xfb, 0x57, 0xcc, 0xe9, 0x73, 0x9d, 0xa2, 0xfb, 0xcf, 0x21, 0x88, 0xc1,
+	0x46, 0xae, 0x85, 0x27, 0x22, 0x4a, 0x2a, 0x4b, 0x8a, 0xc4, 0xbe, 0xe5, 0xd8, 0x36, 0xef, 0xce,
+	0xa6, 0xb5, 0xf2, 0x05, 0x97, 0x53, 0x8e, 0x16, 0xcd, 0xfa, 0x5f, 0x25, 0x58, 0x4f, 0x91, 0xad,
+	0x53, 0x1a, 0x4a, 0xb4, 0x0f, 0xcb, 0x6a, 0x0c, 0xf4, 0xd7, 0xf9, 0xd1, 0xf5, 0x37, 0x2a, 0x9c,
+	0xd5, 0x4c, 0x40, 0x4e, 0x8a, 0x45, 0xdf, 0x00, 0xcc, 0xa7, 0x57, 0x4b, 0xfa, 0xf8, 0xa6, 0x4c,
+	0xe9, 0x79, 0x3e, 0xb9, 0xce, 0x02, 0x57, 0xb5, 0x0d, 0xcb, 0xea, 0x26, 0xf4, 0x04, 0x60, 0x48,
+	0x27, 0xde, 0x29, 0x0e, 0xc6, 0x34, 0x9b, 0xc1, 0xab, 0x34, 0x7e, 0x46, 0x27, 0x2f, 0x92, 0x9c,
+	0x6c, 0x91, 0x0c, 0xb5, 0x2d, 0xaa, 0x3f, 0x18, 0xb0, 0x91, 0x6c, 0x8a, 0xf9, 0x4d, 0xe8, 0x63,
+	0x58, 0x4a, 0xf6, 0x85, 0xee, 0xfd, 0x9a, 0xd5, 0xa2, 0x52, 0x51, 0x03, 0xd6, 0xf2, 0x7d, 0xaa,
+	0x3b, 0xbd, 0xd9, 0x46, 0xcb, 0x51, 0xd5, 0x63, 0xd8, 0xba, 0xdc, 0x33, 0x72, 0xb2, 0x2d, 0x97,
+	0x76, 0xf6, 0xc9, 0x8d, 0xc5, 0xbb, 0xd0, 0xd0, 0x85, 0x25, 0x58, 0xff, 0xb9, 0x08, 0xf7, 0xd2,
+	0xdc, 0x0b, 0xdf, 0x23, 0x96, 0x63, 0x81, 0x28, 0x94, 0x53, 0x4e, 0x4f, 0x28, 0x87, 0x92, 0x60,
+	0x63, 0xf7, 0xc9, 0xf5, 0xf7, 0xfe, 0x8b, 0x4b, 0xfb, 0x53, 0xc3, 0xb9, 0x23, 0x16, 0x2c, 0xd4,
+	0x81, 0xed, 0x64, 0x65, 0x51, 0x22, 0xa9, 0xef, 0xdd, 0x4e, 0x37, 0x07, 0xe5, 0xc8, 0xdc, 0x57,
+	0xff, 0x0e, 0xee, 0x2c, 0xde, 0x86, 0xee, 0x42, 0xd9, 0xed, 0x3a, 0xad, 0xc6, 0x17, 0x5e, 0x63,
+	0xbf, 0xdb, 0x7e, 0xd1, 0xda, 0x2a, 0xa0, 0x6d, 0xd8, 0xd4, 0xae, 0x76, 0x47, 0x3b, 0x8d, 0x85,
+	0xbc, 0xc3, 0xc6, 0x91, 0xdb, 0x3a, 0xd8, 0x2a, 0xa2, 0x1a, 0xdc, 0x3f, 0xea, 0x3c, 0xeb, 0x7c,
+	0xf9, 0x75, 0xc7, 0xd3, 0x21, 0xb7, 0xdb, 0xe8, 0x1e, 0xb9, 0x9e, 0xd3, 0xea, 0x3a, 0xdf, 0x6e,
+	0x2d, 0x35, 0x3f, 0x3c, 0xfb, 0xc3, 0x2c, 0x9c, 0xcd, 0x4c, 0xe3, 0xcd, 0xcc, 0x34, 0xde, 0xce,
+	0x4c, 0xe3, 0xf7, 0x99, 0x69, 0xfc, 0x78, 0x6e, 0x16, 0xde, 0x9c, 0x9b, 0x85, 0xb7, 0xe7, 0x66,
+	0xe1, 0xe5, 0x6a, 0xf6, 0x07, 0xef, 0xad, 0xa8, 0xc5, 0xbc, 0xf7, 0x4f, 0x00, 0x00, 0x00, 0xff,
+	0xff, 0xe2, 0x00, 0x16, 0x3f, 0xe5, 0x07, 0x00, 0x00,
 }
 
 func (m *StreamPartitionSpec) Marshal() (dAtA []byte, err error) {
@@ -393,6 +565,103 @@ func (m *StreamPartitionSpec_ExecutionConfig) MarshalToSizedBuffer(dAtA []byte) 
 	dAtA[i] = 0x12
 	if m.InitialScanParallelism != 0 {
 		i = encodeVarintStream(dAtA, i, uint64(m.InitialScanParallelism))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *ReplicationStreamSpec) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ReplicationStreamSpec) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ReplicationStreamSpec) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Partitions) > 0 {
+		for iNdEx := len(m.Partitions) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Partitions[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintStream(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0xa
+		}
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *ReplicationStreamSpec_Partition) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ReplicationStreamSpec_Partition) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ReplicationStreamSpec_Partition) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.PartitionSpec != nil {
+		{
+			size, err := m.PartitionSpec.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintStream(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x22
+	}
+	{
+		size, err := m.Locality.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintStream(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x1a
+	{
+		size, err := m.SQLAddress.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintStream(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x12
+	if m.NodeID != 0 {
+		i = encodeVarintStream(dAtA, i, uint64(m.NodeID))
 		i--
 		dAtA[i] = 0x8
 	}
@@ -563,6 +832,46 @@ func (m *StreamEvent_StreamCheckpoint) MarshalToSizedBuffer(dAtA []byte) (int, e
 	return len(dAtA) - i, nil
 }
 
+func (m *StreamReplicationStatus) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *StreamReplicationStatus) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *StreamReplicationStatus) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.ProtectedTimestamp != nil {
+		{
+			size, err := m.ProtectedTimestamp.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintStream(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
+	if m.StreamStatus != 0 {
+		i = encodeVarintStream(dAtA, i, uint64(m.StreamStatus))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintStream(dAtA []byte, offset int, v uint64) int {
 	offset -= sovStream(v)
 	base := offset
@@ -606,6 +915,41 @@ func (m *StreamPartitionSpec_ExecutionConfig) Size() (n int) {
 	n += 1 + l + sovStream(uint64(l))
 	if m.BatchByteSize != 0 {
 		n += 1 + sovStream(uint64(m.BatchByteSize))
+	}
+	return n
+}
+
+func (m *ReplicationStreamSpec) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if len(m.Partitions) > 0 {
+		for _, e := range m.Partitions {
+			l = e.Size()
+			n += 1 + l + sovStream(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *ReplicationStreamSpec_Partition) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.NodeID != 0 {
+		n += 1 + sovStream(uint64(m.NodeID))
+	}
+	l = m.SQLAddress.Size()
+	n += 1 + l + sovStream(uint64(l))
+	l = m.Locality.Size()
+	n += 1 + l + sovStream(uint64(l))
+	if m.PartitionSpec != nil {
+		l = m.PartitionSpec.Size()
+		n += 1 + l + sovStream(uint64(l))
 	}
 	return n
 }
@@ -666,6 +1010,22 @@ func (m *StreamEvent_StreamCheckpoint) Size() (n int) {
 			l = e.Size()
 			n += 1 + l + sovStream(uint64(l))
 		}
+	}
+	return n
+}
+
+func (m *StreamReplicationStatus) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.StreamStatus != 0 {
+		n += 1 + sovStream(uint64(m.StreamStatus))
+	}
+	if m.ProtectedTimestamp != nil {
+		l = m.ProtectedTimestamp.Size()
+		n += 1 + l + sovStream(uint64(l))
 	}
 	return n
 }
@@ -926,6 +1286,261 @@ func (m *StreamPartitionSpec_ExecutionConfig) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipStream(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthStream
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ReplicationStreamSpec) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowStream
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ReplicationStreamSpec: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ReplicationStreamSpec: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Partitions", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowStream
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthStream
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthStream
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Partitions = append(m.Partitions, ReplicationStreamSpec_Partition{})
+			if err := m.Partitions[len(m.Partitions)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipStream(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthStream
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ReplicationStreamSpec_Partition) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowStream
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: Partition: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: Partition: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field NodeID", wireType)
+			}
+			m.NodeID = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowStream
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.NodeID |= github_com_cockroachdb_cockroach_pkg_roachpb.NodeID(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SQLAddress", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowStream
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthStream
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthStream
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.SQLAddress.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Locality", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowStream
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthStream
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthStream
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Locality.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PartitionSpec", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowStream
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthStream
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthStream
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.PartitionSpec == nil {
+				m.PartitionSpec = &StreamPartitionSpec{}
+			}
+			if err := m.PartitionSpec.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipStream(dAtA[iNdEx:])
@@ -1329,6 +1944,111 @@ func (m *StreamEvent_StreamCheckpoint) Unmarshal(dAtA []byte) error {
 			}
 			m.Spans = append(m.Spans, StreamEvent_SpanCheckpoint{})
 			if err := m.Spans[len(m.Spans)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipStream(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthStream
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *StreamReplicationStatus) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowStream
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: StreamReplicationStatus: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: StreamReplicationStatus: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field StreamStatus", wireType)
+			}
+			m.StreamStatus = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowStream
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.StreamStatus |= StreamReplicationStatus_StreamStatus(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ProtectedTimestamp", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowStream
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthStream
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthStream
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.ProtectedTimestamp == nil {
+				m.ProtectedTimestamp = &hlc.Timestamp{}
+			}
+			if err := m.ProtectedTimestamp.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
