@@ -1894,7 +1894,7 @@ const sqlEofCode = 1
 const sqlErrCode = 2
 const sqlInitialStackSize = 16
 
-//line sql-gen.y:13859
+//line sql-gen.y:13861
 
 //line yacctab:1
 var sqlExca = [...]int{
@@ -22122,19 +22122,19 @@ sqldefault:
 		}
 	case 95:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:1690
+//line sql-gen.y:1692
 		{
 			return helpWith(sqllex, "ALTER DATABASE")
 		}
 	case 96:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:1694
+//line sql-gen.y:1696
 		{
 			sqlVAL.union.val = &tree.AlterDatabaseOwner{Name: tree.Name(sqlDollar[3].str), Owner: sqlDollar[6].union.roleSpec()}
 		}
 	case 97:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:1701
+//line sql-gen.y:1703
 		{
 
 			sqlVAL.union.val = &tree.AlterRoleSet{
@@ -22146,7 +22146,7 @@ sqldefault:
 		}
 	case 98:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:1713
+//line sql-gen.y:1715
 		{
 
 			sqlVAL.union.val = &tree.AlterDatabasePlacement{
@@ -22156,7 +22156,7 @@ sqldefault:
 		}
 	case 99:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:1723
+//line sql-gen.y:1725
 		{
 			sqlVAL.union.val = &tree.AlterDatabaseAddRegion{
 				Name:   tree.Name(sqlDollar[3].str),
@@ -22165,7 +22165,7 @@ sqldefault:
 		}
 	case 100:
 		sqlDollar = sqlS[sqlpt-9 : sqlpt+1]
-//line sql-gen.y:1730
+//line sql-gen.y:1732
 		{
 			sqlVAL.union.val = &tree.AlterDatabaseAddRegion{
 				Name:        tree.Name(sqlDollar[3].str),
@@ -22175,7 +22175,7 @@ sqldefault:
 		}
 	case 101:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:1740
+//line sql-gen.y:1742
 		{
 			sqlVAL.union.val = &tree.AlterDatabaseDropRegion{
 				Name:   tree.Name(sqlDollar[3].str),
@@ -22184,7 +22184,7 @@ sqldefault:
 		}
 	case 102:
 		sqlDollar = sqlS[sqlpt-8 : sqlpt+1]
-//line sql-gen.y:1747
+//line sql-gen.y:1749
 		{
 			sqlVAL.union.val = &tree.AlterDatabaseDropRegion{
 				Name:     tree.Name(sqlDollar[3].str),
@@ -22194,7 +22194,7 @@ sqldefault:
 		}
 	case 103:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:1757
+//line sql-gen.y:1759
 		{
 			sqlVAL.union.val = &tree.AlterDatabaseSurvivalGoal{
 				Name:         tree.Name(sqlDollar[3].str),
@@ -22203,7 +22203,7 @@ sqldefault:
 		}
 	case 104:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:1766
+//line sql-gen.y:1768
 		{
 			sqlVAL.union.val = &tree.AlterDatabasePrimaryRegion{
 				Name:          tree.Name(sqlDollar[3].str),
@@ -22212,7 +22212,7 @@ sqldefault:
 		}
 	case 105:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:1773
+//line sql-gen.y:1775
 		{
 			sqlVAL.union.val = &tree.AlterDatabasePrimaryRegion{
 				Name:          tree.Name(sqlDollar[3].str),
@@ -22221,43 +22221,43 @@ sqldefault:
 		}
 	case 108:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:1802
+//line sql-gen.y:1804
 		{
 			return helpWith(sqllex, "ALTER RANGE")
 		}
 	case 116:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:1834
+//line sql-gen.y:1836
 		{
 			return helpWith(sqllex, "ALTER INDEX")
 		}
 	case 117:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:1838
+//line sql-gen.y:1840
 		{
 			sqlVAL.union.val = &tree.AlterTable{Table: sqlDollar[3].union.unresolvedObjectName(), IfExists: false, Cmds: sqlDollar[4].union.alterTableCmds()}
 		}
 	case 118:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:1842
+//line sql-gen.y:1844
 		{
 			sqlVAL.union.val = &tree.AlterTable{Table: sqlDollar[5].union.unresolvedObjectName(), IfExists: true, Cmds: sqlDollar[6].union.alterTableCmds()}
 		}
 	case 119:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:1848
+//line sql-gen.y:1850
 		{
 			sqlVAL.union.val = &tree.AlterIndex{Index: sqlDollar[3].union.tableIndexName(), IfExists: false, Cmds: sqlDollar[4].union.alterIndexCmds()}
 		}
 	case 120:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:1852
+//line sql-gen.y:1854
 		{
 			sqlVAL.union.val = &tree.AlterIndex{Index: sqlDollar[5].union.tableIndexName(), IfExists: true, Cmds: sqlDollar[6].union.alterIndexCmds()}
 		}
 	case 121:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:1858
+//line sql-gen.y:1860
 		{
 			name := sqlDollar[3].union.unresolvedObjectName().ToTableName()
 			sqlVAL.union.val = &tree.Split{
@@ -22268,7 +22268,7 @@ sqldefault:
 		}
 	case 122:
 		sqlDollar = sqlS[sqlpt-9 : sqlpt+1]
-//line sql-gen.y:1867
+//line sql-gen.y:1869
 		{
 			name := sqlDollar[3].union.unresolvedObjectName().ToTableName()
 			sqlVAL.union.val = &tree.Split{
@@ -22279,19 +22279,19 @@ sqldefault:
 		}
 	case 123:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:1878
+//line sql-gen.y:1880
 		{
 			sqlVAL.union.val = &tree.Split{TableOrIndex: sqlDollar[3].union.tableIndexName(), Rows: sqlDollar[6].union.slct(), ExpireExpr: tree.Expr(nil)}
 		}
 	case 124:
 		sqlDollar = sqlS[sqlpt-9 : sqlpt+1]
-//line sql-gen.y:1882
+//line sql-gen.y:1884
 		{
 			sqlVAL.union.val = &tree.Split{TableOrIndex: sqlDollar[3].union.tableIndexName(), Rows: sqlDollar[6].union.slct(), ExpireExpr: sqlDollar[9].union.expr()}
 		}
 	case 125:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:1888
+//line sql-gen.y:1890
 		{
 			name := sqlDollar[3].union.unresolvedObjectName().ToTableName()
 			sqlVAL.union.val = &tree.Unsplit{
@@ -22301,7 +22301,7 @@ sqldefault:
 		}
 	case 126:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:1896
+//line sql-gen.y:1898
 		{
 			name := sqlDollar[3].union.unresolvedObjectName().ToTableName()
 			sqlVAL.union.val = &tree.Unsplit{
@@ -22311,44 +22311,44 @@ sqldefault:
 		}
 	case 127:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:1906
+//line sql-gen.y:1908
 		{
 			sqlVAL.union.val = &tree.Unsplit{TableOrIndex: sqlDollar[3].union.tableIndexName(), Rows: sqlDollar[6].union.slct()}
 		}
 	case 128:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:1910
+//line sql-gen.y:1912
 		{
 			sqlVAL.union.val = &tree.Unsplit{TableOrIndex: sqlDollar[3].union.tableIndexName(), All: true}
 		}
 	case 133:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:1922
+//line sql-gen.y:1924
 		{
 			sqlVAL.union.val = tree.RelocateLease
 		}
 	case 134:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:1928
+//line sql-gen.y:1930
 		{
 			sqlVAL.union.val = tree.RelocateVoters
 		}
 	case 135:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:1932
+//line sql-gen.y:1934
 		{
 
 			sqlVAL.union.val = tree.RelocateVoters
 		}
 	case 136:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:1937
+//line sql-gen.y:1939
 		{
 			sqlVAL.union.val = tree.RelocateNonVoters
 		}
 	case 137:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:1943
+//line sql-gen.y:1945
 		{
 
 			name := sqlDollar[3].union.unresolvedObjectName().ToTableName()
@@ -22360,7 +22360,7 @@ sqldefault:
 		}
 	case 138:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:1955
+//line sql-gen.y:1957
 		{
 
 			sqlVAL.union.val = &tree.Relocate{
@@ -22371,7 +22371,7 @@ sqldefault:
 		}
 	case 139:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:1976
+//line sql-gen.y:1978
 		{
 			var zoneName string
 			switch e := sqlDollar[3].union.expr().(type) {
@@ -22391,7 +22391,7 @@ sqldefault:
 		}
 	case 140:
 		sqlDollar = sqlS[sqlpt-8 : sqlpt+1]
-//line sql-gen.y:1996
+//line sql-gen.y:1998
 		{
 			sqlVAL.union.val = &tree.RelocateRange{
 				Rows:            sqlDollar[8].union.slct(),
@@ -22402,7 +22402,7 @@ sqldefault:
 		}
 	case 141:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql-gen.y:2005
+//line sql-gen.y:2007
 		{
 			sqlVAL.union.val = &tree.RelocateRange{
 				Rows: &tree.Select{
@@ -22415,7 +22415,7 @@ sqldefault:
 		}
 	case 142:
 		sqlDollar = sqlS[sqlpt-10 : sqlpt+1]
-//line sql-gen.y:2016
+//line sql-gen.y:2018
 		{
 			sqlVAL.union.val = &tree.RelocateRange{
 				Rows:            sqlDollar[10].union.slct(),
@@ -22426,7 +22426,7 @@ sqldefault:
 		}
 	case 143:
 		sqlDollar = sqlS[sqlpt-9 : sqlpt+1]
-//line sql-gen.y:2025
+//line sql-gen.y:2027
 		{
 			sqlVAL.union.val = &tree.RelocateRange{
 				Rows: &tree.Select{
@@ -22439,33 +22439,33 @@ sqldefault:
 		}
 	case 144:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:2038
+//line sql-gen.y:2040
 		{
 
 			sqlVAL.union.val = &tree.SetZoneConfig{YAMLConfig: sqlDollar[4].union.expr()}
 		}
 	case 145:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:2043
+//line sql-gen.y:2045
 		{
 			sqlVAL.union.val = &tree.SetZoneConfig{Options: sqlDollar[4].union.kvOptions()}
 		}
 	case 146:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:2047
+//line sql-gen.y:2049
 		{
 
 			sqlVAL.union.val = &tree.SetZoneConfig{SetDefault: true}
 		}
 	case 147:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:2052
+//line sql-gen.y:2054
 		{
 			sqlVAL.union.val = &tree.SetZoneConfig{YAMLConfig: tree.DNull}
 		}
 	case 148:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:2058
+//line sql-gen.y:2060
 		{
 			s := sqlDollar[4].union.setZoneConfig()
 			s.ZoneSpecifier = tree.ZoneSpecifier{Database: tree.Name(sqlDollar[3].str)}
@@ -22473,7 +22473,7 @@ sqldefault:
 		}
 	case 149:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:2066
+//line sql-gen.y:2068
 		{
 			name := sqlDollar[3].union.unresolvedObjectName().ToTableName()
 			s := sqlDollar[4].union.setZoneConfig()
@@ -22484,7 +22484,7 @@ sqldefault:
 		}
 	case 150:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:2077
+//line sql-gen.y:2079
 		{
 			s := sqlDollar[4].union.setZoneConfig()
 			s.ZoneSpecifier = tree.ZoneSpecifier{
@@ -22494,7 +22494,7 @@ sqldefault:
 		}
 	case 151:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql-gen.y:2087
+//line sql-gen.y:2089
 		{
 			name := sqlDollar[6].union.unresolvedObjectName().ToTableName()
 			s := sqlDollar[7].union.setZoneConfig()
@@ -22506,7 +22506,7 @@ sqldefault:
 		}
 	case 152:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql-gen.y:2097
+//line sql-gen.y:2099
 		{
 			s := sqlDollar[7].union.setZoneConfig()
 			s.ZoneSpecifier = tree.ZoneSpecifier{
@@ -22517,7 +22517,7 @@ sqldefault:
 		}
 	case 153:
 		sqlDollar = sqlS[sqlpt-9 : sqlpt+1]
-//line sql-gen.y:2106
+//line sql-gen.y:2108
 		{
 			name := sqlDollar[6].union.unresolvedObjectName().ToTableName()
 			s := sqlDollar[9].union.setZoneConfig()
@@ -22530,7 +22530,7 @@ sqldefault:
 		}
 	case 154:
 		sqlDollar = sqlS[sqlpt-8 : sqlpt+1]
-//line sql-gen.y:2117
+//line sql-gen.y:2119
 		{
 			err := errors.New("index name should not be specified in ALTER PARTITION ... OF TABLE")
 			err = errors.WithHint(err, "try ALTER PARTITION ... OF INDEX")
@@ -22538,7 +22538,7 @@ sqldefault:
 		}
 	case 155:
 		sqlDollar = sqlS[sqlpt-9 : sqlpt+1]
-//line sql-gen.y:2123
+//line sql-gen.y:2125
 		{
 			err := errors.New("index wildcard unsupported in ALTER PARTITION ... OF TABLE")
 			err = errors.WithHint(err, "try ALTER PARTITION <partition> OF INDEX <tablename>@*")
@@ -22546,38 +22546,38 @@ sqldefault:
 		}
 	case 156:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:2131
+//line sql-gen.y:2133
 		{
 			sqlVAL.union.val = []tree.KVOption{tree.KVOption{Key: tree.Name(strings.Join(sqlDollar[1].union.strs(), "."))}}
 		}
 	case 157:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:2135
+//line sql-gen.y:2137
 		{
 			sqlVAL.union.val = []tree.KVOption{tree.KVOption{Key: tree.Name(strings.Join(sqlDollar[1].union.strs(), ".")), Value: sqlDollar[3].union.expr()}}
 		}
 	case 158:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:2139
+//line sql-gen.y:2141
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.kvOptions(), tree.KVOption{Key: tree.Name(strings.Join(sqlDollar[3].union.strs(), ".")), Value: sqlDollar[5].union.expr()})
 		}
 	case 159:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql-gen.y:2143
+//line sql-gen.y:2145
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.kvOptions(), tree.KVOption{Key: tree.Name(strings.Join(sqlDollar[3].union.strs(), "."))})
 		}
 	case 160:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:2149
+//line sql-gen.y:2151
 		{
 			name := sqlDollar[3].union.unresolvedObjectName().ToTableName()
 			sqlVAL.union.val = &tree.Scatter{TableOrIndex: tree.TableIndexName{Table: name}}
 		}
 	case 161:
 		sqlDollar = sqlS[sqlpt-12 : sqlpt+1]
-//line sql-gen.y:2154
+//line sql-gen.y:2156
 		{
 			name := sqlDollar[3].union.unresolvedObjectName().ToTableName()
 			sqlVAL.union.val = &tree.Scatter{
@@ -22588,109 +22588,109 @@ sqldefault:
 		}
 	case 162:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:2165
+//line sql-gen.y:2167
 		{
 			sqlVAL.union.val = &tree.Scatter{TableOrIndex: sqlDollar[3].union.tableIndexName()}
 		}
 	case 163:
 		sqlDollar = sqlS[sqlpt-12 : sqlpt+1]
-//line sql-gen.y:2169
+//line sql-gen.y:2171
 		{
 			sqlVAL.union.val = &tree.Scatter{TableOrIndex: sqlDollar[3].union.tableIndexName(), From: sqlDollar[7].union.exprs(), To: sqlDollar[11].union.exprs()}
 		}
 	case 164:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:2175
+//line sql-gen.y:2177
 		{
 			sqlVAL.union.val = tree.AlterTableCmds{sqlDollar[1].union.alterTableCmd()}
 		}
 	case 165:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:2179
+//line sql-gen.y:2181
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.alterTableCmds(), sqlDollar[3].union.alterTableCmd())
 		}
 	case 166:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:2186
+//line sql-gen.y:2188
 		{
 			sqlVAL.union.val = &tree.AlterTableRenameColumn{Column: tree.Name(sqlDollar[3].str), NewName: tree.Name(sqlDollar[5].str)}
 		}
 	case 167:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:2191
+//line sql-gen.y:2193
 		{
 			sqlVAL.union.val = &tree.AlterTableRenameConstraint{Constraint: tree.Name(sqlDollar[3].str), NewName: tree.Name(sqlDollar[5].str)}
 		}
 	case 168:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:2196
+//line sql-gen.y:2198
 		{
 			sqlVAL.union.val = &tree.AlterTableAddColumn{IfNotExists: false, ColumnDef: sqlDollar[2].union.colDef()}
 		}
 	case 169:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:2201
+//line sql-gen.y:2203
 		{
 			sqlVAL.union.val = &tree.AlterTableAddColumn{IfNotExists: true, ColumnDef: sqlDollar[5].union.colDef()}
 		}
 	case 170:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:2206
+//line sql-gen.y:2208
 		{
 			sqlVAL.union.val = &tree.AlterTableAddColumn{IfNotExists: false, ColumnDef: sqlDollar[3].union.colDef()}
 		}
 	case 171:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:2211
+//line sql-gen.y:2213
 		{
 			sqlVAL.union.val = &tree.AlterTableAddColumn{IfNotExists: true, ColumnDef: sqlDollar[6].union.colDef()}
 		}
 	case 172:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:2216
+//line sql-gen.y:2218
 		{
 			sqlVAL.union.val = &tree.AlterTableSetDefault{Column: tree.Name(sqlDollar[3].str), Default: sqlDollar[4].union.expr()}
 		}
 	case 173:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:2221
+//line sql-gen.y:2223
 		{
 			sqlVAL.union.val = &tree.AlterTableSetOnUpdate{Column: tree.Name(sqlDollar[3].str), Expr: sqlDollar[4].union.expr()}
 		}
 	case 174:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:2226
+//line sql-gen.y:2228
 		{
 			sqlVAL.union.val = &tree.AlterTableSetVisible{Column: tree.Name(sqlDollar[3].str), Visible: sqlDollar[4].union.bool()}
 		}
 	case 175:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:2231
+//line sql-gen.y:2233
 		{
 			sqlVAL.union.val = &tree.AlterTableDropNotNull{Column: tree.Name(sqlDollar[3].str)}
 		}
 	case 176:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:2236
+//line sql-gen.y:2238
 		{
 			sqlVAL.union.val = &tree.AlterTableDropStored{Column: tree.Name(sqlDollar[3].str)}
 		}
 	case 177:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:2241
+//line sql-gen.y:2243
 		{
 			sqlVAL.union.val = &tree.AlterTableSetNotNull{Column: tree.Name(sqlDollar[3].str)}
 		}
 	case 178:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:2245
+//line sql-gen.y:2247
 		{
 			return unimplemented(sqllex, "alter table alter column add")
 		}
 	case 179:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:2250
+//line sql-gen.y:2252
 		{
 			sqlVAL.union.val = &tree.AlterTableDropColumn{
 				IfExists:     true,
@@ -22700,7 +22700,7 @@ sqldefault:
 		}
 	case 180:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:2259
+//line sql-gen.y:2261
 		{
 			sqlVAL.union.val = &tree.AlterTableDropColumn{
 				IfExists:     false,
@@ -22710,7 +22710,7 @@ sqldefault:
 		}
 	case 181:
 		sqlDollar = sqlS[sqlpt-8 : sqlpt+1]
-//line sql-gen.y:2271
+//line sql-gen.y:2273
 		{
 			sqlVAL.union.val = &tree.AlterTableAlterColumnType{
 				Column:    tree.Name(sqlDollar[3].str),
@@ -22721,7 +22721,7 @@ sqldefault:
 		}
 	case 182:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:2281
+//line sql-gen.y:2283
 		{
 			sqlVAL.union.val = &tree.AlterTableAddConstraint{
 				ConstraintDef:      sqlDollar[2].union.constraintDef(),
@@ -22730,7 +22730,7 @@ sqldefault:
 		}
 	case 183:
 		sqlDollar = sqlS[sqlpt-8 : sqlpt+1]
-//line sql-gen.y:2289
+//line sql-gen.y:2291
 		{
 			def := sqlDollar[7].union.constraintDef()
 			def.SetName(tree.Name(sqlDollar[6].str))
@@ -22742,27 +22742,27 @@ sqldefault:
 		}
 	case 184:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:2299
+//line sql-gen.y:2301
 		{
 			return unimplementedWithIssueDetail(sqllex, 31632, "alter constraint")
 		}
 	case 185:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:2302
+//line sql-gen.y:2304
 		{
 
 			return unimplementedWithIssueDetail(sqllex, 22456, "alter table inherits")
 		}
 	case 186:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:2308
+//line sql-gen.y:2310
 		{
 
 			return unimplementedWithIssueDetail(sqllex, 22456, "alter table no inherits")
 		}
 	case 187:
 		sqlDollar = sqlS[sqlpt-9 : sqlpt+1]
-//line sql-gen.y:2315
+//line sql-gen.y:2317
 		{
 			sqlVAL.union.val = &tree.AlterTableAlterPrimaryKey{
 				Columns: sqlDollar[7].union.idxElems(),
@@ -22771,7 +22771,7 @@ sqldefault:
 		}
 	case 188:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:2322
+//line sql-gen.y:2324
 		{
 			sqlVAL.union.val = &tree.AlterTableValidateConstraint{
 				Constraint: tree.Name(sqlDollar[3].str),
@@ -22779,7 +22779,7 @@ sqldefault:
 		}
 	case 189:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:2329
+//line sql-gen.y:2331
 		{
 			sqlVAL.union.val = &tree.AlterTableDropConstraint{
 				IfExists:     true,
@@ -22789,7 +22789,7 @@ sqldefault:
 		}
 	case 190:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:2338
+//line sql-gen.y:2340
 		{
 			sqlVAL.union.val = &tree.AlterTableDropConstraint{
 				IfExists:     false,
@@ -22799,13 +22799,13 @@ sqldefault:
 		}
 	case 191:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:2347
+//line sql-gen.y:2349
 		{
 			sqlVAL.union.val = &tree.AlterTableSetAudit{Mode: sqlDollar[3].union.auditMode()}
 		}
 	case 192:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:2352
+//line sql-gen.y:2354
 		{
 			sqlVAL.union.val = &tree.AlterTablePartitionByTable{
 				PartitionByTable: sqlDollar[1].union.partitionByTable(),
@@ -22813,7 +22813,7 @@ sqldefault:
 		}
 	case 193:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:2359
+//line sql-gen.y:2361
 		{
 
 			sqlVAL.union.val = &tree.AlterTableInjectStats{
@@ -22822,31 +22822,31 @@ sqldefault:
 		}
 	case 194:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:2367
+//line sql-gen.y:2369
 		{
 			sqlVAL.union.val = tree.AuditModeReadWrite
 		}
 	case 195:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:2368
+//line sql-gen.y:2370
 		{
 			sqlVAL.union.val = tree.AuditModeDisable
 		}
 	case 196:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:2372
+//line sql-gen.y:2374
 		{
 			sqlVAL.union.val = tree.AlterIndexCmds{sqlDollar[1].union.alterIndexCmd()}
 		}
 	case 197:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:2376
+//line sql-gen.y:2378
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.alterIndexCmds(), sqlDollar[3].union.alterIndexCmd())
 		}
 	case 198:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:2382
+//line sql-gen.y:2384
 		{
 			sqlVAL.union.val = &tree.AlterIndexPartitionBy{
 				PartitionByIndex: sqlDollar[1].union.partitionByIndex(),
@@ -22854,85 +22854,85 @@ sqldefault:
 		}
 	case 199:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:2390
+//line sql-gen.y:2392
 		{
 			sqlVAL.union.val = sqlDollar[3].union.expr()
 		}
 	case 200:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:2394
+//line sql-gen.y:2396
 		{
 			sqlVAL.union.val = nil
 		}
 	case 201:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:2400
+//line sql-gen.y:2402
 		{
 			sqlVAL.union.val = sqlDollar[4].union.expr()
 		}
 	case 202:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:2404
+//line sql-gen.y:2406
 		{
 			sqlVAL.union.val = nil
 		}
 	case 203:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:2410
+//line sql-gen.y:2412
 		{
 			sqlVAL.union.val = true
 		}
 	case 204:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:2414
+//line sql-gen.y:2416
 		{
 			sqlVAL.union.val = false
 		}
 	case 205:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:2420
+//line sql-gen.y:2422
 		{
 			sqlVAL.union.val = sqlDollar[2].union.expr()
 		}
 	case 206:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:2424
+//line sql-gen.y:2426
 		{
 			sqlVAL.union.val = nil
 		}
 	case 207:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:2431
+//line sql-gen.y:2433
 		{
 			sqlVAL.union.val = tree.DropCascade
 		}
 	case 208:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:2435
+//line sql-gen.y:2437
 		{
 			sqlVAL.union.val = tree.DropRestrict
 		}
 	case 209:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:2439
+//line sql-gen.y:2441
 		{
 			sqlVAL.union.val = tree.DropDefault
 		}
 	case 210:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:2445
+//line sql-gen.y:2447
 		{
 			sqlVAL.union.val = tree.ValidationSkip
 		}
 	case 211:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:2449
+//line sql-gen.y:2451
 		{
 			sqlVAL.union.val = tree.ValidationDefault
 		}
 	case 212:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql-gen.y:2474
+//line sql-gen.y:2476
 		{
 			sqlVAL.union.val = &tree.AlterType{
 				Type: sqlDollar[3].union.unresolvedObjectName(),
@@ -22945,7 +22945,7 @@ sqldefault:
 		}
 	case 213:
 		sqlDollar = sqlS[sqlpt-10 : sqlpt+1]
-//line sql-gen.y:2485
+//line sql-gen.y:2487
 		{
 			sqlVAL.union.val = &tree.AlterType{
 				Type: sqlDollar[3].union.unresolvedObjectName(),
@@ -22958,7 +22958,7 @@ sqldefault:
 		}
 	case 214:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:2496
+//line sql-gen.y:2498
 		{
 			sqlVAL.union.val = &tree.AlterType{
 				Type: sqlDollar[3].union.unresolvedObjectName(),
@@ -22969,7 +22969,7 @@ sqldefault:
 		}
 	case 215:
 		sqlDollar = sqlS[sqlpt-8 : sqlpt+1]
-//line sql-gen.y:2505
+//line sql-gen.y:2507
 		{
 			sqlVAL.union.val = &tree.AlterType{
 				Type: sqlDollar[3].union.unresolvedObjectName(),
@@ -22981,7 +22981,7 @@ sqldefault:
 		}
 	case 216:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:2515
+//line sql-gen.y:2517
 		{
 			sqlVAL.union.val = &tree.AlterType{
 				Type: sqlDollar[3].union.unresolvedObjectName(),
@@ -22992,7 +22992,7 @@ sqldefault:
 		}
 	case 217:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:2524
+//line sql-gen.y:2526
 		{
 			sqlVAL.union.val = &tree.AlterType{
 				Type: sqlDollar[3].union.unresolvedObjectName(),
@@ -23003,7 +23003,7 @@ sqldefault:
 		}
 	case 218:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:2533
+//line sql-gen.y:2535
 		{
 			sqlVAL.union.val = &tree.AlterType{
 				Type: sqlDollar[3].union.unresolvedObjectName(),
@@ -23014,25 +23014,25 @@ sqldefault:
 		}
 	case 219:
 		sqlDollar = sqlS[sqlpt-9 : sqlpt+1]
-//line sql-gen.y:2542
+//line sql-gen.y:2544
 		{
 			return unimplementedWithIssueDetail(sqllex, 48701, "ALTER TYPE ATTRIBUTE")
 		}
 	case 220:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:2546
+//line sql-gen.y:2548
 		{
 			return unimplementedWithIssueDetail(sqllex, 48701, "ALTER TYPE ATTRIBUTE")
 		}
 	case 221:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:2549
+//line sql-gen.y:2551
 		{
 			return helpWith(sqllex, "ALTER TYPE")
 		}
 	case 222:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:2553
+//line sql-gen.y:2555
 		{
 			sqlVAL.union.val = &tree.AlterTypeAddValuePlacement{
 				Before:      true,
@@ -23041,7 +23041,7 @@ sqldefault:
 		}
 	case 223:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:2560
+//line sql-gen.y:2562
 		{
 			sqlVAL.union.val = &tree.AlterTypeAddValuePlacement{
 				Before:      false,
@@ -23050,13 +23050,13 @@ sqldefault:
 		}
 	case 224:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:2567
+//line sql-gen.y:2569
 		{
 			sqlVAL.union.val = (*tree.AlterTypeAddValuePlacement)(nil)
 		}
 	case 225:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:2573
+//line sql-gen.y:2575
 		{
 			sqlVAL.union.val = tree.RoleSpec{
 				RoleSpecType: tree.RoleName,
@@ -23065,7 +23065,7 @@ sqldefault:
 		}
 	case 226:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:2580
+//line sql-gen.y:2582
 		{
 			sqlVAL.union.val = tree.RoleSpec{
 				RoleSpecType: tree.RoleName,
@@ -23074,7 +23074,7 @@ sqldefault:
 		}
 	case 227:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:2587
+//line sql-gen.y:2589
 		{
 			sqlVAL.union.val = tree.RoleSpec{
 				RoleSpecType: tree.CurrentUser,
@@ -23082,7 +23082,7 @@ sqldefault:
 		}
 	case 228:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:2593
+//line sql-gen.y:2595
 		{
 			sqlVAL.union.val = tree.RoleSpec{
 				RoleSpecType: tree.SessionUser,
@@ -23090,19 +23090,19 @@ sqldefault:
 		}
 	case 229:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:2601
+//line sql-gen.y:2603
 		{
 			sqlVAL.union.val = tree.RoleSpecList{sqlDollar[1].union.roleSpec()}
 		}
 	case 230:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:2605
+//line sql-gen.y:2607
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.roleSpecList(), sqlDollar[3].union.roleSpec())
 		}
 	case 238:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:2626
+//line sql-gen.y:2628
 		{
 			sqlVAL.union.val = &tree.RefreshMaterializedView{
 				Name:              sqlDollar[5].union.unresolvedObjectName(),
@@ -23112,31 +23112,31 @@ sqldefault:
 		}
 	case 239:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:2633
+//line sql-gen.y:2635
 		{
 			return helpWith(sqllex, "REFRESH")
 		}
 	case 240:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:2637
+//line sql-gen.y:2639
 		{
 			sqlVAL.union.val = tree.RefreshDataWithData
 		}
 	case 241:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:2641
+//line sql-gen.y:2643
 		{
 			sqlVAL.union.val = tree.RefreshDataClear
 		}
 	case 242:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:2645
+//line sql-gen.y:2647
 		{
 			sqlVAL.union.val = tree.RefreshDataDefault
 		}
 	case 243:
 		sqlDollar = sqlS[sqlpt-8 : sqlpt+1]
-//line sql-gen.y:2688
+//line sql-gen.y:2690
 		{
 			sqlVAL.union.val = &tree.Backup{
 				Targets:        sqlDollar[2].union.targetListPtr(),
@@ -23150,7 +23150,7 @@ sqldefault:
 		}
 	case 244:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:2700
+//line sql-gen.y:2702
 		{
 			sqlVAL.union.val = &tree.Backup{
 				Targets: sqlDollar[2].union.targetListPtr(),
@@ -23162,7 +23162,7 @@ sqldefault:
 		}
 	case 245:
 		sqlDollar = sqlS[sqlpt-8 : sqlpt+1]
-//line sql-gen.y:2710
+//line sql-gen.y:2712
 		{
 			sqlVAL.union.val = &tree.Backup{
 				Targets:        sqlDollar[2].union.targetListPtr(),
@@ -23175,7 +23175,7 @@ sqldefault:
 		}
 	case 246:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql-gen.y:2721
+//line sql-gen.y:2723
 		{
 			sqlVAL.union.val = &tree.Backup{
 				Targets:         sqlDollar[2].union.targetListPtr(),
@@ -23187,50 +23187,50 @@ sqldefault:
 		}
 	case 247:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:2730
+//line sql-gen.y:2732
 		{
 			return helpWith(sqllex, "BACKUP")
 		}
 	case 248:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:2734
+//line sql-gen.y:2736
 		{
 			sqlVAL.union.val = (*tree.TargetList)(nil)
 		}
 	case 249:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:2738
+//line sql-gen.y:2740
 		{
 			t := sqlDollar[1].union.targetList()
 			sqlVAL.union.val = &t
 		}
 	case 250:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:2746
+//line sql-gen.y:2748
 		{
 			sqlVAL.union.val = sqlDollar[2].union.backupOptions()
 		}
 	case 251:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:2750
+//line sql-gen.y:2752
 		{
 			sqlVAL.union.val = sqlDollar[4].union.backupOptions()
 		}
 	case 252:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:2754
+//line sql-gen.y:2756
 		{
 			sqlVAL.union.val = &tree.BackupOptions{}
 		}
 	case 253:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:2761
+//line sql-gen.y:2763
 		{
 			sqlVAL.union.val = sqlDollar[1].union.backupOptions()
 		}
 	case 254:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:2765
+//line sql-gen.y:2767
 		{
 			if err := sqlDollar[1].union.backupOptions().CombineWith(sqlDollar[3].union.backupOptions()); err != nil {
 				return setErr(sqllex, err)
@@ -23238,37 +23238,37 @@ sqldefault:
 		}
 	case 255:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:2774
+//line sql-gen.y:2776
 		{
 			sqlVAL.union.val = &tree.BackupOptions{EncryptionPassphrase: sqlDollar[3].union.expr()}
 		}
 	case 256:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:2778
+//line sql-gen.y:2780
 		{
 			sqlVAL.union.val = &tree.BackupOptions{CaptureRevisionHistory: true}
 		}
 	case 257:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:2782
+//line sql-gen.y:2784
 		{
 			sqlVAL.union.val = &tree.BackupOptions{Detached: true}
 		}
 	case 258:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:2786
+//line sql-gen.y:2788
 		{
 			sqlVAL.union.val = &tree.BackupOptions{EncryptionKMSURI: sqlDollar[3].union.stringOrPlaceholderOptList()}
 		}
 	case 259:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:2790
+//line sql-gen.y:2792
 		{
 			sqlVAL.union.val = &tree.BackupOptions{IncrementalStorage: sqlDollar[3].union.stringOrPlaceholderOptList()}
 		}
 	case 260:
 		sqlDollar = sqlS[sqlpt-12 : sqlpt+1]
-//line sql-gen.y:2872
+//line sql-gen.y:2874
 		{
 			sqlVAL.union.val = &tree.ScheduledBackup{
 				ScheduleLabelSpec: *(sqlDollar[3].union.scheduleLabelSpec()),
@@ -23282,19 +23282,19 @@ sqldefault:
 		}
 	case 261:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:2883
+//line sql-gen.y:2885
 		{
 			return helpWith(sqllex, "CREATE SCHEDULE FOR BACKUP")
 		}
 	case 262:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:2888
+//line sql-gen.y:2890
 		{
 			sqlVAL.union.val = tree.NewStrVal(sqlDollar[1].str)
 		}
 	case 263:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:2892
+//line sql-gen.y:2894
 		{
 			p := sqlDollar[1].union.placeholder()
 			sqllex.(*lexer).UpdateNumPlaceholders(p)
@@ -23302,67 +23302,67 @@ sqldefault:
 		}
 	case 264:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:2902
+//line sql-gen.y:2904
 		{
 			sqlVAL.union.val = sqlDollar[2].union.expr()
 		}
 	case 265:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:2908
+//line sql-gen.y:2910
 		{
 			sqlVAL.union.val = &tree.ScheduleLabelSpec{Label: sqlDollar[1].union.expr(), IfNotExists: false}
 		}
 	case 266:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:2912
+//line sql-gen.y:2914
 		{
 			sqlVAL.union.val = &tree.ScheduleLabelSpec{Label: sqlDollar[4].union.expr(), IfNotExists: true}
 		}
 	case 267:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:2916
+//line sql-gen.y:2918
 		{
 			sqlVAL.union.val = &tree.ScheduleLabelSpec{IfNotExists: false}
 		}
 	case 268:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:2925
+//line sql-gen.y:2927
 		{
 			sqlVAL.union.val = &tree.FullBackupClause{Recurrence: sqlDollar[3].union.expr()}
 		}
 	case 269:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:2929
+//line sql-gen.y:2931
 		{
 			sqlVAL.union.val = &tree.FullBackupClause{AlwaysFull: true}
 		}
 	case 270:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:2933
+//line sql-gen.y:2935
 		{
 			sqlVAL.union.val = (*tree.FullBackupClause)(nil)
 		}
 	case 271:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:2939
+//line sql-gen.y:2941
 		{
 			sqlVAL.union.val = sqlDollar[4].union.kvOptions()
 		}
 	case 272:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:2943
+//line sql-gen.y:2945
 		{
 			sqlVAL.union.val = sqlDollar[5].union.kvOptions()
 		}
 	case 273:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:2947
+//line sql-gen.y:2949
 		{
 			sqlVAL.union.val = nil
 		}
 	case 274:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:2981
+//line sql-gen.y:2983
 		{
 			sqlVAL.union.val = &tree.Restore{
 				DescriptorCoverage: tree.AllDescriptors,
@@ -23373,7 +23373,7 @@ sqldefault:
 		}
 	case 275:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql-gen.y:2990
+//line sql-gen.y:2992
 		{
 			sqlVAL.union.val = &tree.Restore{
 				DescriptorCoverage: tree.AllDescriptors,
@@ -23385,7 +23385,7 @@ sqldefault:
 		}
 	case 276:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:3000
+//line sql-gen.y:3002
 		{
 			sqlVAL.union.val = &tree.Restore{
 				Targets: sqlDollar[2].union.targetList(),
@@ -23396,7 +23396,7 @@ sqldefault:
 		}
 	case 277:
 		sqlDollar = sqlS[sqlpt-8 : sqlpt+1]
-//line sql-gen.y:3009
+//line sql-gen.y:3011
 		{
 			sqlVAL.union.val = &tree.Restore{
 				Targets: sqlDollar[2].union.targetList(),
@@ -23408,7 +23408,7 @@ sqldefault:
 		}
 	case 278:
 		sqlDollar = sqlS[sqlpt-8 : sqlpt+1]
-//line sql-gen.y:3019
+//line sql-gen.y:3021
 		{
 			sqlVAL.union.val = &tree.StreamIngestion{
 				Targets: sqlDollar[2].union.targetList(),
@@ -23418,61 +23418,61 @@ sqldefault:
 		}
 	case 279:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:3026
+//line sql-gen.y:3028
 		{
 			return helpWith(sqllex, "RESTORE")
 		}
 	case 280:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:3030
+//line sql-gen.y:3032
 		{
 			sqlVAL.union.val = tree.StringOrPlaceholderOptList{sqlDollar[1].union.expr()}
 		}
 	case 281:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3034
+//line sql-gen.y:3036
 		{
 			sqlVAL.union.val = tree.StringOrPlaceholderOptList(sqlDollar[2].union.exprs())
 		}
 	case 282:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:3040
+//line sql-gen.y:3042
 		{
 			sqlVAL.union.val = []tree.StringOrPlaceholderOptList{sqlDollar[1].union.stringOrPlaceholderOptList()}
 		}
 	case 283:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3044
+//line sql-gen.y:3046
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.listOfStringOrPlaceholderOptList(), sqlDollar[3].union.stringOrPlaceholderOptList())
 		}
 	case 284:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:3051
+//line sql-gen.y:3053
 		{
 			sqlVAL.union.val = sqlDollar[2].union.restoreOptions()
 		}
 	case 285:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:3055
+//line sql-gen.y:3057
 		{
 			sqlVAL.union.val = sqlDollar[4].union.restoreOptions()
 		}
 	case 286:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:3059
+//line sql-gen.y:3061
 		{
 			sqlVAL.union.val = &tree.RestoreOptions{}
 		}
 	case 287:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:3066
+//line sql-gen.y:3068
 		{
 			sqlVAL.union.val = sqlDollar[1].union.restoreOptions()
 		}
 	case 288:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3070
+//line sql-gen.y:3072
 		{
 			if err := sqlDollar[1].union.restoreOptions().CombineWith(sqlDollar[3].union.restoreOptions()); err != nil {
 				return setErr(sqllex, err)
@@ -23480,116 +23480,116 @@ sqldefault:
 		}
 	case 289:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3079
+//line sql-gen.y:3081
 		{
 			sqlVAL.union.val = &tree.RestoreOptions{EncryptionPassphrase: sqlDollar[3].union.expr()}
 		}
 	case 290:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3083
+//line sql-gen.y:3085
 		{
 			sqlVAL.union.val = &tree.RestoreOptions{DecryptionKMSURI: sqlDollar[3].union.stringOrPlaceholderOptList()}
 		}
 	case 291:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3087
+//line sql-gen.y:3089
 		{
 			sqlVAL.union.val = &tree.RestoreOptions{IntoDB: sqlDollar[3].union.expr()}
 		}
 	case 292:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:3091
+//line sql-gen.y:3093
 		{
 			sqlVAL.union.val = &tree.RestoreOptions{SkipMissingFKs: true}
 		}
 	case 293:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:3095
+//line sql-gen.y:3097
 		{
 			sqlVAL.union.val = &tree.RestoreOptions{SkipMissingSequences: true}
 		}
 	case 294:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:3099
+//line sql-gen.y:3101
 		{
 			sqlVAL.union.val = &tree.RestoreOptions{SkipMissingSequenceOwners: true}
 		}
 	case 295:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:3103
+//line sql-gen.y:3105
 		{
 			sqlVAL.union.val = &tree.RestoreOptions{SkipMissingViews: true}
 		}
 	case 296:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:3107
+//line sql-gen.y:3109
 		{
 			sqlVAL.union.val = &tree.RestoreOptions{Detached: true}
 		}
 	case 297:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:3111
+//line sql-gen.y:3113
 		{
 			sqlVAL.union.val = &tree.RestoreOptions{SkipLocalitiesCheck: true}
 		}
 	case 298:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3115
+//line sql-gen.y:3117
 		{
 			sqlVAL.union.val = &tree.RestoreOptions{DebugPauseOn: sqlDollar[3].union.expr()}
 		}
 	case 299:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3119
+//line sql-gen.y:3121
 		{
 			sqlVAL.union.val = &tree.RestoreOptions{NewDBName: sqlDollar[3].union.expr()}
 		}
 	case 300:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3123
+//line sql-gen.y:3125
 		{
 			sqlVAL.union.val = &tree.RestoreOptions{IncrementalStorage: sqlDollar[3].union.stringOrPlaceholderOptList()}
 		}
 	case 301:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:3128
+//line sql-gen.y:3130
 		{
 			sqlVAL.str = strings.ToUpper(sqlDollar[1].str)
 		}
 	case 302:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3134
+//line sql-gen.y:3136
 		{
 			return unimplemented(sqllex, "alter function")
 		}
 	case 303:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3138
+//line sql-gen.y:3140
 		{
 			return unimplemented(sqllex, "alter domain")
 		}
 	case 304:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3142
+//line sql-gen.y:3144
 		{
 			return unimplemented(sqllex, "alter aggregate")
 		}
 	case 305:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:3179
+//line sql-gen.y:3181
 		{
 
 			sqlVAL.union.val = &tree.Import{Bundle: true, FileFormat: sqlDollar[2].str, Files: tree.Exprs{sqlDollar[4].union.expr()}, Options: sqlDollar[6].union.kvOptions()}
 		}
 	case 306:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:3184
+//line sql-gen.y:3186
 		{
 			sqlVAL.union.val = &tree.Import{Bundle: true, FileFormat: sqlDollar[2].str, Files: tree.Exprs{sqlDollar[3].union.expr()}, Options: sqlDollar[4].union.kvOptions()}
 		}
 	case 307:
 		sqlDollar = sqlS[sqlpt-9 : sqlpt+1]
-//line sql-gen.y:3188
+//line sql-gen.y:3190
 		{
 
 			name := sqlDollar[3].union.unresolvedObjectName().ToTableName()
@@ -23597,52 +23597,52 @@ sqldefault:
 		}
 	case 308:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql-gen.y:3194
+//line sql-gen.y:3196
 		{
 			name := sqlDollar[3].union.unresolvedObjectName().ToTableName()
 			sqlVAL.union.val = &tree.Import{Bundle: true, Table: &name, FileFormat: sqlDollar[5].str, Files: tree.Exprs{sqlDollar[6].union.expr()}, Options: sqlDollar[7].union.kvOptions()}
 		}
 	case 309:
 		sqlDollar = sqlS[sqlpt-12 : sqlpt+1]
-//line sql-gen.y:3199
+//line sql-gen.y:3201
 		{
 			name := sqlDollar[3].union.unresolvedObjectName().ToTableName()
 			sqlVAL.union.val = &tree.Import{Table: &name, Into: true, IntoCols: sqlDollar[5].union.nameList(), FileFormat: sqlDollar[7].str, Files: sqlDollar[10].union.exprs(), Options: sqlDollar[12].union.kvOptions()}
 		}
 	case 310:
 		sqlDollar = sqlS[sqlpt-9 : sqlpt+1]
-//line sql-gen.y:3204
+//line sql-gen.y:3206
 		{
 			name := sqlDollar[3].union.unresolvedObjectName().ToTableName()
 			sqlVAL.union.val = &tree.Import{Table: &name, Into: true, IntoCols: nil, FileFormat: sqlDollar[4].str, Files: sqlDollar[7].union.exprs(), Options: sqlDollar[9].union.kvOptions()}
 		}
 	case 311:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:3208
+//line sql-gen.y:3210
 		{
 			return helpWith(sqllex, "IMPORT")
 		}
 	case 312:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql-gen.y:3225
+//line sql-gen.y:3227
 		{
 			sqlVAL.union.val = &tree.Export{Query: sqlDollar[7].union.slct(), FileFormat: sqlDollar[3].str, File: sqlDollar[4].union.expr(), Options: sqlDollar[5].union.kvOptions()}
 		}
 	case 313:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:3228
+//line sql-gen.y:3230
 		{
 			return helpWith(sqllex, "EXPORT")
 		}
 	case 314:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:3232
+//line sql-gen.y:3234
 		{
 			sqlVAL.union.val = tree.NewStrVal(sqlDollar[1].str)
 		}
 	case 315:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:3236
+//line sql-gen.y:3238
 		{
 			p := sqlDollar[1].union.placeholder()
 			sqllex.(*lexer).UpdateNumPlaceholders(p)
@@ -23650,85 +23650,85 @@ sqldefault:
 		}
 	case 316:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:3244
+//line sql-gen.y:3246
 		{
 			sqlVAL.union.val = tree.Exprs{sqlDollar[1].union.expr()}
 		}
 	case 317:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3248
+//line sql-gen.y:3250
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.exprs(), sqlDollar[3].union.expr())
 		}
 	case 318:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3254
+//line sql-gen.y:3256
 		{
 			sqlVAL.union.val = sqlDollar[3].union.exprs()
 		}
 	case 319:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:3258
+//line sql-gen.y:3260
 		{
 			sqlVAL.union.val = tree.Exprs(nil)
 		}
 	case 320:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3264
+//line sql-gen.y:3266
 		{
 			sqlVAL.union.val = tree.KVOption{Key: tree.Name(sqlDollar[1].str), Value: sqlDollar[3].union.expr()}
 		}
 	case 321:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:3268
+//line sql-gen.y:3270
 		{
 			sqlVAL.union.val = tree.KVOption{Key: tree.Name(sqlDollar[1].str)}
 		}
 	case 322:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3272
+//line sql-gen.y:3274
 		{
 			sqlVAL.union.val = tree.KVOption{Key: tree.Name(sqlDollar[1].str), Value: sqlDollar[3].union.expr()}
 		}
 	case 323:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:3276
+//line sql-gen.y:3278
 		{
 			sqlVAL.union.val = tree.KVOption{Key: tree.Name(sqlDollar[1].str)}
 		}
 	case 324:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:3282
+//line sql-gen.y:3284
 		{
 			sqlVAL.union.val = []tree.KVOption{sqlDollar[1].union.kvOption()}
 		}
 	case 325:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3286
+//line sql-gen.y:3288
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.kvOptions(), sqlDollar[3].union.kvOption())
 		}
 	case 326:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:3292
+//line sql-gen.y:3294
 		{
 			sqlVAL.union.val = sqlDollar[2].union.kvOptions()
 		}
 	case 327:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:3296
+//line sql-gen.y:3298
 		{
 			sqlVAL.union.val = sqlDollar[4].union.kvOptions()
 		}
 	case 328:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:3300
+//line sql-gen.y:3302
 		{
 			sqlVAL.union.val = nil
 		}
 	case 329:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql-gen.y:3312
+//line sql-gen.y:3314
 		{
 
 			name := sqlDollar[2].union.unresolvedObjectName().ToTableName()
@@ -23744,31 +23744,31 @@ sqldefault:
 		}
 	case 330:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:3326
+//line sql-gen.y:3328
 		{
 			return unimplemented(sqllex, "copy from unsupported format")
 		}
 	case 331:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:3332
+//line sql-gen.y:3334
 		{
 			sqlVAL.union.val = sqlDollar[2].union.copyOptions()
 		}
 	case 332:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:3336
+//line sql-gen.y:3338
 		{
 			sqlVAL.union.val = &tree.CopyOptions{}
 		}
 	case 333:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:3342
+//line sql-gen.y:3344
 		{
 			sqlVAL.union.val = sqlDollar[1].union.copyOptions()
 		}
 	case 334:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:3346
+//line sql-gen.y:3348
 		{
 			if err := sqlDollar[1].union.copyOptions().CombineWith(sqlDollar[2].union.copyOptions()); err != nil {
 				return setErr(sqllex, err)
@@ -23776,67 +23776,67 @@ sqldefault:
 		}
 	case 335:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3354
+//line sql-gen.y:3356
 		{
 			sqlVAL.union.val = &tree.CopyOptions{Destination: sqlDollar[3].union.expr()}
 		}
 	case 336:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:3358
+//line sql-gen.y:3360
 		{
 			sqlVAL.union.val = &tree.CopyOptions{CopyFormat: tree.CopyFormatBinary}
 		}
 	case 337:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:3362
+//line sql-gen.y:3364
 		{
 			sqlVAL.union.val = &tree.CopyOptions{CopyFormat: tree.CopyFormatCSV}
 		}
 	case 338:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:3366
+//line sql-gen.y:3368
 		{
 			sqlVAL.union.val = &tree.CopyOptions{Delimiter: sqlDollar[2].union.expr()}
 		}
 	case 339:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:3370
+//line sql-gen.y:3372
 		{
 			sqlVAL.union.val = &tree.CopyOptions{Null: sqlDollar[2].union.expr()}
 		}
 	case 341:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:3378
+//line sql-gen.y:3380
 		{
 			return helpWith(sqllex, "CANCEL JOBS")
 		}
 	case 343:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:3379
+//line sql-gen.y:3381
 		{
 			return helpWith(sqllex, "CANCEL QUERIES")
 		}
 	case 345:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:3380
+//line sql-gen.y:3382
 		{
 			return helpWith(sqllex, "CANCEL SESSIONS")
 		}
 	case 347:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:3381
+//line sql-gen.y:3383
 		{
 			return helpWith(sqllex, "CANCEL ALL JOBS")
 		}
 	case 348:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:3382
+//line sql-gen.y:3384
 		{
 			return helpWith(sqllex, "CANCEL")
 		}
 	case 349:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3392
+//line sql-gen.y:3394
 		{
 			sqlVAL.union.val = &tree.ControlJobs{
 				Jobs: &tree.Select{
@@ -23847,31 +23847,31 @@ sqldefault:
 		}
 	case 350:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3400
+//line sql-gen.y:3402
 		{
 			return helpWith(sqllex, "CANCEL JOBS")
 		}
 	case 351:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3402
+//line sql-gen.y:3404
 		{
 			sqlVAL.union.val = &tree.ControlJobs{Jobs: sqlDollar[3].union.slct(), Command: tree.CancelJob}
 		}
 	case 352:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3406
+//line sql-gen.y:3408
 		{
 			sqlVAL.union.val = &tree.ControlJobsForSchedules{Schedules: sqlDollar[3].union.slct(), Command: tree.CancelJob}
 		}
 	case 353:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3409
+//line sql-gen.y:3411
 		{
 			return helpWith(sqllex, "CANCEL JOBS")
 		}
 	case 354:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3419
+//line sql-gen.y:3421
 		{
 			sqlVAL.union.val = &tree.CancelQueries{
 				Queries: &tree.Select{
@@ -23882,7 +23882,7 @@ sqldefault:
 		}
 	case 355:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:3428
+//line sql-gen.y:3430
 		{
 			sqlVAL.union.val = &tree.CancelQueries{
 				Queries: &tree.Select{
@@ -23893,31 +23893,31 @@ sqldefault:
 		}
 	case 356:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3436
+//line sql-gen.y:3438
 		{
 			return helpWith(sqllex, "CANCEL QUERIES")
 		}
 	case 357:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3438
+//line sql-gen.y:3440
 		{
 			sqlVAL.union.val = &tree.CancelQueries{Queries: sqlDollar[3].union.slct(), IfExists: false}
 		}
 	case 358:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:3442
+//line sql-gen.y:3444
 		{
 			sqlVAL.union.val = &tree.CancelQueries{Queries: sqlDollar[5].union.slct(), IfExists: true}
 		}
 	case 359:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3445
+//line sql-gen.y:3447
 		{
 			return helpWith(sqllex, "CANCEL QUERIES")
 		}
 	case 360:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3455
+//line sql-gen.y:3457
 		{
 			sqlVAL.union.val = &tree.CancelSessions{
 				Sessions: &tree.Select{
@@ -23928,7 +23928,7 @@ sqldefault:
 		}
 	case 361:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:3464
+//line sql-gen.y:3466
 		{
 			sqlVAL.union.val = &tree.CancelSessions{
 				Sessions: &tree.Select{
@@ -23939,61 +23939,61 @@ sqldefault:
 		}
 	case 362:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3472
+//line sql-gen.y:3474
 		{
 			return helpWith(sqllex, "CANCEL SESSIONS")
 		}
 	case 363:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3474
+//line sql-gen.y:3476
 		{
 			sqlVAL.union.val = &tree.CancelSessions{Sessions: sqlDollar[3].union.slct(), IfExists: false}
 		}
 	case 364:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:3478
+//line sql-gen.y:3480
 		{
 			sqlVAL.union.val = &tree.CancelSessions{Sessions: sqlDollar[5].union.slct(), IfExists: true}
 		}
 	case 365:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3481
+//line sql-gen.y:3483
 		{
 			return helpWith(sqllex, "CANCEL SESSIONS")
 		}
 	case 366:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:3489
+//line sql-gen.y:3491
 		{
 			sqlVAL.union.val = &tree.ControlJobsOfType{Type: sqlDollar[3].str, Command: tree.CancelJob}
 		}
 	case 367:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3492
+//line sql-gen.y:3494
 		{
 			return helpWith(sqllex, "CANCEL ALL JOBS")
 		}
 	case 368:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:3496
+//line sql-gen.y:3498
 		{
 			sqlVAL.union.val = &tree.CommentOnDatabase{Name: tree.Name(sqlDollar[4].str), Comment: sqlDollar[6].union.strPtr()}
 		}
 	case 369:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:3500
+//line sql-gen.y:3502
 		{
 			sqlVAL.union.val = &tree.CommentOnSchema{Name: tree.Name(sqlDollar[4].str), Comment: sqlDollar[6].union.strPtr()}
 		}
 	case 370:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:3504
+//line sql-gen.y:3506
 		{
 			sqlVAL.union.val = &tree.CommentOnTable{Table: sqlDollar[4].union.unresolvedObjectName(), Comment: sqlDollar[6].union.strPtr()}
 		}
 	case 371:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:3508
+//line sql-gen.y:3510
 		{
 			varName, err := sqlDollar[4].union.unresolvedName().NormalizeVarName()
 			if err != nil {
@@ -24008,410 +24008,410 @@ sqldefault:
 		}
 	case 372:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:3521
+//line sql-gen.y:3523
 		{
 			sqlVAL.union.val = &tree.CommentOnIndex{Index: sqlDollar[4].union.tableIndexName(), Comment: sqlDollar[6].union.strPtr()}
 		}
 	case 373:
 		sqlDollar = sqlS[sqlpt-8 : sqlpt+1]
-//line sql-gen.y:3526
+//line sql-gen.y:3528
 		{
 			sqlVAL.union.val = &tree.CommentOnConstraint{Constraint: tree.Name(sqlDollar[4].str), Table: sqlDollar[6].union.unresolvedObjectName(), Comment: sqlDollar[8].union.strPtr()}
 		}
 	case 374:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:3529
+//line sql-gen.y:3531
 		{
 			return unimplemented(sqllex, "comment on extension")
 		}
 	case 375:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:3533
+//line sql-gen.y:3535
 		{
 			t := sqlDollar[1].str
 			sqlVAL.union.val = &t
 		}
 	case 376:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:3538
+//line sql-gen.y:3540
 		{
 			var str *string
 			sqlVAL.union.val = str
 		}
 	case 378:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:3550
+//line sql-gen.y:3552
 		{
 			return helpWith(sqllex, "CREATE ROLE")
 		}
 	case 381:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:3552
+//line sql-gen.y:3554
 		{
 			return helpWith(sqllex, "CREATE STATISTICS")
 		}
 	case 383:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:3553
+//line sql-gen.y:3555
 		{
 			return helpWith(sqllex, "CREATE SCHEDULE FOR BACKUP")
 		}
 	case 387:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:3556
+//line sql-gen.y:3558
 		{
 			return helpWith(sqllex, "CREATE EXTENSION")
 		}
 	case 388:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:3557
+//line sql-gen.y:3559
 		{
 		}
 	case 389:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:3558
+//line sql-gen.y:3560
 		{
 			return helpWith(sqllex, "CREATE")
 		}
 	case 390:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:3565
+//line sql-gen.y:3567
 		{
 			sqlVAL.union.val = &tree.CreateExtension{IfNotExists: true, Name: sqlDollar[6].str}
 		}
 	case 391:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3568
+//line sql-gen.y:3570
 		{
 			sqlVAL.union.val = &tree.CreateExtension{Name: sqlDollar[3].str}
 		}
 	case 392:
 		sqlDollar = sqlS[sqlpt-8 : sqlpt+1]
-//line sql-gen.y:3571
+//line sql-gen.y:3573
 		{
 			return unimplemented(sqllex, "create extension if not exists with")
 		}
 	case 393:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3572
+//line sql-gen.y:3574
 		{
 			return helpWith(sqllex, "CREATE EXTENSION")
 		}
 	case 394:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:3575
+//line sql-gen.y:3577
 		{
 			return unimplemented(sqllex, "create access method")
 		}
 	case 395:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3576
+//line sql-gen.y:3578
 		{
 			return unimplemented(sqllex, "create aggregate")
 		}
 	case 396:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3577
+//line sql-gen.y:3579
 		{
 			return unimplemented(sqllex, "create cast")
 		}
 	case 397:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:3578
+//line sql-gen.y:3580
 		{
 			return unimplementedWithIssueDetail(sqllex, 28296, "create constraint")
 		}
 	case 398:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3579
+//line sql-gen.y:3581
 		{
 			return unimplemented(sqllex, "create conversion")
 		}
 	case 399:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:3580
+//line sql-gen.y:3582
 		{
 			return unimplemented(sqllex, "create def conv")
 		}
 	case 400:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:3581
+//line sql-gen.y:3583
 		{
 			return unimplemented(sqllex, "create foreign table")
 		}
 	case 401:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:3582
+//line sql-gen.y:3584
 		{
 			return unimplemented(sqllex, "create fdw")
 		}
 	case 402:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3583
+//line sql-gen.y:3585
 		{
 			return unimplementedWithIssueDetail(sqllex, 17511, "create function")
 		}
 	case 403:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:3584
+//line sql-gen.y:3586
 		{
 			return unimplementedWithIssueDetail(sqllex, 17511, "create function")
 		}
 	case 404:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql-gen.y:3585
+//line sql-gen.y:3587
 		{
 			return unimplementedWithIssueDetail(sqllex, 17511, "create language "+sqlDollar[6].str)
 		}
 	case 405:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3586
+//line sql-gen.y:3588
 		{
 			return unimplementedWithIssue(sqllex, 65017)
 		}
 	case 406:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3587
+//line sql-gen.y:3589
 		{
 			return unimplemented(sqllex, "create publication")
 		}
 	case 407:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:3588
+//line sql-gen.y:3590
 		{
 			return unimplemented(sqllex, "create rule")
 		}
 	case 408:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3589
+//line sql-gen.y:3591
 		{
 			return unimplemented(sqllex, "create server")
 		}
 	case 409:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3590
+//line sql-gen.y:3592
 		{
 			return unimplemented(sqllex, "create subscription")
 		}
 	case 410:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3591
+//line sql-gen.y:3593
 		{
 			return unimplementedWithIssueDetail(sqllex, 54113, "create tablespace")
 		}
 	case 411:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3592
+//line sql-gen.y:3594
 		{
 			return unimplementedWithIssueDetail(sqllex, 7821, "create text")
 		}
 	case 412:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3593
+//line sql-gen.y:3595
 		{
 			return unimplementedWithIssueDetail(sqllex, 28296, "create trigger")
 		}
 	case 413:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:3596
+//line sql-gen.y:3598
 		{
 		}
 	case 414:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:3597
+//line sql-gen.y:3599
 		{
 		}
 	case 415:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:3600
+//line sql-gen.y:3602
 		{
 		}
 	case 416:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:3601
+//line sql-gen.y:3603
 		{
 		}
 	case 417:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:3604
+//line sql-gen.y:3606
 		{
 		}
 	case 418:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:3605
+//line sql-gen.y:3607
 		{
 		}
 	case 419:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:3608
+//line sql-gen.y:3610
 		{
 			return unimplemented(sqllex, "drop access method")
 		}
 	case 420:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3609
+//line sql-gen.y:3611
 		{
 			return unimplemented(sqllex, "drop aggregate")
 		}
 	case 421:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3610
+//line sql-gen.y:3612
 		{
 			return unimplemented(sqllex, "drop cast")
 		}
 	case 422:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3611
+//line sql-gen.y:3613
 		{
 			return unimplemented(sqllex, "drop collation")
 		}
 	case 423:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3612
+//line sql-gen.y:3614
 		{
 			return unimplemented(sqllex, "drop conversion")
 		}
 	case 424:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3613
+//line sql-gen.y:3615
 		{
 			return unimplementedWithIssueDetail(sqllex, 27796, "drop")
 		}
 	case 425:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:3614
+//line sql-gen.y:3616
 		{
 			return unimplemented(sqllex, "drop extension "+sqlDollar[5].str)
 		}
 	case 426:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:3615
+//line sql-gen.y:3617
 		{
 			return unimplemented(sqllex, "drop extension "+sqlDollar[3].str)
 		}
 	case 427:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:3616
+//line sql-gen.y:3618
 		{
 			return unimplemented(sqllex, "drop foreign table")
 		}
 	case 428:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:3617
+//line sql-gen.y:3619
 		{
 			return unimplemented(sqllex, "drop fdw")
 		}
 	case 429:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3618
+//line sql-gen.y:3620
 		{
 			return unimplementedWithIssueDetail(sqllex, 17511, "drop function")
 		}
 	case 430:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:3619
+//line sql-gen.y:3621
 		{
 			return unimplementedWithIssueDetail(sqllex, 17511, "drop language "+sqlDollar[4].str)
 		}
 	case 431:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3620
+//line sql-gen.y:3622
 		{
 			return unimplemented(sqllex, "drop operator")
 		}
 	case 432:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3621
+//line sql-gen.y:3623
 		{
 			return unimplemented(sqllex, "drop publication")
 		}
 	case 433:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3622
+//line sql-gen.y:3624
 		{
 			return unimplemented(sqllex, "drop rule")
 		}
 	case 434:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3623
+//line sql-gen.y:3625
 		{
 			return unimplemented(sqllex, "drop server")
 		}
 	case 435:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3624
+//line sql-gen.y:3626
 		{
 			return unimplemented(sqllex, "drop subscription")
 		}
 	case 436:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3625
+//line sql-gen.y:3627
 		{
 			return unimplementedWithIssueDetail(sqllex, 7821, "drop text")
 		}
 	case 437:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3626
+//line sql-gen.y:3628
 		{
 			return unimplementedWithIssueDetail(sqllex, 28296, "drop")
 		}
 	case 439:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:3629
+//line sql-gen.y:3631
 		{
 			return helpWith(sqllex, "CREATE DATABASE")
 		}
 	case 441:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:3630
+//line sql-gen.y:3632
 		{
 			return helpWith(sqllex, "CREATE INDEX")
 		}
 	case 443:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:3631
+//line sql-gen.y:3633
 		{
 			return helpWith(sqllex, "CREATE SCHEMA")
 		}
 	case 445:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:3632
+//line sql-gen.y:3634
 		{
 			return helpWith(sqllex, "CREATE TABLE")
 		}
 	case 447:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:3633
+//line sql-gen.y:3635
 		{
 			return helpWith(sqllex, "CREATE TABLE")
 		}
 	case 448:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:3635
+//line sql-gen.y:3637
 		{
 			return helpWith(sqllex, "CREATE TABLE")
 		}
 	case 450:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:3636
+//line sql-gen.y:3638
 		{
 			return helpWith(sqllex, "CREATE TYPE")
 		}
 	case 452:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:3637
+//line sql-gen.y:3639
 		{
 			return helpWith(sqllex, "CREATE VIEW")
 		}
 	case 454:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:3638
+//line sql-gen.y:3640
 		{
 			return helpWith(sqllex, "CREATE SEQUENCE")
 		}
 	case 455:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql-gen.y:3648
+//line sql-gen.y:3650
 		{
 			sqlVAL.union.val = &tree.CreateStats{
 				Name:        tree.Name(sqlDollar[3].str),
@@ -24422,31 +24422,31 @@ sqldefault:
 		}
 	case 456:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3656
+//line sql-gen.y:3658
 		{
 			return helpWith(sqllex, "CREATE STATISTICS")
 		}
 	case 457:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:3660
+//line sql-gen.y:3662
 		{
 			sqlVAL.union.val = sqlDollar[2].union.nameList()
 		}
 	case 458:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:3664
+//line sql-gen.y:3666
 		{
 			sqlVAL.union.val = tree.NameList(nil)
 		}
 	case 459:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:3670
+//line sql-gen.y:3672
 		{
 			sqlVAL.union.val = sqlDollar[1].union.unresolvedObjectName()
 		}
 	case 460:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3674
+//line sql-gen.y:3676
 		{
 
 			sqlVAL.union.val = &tree.TableRef{
@@ -24455,14 +24455,14 @@ sqldefault:
 		}
 	case 461:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3683
+//line sql-gen.y:3685
 		{
 
 			sqlVAL.union.val = sqlDollar[3].union.createStatsOptions()
 		}
 	case 462:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:3690
+//line sql-gen.y:3692
 		{
 			sqlVAL.union.val = &tree.CreateStatsOptions{
 				AsOf: sqlDollar[1].union.asOfClause(),
@@ -24470,19 +24470,19 @@ sqldefault:
 		}
 	case 463:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:3696
+//line sql-gen.y:3698
 		{
 			sqlVAL.union.val = &tree.CreateStatsOptions{}
 		}
 	case 464:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:3702
+//line sql-gen.y:3704
 		{
 			sqlVAL.union.val = sqlDollar[1].union.createStatsOptions()
 		}
 	case 465:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:3706
+//line sql-gen.y:3708
 		{
 			a := sqlDollar[1].union.createStatsOptions()
 			b := sqlDollar[2].union.createStatsOptions()
@@ -24493,7 +24493,7 @@ sqldefault:
 		}
 	case 466:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:3717
+//line sql-gen.y:3719
 		{
 
 			value, _ := constant.Float64Val(sqlDollar[2].union.numVal().AsConstantValue())
@@ -24507,7 +24507,7 @@ sqldefault:
 		}
 	case 467:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:3729
+//line sql-gen.y:3731
 		{
 			sqlVAL.union.val = &tree.CreateStatsOptions{
 				AsOf: sqlDollar[1].union.asOfClause(),
@@ -24515,7 +24515,7 @@ sqldefault:
 		}
 	case 468:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:3744
+//line sql-gen.y:3746
 		{
 			sqlVAL.union.val = &tree.CreateChangefeed{
 				Targets: sqlDollar[4].union.targetList(),
@@ -24525,7 +24525,7 @@ sqldefault:
 		}
 	case 469:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:3752
+//line sql-gen.y:3754
 		{
 
 			sqlVAL.union.val = &tree.CreateChangefeed{
@@ -24535,44 +24535,44 @@ sqldefault:
 		}
 	case 470:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:3762
+//line sql-gen.y:3764
 		{
 			sqlVAL.union.val = tree.TargetList{Tables: sqlDollar[1].union.tablePatterns()}
 		}
 	case 471:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:3766
+//line sql-gen.y:3768
 		{
 			sqlVAL.union.val = tree.TargetList{Tables: sqlDollar[2].union.tablePatterns()}
 		}
 	case 472:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:3772
+//line sql-gen.y:3774
 		{
 			sqlVAL.union.val = tree.TablePatterns{sqlDollar[1].union.unresolvedObjectName().ToUnresolvedName()}
 		}
 	case 473:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3776
+//line sql-gen.y:3778
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.tablePatterns(), sqlDollar[3].union.unresolvedObjectName().ToUnresolvedName())
 		}
 	case 474:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:3783
+//line sql-gen.y:3785
 		{
 			sqlVAL.union.val = sqlDollar[2].union.expr()
 		}
 	case 475:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:3787
+//line sql-gen.y:3789
 		{
 
 			sqlVAL.union.val = nil
 		}
 	case 476:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql-gen.y:3804
+//line sql-gen.y:3806
 		{
 			sqlVAL.union.val = &tree.ReplicationStream{
 				Targets: sqlDollar[5].union.targetList(),
@@ -24582,31 +24582,31 @@ sqldefault:
 		}
 	case 477:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:3815
+//line sql-gen.y:3817
 		{
 			sqlVAL.union.val = sqlDollar[2].union.replicationOptions()
 		}
 	case 478:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:3819
+//line sql-gen.y:3821
 		{
 			sqlVAL.union.val = sqlDollar[4].union.replicationOptions()
 		}
 	case 479:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:3823
+//line sql-gen.y:3825
 		{
 			sqlVAL.union.val = &tree.ReplicationOptions{}
 		}
 	case 480:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:3830
+//line sql-gen.y:3832
 		{
 			sqlVAL.union.val = sqlDollar[1].union.replicationOptions()
 		}
 	case 481:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3834
+//line sql-gen.y:3836
 		{
 			if err := sqlDollar[1].union.replicationOptions().CombineWith(sqlDollar[3].union.replicationOptions()); err != nil {
 				return setErr(sqllex, err)
@@ -24614,19 +24614,19 @@ sqldefault:
 		}
 	case 482:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3843
+//line sql-gen.y:3845
 		{
 			sqlVAL.union.val = &tree.ReplicationOptions{Cursor: sqlDollar[3].union.expr()}
 		}
 	case 483:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:3847
+//line sql-gen.y:3849
 		{
 			sqlVAL.union.val = &tree.ReplicationOptions{Detached: true}
 		}
 	case 484:
 		sqlDollar = sqlS[sqlpt-9 : sqlpt+1]
-//line sql-gen.y:3860
+//line sql-gen.y:3862
 		{
 			sqlVAL.union.val = &tree.Delete{
 				With:      sqlDollar[1].union.with(),
@@ -24639,137 +24639,137 @@ sqldefault:
 		}
 	case 485:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3870
+//line sql-gen.y:3872
 		{
 			return helpWith(sqllex, "DELETE")
 		}
 	case 486:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:3873
+//line sql-gen.y:3875
 		{
 			return unimplementedWithIssueDetail(sqllex, 40963, "delete using")
 		}
 	case 487:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:3874
+//line sql-gen.y:3876
 		{
 		}
 	case 488:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:3882
+//line sql-gen.y:3884
 		{
 			sqlVAL.union.val = &tree.Discard{Mode: tree.DiscardModeAll}
 		}
 	case 489:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:3885
+//line sql-gen.y:3887
 		{
 			return unimplemented(sqllex, "discard plans")
 		}
 	case 490:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:3886
+//line sql-gen.y:3888
 		{
 			return unimplemented(sqllex, "discard sequences")
 		}
 	case 491:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:3887
+//line sql-gen.y:3889
 		{
 			return unimplemented(sqllex, "discard temp")
 		}
 	case 492:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:3888
+//line sql-gen.y:3890
 		{
 			return unimplemented(sqllex, "discard temp")
 		}
 	case 493:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:3889
+//line sql-gen.y:3891
 		{
 			return helpWith(sqllex, "DISCARD")
 		}
 	case 496:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:3898
+//line sql-gen.y:3900
 		{
 			return helpWith(sqllex, "DROP ROLE")
 		}
 	case 498:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:3899
+//line sql-gen.y:3901
 		{
 			return helpWith(sqllex, "DROP SCHEDULES")
 		}
 	case 499:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:3900
+//line sql-gen.y:3902
 		{
 		}
 	case 500:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:3901
+//line sql-gen.y:3903
 		{
 			return helpWith(sqllex, "DROP")
 		}
 	case 502:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:3904
+//line sql-gen.y:3906
 		{
 			return helpWith(sqllex, "DROP DATABASE")
 		}
 	case 504:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:3905
+//line sql-gen.y:3907
 		{
 			return helpWith(sqllex, "DROP INDEX")
 		}
 	case 506:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:3906
+//line sql-gen.y:3908
 		{
 			return helpWith(sqllex, "DROP TABLE")
 		}
 	case 508:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:3907
+//line sql-gen.y:3909
 		{
 			return helpWith(sqllex, "DROP VIEW")
 		}
 	case 510:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:3908
+//line sql-gen.y:3910
 		{
 			return helpWith(sqllex, "DROP SEQUENCE")
 		}
 	case 512:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:3909
+//line sql-gen.y:3911
 		{
 			return helpWith(sqllex, "DROP SCHEMA")
 		}
 	case 514:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:3910
+//line sql-gen.y:3912
 		{
 			return helpWith(sqllex, "DROP TYPE")
 		}
 	case 515:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:3918
+//line sql-gen.y:3920
 		{
 			sqlVAL.union.val = &tree.DropView{Names: sqlDollar[3].union.tableNames(), IfExists: false, DropBehavior: sqlDollar[4].union.dropBehavior()}
 		}
 	case 516:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:3922
+//line sql-gen.y:3924
 		{
 			sqlVAL.union.val = &tree.DropView{Names: sqlDollar[5].union.tableNames(), IfExists: true, DropBehavior: sqlDollar[6].union.dropBehavior()}
 		}
 	case 517:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:3926
+//line sql-gen.y:3928
 		{
 			sqlVAL.union.val = &tree.DropView{
 				Names:          sqlDollar[4].union.tableNames(),
@@ -24780,7 +24780,7 @@ sqldefault:
 		}
 	case 518:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql-gen.y:3935
+//line sql-gen.y:3937
 		{
 			sqlVAL.union.val = &tree.DropView{
 				Names:          sqlDollar[6].union.tableNames(),
@@ -24791,49 +24791,49 @@ sqldefault:
 		}
 	case 519:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3943
+//line sql-gen.y:3945
 		{
 			return helpWith(sqllex, "DROP VIEW")
 		}
 	case 520:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:3951
+//line sql-gen.y:3953
 		{
 			sqlVAL.union.val = &tree.DropSequence{Names: sqlDollar[3].union.tableNames(), IfExists: false, DropBehavior: sqlDollar[4].union.dropBehavior()}
 		}
 	case 521:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:3955
+//line sql-gen.y:3957
 		{
 			sqlVAL.union.val = &tree.DropSequence{Names: sqlDollar[5].union.tableNames(), IfExists: true, DropBehavior: sqlDollar[6].union.dropBehavior()}
 		}
 	case 522:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3958
+//line sql-gen.y:3960
 		{
 			return helpWith(sqllex, "DROP VIEW")
 		}
 	case 523:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:3966
+//line sql-gen.y:3968
 		{
 			sqlVAL.union.val = &tree.DropTable{Names: sqlDollar[3].union.tableNames(), IfExists: false, DropBehavior: sqlDollar[4].union.dropBehavior()}
 		}
 	case 524:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:3970
+//line sql-gen.y:3972
 		{
 			sqlVAL.union.val = &tree.DropTable{Names: sqlDollar[5].union.tableNames(), IfExists: true, DropBehavior: sqlDollar[6].union.dropBehavior()}
 		}
 	case 525:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3973
+//line sql-gen.y:3975
 		{
 			return helpWith(sqllex, "DROP TABLE")
 		}
 	case 526:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:3981
+//line sql-gen.y:3983
 		{
 			sqlVAL.union.val = &tree.DropIndex{
 				IndexList:    sqlDollar[4].union.newTableIndexNames(),
@@ -24844,7 +24844,7 @@ sqldefault:
 		}
 	case 527:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql-gen.y:3990
+//line sql-gen.y:3992
 		{
 			sqlVAL.union.val = &tree.DropIndex{
 				IndexList:    sqlDollar[6].union.newTableIndexNames(),
@@ -24855,13 +24855,13 @@ sqldefault:
 		}
 	case 528:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:3998
+//line sql-gen.y:4000
 		{
 			return helpWith(sqllex, "DROP INDEX")
 		}
 	case 529:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:4006
+//line sql-gen.y:4008
 		{
 			sqlVAL.union.val = &tree.DropDatabase{
 				Name:         tree.Name(sqlDollar[3].str),
@@ -24871,7 +24871,7 @@ sqldefault:
 		}
 	case 530:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:4014
+//line sql-gen.y:4016
 		{
 			sqlVAL.union.val = &tree.DropDatabase{
 				Name:         tree.Name(sqlDollar[5].str),
@@ -24881,13 +24881,13 @@ sqldefault:
 		}
 	case 531:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:4021
+//line sql-gen.y:4023
 		{
 			return helpWith(sqllex, "DROP DATABASE")
 		}
 	case 532:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:4028
+//line sql-gen.y:4030
 		{
 			sqlVAL.union.val = &tree.DropType{
 				Names:        sqlDollar[3].union.unresolvedObjectNames(),
@@ -24897,7 +24897,7 @@ sqldefault:
 		}
 	case 533:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:4036
+//line sql-gen.y:4038
 		{
 			sqlVAL.union.val = &tree.DropType{
 				Names:        sqlDollar[5].union.unresolvedObjectNames(),
@@ -24907,31 +24907,31 @@ sqldefault:
 		}
 	case 534:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:4043
+//line sql-gen.y:4045
 		{
 			return helpWith(sqllex, "DROP TYPE")
 		}
 	case 535:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:4047
+//line sql-gen.y:4049
 		{
 			sqlVAL.union.val = tree.TargetList{Types: sqlDollar[1].union.unresolvedObjectNames()}
 		}
 	case 536:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:4053
+//line sql-gen.y:4055
 		{
 			sqlVAL.union.val = []*tree.UnresolvedObjectName{sqlDollar[1].union.unresolvedObjectName()}
 		}
 	case 537:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:4057
+//line sql-gen.y:4059
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.unresolvedObjectNames(), sqlDollar[3].union.unresolvedObjectName())
 		}
 	case 538:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:4066
+//line sql-gen.y:4068
 		{
 			sqlVAL.union.val = &tree.DropSchema{
 				Names:        sqlDollar[3].union.objectNamePrefixList(),
@@ -24941,7 +24941,7 @@ sqldefault:
 		}
 	case 539:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:4074
+//line sql-gen.y:4076
 		{
 			sqlVAL.union.val = &tree.DropSchema{
 				Names:        sqlDollar[5].union.objectNamePrefixList(),
@@ -24951,45 +24951,45 @@ sqldefault:
 		}
 	case 540:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:4081
+//line sql-gen.y:4083
 		{
 			return helpWith(sqllex, "DROP SCHEMA")
 		}
 	case 541:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:4089
+//line sql-gen.y:4091
 		{
 			sqlVAL.union.val = &tree.DropRole{Names: sqlDollar[3].union.roleSpecList(), IfExists: false, IsRole: sqlDollar[2].union.bool()}
 		}
 	case 542:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:4093
+//line sql-gen.y:4095
 		{
 			sqlVAL.union.val = &tree.DropRole{Names: sqlDollar[5].union.roleSpecList(), IfExists: true, IsRole: sqlDollar[2].union.bool()}
 		}
 	case 543:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:4096
+//line sql-gen.y:4098
 		{
 			return helpWith(sqllex, "DROP ROLE")
 		}
 	case 544:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:4100
+//line sql-gen.y:4102
 		{
 			name := sqlDollar[1].union.unresolvedObjectName().ToTableName()
 			sqlVAL.union.val = tree.TableNames{name}
 		}
 	case 545:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:4105
+//line sql-gen.y:4107
 		{
 			name := sqlDollar[3].union.unresolvedObjectName().ToTableName()
 			sqlVAL.union.val = append(sqlDollar[1].union.tableNames(), name)
 		}
 	case 546:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:4118
+//line sql-gen.y:4120
 		{
 			sqlVAL.union.val = &tree.Analyze{
 				Table: sqlDollar[2].union.tblExpr(),
@@ -24997,13 +24997,13 @@ sqldefault:
 		}
 	case 547:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:4123
+//line sql-gen.y:4125
 		{
 			return helpWith(sqllex, "ANALYZE")
 		}
 	case 548:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:4125
+//line sql-gen.y:4127
 		{
 			sqlVAL.union.val = &tree.Analyze{
 				Table: sqlDollar[2].union.tblExpr(),
@@ -25011,19 +25011,19 @@ sqldefault:
 		}
 	case 549:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:4130
+//line sql-gen.y:4132
 		{
 			return helpWith(sqllex, "ANALYZE")
 		}
 	case 550:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:4134
+//line sql-gen.y:4136
 		{
 			sqlVAL.union.val = sqlDollar[1].union.unresolvedObjectName()
 		}
 	case 551:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:4157
+//line sql-gen.y:4159
 		{
 			var err error
 			sqlVAL.union.val, err = tree.MakeExplain(nil, sqlDollar[2].union.stmt())
@@ -25033,13 +25033,13 @@ sqldefault:
 		}
 	case 552:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:4164
+//line sql-gen.y:4166
 		{
 			return helpWith(sqllex, "EXPLAIN")
 		}
 	case 553:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:4166
+//line sql-gen.y:4168
 		{
 			var err error
 			sqlVAL.union.val, err = tree.MakeExplain(sqlDollar[3].union.strs(), sqlDollar[5].union.stmt())
@@ -25049,7 +25049,7 @@ sqldefault:
 		}
 	case 554:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:4174
+//line sql-gen.y:4176
 		{
 			var err error
 			sqlVAL.union.val, err = tree.MakeExplain([]string{"ANALYZE"}, sqlDollar[3].union.stmt())
@@ -25059,7 +25059,7 @@ sqldefault:
 		}
 	case 555:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:4182
+//line sql-gen.y:4184
 		{
 			var err error
 			sqlVAL.union.val, err = tree.MakeExplain([]string{"ANALYZE"}, sqlDollar[3].union.stmt())
@@ -25069,7 +25069,7 @@ sqldefault:
 		}
 	case 556:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:4190
+//line sql-gen.y:4192
 		{
 			var err error
 			sqlVAL.union.val, err = tree.MakeExplain(append(sqlDollar[4].union.strs(), "ANALYZE"), sqlDollar[6].union.stmt())
@@ -25079,7 +25079,7 @@ sqldefault:
 		}
 	case 557:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:4198
+//line sql-gen.y:4200
 		{
 			var err error
 			sqlVAL.union.val, err = tree.MakeExplain(append(sqlDollar[4].union.strs(), "ANALYZE"), sqlDollar[6].union.stmt())
@@ -25089,127 +25089,127 @@ sqldefault:
 		}
 	case 558:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:4209
+//line sql-gen.y:4211
 		{
 			return helpWith(sqllex, "EXPLAIN")
 		}
 	case 563:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:4217
+//line sql-gen.y:4219
 		{
 			return helpWith(sqllex, "BACKUP")
 		}
 	case 567:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:4220
+//line sql-gen.y:4222
 		{
 			return helpWith(sqllex, "DELETE")
 		}
 	case 570:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:4222
+//line sql-gen.y:4224
 		{
 			return helpWith(sqllex, "EXPLAIN")
 		}
 	case 572:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:4223
+//line sql-gen.y:4225
 		{
 			return helpWith(sqllex, "IMPORT")
 		}
 	case 574:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:4224
+//line sql-gen.y:4226
 		{
 			return helpWith(sqllex, "INSERT")
 		}
 	case 578:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:4227
+//line sql-gen.y:4229
 		{
 			return helpWith(sqllex, "RESTORE")
 		}
 	case 581:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:4229
+//line sql-gen.y:4231
 		{
 			return helpWith(sqllex, "EXPORT")
 		}
 	case 583:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:4232
+//line sql-gen.y:4234
 		{
 			sqlVAL.union.val = sqlDollar[1].union.slct()
 		}
 	case 587:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:4237
+//line sql-gen.y:4239
 		{
 			return helpWith(sqllex, "TRUNCATE")
 		}
 	case 589:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:4238
+//line sql-gen.y:4240
 		{
 			return helpWith(sqllex, "UPDATE")
 		}
 	case 591:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:4239
+//line sql-gen.y:4241
 		{
 			return helpWith(sqllex, "UPSERT")
 		}
 	case 593:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:4244
+//line sql-gen.y:4246
 		{
 			return helpWith(sqllex, "DELETE")
 		}
 	case 595:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:4245
+//line sql-gen.y:4247
 		{
 			return helpWith(sqllex, "EXPLAIN")
 		}
 	case 597:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:4246
+//line sql-gen.y:4248
 		{
 			return helpWith(sqllex, "INSERT")
 		}
 	case 598:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:4248
+//line sql-gen.y:4250
 		{
 			sqlVAL.union.val = sqlDollar[1].union.slct()
 		}
 	case 601:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:4252
+//line sql-gen.y:4254
 		{
 			return helpWith(sqllex, "UPDATE")
 		}
 	case 603:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:4253
+//line sql-gen.y:4255
 		{
 			return helpWith(sqllex, "UPSERT")
 		}
 	case 604:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:4257
+//line sql-gen.y:4259
 		{
 			sqlVAL.union.val = []string{sqlDollar[1].str}
 		}
 	case 605:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:4261
+//line sql-gen.y:4263
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.strs(), sqlDollar[3].str)
 		}
 	case 606:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:4271
+//line sql-gen.y:4273
 		{
 			sqlVAL.union.val = &tree.Prepare{
 				Name:      tree.Name(sqlDollar[2].str),
@@ -25219,7 +25219,7 @@ sqldefault:
 		}
 	case 607:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql-gen.y:4279
+//line sql-gen.y:4281
 		{
 
 			sqlVAL.union.val = &tree.Prepare{
@@ -25230,25 +25230,25 @@ sqldefault:
 		}
 	case 608:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:4287
+//line sql-gen.y:4289
 		{
 			return helpWith(sqllex, "PREPARE")
 		}
 	case 609:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:4291
+//line sql-gen.y:4293
 		{
 			sqlVAL.union.val = sqlDollar[2].union.typeReferences()
 		}
 	case 610:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:4295
+//line sql-gen.y:4297
 		{
 			sqlVAL.union.val = []tree.ResolvableTypeReference(nil)
 		}
 	case 611:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:4305
+//line sql-gen.y:4307
 		{
 			sqlVAL.union.val = &tree.Execute{
 				Name:   tree.Name(sqlDollar[2].str),
@@ -25257,7 +25257,7 @@ sqldefault:
 		}
 	case 612:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:4312
+//line sql-gen.y:4314
 		{
 
 			sqlVAL.union.val = &tree.Execute{
@@ -25268,79 +25268,79 @@ sqldefault:
 		}
 	case 613:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:4320
+//line sql-gen.y:4322
 		{
 			return helpWith(sqllex, "EXECUTE")
 		}
 	case 614:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:4324
+//line sql-gen.y:4326
 		{
 			sqlVAL.union.val = sqlDollar[2].union.exprs()
 		}
 	case 615:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:4328
+//line sql-gen.y:4330
 		{
 			sqlVAL.union.val = tree.Exprs(nil)
 		}
 	case 616:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:4338
+//line sql-gen.y:4340
 		{
 			sqlVAL.union.val = &tree.Deallocate{Name: tree.Name(sqlDollar[2].str)}
 		}
 	case 617:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:4342
+//line sql-gen.y:4344
 		{
 			sqlVAL.union.val = &tree.Deallocate{Name: tree.Name(sqlDollar[3].str)}
 		}
 	case 618:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:4346
+//line sql-gen.y:4348
 		{
 			sqlVAL.union.val = &tree.Deallocate{}
 		}
 	case 619:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:4350
+//line sql-gen.y:4352
 		{
 			sqlVAL.union.val = &tree.Deallocate{}
 		}
 	case 620:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:4353
+//line sql-gen.y:4355
 		{
 			return helpWith(sqllex, "DEALLOCATE")
 		}
 	case 621:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql-gen.y:4376
+//line sql-gen.y:4378
 		{
 			sqlVAL.union.val = &tree.Grant{Privileges: sqlDollar[2].union.privilegeList(), Grantees: sqlDollar[6].union.roleSpecList(), Targets: sqlDollar[4].union.targetList(), WithGrantOption: sqlDollar[7].union.bool()}
 		}
 	case 622:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:4380
+//line sql-gen.y:4382
 		{
 			sqlVAL.union.val = &tree.GrantRole{Roles: sqlDollar[2].union.nameList(), Members: sqlDollar[4].union.roleSpecList(), AdminOption: false}
 		}
 	case 623:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql-gen.y:4384
+//line sql-gen.y:4386
 		{
 			sqlVAL.union.val = &tree.GrantRole{Roles: sqlDollar[2].union.nameList(), Members: sqlDollar[4].union.roleSpecList(), AdminOption: true}
 		}
 	case 624:
 		sqlDollar = sqlS[sqlpt-8 : sqlpt+1]
-//line sql-gen.y:4388
+//line sql-gen.y:4390
 		{
 			sqlVAL.union.val = &tree.Grant{Privileges: sqlDollar[2].union.privilegeList(), Targets: sqlDollar[5].union.targetList(), Grantees: sqlDollar[7].union.roleSpecList(), WithGrantOption: sqlDollar[8].union.bool()}
 		}
 	case 625:
 		sqlDollar = sqlS[sqlpt-8 : sqlpt+1]
-//line sql-gen.y:4392
+//line sql-gen.y:4394
 		{
 			sqlVAL.union.val = &tree.Grant{
 				Privileges: sqlDollar[2].union.privilegeList(),
@@ -25353,13 +25353,13 @@ sqldefault:
 		}
 	case 626:
 		sqlDollar = sqlS[sqlpt-9 : sqlpt+1]
-//line sql-gen.y:4403
+//line sql-gen.y:4405
 		{
 			return unimplemented(sqllex, "grant privileges on schema with")
 		}
 	case 627:
 		sqlDollar = sqlS[sqlpt-11 : sqlpt+1]
-//line sql-gen.y:4407
+//line sql-gen.y:4409
 		{
 			sqlVAL.union.val = &tree.Grant{
 				Privileges: sqlDollar[2].union.privilegeList(),
@@ -25373,55 +25373,55 @@ sqldefault:
 		}
 	case 628:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:4419
+//line sql-gen.y:4421
 		{
 			return unimplemented(sqllex, "grant privileges on sequence")
 		}
 	case 629:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:4422
+//line sql-gen.y:4424
 		{
 			return helpWith(sqllex, "GRANT")
 		}
 	case 630:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:4445
+//line sql-gen.y:4447
 		{
 			sqlVAL.union.val = &tree.Revoke{Privileges: sqlDollar[2].union.privilegeList(), Grantees: sqlDollar[6].union.roleSpecList(), Targets: sqlDollar[4].union.targetList(), GrantOptionFor: false}
 		}
 	case 631:
 		sqlDollar = sqlS[sqlpt-9 : sqlpt+1]
-//line sql-gen.y:4449
+//line sql-gen.y:4451
 		{
 			sqlVAL.union.val = &tree.Revoke{Privileges: sqlDollar[5].union.privilegeList(), Grantees: sqlDollar[9].union.roleSpecList(), Targets: sqlDollar[7].union.targetList(), GrantOptionFor: true}
 		}
 	case 632:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:4453
+//line sql-gen.y:4455
 		{
 			sqlVAL.union.val = &tree.RevokeRole{Roles: sqlDollar[2].union.nameList(), Members: sqlDollar[4].union.roleSpecList(), AdminOption: false}
 		}
 	case 633:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql-gen.y:4457
+//line sql-gen.y:4459
 		{
 			sqlVAL.union.val = &tree.RevokeRole{Roles: sqlDollar[5].union.nameList(), Members: sqlDollar[7].union.roleSpecList(), AdminOption: true}
 		}
 	case 634:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql-gen.y:4461
+//line sql-gen.y:4463
 		{
 			sqlVAL.union.val = &tree.Revoke{Privileges: sqlDollar[2].union.privilegeList(), Targets: sqlDollar[5].union.targetList(), Grantees: sqlDollar[7].union.roleSpecList(), GrantOptionFor: false}
 		}
 	case 635:
 		sqlDollar = sqlS[sqlpt-10 : sqlpt+1]
-//line sql-gen.y:4465
+//line sql-gen.y:4467
 		{
 			sqlVAL.union.val = &tree.Revoke{Privileges: sqlDollar[5].union.privilegeList(), Targets: sqlDollar[8].union.targetList(), Grantees: sqlDollar[10].union.roleSpecList(), GrantOptionFor: true}
 		}
 	case 636:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql-gen.y:4469
+//line sql-gen.y:4471
 		{
 			sqlVAL.union.val = &tree.Revoke{
 				Privileges: sqlDollar[2].union.privilegeList(),
@@ -25434,7 +25434,7 @@ sqldefault:
 		}
 	case 637:
 		sqlDollar = sqlS[sqlpt-10 : sqlpt+1]
-//line sql-gen.y:4480
+//line sql-gen.y:4482
 		{
 			sqlVAL.union.val = &tree.Revoke{
 				Privileges: sqlDollar[5].union.privilegeList(),
@@ -25447,7 +25447,7 @@ sqldefault:
 		}
 	case 638:
 		sqlDollar = sqlS[sqlpt-10 : sqlpt+1]
-//line sql-gen.y:4491
+//line sql-gen.y:4493
 		{
 			sqlVAL.union.val = &tree.Revoke{
 				Privileges: sqlDollar[2].union.privilegeList(),
@@ -25461,7 +25461,7 @@ sqldefault:
 		}
 	case 639:
 		sqlDollar = sqlS[sqlpt-13 : sqlpt+1]
-//line sql-gen.y:4503
+//line sql-gen.y:4505
 		{
 			sqlVAL.union.val = &tree.Revoke{
 				Privileges: sqlDollar[5].union.privilegeList(),
@@ -25475,25 +25475,25 @@ sqldefault:
 		}
 	case 640:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:4515
+//line sql-gen.y:4517
 		{
 			return unimplemented(sqllex, "revoke privileges on sequence")
 		}
 	case 641:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:4518
+//line sql-gen.y:4520
 		{
 			return helpWith(sqllex, "REVOKE")
 		}
 	case 642:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:4524
+//line sql-gen.y:4526
 		{
 			sqlVAL.union.val = privilege.List{privilege.ALL}
 		}
 	case 643:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:4528
+//line sql-gen.y:4530
 		{
 			privList, err := privilege.ListFromStrings(sqlDollar[1].union.nameList().ToStrings())
 			if err != nil {
@@ -25503,132 +25503,132 @@ sqldefault:
 		}
 	case 644:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:4538
+//line sql-gen.y:4540
 		{
 			sqlVAL.union.val = tree.NameList{tree.Name(sqlDollar[1].str)}
 		}
 	case 645:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:4542
+//line sql-gen.y:4544
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.nameList(), tree.Name(sqlDollar[3].str))
 		}
 	case 651:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:4556
+//line sql-gen.y:4558
 		{
 			return helpWith(sqllex, "RESET")
 		}
 	case 653:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:4557
+//line sql-gen.y:4559
 		{
 			return helpWith(sqllex, "RESET CLUSTER SETTING")
 		}
 	case 654:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:4565
+//line sql-gen.y:4567
 		{
 			sqlVAL.union.val = &tree.SetVar{Name: sqlDollar[2].str, Values: tree.Exprs{tree.DefaultVal{}}, Reset: true}
 		}
 	case 655:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:4569
+//line sql-gen.y:4571
 		{
 			sqlVAL.union.val = &tree.SetVar{Name: sqlDollar[3].str, Values: tree.Exprs{tree.DefaultVal{}}, Reset: true}
 		}
 	case 656:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:4572
+//line sql-gen.y:4574
 		{
 			return helpWith(sqllex, "RESET")
 		}
 	case 657:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:4580
+//line sql-gen.y:4582
 		{
 			sqlVAL.union.val = &tree.SetClusterSetting{Name: strings.Join(sqlDollar[4].union.strs(), "."), Value: tree.DefaultVal{}}
 		}
 	case 658:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:4583
+//line sql-gen.y:4585
 		{
 			return helpWith(sqllex, "RESET CLUSTER SETTING")
 		}
 	case 659:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:4594
+//line sql-gen.y:4596
 		{
 			sqlVAL.union.val = &tree.SetVar{Name: "database", Values: tree.Exprs{sqlDollar[2].union.expr()}}
 		}
 	case 660:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:4597
+//line sql-gen.y:4599
 		{
 			return helpWith(sqllex, "USE")
 		}
 	case 662:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:4601
+//line sql-gen.y:4603
 		{
 			return helpWith(sqllex, "SET TRANSACTION")
 		}
 	case 663:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:4602
+//line sql-gen.y:4604
 		{
 		}
 	case 664:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:4603
+//line sql-gen.y:4605
 		{
 			return unimplemented(sqllex, "set constraints")
 		}
 	case 666:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:4607
+//line sql-gen.y:4609
 		{
 			return helpWith(sqllex, "SET SESSION")
 		}
 	case 668:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:4608
+//line sql-gen.y:4610
 		{
 			return helpWith(sqllex, "SET LOCAL")
 		}
 	case 670:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:4609
+//line sql-gen.y:4611
 		{
 			return helpWith(sqllex, "SET CLUSTER SETTING")
 		}
 	case 672:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:4610
+//line sql-gen.y:4612
 		{
 			return helpWith(sqllex, "USE")
 		}
 	case 675:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:4626
+//line sql-gen.y:4628
 		{
 			return helpWith(sqllex, "SCRUB")
 		}
 	case 676:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:4641
+//line sql-gen.y:4643
 		{
 			sqlVAL.union.val = &tree.Scrub{Typ: tree.ScrubDatabase, Database: tree.Name(sqlDollar[4].str), AsOf: sqlDollar[5].union.asOfClause()}
 		}
 	case 677:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:4644
+//line sql-gen.y:4646
 		{
 			return helpWith(sqllex, "SCRUB DATABASE")
 		}
 	case 678:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:4662
+//line sql-gen.y:4664
 		{
 			sqlVAL.union.val = &tree.Scrub{
 				Typ:     tree.ScrubTable,
@@ -25639,115 +25639,115 @@ sqldefault:
 		}
 	case 679:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:4670
+//line sql-gen.y:4672
 		{
 			return helpWith(sqllex, "SCRUB TABLE")
 		}
 	case 680:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:4674
+//line sql-gen.y:4676
 		{
 			sqlVAL.union.val = sqlDollar[3].union.scrubOptions()
 		}
 	case 681:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:4678
+//line sql-gen.y:4680
 		{
 			sqlVAL.union.val = tree.ScrubOptions{}
 		}
 	case 682:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:4684
+//line sql-gen.y:4686
 		{
 			sqlVAL.union.val = tree.ScrubOptions{sqlDollar[1].union.scrubOption()}
 		}
 	case 683:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:4688
+//line sql-gen.y:4690
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.scrubOptions(), sqlDollar[3].union.scrubOption())
 		}
 	case 684:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:4694
+//line sql-gen.y:4696
 		{
 			sqlVAL.union.val = &tree.ScrubOptionIndex{}
 		}
 	case 685:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:4698
+//line sql-gen.y:4700
 		{
 			sqlVAL.union.val = &tree.ScrubOptionIndex{IndexNames: sqlDollar[3].union.nameList()}
 		}
 	case 686:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:4702
+//line sql-gen.y:4704
 		{
 			sqlVAL.union.val = &tree.ScrubOptionConstraint{}
 		}
 	case 687:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:4706
+//line sql-gen.y:4708
 		{
 			sqlVAL.union.val = &tree.ScrubOptionConstraint{ConstraintNames: sqlDollar[3].union.nameList()}
 		}
 	case 688:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:4710
+//line sql-gen.y:4712
 		{
 			sqlVAL.union.val = &tree.ScrubOptionPhysical{}
 		}
 	case 689:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:4721
+//line sql-gen.y:4723
 		{
 			sqlVAL.union.val = &tree.SetClusterSetting{Name: strings.Join(sqlDollar[4].union.strs(), "."), Value: sqlDollar[6].union.expr()}
 		}
 	case 690:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:4724
+//line sql-gen.y:4726
 		{
 			return helpWith(sqllex, "SET CLUSTER SETTING")
 		}
 	case 693:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:4734
+//line sql-gen.y:4736
 		{
 			sqlVAL.union.val = &tree.SetVar{Values: sqlDollar[4].union.exprs()}
 		}
 	case 694:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:4750
+//line sql-gen.y:4752
 		{
 			sqlVAL.union.val = sqlDollar[3].union.stmt()
 		}
 	case 695:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:4753
+//line sql-gen.y:4755
 		{
 			return helpWith(sqllex, "SET SESSION")
 		}
 	case 696:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:4755
+//line sql-gen.y:4757
 		{
 			sqlVAL.union.val = sqlDollar[2].union.stmt()
 		}
 	case 697:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:4758
+//line sql-gen.y:4760
 		{
 			return helpWith(sqllex, "SET SESSION")
 		}
 	case 698:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:4761
+//line sql-gen.y:4763
 		{
 			sqlVAL.union.val = &tree.SetSessionCharacteristics{Modes: sqlDollar[6].union.transactionModes()}
 		}
 	case 699:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:4775
+//line sql-gen.y:4777
 		{
 			ret := sqlDollar[3].union.setVar()
 			ret.Local = true
@@ -25755,37 +25755,37 @@ sqldefault:
 		}
 	case 700:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:4780
+//line sql-gen.y:4782
 		{
 			return helpWith(sqllex, "SET LOCAL")
 		}
 	case 701:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:4797
+//line sql-gen.y:4799
 		{
 			sqlVAL.union.val = &tree.SetTransaction{Modes: sqlDollar[3].union.transactionModes()}
 		}
 	case 702:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:4800
+//line sql-gen.y:4802
 		{
 			return helpWith(sqllex, "SET TRANSACTION")
 		}
 	case 703:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:4802
+//line sql-gen.y:4804
 		{
 			sqlVAL.union.val = &tree.SetTransaction{Modes: sqlDollar[4].union.transactionModes()}
 		}
 	case 704:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:4805
+//line sql-gen.y:4807
 		{
 			return helpWith(sqllex, "SET TRANSACTION")
 		}
 	case 705:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:4809
+//line sql-gen.y:4811
 		{
 
 			varName := sqlDollar[1].union.strs()
@@ -25797,516 +25797,516 @@ sqldefault:
 		}
 	case 707:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:4828
+//line sql-gen.y:4830
 		{
 
 			sqlVAL.union.val = &tree.SetVar{Name: "timezone", Values: tree.Exprs{sqlDollar[3].union.expr()}}
 		}
 	case 708:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:4832
+//line sql-gen.y:4834
 		{
 			return unimplemented(sqllex, "set from current")
 		}
 	case 709:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:4836
+//line sql-gen.y:4838
 		{
 
 			sqlVAL.union.val = &tree.SetVar{Name: "search_path", Values: tree.Exprs{sqlDollar[2].union.expr()}}
 		}
 	case 710:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:4841
+//line sql-gen.y:4843
 		{
 
 			sqlVAL.union.val = &tree.SetVar{Name: "role", Values: tree.Exprs{sqlDollar[2].union.expr()}}
 		}
 	case 712:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:4850
+//line sql-gen.y:4852
 		{
 
 			sqlVAL.union.val = &tree.SetSessionAuthorizationDefault{}
 		}
 	case 713:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:4855
+//line sql-gen.y:4857
 		{
 			return unimplementedWithIssue(sqllex, 40283)
 		}
 	case 714:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:4859
+//line sql-gen.y:4861
 		{
 			return unimplementedWithIssue(sqllex, 40283)
 		}
 	case 716:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:4871
+//line sql-gen.y:4873
 		{
 
 			sqlVAL.union.val = &tree.SetVar{Name: "client_encoding", Values: tree.Exprs{sqlDollar[2].union.expr()}}
 		}
 	case 717:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:4876
+//line sql-gen.y:4878
 		{
 
 			sqlVAL.union.val = &tree.SetVar{Name: "client_encoding", Values: tree.Exprs{tree.DefaultVal{}}}
 		}
 	case 718:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:4883
+//line sql-gen.y:4885
 		{
 			sqlVAL.union.val = []string{sqlDollar[1].str}
 		}
 	case 719:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:4887
+//line sql-gen.y:4889
 		{
 			sqlVAL.union.val = append([]string{sqlDollar[1].str}, sqlDollar[2].union.strs()...)
 		}
 	case 720:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:4893
+//line sql-gen.y:4895
 		{
 			sqlVAL.union.val = []string{sqlDollar[2].str}
 		}
 	case 721:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:4897
+//line sql-gen.y:4899
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.strs(), sqlDollar[3].str)
 		}
 	case 723:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:4904
+//line sql-gen.y:4906
 		{
 			sqlVAL.union.val = tree.Expr(&tree.UnresolvedName{NumParts: 1, Parts: tree.NameParts{sqlDollar[1].str}})
 		}
 	case 726:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:4925
+//line sql-gen.y:4927
 		{
 			sqlVAL.union.val = tree.Exprs{sqlDollar[1].union.expr()}
 		}
 	case 727:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:4929
+//line sql-gen.y:4931
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.exprs(), sqlDollar[3].union.expr())
 		}
 	case 728:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:4935
+//line sql-gen.y:4937
 		{
 			sqlVAL.union.val = tree.SerializableIsolation
 		}
 	case 729:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:4939
+//line sql-gen.y:4941
 		{
 			sqlVAL.union.val = tree.SerializableIsolation
 		}
 	case 730:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:4943
+//line sql-gen.y:4945
 		{
 			sqlVAL.union.val = tree.SerializableIsolation
 		}
 	case 731:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:4947
+//line sql-gen.y:4949
 		{
 			sqlVAL.union.val = tree.SerializableIsolation
 		}
 	case 732:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:4951
+//line sql-gen.y:4953
 		{
 			sqlVAL.union.val = tree.SerializableIsolation
 		}
 	case 733:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:4957
+//line sql-gen.y:4959
 		{
 			sqlVAL.union.val = tree.Low
 		}
 	case 734:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:4961
+//line sql-gen.y:4963
 		{
 			sqlVAL.union.val = tree.Normal
 		}
 	case 735:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:4965
+//line sql-gen.y:4967
 		{
 			sqlVAL.union.val = tree.High
 		}
 	case 736:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:4976
+//line sql-gen.y:4978
 		{
 			sqlVAL.union.val = tree.NewStrVal(sqlDollar[1].str)
 		}
 	case 737:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:4980
+//line sql-gen.y:4982
 		{
 			sqlVAL.union.val = tree.NewStrVal(sqlDollar[1].str)
 		}
 	case 738:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:4984
+//line sql-gen.y:4986
 		{
 			sqlVAL.union.val = sqlDollar[1].union.expr()
 		}
 	case 740:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:4989
+//line sql-gen.y:4991
 		{
 			sqlVAL.union.val = tree.DefaultVal{}
 		}
 	case 741:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:4993
+//line sql-gen.y:4995
 		{
 			sqlVAL.union.val = tree.NewStrVal(sqlDollar[1].str)
 		}
 	case 743:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:5008
+//line sql-gen.y:5010
 		{
 			return helpWith(sqllex, "SHOW BACKUP")
 		}
 	case 745:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:5009
+//line sql-gen.y:5011
 		{
 			return helpWith(sqllex, "SHOW COLUMNS")
 		}
 	case 747:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:5010
+//line sql-gen.y:5012
 		{
 			return helpWith(sqllex, "SHOW CONSTRAINTS")
 		}
 	case 749:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:5011
+//line sql-gen.y:5013
 		{
 			return helpWith(sqllex, "SHOW CREATE")
 		}
 	case 751:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:5012
+//line sql-gen.y:5014
 		{
 			return helpWith(sqllex, "SHOW CREATE SCHEDULES")
 		}
 	case 753:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:5013
+//line sql-gen.y:5015
 		{
 			return helpWith(sqllex, "SHOW CLUSTER SETTING")
 		}
 	case 755:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:5014
+//line sql-gen.y:5016
 		{
 			return helpWith(sqllex, "SHOW DATABASES")
 		}
 	case 757:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:5015
+//line sql-gen.y:5017
 		{
 			return helpWith(sqllex, "SHOW ENUMS")
 		}
 	case 759:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:5016
+//line sql-gen.y:5018
 		{
 			return helpWith(sqllex, "SHOW TYPES")
 		}
 	case 762:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:5018
+//line sql-gen.y:5020
 		{
 			return helpWith(sqllex, "SHOW GRANTS")
 		}
 	case 764:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:5019
+//line sql-gen.y:5021
 		{
 			return helpWith(sqllex, "SHOW HISTOGRAM")
 		}
 	case 766:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:5020
+//line sql-gen.y:5022
 		{
 			return helpWith(sqllex, "SHOW INDEXES")
 		}
 	case 768:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:5021
+//line sql-gen.y:5023
 		{
 			return helpWith(sqllex, "SHOW PARTITIONS")
 		}
 	case 770:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:5022
+//line sql-gen.y:5024
 		{
 			return helpWith(sqllex, "SHOW JOBS")
 		}
 	case 773:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:5024
+//line sql-gen.y:5026
 		{
 			return helpWith(sqllex, "SHOW SCHEDULES")
 		}
 	case 775:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:5025
+//line sql-gen.y:5027
 		{
 			return helpWith(sqllex, "SHOW STATEMENTS")
 		}
 	case 777:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:5026
+//line sql-gen.y:5028
 		{
 			return helpWith(sqllex, "SHOW RANGES")
 		}
 	case 780:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:5028
+//line sql-gen.y:5030
 		{
 			return helpWith(sqllex, "SHOW REGIONS")
 		}
 	case 783:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:5030
+//line sql-gen.y:5032
 		{
 			return helpWith(sqllex, "SHOW ROLES")
 		}
 	case 785:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:5031
+//line sql-gen.y:5033
 		{
 			return helpWith(sqllex, "SHOW SAVEPOINT")
 		}
 	case 787:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:5032
+//line sql-gen.y:5034
 		{
 			return helpWith(sqllex, "SHOW SCHEMAS")
 		}
 	case 789:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:5033
+//line sql-gen.y:5035
 		{
 			return helpWith(sqllex, "SHOW SEQUENCES")
 		}
 	case 791:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:5034
+//line sql-gen.y:5036
 		{
 			return helpWith(sqllex, "SHOW SESSION")
 		}
 	case 793:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:5035
+//line sql-gen.y:5037
 		{
 			return helpWith(sqllex, "SHOW SESSIONS")
 		}
 	case 795:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:5036
+//line sql-gen.y:5038
 		{
 			return helpWith(sqllex, "SHOW STATISTICS")
 		}
 	case 797:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:5037
+//line sql-gen.y:5039
 		{
 			return helpWith(sqllex, "SHOW SYNTAX")
 		}
 	case 799:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:5038
+//line sql-gen.y:5040
 		{
 			return helpWith(sqllex, "SHOW TABLES")
 		}
 	case 801:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:5039
+//line sql-gen.y:5041
 		{
 			return helpWith(sqllex, "SHOW TRACE")
 		}
 	case 803:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:5040
+//line sql-gen.y:5042
 		{
 			return helpWith(sqllex, "SHOW TRANSACTION")
 		}
 	case 805:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:5041
+//line sql-gen.y:5043
 		{
 			return helpWith(sqllex, "SHOW TRANSACTIONS")
 		}
 	case 807:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:5042
+//line sql-gen.y:5044
 		{
 			return helpWith(sqllex, "SHOW USERS")
 		}
 	case 809:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:5043
+//line sql-gen.y:5045
 		{
 			return helpWith(sqllex, "SHOW ZONE CONFIGURATION")
 		}
 	case 810:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:5044
+//line sql-gen.y:5046
 		{
 			return helpWith(sqllex, "SHOW")
 		}
 	case 814:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:5047
+//line sql-gen.y:5049
 		{
 			return helpWith(sqllex, "SHOW DEFAULT PRIVILEGES")
 		}
 	case 815:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:5052
+//line sql-gen.y:5054
 		{
 		}
 	case 816:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:5053
+//line sql-gen.y:5055
 		{
 			return unimplementedWithIssue(sqllex, 41412)
 		}
 	case 817:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:5056
+//line sql-gen.y:5058
 		{
 			return unimplementedWithIssue(sqllex, 41412)
 		}
 	case 818:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5060
+//line sql-gen.y:5062
 		{
 
 			return purposelyUnimplemented(sqllex, "reindex table", "CockroachDB does not require reindexing.")
 		}
 	case 819:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5065
+//line sql-gen.y:5067
 		{
 
 			return purposelyUnimplemented(sqllex, "reindex index", "CockroachDB does not require reindexing.")
 		}
 	case 820:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5070
+//line sql-gen.y:5072
 		{
 
 			return purposelyUnimplemented(sqllex, "reindex schema", "CockroachDB does not require reindexing.")
 		}
 	case 821:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5075
+//line sql-gen.y:5077
 		{
 
 			return purposelyUnimplemented(sqllex, "reindex database", "CockroachDB does not require reindexing.")
 		}
 	case 822:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5080
+//line sql-gen.y:5082
 		{
 
 			return purposelyUnimplemented(sqllex, "reindex system", "CockroachDB does not require reindexing.")
 		}
 	case 823:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:5090
+//line sql-gen.y:5092
 		{
 			sqlVAL.union.val = &tree.ShowVar{Name: sqlDollar[2].str}
 		}
 	case 824:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5091
+//line sql-gen.y:5093
 		{
 			sqlVAL.union.val = &tree.ShowVar{Name: sqlDollar[3].str}
 		}
 	case 825:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5092
+//line sql-gen.y:5094
 		{
 			return helpWith(sqllex, "SHOW SESSION")
 		}
 	case 827:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:5097
+//line sql-gen.y:5099
 		{
 			sqlVAL.str = sqlDollar[1].str + "." + strings.Join(sqlDollar[2].union.strs(), ".")
 		}
 	case 830:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:5107
+//line sql-gen.y:5109
 		{
 			sqlVAL.str = "client_encoding"
 		}
 	case 835:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:5113
+//line sql-gen.y:5115
 		{
 			sqlVAL.str = "timezone"
 		}
 	case 836:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:5114
+//line sql-gen.y:5116
 		{
 			return helpWith(sqllex, "SHOW SESSION")
 		}
 	case 837:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:5118
+//line sql-gen.y:5120
 		{
 			sqlVAL.union.val = []string{sqlDollar[2].str}
 		}
 	case 838:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5122
+//line sql-gen.y:5124
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.strs(), sqlDollar[3].str)
 		}
 	case 839:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:5138
+//line sql-gen.y:5140
 		{
 			sqlVAL.union.val = &tree.ShowTableStats{Table: sqlDollar[5].union.unresolvedObjectName()}
 		}
 	case 840:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql-gen.y:5142
+//line sql-gen.y:5144
 		{
 
 			sqlVAL.union.val = &tree.ShowTableStats{Table: sqlDollar[7].union.unresolvedObjectName(), UsingJSON: true}
 		}
 	case 841:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5146
+//line sql-gen.y:5148
 		{
 			return helpWith(sqllex, "SHOW STATISTICS")
 		}
 	case 842:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5157
+//line sql-gen.y:5159
 		{
 
 			id, err := sqlDollar[3].union.numVal().AsInt64()
@@ -26317,13 +26317,13 @@ sqldefault:
 		}
 	case 843:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5165
+//line sql-gen.y:5167
 		{
 			return helpWith(sqllex, "SHOW HISTOGRAM")
 		}
 	case 844:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:5173
+//line sql-gen.y:5175
 		{
 			sqlVAL.union.val = &tree.ShowBackup{
 				InCollection: sqlDollar[4].union.expr(),
@@ -26331,7 +26331,7 @@ sqldefault:
 		}
 	case 845:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:5179
+//line sql-gen.y:5181
 		{
 			sqlVAL.union.val = &tree.ShowBackup{
 				Details: tree.BackupDefaultDetails,
@@ -26341,7 +26341,7 @@ sqldefault:
 		}
 	case 846:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:5187
+//line sql-gen.y:5189
 		{
 			sqlVAL.union.val = &tree.ShowBackup{
 				Details:      tree.BackupDefaultDetails,
@@ -26352,7 +26352,7 @@ sqldefault:
 		}
 	case 847:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:5196
+//line sql-gen.y:5198
 		{
 			sqlVAL.union.val = &tree.ShowBackup{
 				Details:              tree.BackupDefaultDetails,
@@ -26363,7 +26363,7 @@ sqldefault:
 		}
 	case 848:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:5205
+//line sql-gen.y:5207
 		{
 
 			sqlVAL.union.val = &tree.ShowBackup{
@@ -26374,7 +26374,7 @@ sqldefault:
 		}
 	case 849:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:5214
+//line sql-gen.y:5216
 		{
 
 			sqlVAL.union.val = &tree.ShowBackup{
@@ -26385,115 +26385,115 @@ sqldefault:
 		}
 	case 850:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5222
+//line sql-gen.y:5224
 		{
 			return helpWith(sqllex, "SHOW BACKUP")
 		}
 	case 851:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:5232
+//line sql-gen.y:5234
 		{
 			sqlVAL.union.val = &tree.ShowClusterSetting{Name: strings.Join(sqlDollar[4].union.strs(), ".")}
 		}
 	case 852:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:5236
+//line sql-gen.y:5238
 		{
 			sqlVAL.union.val = &tree.ShowClusterSettingList{All: true}
 		}
 	case 853:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5239
+//line sql-gen.y:5241
 		{
 			return helpWith(sqllex, "SHOW CLUSTER SETTING")
 		}
 	case 854:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:5241
+//line sql-gen.y:5243
 		{
 			sqlVAL.union.val = &tree.ShowClusterSettingList{All: true}
 		}
 	case 855:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:5244
+//line sql-gen.y:5246
 		{
 			return helpWith(sqllex, "SHOW CLUSTER SETTING")
 		}
 	case 856:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5246
+//line sql-gen.y:5248
 		{
 			sqlVAL.union.val = &tree.ShowClusterSettingList{}
 		}
 	case 857:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:5250
+//line sql-gen.y:5252
 		{
 			sqlVAL.union.val = &tree.ShowClusterSettingList{}
 		}
 	case 858:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:5253
+//line sql-gen.y:5255
 		{
 			return helpWith(sqllex, "SHOW CLUSTER SETTING")
 		}
 	case 859:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:5261
+//line sql-gen.y:5263
 		{
 			sqlVAL.union.val = &tree.ShowColumns{Table: sqlDollar[4].union.unresolvedObjectName(), WithComment: sqlDollar[5].union.bool()}
 		}
 	case 860:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5264
+//line sql-gen.y:5266
 		{
 			return helpWith(sqllex, "SHOW COLUMNS")
 		}
 	case 861:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:5272
+//line sql-gen.y:5274
 		{
 			sqlVAL.union.val = &tree.ShowPartitions{IsTable: true, Table: sqlDollar[5].union.unresolvedObjectName()}
 		}
 	case 862:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:5276
+//line sql-gen.y:5278
 		{
 			sqlVAL.union.val = &tree.ShowPartitions{IsDB: true, Database: tree.Name(sqlDollar[5].str)}
 		}
 	case 863:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:5280
+//line sql-gen.y:5282
 		{
 			sqlVAL.union.val = &tree.ShowPartitions{IsIndex: true, Index: sqlDollar[5].union.tableIndexName()}
 		}
 	case 864:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql-gen.y:5284
+//line sql-gen.y:5286
 		{
 			sqlVAL.union.val = &tree.ShowPartitions{IsTable: true, Table: sqlDollar[5].union.unresolvedObjectName()}
 		}
 	case 865:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5287
+//line sql-gen.y:5289
 		{
 			return helpWith(sqllex, "SHOW PARTITIONS")
 		}
 	case 866:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5295
+//line sql-gen.y:5297
 		{
 			sqlVAL.union.val = &tree.ShowDatabases{WithComment: sqlDollar[3].union.bool()}
 		}
 	case 867:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5298
+//line sql-gen.y:5300
 		{
 			return helpWith(sqllex, "SHOW DATABASES")
 		}
 	case 868:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:5304
+//line sql-gen.y:5306
 		{
 			sqlVAL.union.val = &tree.ShowDefaultPrivileges{
 				Roles: sqlDollar[4].union.roleSpecList(),
@@ -26501,7 +26501,7 @@ sqldefault:
 		}
 	case 869:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:5309
+//line sql-gen.y:5311
 		{
 			sqlVAL.union.val = &tree.ShowDefaultPrivileges{
 				ForAllRoles: true,
@@ -26509,19 +26509,19 @@ sqldefault:
 		}
 	case 870:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:5314
+//line sql-gen.y:5316
 		{
 			return helpWith(sqllex, "SHOW DEFAULT PRIVILEGES")
 		}
 	case 871:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:5321
+//line sql-gen.y:5323
 		{
 			sqlVAL.union.val = &tree.ShowEnums{}
 		}
 	case 872:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:5325
+//line sql-gen.y:5327
 		{
 			sqlVAL.union.val = &tree.ShowEnums{ObjectNamePrefix: tree.ObjectNamePrefix{
 				CatalogName:     tree.Name(sqlDollar[4].str),
@@ -26533,7 +26533,7 @@ sqldefault:
 		}
 	case 873:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:5335
+//line sql-gen.y:5337
 		{
 			sqlVAL.union.val = &tree.ShowEnums{ObjectNamePrefix: tree.ObjectNamePrefix{
 
@@ -26544,25 +26544,25 @@ sqldefault:
 		}
 	case 874:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5344
+//line sql-gen.y:5346
 		{
 			return helpWith(sqllex, "SHOW ENUMS")
 		}
 	case 875:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:5351
+//line sql-gen.y:5353
 		{
 			sqlVAL.union.val = &tree.ShowTypes{}
 		}
 	case 876:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5354
+//line sql-gen.y:5356
 		{
 			return helpWith(sqllex, "SHOW TYPES")
 		}
 	case 877:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:5367
+//line sql-gen.y:5369
 		{
 			lst := sqlDollar[3].union.targetListPtr()
 			if lst != nil && lst.ForRoles {
@@ -26573,199 +26573,199 @@ sqldefault:
 		}
 	case 878:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5375
+//line sql-gen.y:5377
 		{
 			return helpWith(sqllex, "SHOW GRANTS")
 		}
 	case 879:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:5383
+//line sql-gen.y:5385
 		{
 			sqlVAL.union.val = &tree.ShowIndexes{Table: sqlDollar[4].union.unresolvedObjectName(), WithComment: sqlDollar[5].union.bool()}
 		}
 	case 880:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5386
+//line sql-gen.y:5388
 		{
 			return helpWith(sqllex, "SHOW INDEXES")
 		}
 	case 881:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:5388
+//line sql-gen.y:5390
 		{
 			sqlVAL.union.val = &tree.ShowDatabaseIndexes{Database: tree.Name(sqlDollar[5].str), WithComment: sqlDollar[6].union.bool()}
 		}
 	case 882:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:5392
+//line sql-gen.y:5394
 		{
 			sqlVAL.union.val = &tree.ShowIndexes{Table: sqlDollar[4].union.unresolvedObjectName(), WithComment: sqlDollar[5].union.bool()}
 		}
 	case 883:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:5396
+//line sql-gen.y:5398
 		{
 			sqlVAL.union.val = &tree.ShowDatabaseIndexes{Database: tree.Name(sqlDollar[5].str), WithComment: sqlDollar[6].union.bool()}
 		}
 	case 884:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5399
+//line sql-gen.y:5401
 		{
 			return helpWith(sqllex, "SHOW INDEXES")
 		}
 	case 885:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:5401
+//line sql-gen.y:5403
 		{
 			sqlVAL.union.val = &tree.ShowIndexes{Table: sqlDollar[4].union.unresolvedObjectName(), WithComment: sqlDollar[5].union.bool()}
 		}
 	case 886:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:5405
+//line sql-gen.y:5407
 		{
 			sqlVAL.union.val = &tree.ShowDatabaseIndexes{Database: tree.Name(sqlDollar[5].str), WithComment: sqlDollar[6].union.bool()}
 		}
 	case 887:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5408
+//line sql-gen.y:5410
 		{
 			return helpWith(sqllex, "SHOW INDEXES")
 		}
 	case 888:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:5416
+//line sql-gen.y:5418
 		{
 			sqlVAL.union.val = &tree.ShowConstraints{Table: sqlDollar[4].union.unresolvedObjectName(), WithComment: sqlDollar[5].union.bool()}
 		}
 	case 889:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5419
+//line sql-gen.y:5421
 		{
 			return helpWith(sqllex, "SHOW CONSTRAINTS")
 		}
 	case 890:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:5421
+//line sql-gen.y:5423
 		{
 			sqlVAL.union.val = &tree.ShowConstraints{Table: sqlDollar[4].union.unresolvedObjectName(), WithComment: sqlDollar[5].union.bool()}
 		}
 	case 891:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5424
+//line sql-gen.y:5426
 		{
 			return helpWith(sqllex, "SHOW CONSTRAINTS")
 		}
 	case 892:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5432
+//line sql-gen.y:5434
 		{
 			sqlVAL.union.val = &tree.ShowQueries{All: false, Cluster: sqlDollar[2].union.bool()}
 		}
 	case 893:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:5435
+//line sql-gen.y:5437
 		{
 			return helpWith(sqllex, "SHOW STATEMENTS")
 		}
 	case 894:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:5437
+//line sql-gen.y:5439
 		{
 			sqlVAL.union.val = &tree.ShowQueries{All: true, Cluster: sqlDollar[3].union.bool()}
 		}
 	case 895:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:5440
+//line sql-gen.y:5442
 		{
 			return helpWith(sqllex, "SHOW STATEMENTS")
 		}
 	case 896:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:5444
+//line sql-gen.y:5446
 		{
 			sqlVAL.union.val = true
 		}
 	case 897:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:5446
+//line sql-gen.y:5448
 		{
 			sqlVAL.union.val = true
 		}
 	case 898:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:5448
+//line sql-gen.y:5450
 		{
 			sqlVAL.union.val = false
 		}
 	case 901:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5465
+//line sql-gen.y:5467
 		{
 			sqlVAL.union.val = &tree.ShowJobs{Automatic: true}
 		}
 	case 902:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:5469
+//line sql-gen.y:5471
 		{
 			sqlVAL.union.val = &tree.ShowJobs{Automatic: false}
 		}
 	case 903:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5473
+//line sql-gen.y:5475
 		{
 			sqlVAL.union.val = &tree.ShowChangefeedJobs{}
 		}
 	case 904:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:5476
+//line sql-gen.y:5478
 		{
 			return helpWith(sqllex, "SHOW JOBS")
 		}
 	case 905:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5477
+//line sql-gen.y:5479
 		{
 			return helpWith(sqllex, "SHOW JOBS")
 		}
 	case 906:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:5478
+//line sql-gen.y:5480
 		{
 			return helpWith(sqllex, "SHOW JOBS")
 		}
 	case 907:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5480
+//line sql-gen.y:5482
 		{
 			sqlVAL.union.val = &tree.ShowJobs{Jobs: sqlDollar[3].union.slct()}
 		}
 	case 908:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:5484
+//line sql-gen.y:5486
 		{
 			sqlVAL.union.val = &tree.ShowJobs{Jobs: sqlDollar[5].union.slct(), Block: true}
 		}
 	case 909:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5488
+//line sql-gen.y:5490
 		{
 			sqlVAL.union.val = &tree.ShowJobs{Schedules: sqlDollar[3].union.slct()}
 		}
 	case 910:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:5492
+//line sql-gen.y:5494
 		{
 			sqlVAL.union.val = &tree.ShowChangefeedJobs{Jobs: sqlDollar[4].union.slct()}
 		}
 	case 911:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:5495
+//line sql-gen.y:5497
 		{
 			return helpWith(sqllex, "SHOW JOBS")
 		}
 	case 912:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5497
+//line sql-gen.y:5499
 		{
 			sqlVAL.union.val = &tree.ShowJobs{
 				Jobs: &tree.Select{
@@ -26775,7 +26775,7 @@ sqldefault:
 		}
 	case 913:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:5505
+//line sql-gen.y:5507
 		{
 			sqlVAL.union.val = &tree.ShowChangefeedJobs{
 				Jobs: &tree.Select{
@@ -26785,7 +26785,7 @@ sqldefault:
 		}
 	case 914:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:5513
+//line sql-gen.y:5515
 		{
 			sqlVAL.union.val = &tree.ShowJobs{
 				Jobs: &tree.Select{
@@ -26796,19 +26796,19 @@ sqldefault:
 		}
 	case 915:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5521
+//line sql-gen.y:5523
 		{
 			return helpWith(sqllex, "SHOW JOBS")
 		}
 	case 916:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:5522
+//line sql-gen.y:5524
 		{
 			return helpWith(sqllex, "SHOW JOBS")
 		}
 	case 917:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5532
+//line sql-gen.y:5534
 		{
 			sqlVAL.union.val = &tree.ShowSchedules{
 				WhichSchedules: tree.SpecifiedSchedules,
@@ -26817,13 +26817,13 @@ sqldefault:
 		}
 	case 918:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:5538
+//line sql-gen.y:5540
 		{
 			return helpWith(sqllex, "SHOW SCHEDULES")
 		}
 	case 919:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:5540
+//line sql-gen.y:5542
 		{
 			sqlVAL.union.val = &tree.ShowSchedules{
 				WhichSchedules: sqlDollar[2].union.scheduleState(),
@@ -26832,13 +26832,13 @@ sqldefault:
 		}
 	case 920:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:5546
+//line sql-gen.y:5548
 		{
 			return helpWith(sqllex, "SHOW SCHEDULES")
 		}
 	case 921:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5548
+//line sql-gen.y:5550
 		{
 			sqlVAL.union.val = &tree.ShowSchedules{
 				WhichSchedules: tree.SpecifiedSchedules,
@@ -26847,116 +26847,116 @@ sqldefault:
 		}
 	case 922:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5554
+//line sql-gen.y:5556
 		{
 			return helpWith(sqllex, "SHOW SCHEDULES")
 		}
 	case 923:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:5558
+//line sql-gen.y:5560
 		{
 			sqlVAL.union.val = tree.ActiveSchedules
 		}
 	case 924:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:5562
+//line sql-gen.y:5564
 		{
 			sqlVAL.union.val = tree.PausedSchedules
 		}
 	case 925:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:5568
+//line sql-gen.y:5570
 		{
 			sqlVAL.union.val = tree.InvalidExecutor
 		}
 	case 926:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:5572
+//line sql-gen.y:5574
 		{
 			sqlVAL.union.val = tree.ScheduledBackupExecutor
 		}
 	case 927:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5576
+//line sql-gen.y:5578
 		{
 			sqlVAL.union.val = tree.ScheduledSQLStatsCompactionExecutor
 		}
 	case 928:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:5587
+//line sql-gen.y:5589
 		{
 			sqlVAL.union.val = &tree.ShowTraceForSession{TraceType: tree.ShowTraceRaw, Compact: sqlDollar[2].union.bool()}
 		}
 	case 929:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:5590
+//line sql-gen.y:5592
 		{
 			return helpWith(sqllex, "SHOW TRACE")
 		}
 	case 930:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:5592
+//line sql-gen.y:5594
 		{
 			sqlVAL.union.val = &tree.ShowTraceForSession{TraceType: tree.ShowTraceKV, Compact: sqlDollar[2].union.bool()}
 		}
 	case 931:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:5595
+//line sql-gen.y:5597
 		{
 			return helpWith(sqllex, "SHOW TRACE")
 		}
 	case 932:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:5597
+//line sql-gen.y:5599
 		{
 
 			sqlVAL.union.val = &tree.ShowTraceForSession{TraceType: tree.ShowTraceReplica, Compact: sqlDollar[2].union.bool()}
 		}
 	case 933:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:5601
+//line sql-gen.y:5603
 		{
 			return helpWith(sqllex, "SHOW TRACE")
 		}
 	case 934:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:5604
+//line sql-gen.y:5606
 		{
 			sqlVAL.union.val = true
 		}
 	case 935:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:5605
+//line sql-gen.y:5607
 		{
 			sqlVAL.union.val = false
 		}
 	case 936:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5613
+//line sql-gen.y:5615
 		{
 			sqlVAL.union.val = &tree.ShowSessions{Cluster: sqlDollar[2].union.bool()}
 		}
 	case 937:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:5616
+//line sql-gen.y:5618
 		{
 			return helpWith(sqllex, "SHOW SESSIONS")
 		}
 	case 938:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:5618
+//line sql-gen.y:5620
 		{
 			sqlVAL.union.val = &tree.ShowSessions{All: true, Cluster: sqlDollar[3].union.bool()}
 		}
 	case 939:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:5621
+//line sql-gen.y:5623
 		{
 			return helpWith(sqllex, "SHOW SESSIONS")
 		}
 	case 940:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql-gen.y:5629
+//line sql-gen.y:5631
 		{
 			sqlVAL.union.val = &tree.ShowTables{ObjectNamePrefix: tree.ObjectNamePrefix{
 				CatalogName:     tree.Name(sqlDollar[4].str),
@@ -26968,7 +26968,7 @@ sqldefault:
 		}
 	case 941:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:5639
+//line sql-gen.y:5641
 		{
 			sqlVAL.union.val = &tree.ShowTables{ObjectNamePrefix: tree.ObjectNamePrefix{
 
@@ -26979,281 +26979,281 @@ sqldefault:
 		}
 	case 942:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5649
+//line sql-gen.y:5651
 		{
 			sqlVAL.union.val = &tree.ShowTables{WithComment: sqlDollar[3].union.bool()}
 		}
 	case 943:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5652
+//line sql-gen.y:5654
 		{
 			return helpWith(sqllex, "SHOW TABLES")
 		}
 	case 944:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5659
+//line sql-gen.y:5661
 		{
 			sqlVAL.union.val = &tree.ShowTransactions{Cluster: sqlDollar[2].union.bool()}
 		}
 	case 945:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:5662
+//line sql-gen.y:5664
 		{
 			return helpWith(sqllex, "SHOW TRANSACTIONS")
 		}
 	case 946:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:5664
+//line sql-gen.y:5666
 		{
 			sqlVAL.union.val = &tree.ShowTransactions{All: true, Cluster: sqlDollar[3].union.bool()}
 		}
 	case 947:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:5667
+//line sql-gen.y:5669
 		{
 			return helpWith(sqllex, "SHOW TRANSACTIONS")
 		}
 	case 948:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:5670
+//line sql-gen.y:5672
 		{
 			sqlVAL.union.val = true
 		}
 	case 949:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:5671
+//line sql-gen.y:5673
 		{
 			sqlVAL.union.val = false
 		}
 	case 950:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:5678
+//line sql-gen.y:5680
 		{
 			sqlVAL.union.val = &tree.ShowSchemas{Database: tree.Name(sqlDollar[4].str)}
 		}
 	case 951:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:5682
+//line sql-gen.y:5684
 		{
 			sqlVAL.union.val = &tree.ShowSchemas{}
 		}
 	case 952:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5685
+//line sql-gen.y:5687
 		{
 			return helpWith(sqllex, "SHOW SCHEMAS")
 		}
 	case 953:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:5692
+//line sql-gen.y:5694
 		{
 			sqlVAL.union.val = &tree.ShowSequences{Database: tree.Name(sqlDollar[4].str)}
 		}
 	case 954:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:5696
+//line sql-gen.y:5698
 		{
 			sqlVAL.union.val = &tree.ShowSequences{}
 		}
 	case 955:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5699
+//line sql-gen.y:5701
 		{
 			return helpWith(sqllex, "SHOW SEQUENCES")
 		}
 	case 956:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5706
+//line sql-gen.y:5708
 		{
 
 			sqlVAL.union.val = &tree.ShowSyntax{Statement: sqlDollar[3].str}
 		}
 	case 957:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5710
+//line sql-gen.y:5712
 		{
 			return helpWith(sqllex, "SHOW SYNTAX")
 		}
 	case 958:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:5714
+//line sql-gen.y:5716
 		{
 
 			sqlVAL.union.val = &tree.ShowLastQueryStatistics{Columns: sqlDollar[5].union.nameList()}
 		}
 	case 959:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:5721
+//line sql-gen.y:5723
 		{
 			sqlVAL.union.val = sqlDollar[2].union.nameList()
 		}
 	case 960:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:5725
+//line sql-gen.y:5727
 		{
 
 			sqlVAL.union.val = tree.ShowLastQueryStatisticsDefaultColumns
 		}
 	case 961:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5736
+//line sql-gen.y:5738
 		{
 			sqlVAL.union.val = &tree.ShowSavepointStatus{}
 		}
 	case 962:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5739
+//line sql-gen.y:5741
 		{
 			return helpWith(sqllex, "SHOW SAVEPOINT")
 		}
 	case 963:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:5747
+//line sql-gen.y:5749
 		{
 
 			sqlVAL.union.val = &tree.ShowVar{Name: "transaction_isolation"}
 		}
 	case 964:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5752
+//line sql-gen.y:5754
 		{
 
 			sqlVAL.union.val = &tree.ShowVar{Name: "transaction_priority"}
 		}
 	case 965:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5757
+//line sql-gen.y:5759
 		{
 
 			sqlVAL.union.val = &tree.ShowTransactionStatus{}
 		}
 	case 966:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5761
+//line sql-gen.y:5763
 		{
 			return helpWith(sqllex, "SHOW TRANSACTION")
 		}
 	case 967:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5773
+//line sql-gen.y:5775
 		{
 			sqlVAL.union.val = &tree.ShowCreate{Name: sqlDollar[3].union.unresolvedObjectName()}
 		}
 	case 968:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:5777
+//line sql-gen.y:5779
 		{
 
 			sqlVAL.union.val = &tree.ShowCreate{Mode: tree.ShowCreateModeTable, Name: sqlDollar[4].union.unresolvedObjectName()}
 		}
 	case 969:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:5782
+//line sql-gen.y:5784
 		{
 
 			sqlVAL.union.val = &tree.ShowCreate{Mode: tree.ShowCreateModeView, Name: sqlDollar[4].union.unresolvedObjectName()}
 		}
 	case 970:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:5787
+//line sql-gen.y:5789
 		{
 
 			sqlVAL.union.val = &tree.ShowCreate{Mode: tree.ShowCreateModeSequence, Name: sqlDollar[4].union.unresolvedObjectName()}
 		}
 	case 971:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:5792
+//line sql-gen.y:5794
 		{
 
 			sqlVAL.union.val = &tree.ShowCreate{Mode: tree.ShowCreateModeDatabase, Name: sqlDollar[4].union.unresolvedObjectName()}
 		}
 	case 972:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:5797
+//line sql-gen.y:5799
 		{
 			sqlVAL.union.val = &tree.ShowCreateAllSchemas{}
 		}
 	case 973:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:5801
+//line sql-gen.y:5803
 		{
 			sqlVAL.union.val = &tree.ShowCreateAllTables{}
 		}
 	case 974:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:5805
+//line sql-gen.y:5807
 		{
 			sqlVAL.union.val = &tree.ShowCreateAllTypes{}
 		}
 	case 975:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5808
+//line sql-gen.y:5810
 		{
 			return helpWith(sqllex, "SHOW CREATE")
 		}
 	case 976:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:5818
+//line sql-gen.y:5820
 		{
 			sqlVAL.union.val = &tree.ShowCreateSchedules{}
 		}
 	case 977:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:5821
+//line sql-gen.y:5823
 		{
 			return helpWith(sqllex, "SHOW CREATE SCHEDULES")
 		}
 	case 978:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:5823
+//line sql-gen.y:5825
 		{
 			sqlVAL.union.val = &tree.ShowCreateSchedules{ScheduleID: sqlDollar[4].union.expr()}
 		}
 	case 979:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:5826
+//line sql-gen.y:5828
 		{
 			return helpWith(sqllex, "SHOW CREATE SCHEDULES")
 		}
 	case 980:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:5834
+//line sql-gen.y:5836
 		{
 			sqlVAL.union.val = &tree.ShowUsers{}
 		}
 	case 981:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5837
+//line sql-gen.y:5839
 		{
 			return helpWith(sqllex, "SHOW USERS")
 		}
 	case 982:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:5845
+//line sql-gen.y:5847
 		{
 			sqlVAL.union.val = &tree.ShowRoles{}
 		}
 	case 983:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5848
+//line sql-gen.y:5850
 		{
 			return helpWith(sqllex, "SHOW ROLES")
 		}
 	case 984:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:5858
+//line sql-gen.y:5860
 		{
 			sqlVAL.union.val = &tree.ShowZoneConfig{ZoneSpecifier: tree.ZoneSpecifier{NamedZone: tree.UnrestrictedName(sqlDollar[6].str)}}
 		}
 	case 985:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:5862
+//line sql-gen.y:5864
 		{
 			sqlVAL.union.val = &tree.ShowZoneConfig{ZoneSpecifier: tree.ZoneSpecifier{Database: tree.Name(sqlDollar[6].str)}}
 		}
 	case 986:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql-gen.y:5866
+//line sql-gen.y:5868
 		{
 			name := sqlDollar[6].union.unresolvedObjectName().ToTableName()
 			sqlVAL.union.val = &tree.ShowZoneConfig{ZoneSpecifier: tree.ZoneSpecifier{
@@ -27263,7 +27263,7 @@ sqldefault:
 		}
 	case 987:
 		sqlDollar = sqlS[sqlpt-9 : sqlpt+1]
-//line sql-gen.y:5874
+//line sql-gen.y:5876
 		{
 			name := sqlDollar[9].union.unresolvedObjectName().ToTableName()
 			sqlVAL.union.val = &tree.ShowZoneConfig{ZoneSpecifier: tree.ZoneSpecifier{
@@ -27273,7 +27273,7 @@ sqldefault:
 		}
 	case 988:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql-gen.y:5882
+//line sql-gen.y:5884
 		{
 			sqlVAL.union.val = &tree.ShowZoneConfig{ZoneSpecifier: tree.ZoneSpecifier{
 				TableOrIndex: sqlDollar[6].union.tableIndexName(),
@@ -27282,7 +27282,7 @@ sqldefault:
 		}
 	case 989:
 		sqlDollar = sqlS[sqlpt-9 : sqlpt+1]
-//line sql-gen.y:5889
+//line sql-gen.y:5891
 		{
 			sqlVAL.union.val = &tree.ShowZoneConfig{ZoneSpecifier: tree.ZoneSpecifier{
 				TableOrIndex: sqlDollar[9].union.tableIndexName(),
@@ -27291,42 +27291,42 @@ sqldefault:
 		}
 	case 990:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:5895
+//line sql-gen.y:5897
 		{
 			return helpWith(sqllex, "SHOW ZONE CONFIGURATION")
 		}
 	case 991:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5897
+//line sql-gen.y:5899
 		{
 			sqlVAL.union.val = &tree.ShowZoneConfig{}
 		}
 	case 992:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:5900
+//line sql-gen.y:5902
 		{
 			return helpWith(sqllex, "SHOW ZONE CONFIGURATION")
 		}
 	case 993:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:5902
+//line sql-gen.y:5904
 		{
 			sqlVAL.union.val = &tree.ShowZoneConfig{}
 		}
 	case 994:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:5905
+//line sql-gen.y:5907
 		{
 			return helpWith(sqllex, "SHOW ZONE CONFIGURATION")
 		}
 	case 996:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:5909
+//line sql-gen.y:5911
 		{
 		}
 	case 997:
 		sqlDollar = sqlS[sqlpt-10 : sqlpt+1]
-//line sql-gen.y:5918
+//line sql-gen.y:5920
 		{
 			name := sqlDollar[5].union.unresolvedObjectName().ToTableName()
 			sqlVAL.union.val = &tree.ShowRangeForRow{
@@ -27336,7 +27336,7 @@ sqldefault:
 		}
 	case 998:
 		sqlDollar = sqlS[sqlpt-10 : sqlpt+1]
-//line sql-gen.y:5926
+//line sql-gen.y:5928
 		{
 			sqlVAL.union.val = &tree.ShowRangeForRow{
 				Row:          sqlDollar[9].union.exprs(),
@@ -27345,44 +27345,44 @@ sqldefault:
 		}
 	case 999:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5932
+//line sql-gen.y:5934
 		{
 			return helpWith(sqllex, "SHOW RANGE")
 		}
 	case 1000:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:5941
+//line sql-gen.y:5943
 		{
 			name := sqlDollar[5].union.unresolvedObjectName().ToTableName()
 			sqlVAL.union.val = &tree.ShowRanges{TableOrIndex: tree.TableIndexName{Table: name}}
 		}
 	case 1001:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:5946
+//line sql-gen.y:5948
 		{
 			sqlVAL.union.val = &tree.ShowRanges{TableOrIndex: sqlDollar[5].union.tableIndexName()}
 		}
 	case 1002:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:5950
+//line sql-gen.y:5952
 		{
 			sqlVAL.union.val = &tree.ShowRanges{DatabaseName: tree.Name(sqlDollar[5].str)}
 		}
 	case 1003:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:5953
+//line sql-gen.y:5955
 		{
 			return helpWith(sqllex, "SHOW RANGES")
 		}
 	case 1004:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:5962
+//line sql-gen.y:5964
 		{
 			sqlVAL.union.val = &tree.ShowSurvivalGoal{}
 		}
 	case 1005:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:5966
+//line sql-gen.y:5968
 		{
 			sqlVAL.union.val = &tree.ShowSurvivalGoal{
 				DatabaseName: tree.Name(sqlDollar[6].str),
@@ -27390,7 +27390,7 @@ sqldefault:
 		}
 	case 1006:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:5982
+//line sql-gen.y:5984
 		{
 			sqlVAL.union.val = &tree.ShowRegions{
 				ShowRegionsFrom: tree.ShowRegionsFromCluster,
@@ -27398,7 +27398,7 @@ sqldefault:
 		}
 	case 1007:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:5988
+//line sql-gen.y:5990
 		{
 			sqlVAL.union.val = &tree.ShowRegions{
 				ShowRegionsFrom: tree.ShowRegionsFromDatabase,
@@ -27406,7 +27406,7 @@ sqldefault:
 		}
 	case 1008:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:5994
+//line sql-gen.y:5996
 		{
 			sqlVAL.union.val = &tree.ShowRegions{
 				ShowRegionsFrom: tree.ShowRegionsFromAllDatabases,
@@ -27414,7 +27414,7 @@ sqldefault:
 		}
 	case 1009:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:6000
+//line sql-gen.y:6002
 		{
 			sqlVAL.union.val = &tree.ShowRegions{
 				ShowRegionsFrom: tree.ShowRegionsFromDatabase,
@@ -27423,7 +27423,7 @@ sqldefault:
 		}
 	case 1010:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:6007
+//line sql-gen.y:6009
 		{
 			sqlVAL.union.val = &tree.ShowRegions{
 				ShowRegionsFrom: tree.ShowRegionsFromDefault,
@@ -27431,57 +27431,57 @@ sqldefault:
 		}
 	case 1011:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:6012
+//line sql-gen.y:6014
 		{
 			return helpWith(sqllex, "SHOW REGIONS")
 		}
 	case 1012:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:6016
+//line sql-gen.y:6018
 		{
 			sqlVAL.union.val = &tree.ShowVar{Name: "locality"}
 		}
 	case 1013:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:6022
+//line sql-gen.y:6024
 		{
 
 			sqlVAL.union.val = &tree.ShowFingerprints{Table: sqlDollar[5].union.unresolvedObjectName()}
 		}
 	case 1014:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:6029
+//line sql-gen.y:6031
 		{
 			sqlVAL.union.val = &tree.ShowFullTableScans{}
 		}
 	case 1015:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:6035
+//line sql-gen.y:6037
 		{
 			tmp := sqlDollar[2].union.targetList()
 			sqlVAL.union.val = &tmp
 		}
 	case 1016:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:6040
+//line sql-gen.y:6042
 		{
 			sqlVAL.union.val = (*tree.TargetList)(nil)
 		}
 	case 1017:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:6160
+//line sql-gen.y:6162
 		{
 			sqlVAL.union.val = tree.TargetList{Tables: tree.TablePatterns{&tree.UnresolvedName{NumParts: 1, Parts: tree.NameParts{sqlDollar[1].str}}}}
 		}
 	case 1018:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:6164
+//line sql-gen.y:6166
 		{
 			sqlVAL.union.val = tree.TargetList{Tables: tree.TablePatterns{&tree.UnresolvedName{NumParts: 1, Parts: tree.NameParts{sqlDollar[1].str}}}}
 		}
 	case 1019:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:6168
+//line sql-gen.y:6170
 		{
 
 			sqlVAL.union.val = tree.TargetList{
@@ -27491,26 +27491,26 @@ sqldefault:
 		}
 	case 1020:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:6207
+//line sql-gen.y:6209
 		{
 			sqlVAL.union.val = tree.TargetList{Tables: tree.TablePatterns{sqlDollar[1].union.unresolvedName()}}
 		}
 	case 1021:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:6211
+//line sql-gen.y:6213
 		{
 			remainderPats := sqlDollar[3].union.tablePatterns()
 			sqlVAL.union.val = tree.TargetList{Tables: append(tree.TablePatterns{sqlDollar[1].union.unresolvedName()}, remainderPats...)}
 		}
 	case 1022:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:6216
+//line sql-gen.y:6218
 		{
 			sqlVAL.union.val = tree.TargetList{Tables: sqlDollar[2].union.tablePatterns()}
 		}
 	case 1023:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:6220
+//line sql-gen.y:6222
 		{
 			tenID := uint64(sqlDollar[2].union.int64())
 			if tenID == 0 {
@@ -27520,103 +27520,103 @@ sqldefault:
 		}
 	case 1024:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:6228
+//line sql-gen.y:6230
 		{
 			sqlVAL.union.val = tree.TargetList{Databases: sqlDollar[2].union.nameList()}
 		}
 	case 1025:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:6237
+//line sql-gen.y:6239
 		{
 			sqlVAL.union.val = tree.TargetList{ForRoles: true, Roles: sqlDollar[2].union.roleSpecList()}
 		}
 	case 1026:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:6241
+//line sql-gen.y:6243
 		{
 			sqlVAL.union.val = tree.TargetList{Schemas: sqlDollar[2].union.objectNamePrefixList()}
 		}
 	case 1027:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:6245
+//line sql-gen.y:6247
 		{
 			sqlVAL.union.val = tree.TargetList{Types: sqlDollar[2].union.unresolvedObjectNames()}
 		}
 	case 1029:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:6252
+//line sql-gen.y:6254
 		{
 			sqlVAL.union.val = sqlDollar[2].union.roleSpecList()
 		}
 	case 1030:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:6256
+//line sql-gen.y:6258
 		{
 			sqlVAL.union.val = tree.RoleSpecList(nil)
 		}
 	case 1032:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:6269
+//line sql-gen.y:6271
 		{
 			return helpWith(sqllex, "PAUSE JOBS")
 		}
 	case 1034:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:6270
+//line sql-gen.y:6272
 		{
 			return helpWith(sqllex, "PAUSE SCHEDULES")
 		}
 	case 1036:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:6271
+//line sql-gen.y:6273
 		{
 			return helpWith(sqllex, "PAUSE ALL JOBS")
 		}
 	case 1037:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:6272
+//line sql-gen.y:6274
 		{
 			return helpWith(sqllex, "PAUSE")
 		}
 	case 1039:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:6282
+//line sql-gen.y:6284
 		{
 			return helpWith(sqllex, "RESUME JOBS")
 		}
 	case 1041:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:6283
+//line sql-gen.y:6285
 		{
 			return helpWith(sqllex, "RESUME SCHEDULES")
 		}
 	case 1043:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:6284
+//line sql-gen.y:6286
 		{
 			return helpWith(sqllex, "RESUME ALL JOBS")
 		}
 	case 1044:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:6285
+//line sql-gen.y:6287
 		{
 			return helpWith(sqllex, "RESUME")
 		}
 	case 1045:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:6293
+//line sql-gen.y:6295
 		{
 			sqlVAL.union.val = &tree.ControlJobsOfType{Type: sqlDollar[3].str, Command: tree.ResumeJob}
 		}
 	case 1046:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:6296
+//line sql-gen.y:6298
 		{
 			return helpWith(sqllex, "RESUME ALL JOBS")
 		}
 	case 1047:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:6306
+//line sql-gen.y:6308
 		{
 			sqlVAL.union.val = &tree.ControlJobs{
 				Jobs: &tree.Select{
@@ -27627,7 +27627,7 @@ sqldefault:
 		}
 	case 1048:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql-gen.y:6315
+//line sql-gen.y:6317
 		{
 			sqlVAL.union.val = &tree.ControlJobs{
 				Jobs: &tree.Select{
@@ -27639,43 +27639,43 @@ sqldefault:
 		}
 	case 1049:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:6324
+//line sql-gen.y:6326
 		{
 			return helpWith(sqllex, "PAUSE JOBS")
 		}
 	case 1050:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:6326
+//line sql-gen.y:6328
 		{
 			sqlVAL.union.val = &tree.ControlJobs{Jobs: sqlDollar[3].union.slct(), Command: tree.PauseJob}
 		}
 	case 1051:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql-gen.y:6330
+//line sql-gen.y:6332
 		{
 			sqlVAL.union.val = &tree.ControlJobs{Jobs: sqlDollar[3].union.slct(), Command: tree.PauseJob, Reason: sqlDollar[7].union.expr()}
 		}
 	case 1052:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:6334
+//line sql-gen.y:6336
 		{
 			sqlVAL.union.val = &tree.ControlJobsForSchedules{Schedules: sqlDollar[3].union.slct(), Command: tree.PauseJob}
 		}
 	case 1053:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:6337
+//line sql-gen.y:6339
 		{
 			return helpWith(sqllex, "PAUSE JOBS")
 		}
 	case 1054:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:6342
+//line sql-gen.y:6344
 		{
 			sqlVAL.union.val = sqlDollar[3].union.slct()
 		}
 	case 1055:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:6346
+//line sql-gen.y:6348
 		{
 			sqlVAL.union.val = &tree.Select{
 				Select: &tree.ValuesClause{Rows: []tree.Exprs{tree.Exprs{sqlDollar[3].union.expr()}}},
@@ -27683,7 +27683,7 @@ sqldefault:
 		}
 	case 1056:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:6361
+//line sql-gen.y:6363
 		{
 			sqlVAL.union.val = &tree.ControlSchedules{
 				Schedules: &tree.Select{
@@ -27694,13 +27694,13 @@ sqldefault:
 		}
 	case 1057:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:6369
+//line sql-gen.y:6371
 		{
 			return helpWith(sqllex, "PAUSE SCHEDULES")
 		}
 	case 1058:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:6371
+//line sql-gen.y:6373
 		{
 			sqlVAL.union.val = &tree.ControlSchedules{
 				Schedules: sqlDollar[3].union.slct(),
@@ -27709,25 +27709,25 @@ sqldefault:
 		}
 	case 1059:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:6377
+//line sql-gen.y:6379
 		{
 			return helpWith(sqllex, "PAUSE SCHEDULES")
 		}
 	case 1060:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:6385
+//line sql-gen.y:6387
 		{
 			sqlVAL.union.val = &tree.ControlJobsOfType{Type: sqlDollar[3].str, Command: tree.PauseJob}
 		}
 	case 1061:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:6388
+//line sql-gen.y:6390
 		{
 			return helpWith(sqllex, "PAUSE ALL JOBS")
 		}
 	case 1062:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:6397
+//line sql-gen.y:6399
 		{
 			sqlVAL.union.val = &tree.CreateSchema{
 				Schema: sqlDollar[3].union.objectNamePrefix(),
@@ -27735,7 +27735,7 @@ sqldefault:
 		}
 	case 1063:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:6403
+//line sql-gen.y:6405
 		{
 			sqlVAL.union.val = &tree.CreateSchema{
 				Schema:      sqlDollar[6].union.objectNamePrefix(),
@@ -27744,7 +27744,7 @@ sqldefault:
 		}
 	case 1064:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:6410
+//line sql-gen.y:6412
 		{
 			sqlVAL.union.val = &tree.CreateSchema{
 				Schema:   sqlDollar[3].union.objectNamePrefix(),
@@ -27753,7 +27753,7 @@ sqldefault:
 		}
 	case 1065:
 		sqlDollar = sqlS[sqlpt-8 : sqlpt+1]
-//line sql-gen.y:6417
+//line sql-gen.y:6419
 		{
 			sqlVAL.union.val = &tree.CreateSchema{
 				Schema:      sqlDollar[6].union.objectNamePrefix(),
@@ -27763,13 +27763,13 @@ sqldefault:
 		}
 	case 1066:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:6424
+//line sql-gen.y:6426
 		{
 			return helpWith(sqllex, "CREATE SCHEMA")
 		}
 	case 1067:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:6435
+//line sql-gen.y:6437
 		{
 			sqlVAL.union.val = &tree.AlterSchema{
 				Schema: sqlDollar[3].union.objectNamePrefix(),
@@ -27780,7 +27780,7 @@ sqldefault:
 		}
 	case 1068:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:6444
+//line sql-gen.y:6446
 		{
 			sqlVAL.union.val = &tree.AlterSchema{
 				Schema: sqlDollar[3].union.objectNamePrefix(),
@@ -27791,13 +27791,13 @@ sqldefault:
 		}
 	case 1069:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:6452
+//line sql-gen.y:6454
 		{
 			return helpWith(sqllex, "ALTER SCHEMA")
 		}
 	case 1070:
 		sqlDollar = sqlS[sqlpt-12 : sqlpt+1]
-//line sql-gen.y:6488
+//line sql-gen.y:6490
 		{
 			name := sqlDollar[4].union.unresolvedObjectName().ToTableName()
 			sqlVAL.union.val = &tree.CreateTable{
@@ -27814,7 +27814,7 @@ sqldefault:
 		}
 	case 1071:
 		sqlDollar = sqlS[sqlpt-15 : sqlpt+1]
-//line sql-gen.y:6503
+//line sql-gen.y:6505
 		{
 			name := sqlDollar[7].union.unresolvedObjectName().ToTableName()
 			sqlVAL.union.val = &tree.CreateTable{
@@ -27831,105 +27831,105 @@ sqldefault:
 		}
 	case 1072:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:6520
+//line sql-gen.y:6522
 		{
 			sqlVAL.union.val = sqlDollar[1].union.locality()
 		}
 	case 1073:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:6524
+//line sql-gen.y:6526
 		{
 			sqlVAL.union.val = (*tree.Locality)(nil)
 		}
 	case 1075:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:6531
+//line sql-gen.y:6533
 		{
 
 			sqlVAL.union.val = nil
 		}
 	case 1076:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:6537
+//line sql-gen.y:6539
 		{
 			return unimplemented(sqllex, "create table with oids")
 		}
 	case 1077:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:6543
+//line sql-gen.y:6545
 		{
 			sqlVAL.str = ""
 		}
 	case 1078:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:6547
+//line sql-gen.y:6549
 		{
 
 			return unimplementedWithIssueDetail(sqllex, 22456, "create table inherits")
 		}
 	case 1079:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:6553
+//line sql-gen.y:6555
 		{
 			sqlVAL.union.val = nil
 		}
 	case 1080:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:6557
+//line sql-gen.y:6559
 		{
 			sqlVAL.union.val = sqlDollar[3].union.storageParams()
 		}
 	case 1081:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:6562
+//line sql-gen.y:6564
 		{
 			sqlVAL.union.val = tree.CreateTableOnCommitUnset
 		}
 	case 1082:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:6566
+//line sql-gen.y:6568
 		{
 			sqlVAL.union.val = tree.CreateTableOnCommitPreserveRows
 		}
 	case 1083:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:6570
+//line sql-gen.y:6572
 		{
 			return unimplementedWithIssueDetail(sqllex, 46556, "delete rows")
 		}
 	case 1084:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:6574
+//line sql-gen.y:6576
 		{
 			return unimplementedWithIssueDetail(sqllex, 46556, "drop")
 		}
 	case 1085:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:6580
+//line sql-gen.y:6582
 		{
 			sqlVAL.union.val = tree.StorageParam{Key: tree.Name(sqlDollar[1].str), Value: sqlDollar[3].union.expr()}
 		}
 	case 1086:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:6584
+//line sql-gen.y:6586
 		{
 			sqlVAL.union.val = tree.StorageParam{Key: tree.Name(sqlDollar[1].str), Value: sqlDollar[3].union.expr()}
 		}
 	case 1087:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:6590
+//line sql-gen.y:6592
 		{
 			sqlVAL.union.val = []tree.StorageParam{sqlDollar[1].union.storageParam()}
 		}
 	case 1088:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:6594
+//line sql-gen.y:6596
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.storageParams(), sqlDollar[3].union.storageParam())
 		}
 	case 1089:
 		sqlDollar = sqlS[sqlpt-10 : sqlpt+1]
-//line sql-gen.y:6600
+//line sql-gen.y:6602
 		{
 			name := sqlDollar[4].union.unresolvedObjectName().ToTableName()
 			sqlVAL.union.val = &tree.CreateTable{
@@ -27944,7 +27944,7 @@ sqldefault:
 		}
 	case 1090:
 		sqlDollar = sqlS[sqlpt-13 : sqlpt+1]
-//line sql-gen.y:6613
+//line sql-gen.y:6615
 		{
 			name := sqlDollar[7].union.unresolvedObjectName().ToTableName()
 			sqlVAL.union.val = &tree.CreateTable{
@@ -27959,95 +27959,95 @@ sqldefault:
 		}
 	case 1091:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:6627
+//line sql-gen.y:6629
 		{
 		}
 	case 1092:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:6628
+//line sql-gen.y:6630
 		{
 		}
 	case 1093:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:6629
+//line sql-gen.y:6631
 		{
 			return unimplemented(sqllex, "create table as with no data")
 		}
 	case 1094:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:6647
+//line sql-gen.y:6649
 		{
 			sqlVAL.union.val = tree.PersistenceTemporary
 		}
 	case 1095:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:6648
+//line sql-gen.y:6650
 		{
 			sqlVAL.union.val = tree.PersistenceTemporary
 		}
 	case 1096:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:6649
+//line sql-gen.y:6651
 		{
 			sqlVAL.union.val = tree.PersistencePermanent
 		}
 	case 1098:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:6653
+//line sql-gen.y:6655
 		{
 			sqlVAL.union.val = tree.PersistenceTemporary
 		}
 	case 1099:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:6654
+//line sql-gen.y:6656
 		{
 			sqlVAL.union.val = tree.PersistenceTemporary
 		}
 	case 1100:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:6655
+//line sql-gen.y:6657
 		{
 			sqlVAL.union.val = tree.PersistenceTemporary
 		}
 	case 1101:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:6656
+//line sql-gen.y:6658
 		{
 			sqlVAL.union.val = tree.PersistenceTemporary
 		}
 	case 1102:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:6657
+//line sql-gen.y:6659
 		{
 			sqlVAL.union.val = tree.PersistenceUnlogged
 		}
 	case 1104:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:6662
+//line sql-gen.y:6664
 		{
 			sqlVAL.union.val = tree.TableDefs(nil)
 		}
 	case 1105:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:6668
+//line sql-gen.y:6670
 		{
 			sqlVAL.union.val = tree.TableDefs{sqlDollar[1].union.tblDef()}
 		}
 	case 1106:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:6672
+//line sql-gen.y:6674
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.tblDefs(), sqlDollar[3].union.tblDef())
 		}
 	case 1107:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:6678
+//line sql-gen.y:6680
 		{
 			sqlVAL.union.val = sqlDollar[1].union.colDef()
 		}
 	case 1110:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:6684
+//line sql-gen.y:6686
 		{
 			def := sqlDollar[1].union.constraintDef()
 			valBehavior := sqlDollar[2].union.validationBehavior()
@@ -28062,7 +28062,7 @@ sqldefault:
 		}
 	case 1111:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:6697
+//line sql-gen.y:6699
 		{
 			sqlVAL.union.val = &tree.LikeTableDef{
 				Name:    sqlDollar[2].union.unresolvedObjectName().ToTableName(),
@@ -28071,13 +28071,13 @@ sqldefault:
 		}
 	case 1112:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:6706
+//line sql-gen.y:6708
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.likeTableOptionList(), sqlDollar[3].union.likeTableOption())
 		}
 	case 1113:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:6710
+//line sql-gen.y:6712
 		{
 			opt := sqlDollar[3].union.likeTableOption()
 			opt.Excluded = true
@@ -28085,85 +28085,85 @@ sqldefault:
 		}
 	case 1114:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:6716
+//line sql-gen.y:6718
 		{
 			sqlVAL.union.val = []tree.LikeTableOption(nil)
 		}
 	case 1115:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:6721
+//line sql-gen.y:6723
 		{
 			return unimplementedWithIssueDetail(sqllex, 47071, "like table in/excluding comments")
 		}
 	case 1116:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:6722
+//line sql-gen.y:6724
 		{
 			sqlVAL.union.val = tree.LikeTableOption{Opt: tree.LikeTableOptConstraints}
 		}
 	case 1117:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:6723
+//line sql-gen.y:6725
 		{
 			sqlVAL.union.val = tree.LikeTableOption{Opt: tree.LikeTableOptDefaults}
 		}
 	case 1118:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:6724
+//line sql-gen.y:6726
 		{
 			return unimplementedWithIssueDetail(sqllex, 47071, "like table in/excluding identity")
 		}
 	case 1119:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:6725
+//line sql-gen.y:6727
 		{
 			sqlVAL.union.val = tree.LikeTableOption{Opt: tree.LikeTableOptGenerated}
 		}
 	case 1120:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:6726
+//line sql-gen.y:6728
 		{
 			sqlVAL.union.val = tree.LikeTableOption{Opt: tree.LikeTableOptIndexes}
 		}
 	case 1121:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:6727
+//line sql-gen.y:6729
 		{
 			return unimplementedWithIssueDetail(sqllex, 47071, "like table in/excluding statistics")
 		}
 	case 1122:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:6728
+//line sql-gen.y:6730
 		{
 			return unimplementedWithIssueDetail(sqllex, 47071, "like table in/excluding storage")
 		}
 	case 1123:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:6729
+//line sql-gen.y:6731
 		{
 			sqlVAL.union.val = tree.LikeTableOption{Opt: tree.LikeTableOptAll}
 		}
 	case 1124:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:6734
+//line sql-gen.y:6736
 		{
 			sqlVAL.str = sqlDollar[2].str
 		}
 	case 1126:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:6741
+//line sql-gen.y:6743
 		{
 			sqlVAL.str = ""
 		}
 	case 1128:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:6748
+//line sql-gen.y:6750
 		{
 			sqlVAL.union.val = (*tree.PartitionBy)(nil)
 		}
 	case 1129:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:6754
+//line sql-gen.y:6756
 		{
 			sqlVAL.union.val = &tree.PartitionByIndex{
 				PartitionBy: sqlDollar[1].union.partitionBy(),
@@ -28171,7 +28171,7 @@ sqldefault:
 		}
 	case 1130:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:6762
+//line sql-gen.y:6764
 		{
 			sqlVAL.union.val = &tree.PartitionByIndex{
 				PartitionBy: sqlDollar[1].union.partitionBy(),
@@ -28179,13 +28179,13 @@ sqldefault:
 		}
 	case 1131:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:6768
+//line sql-gen.y:6770
 		{
 			sqlVAL.union.val = (*tree.PartitionByIndex)(nil)
 		}
 	case 1132:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:6774
+//line sql-gen.y:6776
 		{
 			sqlVAL.union.val = &tree.PartitionByTable{
 				PartitionBy: sqlDollar[1].union.partitionBy(),
@@ -28193,7 +28193,7 @@ sqldefault:
 		}
 	case 1133:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:6780
+//line sql-gen.y:6782
 		{
 			sqlVAL.union.val = &tree.PartitionByTable{
 				All:         true,
@@ -28202,19 +28202,19 @@ sqldefault:
 		}
 	case 1135:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:6790
+//line sql-gen.y:6792
 		{
 			sqlVAL.union.val = (*tree.PartitionByTable)(nil)
 		}
 	case 1136:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:6796
+//line sql-gen.y:6798
 		{
 			sqlVAL.union.val = sqlDollar[3].union.partitionBy()
 		}
 	case 1137:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql-gen.y:6802
+//line sql-gen.y:6804
 		{
 			sqlVAL.union.val = &tree.PartitionBy{
 				Fields: sqlDollar[3].union.nameList(),
@@ -28223,7 +28223,7 @@ sqldefault:
 		}
 	case 1138:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql-gen.y:6809
+//line sql-gen.y:6811
 		{
 			sqlVAL.union.val = &tree.PartitionBy{
 				Fields: sqlDollar[3].union.nameList(),
@@ -28232,25 +28232,25 @@ sqldefault:
 		}
 	case 1139:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:6816
+//line sql-gen.y:6818
 		{
 			sqlVAL.union.val = (*tree.PartitionBy)(nil)
 		}
 	case 1140:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:6822
+//line sql-gen.y:6824
 		{
 			sqlVAL.union.val = []tree.ListPartition{sqlDollar[1].union.listPartition()}
 		}
 	case 1141:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:6826
+//line sql-gen.y:6828
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.listPartitions(), sqlDollar[3].union.listPartition())
 		}
 	case 1142:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql-gen.y:6832
+//line sql-gen.y:6834
 		{
 			sqlVAL.union.val = tree.ListPartition{
 				Name:         tree.UnrestrictedName(sqlDollar[1].str),
@@ -28260,19 +28260,19 @@ sqldefault:
 		}
 	case 1143:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:6842
+//line sql-gen.y:6844
 		{
 			sqlVAL.union.val = []tree.RangePartition{sqlDollar[1].union.rangePartition()}
 		}
 	case 1144:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:6846
+//line sql-gen.y:6848
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.rangePartitions(), sqlDollar[3].union.rangePartition())
 		}
 	case 1145:
 		sqlDollar = sqlS[sqlpt-11 : sqlpt+1]
-//line sql-gen.y:6852
+//line sql-gen.y:6854
 		{
 			sqlVAL.union.val = tree.RangePartition{
 				Name:         tree.UnrestrictedName(sqlDollar[1].str),
@@ -28283,7 +28283,7 @@ sqldefault:
 		}
 	case 1146:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:6866
+//line sql-gen.y:6868
 		{
 			typ := sqlDollar[2].union.typeReference()
 			tableDef, err := tree.NewColumnTableDef(tree.Name(sqlDollar[1].str), typ, tree.IsReferenceSerialType(typ), sqlDollar[3].union.colQuals())
@@ -28294,79 +28294,79 @@ sqldefault:
 		}
 	case 1147:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:6877
+//line sql-gen.y:6879
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.colQuals(), sqlDollar[2].union.colQual())
 		}
 	case 1148:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:6881
+//line sql-gen.y:6883
 		{
 			sqlVAL.union.val = []tree.NamedColumnQualification(nil)
 		}
 	case 1149:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:6887
+//line sql-gen.y:6889
 		{
 			sqlVAL.union.val = tree.NamedColumnQualification{Name: tree.Name(sqlDollar[2].str), Qualification: sqlDollar[3].union.colQualElem()}
 		}
 	case 1150:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:6891
+//line sql-gen.y:6893
 		{
 			sqlVAL.union.val = tree.NamedColumnQualification{Qualification: sqlDollar[1].union.colQualElem()}
 		}
 	case 1151:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:6895
+//line sql-gen.y:6897
 		{
 			sqlVAL.union.val = tree.NamedColumnQualification{Qualification: tree.ColumnCollation(sqlDollar[2].str)}
 		}
 	case 1152:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:6899
+//line sql-gen.y:6901
 		{
 			sqlVAL.union.val = tree.NamedColumnQualification{Qualification: &tree.ColumnFamilyConstraint{Family: tree.Name(sqlDollar[2].str)}}
 		}
 	case 1153:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:6903
+//line sql-gen.y:6905
 		{
 			sqlVAL.union.val = tree.NamedColumnQualification{Qualification: &tree.ColumnFamilyConstraint{Family: tree.Name(sqlDollar[3].str), Create: true}}
 		}
 	case 1154:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:6907
+//line sql-gen.y:6909
 		{
 			sqlVAL.union.val = tree.NamedColumnQualification{Qualification: &tree.ColumnFamilyConstraint{Create: true}}
 		}
 	case 1155:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:6911
+//line sql-gen.y:6913
 		{
 			sqlVAL.union.val = tree.NamedColumnQualification{Qualification: &tree.ColumnFamilyConstraint{Family: tree.Name(sqlDollar[6].str), Create: true, IfNotExists: true}}
 		}
 	case 1156:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:6929
+//line sql-gen.y:6931
 		{
 			sqlVAL.union.val = tree.NotNullConstraint{}
 		}
 	case 1157:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:6933
+//line sql-gen.y:6935
 		{
 			sqlVAL.union.val = tree.NullConstraint{}
 		}
 	case 1158:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:6937
+//line sql-gen.y:6939
 		{
 			sqlVAL.union.val = tree.HiddenConstraint{}
 		}
 	case 1159:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:6941
+//line sql-gen.y:6943
 		{
 			sqlVAL.union.val = tree.UniqueConstraint{
 				WithoutIndex: sqlDollar[2].union.bool(),
@@ -28374,13 +28374,13 @@ sqldefault:
 		}
 	case 1160:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:6947
+//line sql-gen.y:6949
 		{
 			sqlVAL.union.val = tree.PrimaryKeyConstraint{}
 		}
 	case 1161:
 		sqlDollar = sqlS[sqlpt-8 : sqlpt+1]
-//line sql-gen.y:6951
+//line sql-gen.y:6953
 		{
 			sqlVAL.union.val = tree.ShardedPrimaryKeyConstraint{
 				Sharded:      true,
@@ -28389,25 +28389,25 @@ sqldefault:
 		}
 	case 1162:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:6958
+//line sql-gen.y:6960
 		{
 			sqlVAL.union.val = &tree.ColumnCheckConstraint{Expr: sqlDollar[3].union.expr()}
 		}
 	case 1163:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:6962
+//line sql-gen.y:6964
 		{
 			sqlVAL.union.val = &tree.ColumnDefault{Expr: sqlDollar[2].union.expr()}
 		}
 	case 1164:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:6966
+//line sql-gen.y:6968
 		{
 			sqlVAL.union.val = &tree.ColumnOnUpdate{Expr: sqlDollar[3].union.expr()}
 		}
 	case 1165:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:6970
+//line sql-gen.y:6972
 		{
 			name := sqlDollar[2].union.unresolvedObjectName().ToTableName()
 			sqlVAL.union.val = &tree.ColumnFKConstraint{
@@ -28419,26 +28419,26 @@ sqldefault:
 		}
 	case 1166:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:6980
+//line sql-gen.y:6982
 		{
 			sqlVAL.union.val = &tree.ColumnComputedDef{Expr: sqlDollar[3].union.expr(), Virtual: false}
 		}
 	case 1167:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:6984
+//line sql-gen.y:6986
 		{
 			sqlVAL.union.val = &tree.ColumnComputedDef{Expr: sqlDollar[3].union.expr(), Virtual: true}
 		}
 	case 1168:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:6988
+//line sql-gen.y:6990
 		{
 			sqllex.Error("use AS ( <expr> ) STORED or AS ( <expr> ) VIRTUAL")
 			return 1
 		}
 	case 1169:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:6993
+//line sql-gen.y:6995
 		{
 			sqlVAL.union.val = &tree.GeneratedAlwaysAsIdentity{
 				SeqOptions: sqlDollar[4].union.seqOpts(),
@@ -28446,7 +28446,7 @@ sqldefault:
 		}
 	case 1170:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:6999
+//line sql-gen.y:7001
 		{
 			sqlVAL.union.val = &tree.GeneratedByDefAsIdentity{
 				SeqOptions: sqlDollar[4].union.seqOpts(),
@@ -28454,47 +28454,47 @@ sqldefault:
 		}
 	case 1171:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:7005
+//line sql-gen.y:7007
 		{
 			sqlVAL.union.val = &tree.GeneratedAlwaysAsIdentity{}
 		}
 	case 1172:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:7009
+//line sql-gen.y:7011
 		{
 			sqlVAL.union.val = &tree.GeneratedByDefAsIdentity{}
 		}
 	case 1173:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:7015
+//line sql-gen.y:7017
 		{
 
 			sqlVAL.union.val = true
 		}
 	case 1174:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:7020
+//line sql-gen.y:7022
 		{
 			sqlVAL.union.val = false
 		}
 	case 1175:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:7025
+//line sql-gen.y:7027
 		{
 		}
 	case 1177:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:7029
+//line sql-gen.y:7031
 		{
 		}
 	case 1178:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:7032
+//line sql-gen.y:7034
 		{
 		}
 	case 1179:
 		sqlDollar = sqlS[sqlpt-10 : sqlpt+1]
-//line sql-gen.y:7036
+//line sql-gen.y:7038
 		{
 			sqlVAL.union.val = &tree.IndexTableDef{
 				Name:             tree.Name(sqlDollar[2].str),
@@ -28508,7 +28508,7 @@ sqldefault:
 		}
 	case 1180:
 		sqlDollar = sqlS[sqlpt-11 : sqlpt+1]
-//line sql-gen.y:7048
+//line sql-gen.y:7050
 		{
 			sqlVAL.union.val = &tree.UniqueConstraintTableDef{
 				IndexTableDef: tree.IndexTableDef{
@@ -28524,7 +28524,7 @@ sqldefault:
 		}
 	case 1181:
 		sqlDollar = sqlS[sqlpt-9 : sqlpt+1]
-//line sql-gen.y:7062
+//line sql-gen.y:7064
 		{
 			sqlVAL.union.val = &tree.IndexTableDef{
 				Name:             tree.Name(sqlDollar[3].str),
@@ -28537,7 +28537,7 @@ sqldefault:
 		}
 	case 1182:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:7075
+//line sql-gen.y:7077
 		{
 			sqlVAL.union.val = &tree.FamilyTableDef{
 				Name:    tree.Name(sqlDollar[2].str),
@@ -28546,20 +28546,20 @@ sqldefault:
 		}
 	case 1183:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:7087
+//line sql-gen.y:7089
 		{
 			sqlVAL.union.val = sqlDollar[3].union.constraintDef()
 			sqlVAL.union.val.(tree.ConstraintTableDef).SetName(tree.Name(sqlDollar[2].str))
 		}
 	case 1184:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:7092
+//line sql-gen.y:7094
 		{
 			sqlVAL.union.val = sqlDollar[1].union.constraintDef()
 		}
 	case 1185:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:7098
+//line sql-gen.y:7100
 		{
 			sqlVAL.union.val = &tree.CheckConstraintTableDef{
 				Expr: sqlDollar[3].union.expr(),
@@ -28567,7 +28567,7 @@ sqldefault:
 		}
 	case 1186:
 		sqlDollar = sqlS[sqlpt-9 : sqlpt+1]
-//line sql-gen.y:7105
+//line sql-gen.y:7107
 		{
 			sqlVAL.union.val = &tree.UniqueConstraintTableDef{
 				WithoutIndex: sqlDollar[2].union.bool(),
@@ -28581,7 +28581,7 @@ sqldefault:
 		}
 	case 1187:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:7117
+//line sql-gen.y:7119
 		{
 			sqlVAL.union.val = &tree.UniqueConstraintTableDef{
 				IndexTableDef: tree.IndexTableDef{
@@ -28593,7 +28593,7 @@ sqldefault:
 		}
 	case 1188:
 		sqlDollar = sqlS[sqlpt-11 : sqlpt+1]
-//line sql-gen.y:7128
+//line sql-gen.y:7130
 		{
 			name := sqlDollar[7].union.unresolvedObjectName().ToTableName()
 			sqlVAL.union.val = &tree.ForeignKeyConstraintTableDef{
@@ -28606,25 +28606,25 @@ sqldefault:
 		}
 	case 1189:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:7139
+//line sql-gen.y:7141
 		{
 			return unimplementedWithIssueDetail(sqllex, 46657, "add constraint exclude using")
 		}
 	case 1190:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:7146
+//line sql-gen.y:7148
 		{
 			sqlVAL.union.val = sqlDollar[2].union.val
 		}
 	case 1191:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:7150
+//line sql-gen.y:7152
 		{
 			sqlVAL.union.val = tree.TableDefs(nil)
 		}
 	case 1192:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:7156
+//line sql-gen.y:7158
 		{
 			tableDef, err := tree.NewColumnTableDef(tree.Name(sqlDollar[1].str), nil, false, sqlDollar[2].union.colQuals())
 			if err != nil {
@@ -28636,7 +28636,7 @@ sqldefault:
 		}
 	case 1193:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:7166
+//line sql-gen.y:7168
 		{
 			tableDef, err := tree.NewColumnTableDef(tree.Name(sqlDollar[3].str), nil, false, sqlDollar[4].union.colQuals())
 			if err != nil {
@@ -28649,26 +28649,26 @@ sqldefault:
 		}
 	case 1194:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:7177
+//line sql-gen.y:7179
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.tblDefs(), sqlDollar[3].union.tblDef())
 		}
 	case 1195:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:7181
+//line sql-gen.y:7183
 		{
 			var constraintToTableDef tree.TableDef = sqlDollar[3].union.constraintDef()
 			sqlVAL.union.val = append(sqlDollar[1].union.tblDefs(), constraintToTableDef)
 		}
 	case 1196:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:7188
+//line sql-gen.y:7190
 		{
 			sqlVAL.union.val = sqlDollar[1].union.constraintDef()
 		}
 	case 1197:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:7194
+//line sql-gen.y:7196
 		{
 			sqlVAL.union.val = &tree.UniqueConstraintTableDef{
 				IndexTableDef: tree.IndexTableDef{
@@ -28679,102 +28679,102 @@ sqldefault:
 		}
 	case 1198:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:7205
+//line sql-gen.y:7207
 		{
 			sqlVAL.union.val = tree.IndexElemList{sqlDollar[1].union.idxElem()}
 		}
 	case 1199:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:7209
+//line sql-gen.y:7211
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.idxElems(), sqlDollar[3].union.idxElem())
 		}
 	case 1200:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:7215
+//line sql-gen.y:7217
 		{
 			sqlVAL.union.val = tree.IndexElem{Column: tree.Name(sqlDollar[1].str)}
 		}
 	case 1201:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:7221
+//line sql-gen.y:7223
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.colQuals(), sqlDollar[2].union.colQual())
 		}
 	case 1202:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:7225
+//line sql-gen.y:7227
 		{
 			sqlVAL.union.val = []tree.NamedColumnQualification(nil)
 		}
 	case 1203:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:7231
+//line sql-gen.y:7233
 		{
 			sqlVAL.union.val = tree.NamedColumnQualification{Qualification: sqlDollar[1].union.colQualElem()}
 		}
 	case 1204:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:7235
+//line sql-gen.y:7237
 		{
 			sqlVAL.union.val = tree.NamedColumnQualification{Qualification: &tree.ColumnFamilyConstraint{Family: tree.Name(sqlDollar[2].str)}}
 		}
 	case 1205:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:7241
+//line sql-gen.y:7243
 		{
 			sqlVAL.union.val = tree.PrimaryKeyConstraint{}
 		}
 	case 1206:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:7246
+//line sql-gen.y:7248
 		{
 		}
 	case 1207:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:7247
+//line sql-gen.y:7249
 		{
 			return unimplementedWithIssueDetail(sqllex, 31632, "deferrable")
 		}
 	case 1208:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:7248
+//line sql-gen.y:7250
 		{
 			return unimplementedWithIssueDetail(sqllex, 31632, "def initially deferred")
 		}
 	case 1209:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:7249
+//line sql-gen.y:7251
 		{
 			return unimplementedWithIssueDetail(sqllex, 31632, "def initially immediate")
 		}
 	case 1210:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:7250
+//line sql-gen.y:7252
 		{
 			return unimplementedWithIssueDetail(sqllex, 31632, "initially deferred")
 		}
 	case 1211:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:7251
+//line sql-gen.y:7253
 		{
 			return unimplementedWithIssueDetail(sqllex, 31632, "initially immediate")
 		}
 	case 1215:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:7269
+//line sql-gen.y:7271
 		{
 			sqlVAL.union.val = sqlDollar[3].union.nameList()
 		}
 	case 1216:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:7273
+//line sql-gen.y:7275
 		{
 			sqlVAL.union.val = tree.NameList(nil)
 		}
 	case 1217:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:7279
+//line sql-gen.y:7281
 		{
 			sqlVAL.union.val = &tree.ShardedIndexDef{
 				ShardBuckets: sqlDollar[6].union.expr(),
@@ -28782,121 +28782,121 @@ sqldefault:
 		}
 	case 1218:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:7285
+//line sql-gen.y:7287
 		{
 			sqlVAL.union.val = (*tree.ShardedIndexDef)(nil)
 		}
 	case 1219:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:7291
+//line sql-gen.y:7293
 		{
 			sqlVAL.union.val = sqlDollar[2].union.nameList()
 		}
 	case 1220:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:7295
+//line sql-gen.y:7297
 		{
 			sqlVAL.union.val = tree.NameList(nil)
 		}
 	case 1221:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:7315
+//line sql-gen.y:7317
 		{
 			sqlVAL.union.val = tree.MatchSimple
 		}
 	case 1222:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:7319
+//line sql-gen.y:7321
 		{
 			sqlVAL.union.val = tree.MatchFull
 		}
 	case 1223:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:7323
+//line sql-gen.y:7325
 		{
 			return unimplementedWithIssueDetail(sqllex, 20305, "match partial")
 		}
 	case 1224:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:7327
+//line sql-gen.y:7329
 		{
 			sqlVAL.union.val = tree.MatchSimple
 		}
 	case 1225:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:7336
+//line sql-gen.y:7338
 		{
 			sqlVAL.union.val = tree.ReferenceActions{Update: sqlDollar[1].union.referenceAction()}
 		}
 	case 1226:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:7340
+//line sql-gen.y:7342
 		{
 			sqlVAL.union.val = tree.ReferenceActions{Delete: sqlDollar[1].union.referenceAction()}
 		}
 	case 1227:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:7344
+//line sql-gen.y:7346
 		{
 			sqlVAL.union.val = tree.ReferenceActions{Update: sqlDollar[1].union.referenceAction(), Delete: sqlDollar[2].union.referenceAction()}
 		}
 	case 1228:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:7348
+//line sql-gen.y:7350
 		{
 			sqlVAL.union.val = tree.ReferenceActions{Delete: sqlDollar[1].union.referenceAction(), Update: sqlDollar[2].union.referenceAction()}
 		}
 	case 1229:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:7352
+//line sql-gen.y:7354
 		{
 			sqlVAL.union.val = tree.ReferenceActions{}
 		}
 	case 1230:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:7358
+//line sql-gen.y:7360
 		{
 			sqlVAL.union.val = sqlDollar[3].union.referenceAction()
 		}
 	case 1231:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:7364
+//line sql-gen.y:7366
 		{
 			sqlVAL.union.val = sqlDollar[3].union.referenceAction()
 		}
 	case 1232:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:7372
+//line sql-gen.y:7374
 		{
 			sqlVAL.union.val = tree.NoAction
 		}
 	case 1233:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:7376
+//line sql-gen.y:7378
 		{
 			sqlVAL.union.val = tree.Restrict
 		}
 	case 1234:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:7380
+//line sql-gen.y:7382
 		{
 			sqlVAL.union.val = tree.Cascade
 		}
 	case 1235:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:7384
+//line sql-gen.y:7386
 		{
 			sqlVAL.union.val = tree.SetNull
 		}
 	case 1236:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:7388
+//line sql-gen.y:7390
 		{
 			sqlVAL.union.val = tree.SetDefault
 		}
 	case 1237:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:7408
+//line sql-gen.y:7410
 		{
 			name := sqlDollar[4].union.unresolvedObjectName().ToTableName()
 			sqlVAL.union.val = &tree.CreateSequence{
@@ -28907,7 +28907,7 @@ sqldefault:
 		}
 	case 1238:
 		sqlDollar = sqlS[sqlpt-8 : sqlpt+1]
-//line sql-gen.y:7417
+//line sql-gen.y:7419
 		{
 			name := sqlDollar[7].union.unresolvedObjectName().ToTableName()
 			sqlVAL.union.val = &tree.CreateSequence{
@@ -28918,31 +28918,31 @@ sqldefault:
 		}
 	case 1239:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:7425
+//line sql-gen.y:7427
 		{
 			return helpWith(sqllex, "CREATE SEQUENCE")
 		}
 	case 1241:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:7429
+//line sql-gen.y:7431
 		{
 			sqlVAL.union.val = []tree.SequenceOption(nil)
 		}
 	case 1242:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:7432
+//line sql-gen.y:7434
 		{
 			sqlVAL.union.val = []tree.SequenceOption{sqlDollar[1].union.seqOpt()}
 		}
 	case 1243:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:7433
+//line sql-gen.y:7435
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.seqOpts(), sqlDollar[2].union.seqOpt())
 		}
 	case 1244:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:7436
+//line sql-gen.y:7438
 		{
 
 			parsedType := sqlDollar[2].union.colType()
@@ -28954,25 +28954,25 @@ sqldefault:
 		}
 	case 1245:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:7445
+//line sql-gen.y:7447
 		{
 			sqlVAL.union.val = tree.SequenceOption{Name: tree.SeqOptCycle}
 		}
 	case 1246:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:7447
+//line sql-gen.y:7449
 		{
 			sqlVAL.union.val = tree.SequenceOption{Name: tree.SeqOptNoCycle}
 		}
 	case 1247:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:7448
+//line sql-gen.y:7450
 		{
 			sqlVAL.union.val = tree.SequenceOption{Name: tree.SeqOptOwnedBy, ColumnItemVal: nil}
 		}
 	case 1248:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:7449
+//line sql-gen.y:7451
 		{
 			varName, err := sqlDollar[3].union.unresolvedName().NormalizeVarName()
 			if err != nil {
@@ -28987,214 +28987,214 @@ sqldefault:
 		}
 	case 1249:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:7459
+//line sql-gen.y:7461
 		{
 			x := sqlDollar[2].union.int64()
 			sqlVAL.union.val = tree.SequenceOption{Name: tree.SeqOptCache, IntVal: &x}
 		}
 	case 1250:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:7461
+//line sql-gen.y:7463
 		{
 			x := sqlDollar[2].union.int64()
 			sqlVAL.union.val = tree.SequenceOption{Name: tree.SeqOptIncrement, IntVal: &x}
 		}
 	case 1251:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:7463
+//line sql-gen.y:7465
 		{
 			x := sqlDollar[3].union.int64()
 			sqlVAL.union.val = tree.SequenceOption{Name: tree.SeqOptIncrement, IntVal: &x, OptionalWord: true}
 		}
 	case 1252:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:7465
+//line sql-gen.y:7467
 		{
 			x := sqlDollar[2].union.int64()
 			sqlVAL.union.val = tree.SequenceOption{Name: tree.SeqOptMinValue, IntVal: &x}
 		}
 	case 1253:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:7467
+//line sql-gen.y:7469
 		{
 			sqlVAL.union.val = tree.SequenceOption{Name: tree.SeqOptMinValue}
 		}
 	case 1254:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:7468
+//line sql-gen.y:7470
 		{
 			x := sqlDollar[2].union.int64()
 			sqlVAL.union.val = tree.SequenceOption{Name: tree.SeqOptMaxValue, IntVal: &x}
 		}
 	case 1255:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:7470
+//line sql-gen.y:7472
 		{
 			sqlVAL.union.val = tree.SequenceOption{Name: tree.SeqOptMaxValue}
 		}
 	case 1256:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:7471
+//line sql-gen.y:7473
 		{
 			x := sqlDollar[2].union.int64()
 			sqlVAL.union.val = tree.SequenceOption{Name: tree.SeqOptStart, IntVal: &x}
 		}
 	case 1257:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:7473
+//line sql-gen.y:7475
 		{
 			x := sqlDollar[3].union.int64()
 			sqlVAL.union.val = tree.SequenceOption{Name: tree.SeqOptStart, IntVal: &x, OptionalWord: true}
 		}
 	case 1258:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:7475
+//line sql-gen.y:7477
 		{
 			sqlVAL.union.val = tree.SequenceOption{Name: tree.SeqOptVirtual}
 		}
 	case 1259:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:7483
+//line sql-gen.y:7485
 		{
 			sqlVAL.union.val = &tree.Truncate{Tables: sqlDollar[3].union.tableNames(), DropBehavior: sqlDollar[4].union.dropBehavior()}
 		}
 	case 1260:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:7486
+//line sql-gen.y:7488
 		{
 			return helpWith(sqllex, "TRUNCATE")
 		}
 	case 1261:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:7490
+//line sql-gen.y:7492
 		{
 
 			sqlVAL.union.val = tree.KVOption{Key: tree.Name(sqlDollar[2].str), Value: sqlDollar[3].union.expr()}
 		}
 	case 1262:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:7496
+//line sql-gen.y:7498
 		{
 			sqlVAL.union.val = tree.KVOption{Key: tree.Name(sqlDollar[1].str), Value: sqlDollar[2].union.expr()}
 		}
 	case 1263:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:7500
+//line sql-gen.y:7502
 		{
 			sqlVAL.union.val = tree.KVOption{Key: tree.Name(sqlDollar[1].str), Value: tree.DNull}
 		}
 	case 1264:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:7510
+//line sql-gen.y:7512
 		{
 			sqlVAL.union.val = &tree.CreateRole{Name: sqlDollar[3].union.roleSpec(), KVOptions: sqlDollar[4].union.kvOptions(), IsRole: sqlDollar[2].union.bool()}
 		}
 	case 1265:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql-gen.y:7514
+//line sql-gen.y:7516
 		{
 			sqlVAL.union.val = &tree.CreateRole{Name: sqlDollar[6].union.roleSpec(), IfNotExists: true, KVOptions: sqlDollar[7].union.kvOptions(), IsRole: sqlDollar[2].union.bool()}
 		}
 	case 1266:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:7517
+//line sql-gen.y:7519
 		{
 			return helpWith(sqllex, "CREATE ROLE")
 		}
 	case 1267:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:7528
+//line sql-gen.y:7530
 		{
 			sqlVAL.union.val = &tree.AlterRole{Name: sqlDollar[3].union.roleSpec(), KVOptions: sqlDollar[4].union.kvOptions(), IsRole: sqlDollar[2].union.bool()}
 		}
 	case 1268:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:7532
+//line sql-gen.y:7534
 		{
 			sqlVAL.union.val = &tree.AlterRole{Name: sqlDollar[5].union.roleSpec(), IfExists: true, KVOptions: sqlDollar[6].union.kvOptions(), IsRole: sqlDollar[2].union.bool()}
 		}
 	case 1269:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:7536
+//line sql-gen.y:7538
 		{
 			sqlVAL.union.val = &tree.AlterRoleSet{RoleName: sqlDollar[3].union.roleSpec(), DatabaseName: tree.Name(sqlDollar[4].str), IsRole: sqlDollar[2].union.bool(), SetOrReset: sqlDollar[5].union.setVar()}
 		}
 	case 1270:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql-gen.y:7540
+//line sql-gen.y:7542
 		{
 			sqlVAL.union.val = &tree.AlterRoleSet{RoleName: sqlDollar[5].union.roleSpec(), IfExists: true, DatabaseName: tree.Name(sqlDollar[6].str), IsRole: sqlDollar[2].union.bool(), SetOrReset: sqlDollar[7].union.setVar()}
 		}
 	case 1271:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:7544
+//line sql-gen.y:7546
 		{
 			sqlVAL.union.val = &tree.AlterRoleSet{AllRoles: true, DatabaseName: tree.Name(sqlDollar[4].str), IsRole: true, SetOrReset: sqlDollar[5].union.setVar()}
 		}
 	case 1272:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:7548
+//line sql-gen.y:7550
 		{
 			sqlVAL.union.val = &tree.AlterRoleSet{AllRoles: true, DatabaseName: tree.Name(sqlDollar[4].str), IsRole: false, SetOrReset: sqlDollar[5].union.setVar()}
 		}
 	case 1273:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:7551
+//line sql-gen.y:7553
 		{
 			return helpWith(sqllex, "ALTER ROLE")
 		}
 	case 1274:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:7555
+//line sql-gen.y:7557
 		{
 			sqlVAL.str = sqlDollar[3].str
 		}
 	case 1275:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:7559
+//line sql-gen.y:7561
 		{
 			sqlVAL.str = ""
 		}
 	case 1276:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:7565
+//line sql-gen.y:7567
 		{
 			sqlVAL.union.val = sqlDollar[2].union.setVar()
 		}
 	case 1277:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:7569
+//line sql-gen.y:7571
 		{
 			sqlVAL.union.val = &tree.SetVar{ResetAll: true}
 		}
 	case 1278:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:7573
+//line sql-gen.y:7575
 		{
 			sqlVAL.union.val = &tree.SetVar{Name: sqlDollar[2].str, Values: tree.Exprs{tree.DefaultVal{}}}
 		}
 	case 1279:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:7581
+//line sql-gen.y:7583
 		{
 			sqlVAL.union.val = true
 		}
 	case 1280:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:7585
+//line sql-gen.y:7587
 		{
 
 			sqlVAL.union.val = true
 		}
 	case 1281:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:7590
+//line sql-gen.y:7592
 		{
 			sqlVAL.union.val = false
 		}
 	case 1282:
 		sqlDollar = sqlS[sqlpt-8 : sqlpt+1]
-//line sql-gen.y:7600
+//line sql-gen.y:7602
 		{
 			name := sqlDollar[5].union.unresolvedObjectName().ToTableName()
 			sqlVAL.union.val = &tree.CreateView{
@@ -29208,7 +29208,7 @@ sqldefault:
 		}
 	case 1283:
 		sqlDollar = sqlS[sqlpt-10 : sqlpt+1]
-//line sql-gen.y:7614
+//line sql-gen.y:7616
 		{
 			name := sqlDollar[7].union.unresolvedObjectName().ToTableName()
 			sqlVAL.union.val = &tree.CreateView{
@@ -29222,7 +29222,7 @@ sqldefault:
 		}
 	case 1284:
 		sqlDollar = sqlS[sqlpt-11 : sqlpt+1]
-//line sql-gen.y:7626
+//line sql-gen.y:7628
 		{
 			name := sqlDollar[8].union.unresolvedObjectName().ToTableName()
 			sqlVAL.union.val = &tree.CreateView{
@@ -29236,7 +29236,7 @@ sqldefault:
 		}
 	case 1285:
 		sqlDollar = sqlS[sqlpt-8 : sqlpt+1]
-//line sql-gen.y:7638
+//line sql-gen.y:7640
 		{
 			name := sqlDollar[4].union.unresolvedObjectName().ToTableName()
 			sqlVAL.union.val = &tree.CreateView{
@@ -29248,7 +29248,7 @@ sqldefault:
 		}
 	case 1286:
 		sqlDollar = sqlS[sqlpt-11 : sqlpt+1]
-//line sql-gen.y:7648
+//line sql-gen.y:7650
 		{
 			name := sqlDollar[7].union.unresolvedObjectName().ToTableName()
 			sqlVAL.union.val = &tree.CreateView{
@@ -29261,198 +29261,198 @@ sqldefault:
 		}
 	case 1287:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:7658
+//line sql-gen.y:7660
 		{
 			return helpWith(sqllex, "CREATE VIEW")
 		}
 	case 1288:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:7662
+//line sql-gen.y:7664
 		{
 			return unimplementedWithIssue(sqllex, 74083)
 		}
 	case 1289:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:7666
+//line sql-gen.y:7668
 		{
 			sqlVAL.union.val = true
 		}
 	case 1290:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:7670
+//line sql-gen.y:7672
 		{
 			sqlVAL.union.val = true
 		}
 	case 1291:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:7676
+//line sql-gen.y:7678
 		{
 			sqlVAL.union.val = tree.KVOption{Key: tree.Name(sqlDollar[1].str), Value: nil}
 		}
 	case 1292:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:7680
+//line sql-gen.y:7682
 		{
 			sqlVAL.union.val = tree.KVOption{Key: tree.Name(sqlDollar[1].str), Value: nil}
 		}
 	case 1293:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:7684
+//line sql-gen.y:7686
 		{
 			sqlVAL.union.val = tree.KVOption{Key: tree.Name(sqlDollar[1].str), Value: nil}
 		}
 	case 1294:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:7688
+//line sql-gen.y:7690
 		{
 			sqlVAL.union.val = tree.KVOption{Key: tree.Name(sqlDollar[1].str), Value: nil}
 		}
 	case 1295:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:7692
+//line sql-gen.y:7694
 		{
 			sqlVAL.union.val = tree.KVOption{Key: tree.Name(sqlDollar[1].str), Value: nil}
 		}
 	case 1296:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:7696
+//line sql-gen.y:7698
 		{
 			sqlVAL.union.val = tree.KVOption{Key: tree.Name(sqlDollar[1].str), Value: nil}
 		}
 	case 1297:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:7700
+//line sql-gen.y:7702
 		{
 			sqlVAL.union.val = tree.KVOption{Key: tree.Name(sqlDollar[1].str), Value: nil}
 		}
 	case 1298:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:7704
+//line sql-gen.y:7706
 		{
 			sqlVAL.union.val = tree.KVOption{Key: tree.Name(sqlDollar[1].str), Value: nil}
 		}
 	case 1299:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:7708
+//line sql-gen.y:7710
 		{
 			sqlVAL.union.val = tree.KVOption{Key: tree.Name(sqlDollar[1].str), Value: nil}
 		}
 	case 1300:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:7712
+//line sql-gen.y:7714
 		{
 			sqlVAL.union.val = tree.KVOption{Key: tree.Name(sqlDollar[1].str), Value: nil}
 		}
 	case 1301:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:7716
+//line sql-gen.y:7718
 		{
 			sqlVAL.union.val = tree.KVOption{Key: tree.Name(sqlDollar[1].str), Value: nil}
 		}
 	case 1302:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:7720
+//line sql-gen.y:7722
 		{
 			sqlVAL.union.val = tree.KVOption{Key: tree.Name(sqlDollar[1].str), Value: nil}
 		}
 	case 1303:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:7724
+//line sql-gen.y:7726
 		{
 			sqlVAL.union.val = tree.KVOption{Key: tree.Name(sqlDollar[1].str), Value: nil}
 		}
 	case 1304:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:7728
+//line sql-gen.y:7730
 		{
 			sqlVAL.union.val = tree.KVOption{Key: tree.Name(sqlDollar[1].str), Value: nil}
 		}
 	case 1305:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:7732
+//line sql-gen.y:7734
 		{
 			sqlVAL.union.val = tree.KVOption{Key: tree.Name(sqlDollar[1].str), Value: nil}
 		}
 	case 1306:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:7736
+//line sql-gen.y:7738
 		{
 			sqlVAL.union.val = tree.KVOption{Key: tree.Name(sqlDollar[1].str), Value: nil}
 		}
 	case 1307:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:7740
+//line sql-gen.y:7742
 		{
 			sqlVAL.union.val = tree.KVOption{Key: tree.Name(sqlDollar[1].str), Value: nil}
 		}
 	case 1308:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:7744
+//line sql-gen.y:7746
 		{
 			sqlVAL.union.val = tree.KVOption{Key: tree.Name(sqlDollar[1].str), Value: nil}
 		}
 	case 1309:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:7748
+//line sql-gen.y:7750
 		{
 			sqlVAL.union.val = tree.KVOption{Key: tree.Name(sqlDollar[1].str), Value: nil}
 		}
 	case 1310:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:7752
+//line sql-gen.y:7754
 		{
 			sqlVAL.union.val = tree.KVOption{Key: tree.Name(sqlDollar[1].str), Value: nil}
 		}
 	case 1313:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:7760
+//line sql-gen.y:7762
 		{
 			sqlVAL.union.val = []tree.KVOption{sqlDollar[1].union.kvOption()}
 		}
 	case 1314:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:7764
+//line sql-gen.y:7766
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.kvOptions(), sqlDollar[2].union.kvOption())
 		}
 	case 1315:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:7770
+//line sql-gen.y:7772
 		{
 			sqlVAL.union.val = sqlDollar[2].union.kvOptions()
 		}
 	case 1316:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:7774
+//line sql-gen.y:7776
 		{
 			sqlVAL.union.val = nil
 		}
 	case 1317:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:7780
+//line sql-gen.y:7782
 		{
 			sqlVAL.union.val = tree.KVOption{Key: tree.Name("valid until"), Value: sqlDollar[3].union.expr()}
 		}
 	case 1318:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:7784
+//line sql-gen.y:7786
 		{
 			sqlVAL.union.val = tree.KVOption{Key: tree.Name("valid until"), Value: tree.DNull}
 		}
 	case 1319:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:7789
+//line sql-gen.y:7791
 		{
 		}
 	case 1320:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:7790
+//line sql-gen.y:7792
 		{
 			return unimplemented(sqllex, "create recursive view")
 		}
 	case 1321:
 		sqlDollar = sqlS[sqlpt-8 : sqlpt+1]
-//line sql-gen.y:7799
+//line sql-gen.y:7801
 		{
 			sqlVAL.union.val = &tree.CreateType{
 				TypeName:   sqlDollar[3].union.unresolvedObjectName(),
@@ -29462,7 +29462,7 @@ sqldefault:
 		}
 	case 1322:
 		sqlDollar = sqlS[sqlpt-11 : sqlpt+1]
-//line sql-gen.y:7807
+//line sql-gen.y:7809
 		{
 			sqlVAL.union.val = &tree.CreateType{
 				TypeName:    sqlDollar[6].union.unresolvedObjectName(),
@@ -29473,67 +29473,67 @@ sqldefault:
 		}
 	case 1323:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:7815
+//line sql-gen.y:7817
 		{
 			return helpWith(sqllex, "CREATE TYPE")
 		}
 	case 1324:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:7817
+//line sql-gen.y:7819
 		{
 			return unimplementedWithIssue(sqllex, 27792)
 		}
 	case 1325:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:7819
+//line sql-gen.y:7821
 		{
 			return unimplementedWithIssue(sqllex, 27791)
 		}
 	case 1326:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:7821
+//line sql-gen.y:7823
 		{
 			return unimplementedWithIssueDetail(sqllex, 27793, "base")
 		}
 	case 1327:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:7823
+//line sql-gen.y:7825
 		{
 			return unimplementedWithIssueDetail(sqllex, 27793, "shell")
 		}
 	case 1328:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:7825
+//line sql-gen.y:7827
 		{
 			return unimplementedWithIssueDetail(sqllex, 27796, "create")
 		}
 	case 1329:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:7829
+//line sql-gen.y:7831
 		{
 			sqlVAL.union.val = sqlDollar[1].union.enumValueList()
 		}
 	case 1330:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:7833
+//line sql-gen.y:7835
 		{
 			sqlVAL.union.val = tree.EnumValueList(nil)
 		}
 	case 1331:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:7839
+//line sql-gen.y:7841
 		{
 			sqlVAL.union.val = tree.EnumValueList{tree.EnumValue(sqlDollar[1].str)}
 		}
 	case 1332:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:7843
+//line sql-gen.y:7845
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.enumValueList(), tree.EnumValue(sqlDollar[3].str))
 		}
 	case 1333:
 		sqlDollar = sqlS[sqlpt-16 : sqlpt+1]
-//line sql-gen.y:7860
+//line sql-gen.y:7862
 		{
 			table := sqlDollar[7].union.unresolvedObjectName().ToTableName()
 			sqlVAL.union.val = &tree.CreateIndex{
@@ -29552,7 +29552,7 @@ sqldefault:
 		}
 	case 1334:
 		sqlDollar = sqlS[sqlpt-19 : sqlpt+1]
-//line sql-gen.y:7877
+//line sql-gen.y:7879
 		{
 			table := sqlDollar[10].union.unresolvedObjectName().ToTableName()
 			sqlVAL.union.val = &tree.CreateIndex{
@@ -29572,7 +29572,7 @@ sqldefault:
 		}
 	case 1335:
 		sqlDollar = sqlS[sqlpt-15 : sqlpt+1]
-//line sql-gen.y:7895
+//line sql-gen.y:7897
 		{
 			table := sqlDollar[8].union.unresolvedObjectName().ToTableName()
 			sqlVAL.union.val = &tree.CreateIndex{
@@ -29590,7 +29590,7 @@ sqldefault:
 		}
 	case 1336:
 		sqlDollar = sqlS[sqlpt-18 : sqlpt+1]
-//line sql-gen.y:7911
+//line sql-gen.y:7913
 		{
 			table := sqlDollar[11].union.unresolvedObjectName().ToTableName()
 			sqlVAL.union.val = &tree.CreateIndex{
@@ -29609,13 +29609,13 @@ sqldefault:
 		}
 	case 1337:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:7927
+//line sql-gen.y:7929
 		{
 			return helpWith(sqllex, "CREATE INDEX")
 		}
 	case 1338:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:7931
+//line sql-gen.y:7933
 		{
 
 			switch sqlDollar[2].str {
@@ -29632,49 +29632,49 @@ sqldefault:
 		}
 	case 1339:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:7946
+//line sql-gen.y:7948
 		{
 			sqlVAL.union.val = false
 		}
 	case 1340:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:7952
+//line sql-gen.y:7954
 		{
 			sqlVAL.union.val = true
 		}
 	case 1341:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:7956
+//line sql-gen.y:7958
 		{
 			sqlVAL.union.val = false
 		}
 	case 1342:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:7962
+//line sql-gen.y:7964
 		{
 			sqlVAL.union.val = true
 		}
 	case 1343:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:7966
+//line sql-gen.y:7968
 		{
 			sqlVAL.union.val = false
 		}
 	case 1344:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:7972
+//line sql-gen.y:7974
 		{
 			sqlVAL.union.val = tree.IndexElemList{sqlDollar[1].union.idxElem()}
 		}
 	case 1345:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:7976
+//line sql-gen.y:7978
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.idxElems(), sqlDollar[3].union.idxElem())
 		}
 	case 1346:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:7985
+//line sql-gen.y:7987
 		{
 			e := sqlDollar[2].union.idxElem()
 			e.Expr = sqlDollar[1].union.expr()
@@ -29682,7 +29682,7 @@ sqldefault:
 		}
 	case 1347:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:7991
+//line sql-gen.y:7993
 		{
 			e := sqlDollar[4].union.idxElem()
 			e.Expr = sqlDollar[2].union.expr()
@@ -29690,7 +29690,7 @@ sqldefault:
 		}
 	case 1348:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:7997
+//line sql-gen.y:7999
 		{
 			e := sqlDollar[2].union.idxElem()
 			e.Column = tree.Name(sqlDollar[1].str)
@@ -29698,7 +29698,7 @@ sqldefault:
 		}
 	case 1349:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:8005
+//line sql-gen.y:8007
 		{
 
 			opClass := sqlDollar[1].str
@@ -29723,61 +29723,61 @@ sqldefault:
 		}
 	case 1350:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:8029
+//line sql-gen.y:8031
 		{
 			sqlVAL.str = sqlDollar[1].str
 		}
 	case 1351:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:8030
+//line sql-gen.y:8032
 		{
 			sqlVAL.str = ""
 		}
 	case 1352:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:8033
+//line sql-gen.y:8035
 		{
 			sqlVAL.str = sqlDollar[2].str
 		}
 	case 1353:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:8034
+//line sql-gen.y:8036
 		{
 			sqlVAL.str = ""
 		}
 	case 1354:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:8038
+//line sql-gen.y:8040
 		{
 			sqlVAL.union.val = tree.Ascending
 		}
 	case 1355:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:8042
+//line sql-gen.y:8044
 		{
 			sqlVAL.union.val = tree.Descending
 		}
 	case 1356:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:8046
+//line sql-gen.y:8048
 		{
 			sqlVAL.union.val = tree.DefaultDirection
 		}
 	case 1357:
 		sqlDollar = sqlS[sqlpt-9 : sqlpt+1]
-//line sql-gen.y:8052
+//line sql-gen.y:8054
 		{
 			sqlVAL.union.val = &tree.ReparentDatabase{Name: tree.Name(sqlDollar[3].str), Parent: tree.Name(sqlDollar[9].str)}
 		}
 	case 1358:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:8058
+//line sql-gen.y:8060
 		{
 			sqlVAL.union.val = &tree.RenameDatabase{Name: tree.Name(sqlDollar[3].str), NewName: tree.Name(sqlDollar[6].str)}
 		}
 	case 1359:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:8064
+//line sql-gen.y:8066
 		{
 			name := sqlDollar[3].union.unresolvedObjectName()
 			newName := sqlDollar[6].union.unresolvedObjectName()
@@ -29785,7 +29785,7 @@ sqldefault:
 		}
 	case 1360:
 		sqlDollar = sqlS[sqlpt-8 : sqlpt+1]
-//line sql-gen.y:8070
+//line sql-gen.y:8072
 		{
 			name := sqlDollar[5].union.unresolvedObjectName()
 			newName := sqlDollar[8].union.unresolvedObjectName()
@@ -29793,7 +29793,7 @@ sqldefault:
 		}
 	case 1361:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:8078
+//line sql-gen.y:8080
 		{
 			sqlVAL.union.val = &tree.AlterTableSetSchema{
 				Name: sqlDollar[3].union.unresolvedObjectName(), Schema: tree.Name(sqlDollar[6].str), IfExists: false,
@@ -29801,7 +29801,7 @@ sqldefault:
 		}
 	case 1362:
 		sqlDollar = sqlS[sqlpt-8 : sqlpt+1]
-//line sql-gen.y:8084
+//line sql-gen.y:8086
 		{
 			sqlVAL.union.val = &tree.AlterTableSetSchema{
 				Name: sqlDollar[5].union.unresolvedObjectName(), Schema: tree.Name(sqlDollar[8].str), IfExists: true,
@@ -29809,7 +29809,7 @@ sqldefault:
 		}
 	case 1363:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:8092
+//line sql-gen.y:8094
 		{
 			sqlVAL.union.val = &tree.AlterTableLocality{
 				Name:     sqlDollar[3].union.unresolvedObjectName(),
@@ -29819,7 +29819,7 @@ sqldefault:
 		}
 	case 1364:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql-gen.y:8100
+//line sql-gen.y:8102
 		{
 			sqlVAL.union.val = &tree.AlterTableLocality{
 				Name:     sqlDollar[5].union.unresolvedObjectName(),
@@ -29829,7 +29829,7 @@ sqldefault:
 		}
 	case 1365:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:8110
+//line sql-gen.y:8112
 		{
 			sqlVAL.union.val = &tree.Locality{
 				LocalityLevel: tree.LocalityLevelGlobal,
@@ -29837,7 +29837,7 @@ sqldefault:
 		}
 	case 1366:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:8116
+//line sql-gen.y:8118
 		{
 			sqlVAL.union.val = &tree.Locality{
 				TableRegion:   tree.Name(sqlDollar[6].str),
@@ -29846,7 +29846,7 @@ sqldefault:
 		}
 	case 1367:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql-gen.y:8123
+//line sql-gen.y:8125
 		{
 			sqlVAL.union.val = &tree.Locality{
 				LocalityLevel: tree.LocalityLevelTable,
@@ -29854,7 +29854,7 @@ sqldefault:
 		}
 	case 1368:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:8129
+//line sql-gen.y:8131
 		{
 			sqlVAL.union.val = &tree.Locality{
 				LocalityLevel: tree.LocalityLevelTable,
@@ -29862,7 +29862,7 @@ sqldefault:
 		}
 	case 1369:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:8135
+//line sql-gen.y:8137
 		{
 			sqlVAL.union.val = &tree.Locality{
 				TableRegion:   tree.Name(sqlDollar[4].str),
@@ -29871,7 +29871,7 @@ sqldefault:
 		}
 	case 1370:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:8142
+//line sql-gen.y:8144
 		{
 			sqlVAL.union.val = &tree.Locality{
 				LocalityLevel: tree.LocalityLevelTable,
@@ -29879,7 +29879,7 @@ sqldefault:
 		}
 	case 1371:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:8148
+//line sql-gen.y:8150
 		{
 			sqlVAL.union.val = &tree.Locality{
 				LocalityLevel: tree.LocalityLevelTable,
@@ -29887,7 +29887,7 @@ sqldefault:
 		}
 	case 1372:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:8154
+//line sql-gen.y:8156
 		{
 			sqlVAL.union.val = &tree.Locality{
 				LocalityLevel: tree.LocalityLevelRow,
@@ -29895,7 +29895,7 @@ sqldefault:
 		}
 	case 1373:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:8160
+//line sql-gen.y:8162
 		{
 			sqlVAL.union.val = &tree.Locality{
 				LocalityLevel:       tree.LocalityLevelRow,
@@ -29904,7 +29904,7 @@ sqldefault:
 		}
 	case 1374:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:8169
+//line sql-gen.y:8171
 		{
 			sqlVAL.union.val = &tree.AlterTableOwner{
 				Name:     sqlDollar[3].union.unresolvedObjectName(),
@@ -29914,7 +29914,7 @@ sqldefault:
 		}
 	case 1375:
 		sqlDollar = sqlS[sqlpt-8 : sqlpt+1]
-//line sql-gen.y:8177
+//line sql-gen.y:8179
 		{
 			sqlVAL.union.val = &tree.AlterTableOwner{
 				Name:     sqlDollar[5].union.unresolvedObjectName(),
@@ -29924,7 +29924,7 @@ sqldefault:
 		}
 	case 1376:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:8187
+//line sql-gen.y:8189
 		{
 			sqlVAL.union.val = &tree.AlterTableSetSchema{
 				Name: sqlDollar[3].union.unresolvedObjectName(), Schema: tree.Name(sqlDollar[6].str), IfExists: false, IsView: true,
@@ -29932,7 +29932,7 @@ sqldefault:
 		}
 	case 1377:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql-gen.y:8193
+//line sql-gen.y:8195
 		{
 			sqlVAL.union.val = &tree.AlterTableSetSchema{
 				Name:           sqlDollar[4].union.unresolvedObjectName(),
@@ -29944,7 +29944,7 @@ sqldefault:
 		}
 	case 1378:
 		sqlDollar = sqlS[sqlpt-8 : sqlpt+1]
-//line sql-gen.y:8203
+//line sql-gen.y:8205
 		{
 			sqlVAL.union.val = &tree.AlterTableSetSchema{
 				Name: sqlDollar[5].union.unresolvedObjectName(), Schema: tree.Name(sqlDollar[8].str), IfExists: true, IsView: true,
@@ -29952,7 +29952,7 @@ sqldefault:
 		}
 	case 1379:
 		sqlDollar = sqlS[sqlpt-9 : sqlpt+1]
-//line sql-gen.y:8209
+//line sql-gen.y:8211
 		{
 			sqlVAL.union.val = &tree.AlterTableSetSchema{
 				Name:           sqlDollar[6].union.unresolvedObjectName(),
@@ -29964,7 +29964,7 @@ sqldefault:
 		}
 	case 1380:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:8221
+//line sql-gen.y:8223
 		{
 			sqlVAL.union.val = &tree.AlterTableOwner{
 				Name:     sqlDollar[3].union.unresolvedObjectName(),
@@ -29975,7 +29975,7 @@ sqldefault:
 		}
 	case 1381:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql-gen.y:8230
+//line sql-gen.y:8232
 		{
 			sqlVAL.union.val = &tree.AlterTableOwner{
 				Name:           sqlDollar[4].union.unresolvedObjectName(),
@@ -29987,7 +29987,7 @@ sqldefault:
 		}
 	case 1382:
 		sqlDollar = sqlS[sqlpt-8 : sqlpt+1]
-//line sql-gen.y:8240
+//line sql-gen.y:8242
 		{
 			sqlVAL.union.val = &tree.AlterTableOwner{
 				Name:     sqlDollar[5].union.unresolvedObjectName(),
@@ -29998,7 +29998,7 @@ sqldefault:
 		}
 	case 1383:
 		sqlDollar = sqlS[sqlpt-9 : sqlpt+1]
-//line sql-gen.y:8249
+//line sql-gen.y:8251
 		{
 			sqlVAL.union.val = &tree.AlterTableOwner{
 				Name:           sqlDollar[6].union.unresolvedObjectName(),
@@ -30010,7 +30010,7 @@ sqldefault:
 		}
 	case 1384:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:8261
+//line sql-gen.y:8263
 		{
 			sqlVAL.union.val = &tree.AlterTableSetSchema{
 				Name: sqlDollar[3].union.unresolvedObjectName(), Schema: tree.Name(sqlDollar[6].str), IfExists: false, IsSequence: true,
@@ -30018,7 +30018,7 @@ sqldefault:
 		}
 	case 1385:
 		sqlDollar = sqlS[sqlpt-8 : sqlpt+1]
-//line sql-gen.y:8267
+//line sql-gen.y:8269
 		{
 			sqlVAL.union.val = &tree.AlterTableSetSchema{
 				Name: sqlDollar[5].union.unresolvedObjectName(), Schema: tree.Name(sqlDollar[8].str), IfExists: true, IsSequence: true,
@@ -30026,7 +30026,7 @@ sqldefault:
 		}
 	case 1386:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:8275
+//line sql-gen.y:8277
 		{
 			sqlVAL.union.val = &tree.AlterTableOwner{
 				Name:       sqlDollar[3].union.unresolvedObjectName(),
@@ -30037,7 +30037,7 @@ sqldefault:
 		}
 	case 1387:
 		sqlDollar = sqlS[sqlpt-8 : sqlpt+1]
-//line sql-gen.y:8284
+//line sql-gen.y:8286
 		{
 			sqlVAL.union.val = &tree.AlterTableOwner{
 				Name:       sqlDollar[5].union.unresolvedObjectName(),
@@ -30048,7 +30048,7 @@ sqldefault:
 		}
 	case 1388:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:8295
+//line sql-gen.y:8297
 		{
 			name := sqlDollar[3].union.unresolvedObjectName()
 			newName := sqlDollar[6].union.unresolvedObjectName()
@@ -30056,7 +30056,7 @@ sqldefault:
 		}
 	case 1389:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql-gen.y:8301
+//line sql-gen.y:8303
 		{
 			name := sqlDollar[4].union.unresolvedObjectName()
 			newName := sqlDollar[7].union.unresolvedObjectName()
@@ -30070,7 +30070,7 @@ sqldefault:
 		}
 	case 1390:
 		sqlDollar = sqlS[sqlpt-8 : sqlpt+1]
-//line sql-gen.y:8313
+//line sql-gen.y:8315
 		{
 			name := sqlDollar[5].union.unresolvedObjectName()
 			newName := sqlDollar[8].union.unresolvedObjectName()
@@ -30078,7 +30078,7 @@ sqldefault:
 		}
 	case 1391:
 		sqlDollar = sqlS[sqlpt-9 : sqlpt+1]
-//line sql-gen.y:8319
+//line sql-gen.y:8321
 		{
 			name := sqlDollar[6].union.unresolvedObjectName()
 			newName := sqlDollar[9].union.unresolvedObjectName()
@@ -30092,7 +30092,7 @@ sqldefault:
 		}
 	case 1392:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:8333
+//line sql-gen.y:8335
 		{
 			name := sqlDollar[3].union.unresolvedObjectName()
 			newName := sqlDollar[6].union.unresolvedObjectName()
@@ -30100,7 +30100,7 @@ sqldefault:
 		}
 	case 1393:
 		sqlDollar = sqlS[sqlpt-8 : sqlpt+1]
-//line sql-gen.y:8339
+//line sql-gen.y:8341
 		{
 			name := sqlDollar[5].union.unresolvedObjectName()
 			newName := sqlDollar[8].union.unresolvedObjectName()
@@ -30108,19 +30108,19 @@ sqldefault:
 		}
 	case 1394:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:8347
+//line sql-gen.y:8349
 		{
 			sqlVAL.union.val = &tree.RenameIndex{Index: sqlDollar[3].union.newTableIndexName(), NewName: tree.UnrestrictedName(sqlDollar[6].str), IfExists: false}
 		}
 	case 1395:
 		sqlDollar = sqlS[sqlpt-8 : sqlpt+1]
-//line sql-gen.y:8351
+//line sql-gen.y:8353
 		{
 			sqlVAL.union.val = &tree.RenameIndex{Index: sqlDollar[5].union.newTableIndexName(), NewName: tree.UnrestrictedName(sqlDollar[8].str), IfExists: true}
 		}
 	case 1396:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:8363
+//line sql-gen.y:8365
 		{
 			sqlVAL.union.val = &tree.AlterDefaultPrivileges{
 				Roles:   sqlDollar[4].union.roleSpecList(),
@@ -30131,7 +30131,7 @@ sqldefault:
 		}
 	case 1397:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:8372
+//line sql-gen.y:8374
 		{
 			sqlVAL.union.val = &tree.AlterDefaultPrivileges{
 				Roles:   sqlDollar[4].union.roleSpecList(),
@@ -30142,7 +30142,7 @@ sqldefault:
 		}
 	case 1398:
 		sqlDollar = sqlS[sqlpt-8 : sqlpt+1]
-//line sql-gen.y:8381
+//line sql-gen.y:8383
 		{
 			sqlVAL.union.val = &tree.AlterDefaultPrivileges{
 				ForAllRoles: true,
@@ -30153,7 +30153,7 @@ sqldefault:
 		}
 	case 1399:
 		sqlDollar = sqlS[sqlpt-8 : sqlpt+1]
-//line sql-gen.y:8390
+//line sql-gen.y:8392
 		{
 			sqlVAL.union.val = &tree.AlterDefaultPrivileges{
 				ForAllRoles: true,
@@ -30164,13 +30164,13 @@ sqldefault:
 		}
 	case 1400:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:8398
+//line sql-gen.y:8400
 		{
 			return helpWith(sqllex, "ALTER DEFAULT PRIVILEGES")
 		}
 	case 1401:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql-gen.y:8402
+//line sql-gen.y:8404
 		{
 			sqlVAL.union.val = tree.AbbreviatedGrant{
 				Privileges:      sqlDollar[2].union.privilegeList(),
@@ -30181,19 +30181,19 @@ sqldefault:
 		}
 	case 1402:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:8413
+//line sql-gen.y:8415
 		{
 			sqlVAL.union.val = true
 		}
 	case 1403:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:8417
+//line sql-gen.y:8419
 		{
 			sqlVAL.union.val = false
 		}
 	case 1404:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql-gen.y:8423
+//line sql-gen.y:8425
 		{
 			sqlVAL.union.val = tree.AbbreviatedRevoke{
 				Privileges: sqlDollar[2].union.privilegeList(),
@@ -30203,7 +30203,7 @@ sqldefault:
 		}
 	case 1405:
 		sqlDollar = sqlS[sqlpt-10 : sqlpt+1]
-//line sql-gen.y:8431
+//line sql-gen.y:8433
 		{
 			sqlVAL.union.val = tree.AbbreviatedRevoke{
 				Privileges:     sqlDollar[5].union.privilegeList(),
@@ -30214,99 +30214,99 @@ sqldefault:
 		}
 	case 1406:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:8442
+//line sql-gen.y:8444
 		{
 			sqlVAL.union.val = tree.Tables
 		}
 	case 1407:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:8446
+//line sql-gen.y:8448
 		{
 			sqlVAL.union.val = tree.Sequences
 		}
 	case 1408:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:8450
+//line sql-gen.y:8452
 		{
 			sqlVAL.union.val = tree.Types
 		}
 	case 1409:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:8454
+//line sql-gen.y:8456
 		{
 			sqlVAL.union.val = tree.Schemas
 		}
 	case 1410:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:8458
+//line sql-gen.y:8460
 		{
 			return unimplemented(sqllex, "ALTER DEFAULT PRIVILEGES ... ON FUNCTIONS ...")
 		}
 	case 1411:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:8462
+//line sql-gen.y:8464
 		{
 			return unimplemented(sqllex, "ALTER DEFAULT PRIVILEGES ... ON FUNCTIONS ...")
 		}
 	case 1412:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:8468
+//line sql-gen.y:8470
 		{
 			sqlVAL.union.val = sqlDollar[3].union.roleSpecList()
 		}
 	case 1413:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:8471
+//line sql-gen.y:8473
 		{
 			sqlVAL.union.val = tree.RoleSpecList(nil)
 		}
 	case 1414:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:8477
+//line sql-gen.y:8479
 		{
 			sqlVAL.union.val = sqlDollar[3].union.objectNamePrefixList()
 		}
 	case 1415:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:8481
+//line sql-gen.y:8483
 		{
 			sqlVAL.union.val = tree.ObjectNamePrefixList{}
 		}
 	case 1416:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:8486
+//line sql-gen.y:8488
 		{
 		}
 	case 1417:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:8487
+//line sql-gen.y:8489
 		{
 		}
 	case 1418:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:8490
+//line sql-gen.y:8492
 		{
 		}
 	case 1419:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:8491
+//line sql-gen.y:8493
 		{
 		}
 	case 1420:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:8499
+//line sql-gen.y:8501
 		{
 			sqlVAL.union.val = &tree.ReleaseSavepoint{Savepoint: tree.Name(sqlDollar[2].str)}
 		}
 	case 1421:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:8502
+//line sql-gen.y:8504
 		{
 			return helpWith(sqllex, "RELEASE")
 		}
 	case 1422:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:8512
+//line sql-gen.y:8514
 		{
 			sqlVAL.union.val = &tree.ControlJobs{
 				Jobs: &tree.Select{
@@ -30317,31 +30317,31 @@ sqldefault:
 		}
 	case 1423:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:8520
+//line sql-gen.y:8522
 		{
 			return helpWith(sqllex, "RESUME JOBS")
 		}
 	case 1424:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:8522
+//line sql-gen.y:8524
 		{
 			sqlVAL.union.val = &tree.ControlJobs{Jobs: sqlDollar[3].union.slct(), Command: tree.ResumeJob}
 		}
 	case 1425:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:8526
+//line sql-gen.y:8528
 		{
 			sqlVAL.union.val = &tree.ControlJobsForSchedules{Schedules: sqlDollar[3].union.slct(), Command: tree.ResumeJob}
 		}
 	case 1426:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:8529
+//line sql-gen.y:8531
 		{
 			return helpWith(sqllex, "RESUME JOBS")
 		}
 	case 1427:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:8542
+//line sql-gen.y:8544
 		{
 			sqlVAL.union.val = &tree.ControlSchedules{
 				Schedules: &tree.Select{
@@ -30352,13 +30352,13 @@ sqldefault:
 		}
 	case 1428:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:8550
+//line sql-gen.y:8552
 		{
 			return helpWith(sqllex, "RESUME SCHEDULES")
 		}
 	case 1429:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:8552
+//line sql-gen.y:8554
 		{
 			sqlVAL.union.val = &tree.ControlSchedules{
 				Schedules: sqlDollar[3].union.slct(),
@@ -30367,13 +30367,13 @@ sqldefault:
 		}
 	case 1430:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:8558
+//line sql-gen.y:8560
 		{
 			return helpWith(sqllex, "RESUME SCHEDULES")
 		}
 	case 1431:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:8571
+//line sql-gen.y:8573
 		{
 			sqlVAL.union.val = &tree.ControlSchedules{
 				Schedules: &tree.Select{
@@ -30384,13 +30384,13 @@ sqldefault:
 		}
 	case 1432:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:8579
+//line sql-gen.y:8581
 		{
 			return helpWith(sqllex, "DROP SCHEDULES")
 		}
 	case 1433:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:8581
+//line sql-gen.y:8583
 		{
 			sqlVAL.union.val = &tree.ControlSchedules{
 				Schedules: sqlDollar[3].union.slct(),
@@ -30399,170 +30399,170 @@ sqldefault:
 		}
 	case 1434:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:8587
+//line sql-gen.y:8589
 		{
 			return helpWith(sqllex, "DROP SCHEDULES")
 		}
 	case 1435:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:8595
+//line sql-gen.y:8597
 		{
 			sqlVAL.union.val = &tree.Savepoint{Name: tree.Name(sqlDollar[2].str)}
 		}
 	case 1436:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:8598
+//line sql-gen.y:8600
 		{
 			return helpWith(sqllex, "SAVEPOINT")
 		}
 	case 1438:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:8602
+//line sql-gen.y:8604
 		{
 			return helpWith(sqllex, "BEGIN")
 		}
 	case 1440:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:8603
+//line sql-gen.y:8605
 		{
 			return helpWith(sqllex, "COMMIT")
 		}
 	case 1442:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:8604
+//line sql-gen.y:8606
 		{
 			return helpWith(sqllex, "ROLLBACK")
 		}
 	case 1444:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:8620
+//line sql-gen.y:8622
 		{
 			sqlVAL.union.val = sqlDollar[3].union.stmt()
 		}
 	case 1445:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:8623
+//line sql-gen.y:8625
 		{
 			return helpWith(sqllex, "BEGIN")
 		}
 	case 1446:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:8625
+//line sql-gen.y:8627
 		{
 			sqlVAL.union.val = sqlDollar[3].union.stmt()
 		}
 	case 1447:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:8628
+//line sql-gen.y:8630
 		{
 			return helpWith(sqllex, "BEGIN")
 		}
 	case 1448:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:8638
+//line sql-gen.y:8640
 		{
 			sqlVAL.union.val = &tree.CommitTransaction{}
 		}
 	case 1449:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:8641
+//line sql-gen.y:8643
 		{
 			return helpWith(sqllex, "COMMIT")
 		}
 	case 1450:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:8643
+//line sql-gen.y:8645
 		{
 			sqlVAL.union.val = &tree.CommitTransaction{}
 		}
 	case 1451:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:8646
+//line sql-gen.y:8648
 		{
 			return helpWith(sqllex, "COMMIT")
 		}
 	case 1452:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:8650
+//line sql-gen.y:8652
 		{
 			sqlVAL.union.val = &tree.RollbackTransaction{}
 		}
 	case 1453:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:8655
+//line sql-gen.y:8657
 		{
 		}
 	case 1454:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:8656
+//line sql-gen.y:8658
 		{
 		}
 	case 1455:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:8657
+//line sql-gen.y:8659
 		{
 		}
 	case 1456:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:8667
+//line sql-gen.y:8669
 		{
 			sqlVAL.union.val = &tree.RollbackTransaction{}
 		}
 	case 1457:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:8671
+//line sql-gen.y:8673
 		{
 			sqlVAL.union.val = &tree.RollbackToSavepoint{Savepoint: tree.Name(sqlDollar[4].str)}
 		}
 	case 1458:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:8674
+//line sql-gen.y:8676
 		{
 			return helpWith(sqllex, "ROLLBACK")
 		}
 	case 1459:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:8677
+//line sql-gen.y:8679
 		{
 		}
 	case 1460:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:8678
+//line sql-gen.y:8680
 		{
 		}
 	case 1461:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:8682
+//line sql-gen.y:8684
 		{
 			sqlVAL.str = sqlDollar[2].str
 		}
 	case 1462:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:8686
+//line sql-gen.y:8688
 		{
 			sqlVAL.str = sqlDollar[1].str
 		}
 	case 1463:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:8692
+//line sql-gen.y:8694
 		{
 			sqlVAL.union.val = &tree.BeginTransaction{Modes: sqlDollar[1].union.transactionModes()}
 		}
 	case 1464:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:8696
+//line sql-gen.y:8698
 		{
 			sqlVAL.union.val = &tree.BeginTransaction{}
 		}
 	case 1465:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:8702
+//line sql-gen.y:8704
 		{
 			sqlVAL.union.val = sqlDollar[1].union.transactionModes()
 		}
 	case 1466:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:8706
+//line sql-gen.y:8708
 		{
 			a := sqlDollar[1].union.transactionModes()
 			b := sqlDollar[3].union.transactionModes()
@@ -30574,84 +30574,84 @@ sqldefault:
 		}
 	case 1467:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:8719
+//line sql-gen.y:8721
 		{
 		}
 	case 1468:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:8721
+//line sql-gen.y:8723
 		{
 		}
 	case 1469:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:8725
+//line sql-gen.y:8727
 		{
 
 			sqlVAL.union.val = tree.TransactionModes{Isolation: sqlDollar[1].union.isoLevel()}
 		}
 	case 1470:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:8730
+//line sql-gen.y:8732
 		{
 			sqlVAL.union.val = tree.TransactionModes{UserPriority: sqlDollar[1].union.userPriority()}
 		}
 	case 1471:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:8734
+//line sql-gen.y:8736
 		{
 			sqlVAL.union.val = tree.TransactionModes{ReadWriteMode: sqlDollar[1].union.readWriteMode()}
 		}
 	case 1472:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:8738
+//line sql-gen.y:8740
 		{
 			sqlVAL.union.val = tree.TransactionModes{AsOf: sqlDollar[1].union.asOfClause()}
 		}
 	case 1473:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:8742
+//line sql-gen.y:8744
 		{
 			sqlVAL.union.val = tree.TransactionModes{Deferrable: sqlDollar[1].union.deferrableMode()}
 		}
 	case 1474:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:8748
+//line sql-gen.y:8750
 		{
 			sqlVAL.union.val = sqlDollar[2].union.userPriority()
 		}
 	case 1475:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:8754
+//line sql-gen.y:8756
 		{
 			sqlVAL.union.val = sqlDollar[3].union.isoLevel()
 		}
 	case 1476:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:8760
+//line sql-gen.y:8762
 		{
 			sqlVAL.union.val = tree.ReadOnly
 		}
 	case 1477:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:8764
+//line sql-gen.y:8766
 		{
 			sqlVAL.union.val = tree.ReadWrite
 		}
 	case 1478:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:8770
+//line sql-gen.y:8772
 		{
 			sqlVAL.union.val = tree.Deferrable
 		}
 	case 1479:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:8774
+//line sql-gen.y:8776
 		{
 			sqlVAL.union.val = tree.NotDeferrable
 		}
 	case 1480:
 		sqlDollar = sqlS[sqlpt-13 : sqlpt+1]
-//line sql-gen.y:8784
+//line sql-gen.y:8786
 		{
 			sqlVAL.union.val = &tree.CreateDatabase{
 				Name:            tree.Name(sqlDollar[3].str),
@@ -30668,7 +30668,7 @@ sqldefault:
 		}
 	case 1481:
 		sqlDollar = sqlS[sqlpt-16 : sqlpt+1]
-//line sql-gen.y:8799
+//line sql-gen.y:8801
 		{
 			sqlVAL.union.val = &tree.CreateDatabase{
 				IfNotExists:     true,
@@ -30686,136 +30686,136 @@ sqldefault:
 		}
 	case 1482:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:8814
+//line sql-gen.y:8816
 		{
 			return helpWith(sqllex, "CREATE DATABASE")
 		}
 	case 1484:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:8819
+//line sql-gen.y:8821
 		{
 			sqlVAL.str = ""
 		}
 	case 1485:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:8824
+//line sql-gen.y:8826
 		{
 			sqlVAL.str = sqlDollar[4].str
 		}
 	case 1487:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:8831
+//line sql-gen.y:8833
 		{
 			sqlVAL.union.val = tree.DataPlacementUnspecified
 		}
 	case 1488:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:8837
+//line sql-gen.y:8839
 		{
 
 			sqlVAL.union.val = tree.DataPlacementRestricted
 		}
 	case 1489:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:8842
+//line sql-gen.y:8844
 		{
 
 			sqlVAL.union.val = tree.DataPlacementDefault
 		}
 	case 1490:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:8849
+//line sql-gen.y:8851
 		{
 			sqlVAL.union.val = sqlDollar[3].union.nameList()
 		}
 	case 1491:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:8853
+//line sql-gen.y:8855
 		{
 			sqlVAL.union.val = tree.NameList(nil)
 		}
 	case 1492:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:8859
+//line sql-gen.y:8861
 		{
 
 		}
 	case 1494:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:8866
+//line sql-gen.y:8868
 		{
 			sqlVAL.union.val = tree.SurvivalGoalRegionFailure
 		}
 	case 1495:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:8870
+//line sql-gen.y:8872
 		{
 			sqlVAL.union.val = tree.SurvivalGoalZoneFailure
 		}
 	case 1496:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:8874
+//line sql-gen.y:8876
 		{
 
 			sqlVAL.union.val = tree.SurvivalGoalZoneFailure
 		}
 	case 1498:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:8883
+//line sql-gen.y:8885
 		{
 			sqlVAL.union.val = tree.SurvivalGoalDefault
 		}
 	case 1499:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:8889
+//line sql-gen.y:8891
 		{
 			sqlVAL.str = sqlDollar[3].str
 		}
 	case 1500:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:8893
+//line sql-gen.y:8895
 		{
 			sqlVAL.str = ""
 		}
 	case 1501:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:8899
+//line sql-gen.y:8901
 		{
 			sqlVAL.str = sqlDollar[3].str
 		}
 	case 1502:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:8903
+//line sql-gen.y:8905
 		{
 			sqlVAL.str = ""
 		}
 	case 1503:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:8909
+//line sql-gen.y:8911
 		{
 			sqlVAL.str = sqlDollar[3].str
 		}
 	case 1504:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:8913
+//line sql-gen.y:8915
 		{
 			sqlVAL.str = ""
 		}
 	case 1505:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:8919
+//line sql-gen.y:8921
 		{
 			sqlVAL.str = sqlDollar[3].str
 		}
 	case 1506:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:8923
+//line sql-gen.y:8925
 		{
 			sqlVAL.str = ""
 		}
 	case 1507:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:8929
+//line sql-gen.y:8931
 		{
 			ret, err := sqlDollar[4].union.numVal().AsInt32()
 			if err != nil {
@@ -30825,23 +30825,23 @@ sqldefault:
 		}
 	case 1508:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:8937
+//line sql-gen.y:8939
 		{
 			sqlVAL.union.val = int32(-1)
 		}
 	case 1509:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:8942
+//line sql-gen.y:8944
 		{
 		}
 	case 1510:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:8943
+//line sql-gen.y:8945
 		{
 		}
 	case 1511:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:8958
+//line sql-gen.y:8960
 		{
 			sqlVAL.union.val = sqlDollar[5].union.stmt()
 			sqlVAL.union.val.(*tree.Insert).With = sqlDollar[1].union.with()
@@ -30850,7 +30850,7 @@ sqldefault:
 		}
 	case 1512:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql-gen.y:8965
+//line sql-gen.y:8967
 		{
 			sqlVAL.union.val = sqlDollar[5].union.stmt()
 			sqlVAL.union.val.(*tree.Insert).With = sqlDollar[1].union.with()
@@ -30860,13 +30860,13 @@ sqldefault:
 		}
 	case 1513:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:8972
+//line sql-gen.y:8974
 		{
 			return helpWith(sqllex, "INSERT")
 		}
 	case 1514:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:8983
+//line sql-gen.y:8985
 		{
 			sqlVAL.union.val = sqlDollar[5].union.stmt()
 			sqlVAL.union.val.(*tree.Insert).With = sqlDollar[1].union.with()
@@ -30876,69 +30876,69 @@ sqldefault:
 		}
 	case 1515:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:8990
+//line sql-gen.y:8992
 		{
 			return helpWith(sqllex, "UPSERT")
 		}
 	case 1516:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:8994
+//line sql-gen.y:8996
 		{
 			name := sqlDollar[1].union.unresolvedObjectName().ToTableName()
 			sqlVAL.union.val = &name
 		}
 	case 1517:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:9003
+//line sql-gen.y:9005
 		{
 			name := sqlDollar[1].union.unresolvedObjectName().ToTableName()
 			sqlVAL.union.val = &tree.AliasedTableExpr{Expr: &name, As: tree.AliasClause{Alias: tree.Name(sqlDollar[3].str)}}
 		}
 	case 1518:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:9008
+//line sql-gen.y:9010
 		{
 			sqlVAL.union.val = sqlDollar[1].union.tblExpr()
 		}
 	case 1519:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:9014
+//line sql-gen.y:9016
 		{
 			sqlVAL.union.val = &tree.Insert{Rows: sqlDollar[1].union.slct()}
 		}
 	case 1520:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:9018
+//line sql-gen.y:9020
 		{
 			sqlVAL.union.val = &tree.Insert{Columns: sqlDollar[2].union.nameList(), Rows: sqlDollar[4].union.slct()}
 		}
 	case 1521:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:9022
+//line sql-gen.y:9024
 		{
 			sqlVAL.union.val = &tree.Insert{Rows: &tree.Select{}}
 		}
 	case 1522:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:9028
+//line sql-gen.y:9030
 		{
 			sqlVAL.union.val = tree.NameList{tree.Name(sqlDollar[1].str)}
 		}
 	case 1523:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:9032
+//line sql-gen.y:9034
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.nameList(), tree.Name(sqlDollar[3].str))
 		}
 	case 1525:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:9052
+//line sql-gen.y:9054
 		{
 			return unimplementedWithIssue(sqllex, 27792)
 		}
 	case 1526:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:9056
+//line sql-gen.y:9058
 		{
 			sqlVAL.union.val = &tree.OnConflict{
 				Columns:   tree.NameList(nil),
@@ -30947,7 +30947,7 @@ sqldefault:
 		}
 	case 1527:
 		sqlDollar = sqlS[sqlpt-8 : sqlpt+1]
-//line sql-gen.y:9063
+//line sql-gen.y:9065
 		{
 			sqlVAL.union.val = &tree.OnConflict{
 				Columns:          sqlDollar[4].union.nameList(),
@@ -30957,7 +30957,7 @@ sqldefault:
 		}
 	case 1528:
 		sqlDollar = sqlS[sqlpt-11 : sqlpt+1]
-//line sql-gen.y:9071
+//line sql-gen.y:9073
 		{
 			sqlVAL.union.val = &tree.OnConflict{
 				Columns:          sqlDollar[4].union.nameList(),
@@ -30968,7 +30968,7 @@ sqldefault:
 		}
 	case 1529:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql-gen.y:9080
+//line sql-gen.y:9082
 		{
 			sqlVAL.union.val = &tree.OnConflict{
 				Constraint: tree.Name(sqlDollar[5].str),
@@ -30977,7 +30977,7 @@ sqldefault:
 		}
 	case 1530:
 		sqlDollar = sqlS[sqlpt-10 : sqlpt+1]
-//line sql-gen.y:9087
+//line sql-gen.y:9089
 		{
 			sqlVAL.union.val = &tree.OnConflict{
 				Constraint: tree.Name(sqlDollar[5].str),
@@ -30987,26 +30987,26 @@ sqldefault:
 		}
 	case 1531:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:9097
+//line sql-gen.y:9099
 		{
 			ret := tree.ReturningExprs(sqlDollar[2].union.selExprs())
 			sqlVAL.union.val = &ret
 		}
 	case 1532:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:9102
+//line sql-gen.y:9104
 		{
 			sqlVAL.union.val = tree.ReturningNothingClause
 		}
 	case 1533:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:9106
+//line sql-gen.y:9108
 		{
 			sqlVAL.union.val = tree.AbsentReturningClause
 		}
 	case 1534:
 		sqlDollar = sqlS[sqlpt-10 : sqlpt+1]
-//line sql-gen.y:9123
+//line sql-gen.y:9125
 		{
 			sqlVAL.union.val = &tree.Update{
 				With:      sqlDollar[1].union.with(),
@@ -31021,55 +31021,55 @@ sqldefault:
 		}
 	case 1535:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:9135
+//line sql-gen.y:9137
 		{
 			return helpWith(sqllex, "UPDATE")
 		}
 	case 1536:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:9138
+//line sql-gen.y:9140
 		{
 			sqlVAL.union.val = sqlDollar[2].union.tblExprs()
 		}
 	case 1537:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:9141
+//line sql-gen.y:9143
 		{
 			sqlVAL.union.val = tree.TableExprs{}
 		}
 	case 1538:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:9147
+//line sql-gen.y:9149
 		{
 			sqlVAL.union.val = tree.UpdateExprs{sqlDollar[1].union.updateExpr()}
 		}
 	case 1539:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:9151
+//line sql-gen.y:9153
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.updateExprs(), sqlDollar[3].union.updateExpr())
 		}
 	case 1542:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:9164
+//line sql-gen.y:9166
 		{
 			sqlVAL.union.val = &tree.UpdateExpr{Names: tree.NameList{tree.Name(sqlDollar[1].str)}, Expr: sqlDollar[3].union.expr()}
 		}
 	case 1543:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:9167
+//line sql-gen.y:9169
 		{
 			return unimplementedWithIssue(sqllex, 27792)
 		}
 	case 1544:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:9171
+//line sql-gen.y:9173
 		{
 			sqlVAL.union.val = &tree.UpdateExpr{Tuple: true, Names: sqlDollar[2].union.nameList(), Expr: sqlDollar[5].union.expr()}
 		}
 	case 1545:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:9182
+//line sql-gen.y:9184
 		{
 			sqlVAL.union.val = &tree.ReassignOwnedBy{
 				OldRoles: sqlDollar[4].union.roleSpecList(),
@@ -31078,13 +31078,13 @@ sqldefault:
 		}
 	case 1546:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:9188
+//line sql-gen.y:9190
 		{
 			return helpWith(sqllex, "REASSIGN OWNED BY")
 		}
 	case 1547:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:9197
+//line sql-gen.y:9199
 		{
 			sqlVAL.union.val = &tree.DropOwnedBy{
 				Roles:        sqlDollar[4].union.roleSpecList(),
@@ -31093,115 +31093,115 @@ sqldefault:
 		}
 	case 1548:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:9203
+//line sql-gen.y:9205
 		{
 			return helpWith(sqllex, "DROP OWNED BY")
 		}
 	case 1550:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:9244
+//line sql-gen.y:9246
 		{
 			sqlVAL.union.val = &tree.Select{Select: sqlDollar[1].union.selectStmt()}
 		}
 	case 1551:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:9250
+//line sql-gen.y:9252
 		{
 			sqlVAL.union.val = &tree.ParenSelect{Select: sqlDollar[2].union.slct()}
 		}
 	case 1552:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:9254
+//line sql-gen.y:9256
 		{
 			sqlVAL.union.val = &tree.ParenSelect{Select: &tree.Select{Select: sqlDollar[2].union.selectStmt()}}
 		}
 	case 1553:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:9269
+//line sql-gen.y:9271
 		{
 			sqlVAL.union.val = &tree.Select{Select: sqlDollar[1].union.selectStmt()}
 		}
 	case 1554:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:9273
+//line sql-gen.y:9275
 		{
 			sqlVAL.union.val = &tree.Select{Select: sqlDollar[1].union.selectStmt(), OrderBy: sqlDollar[2].union.orderBy()}
 		}
 	case 1555:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:9277
+//line sql-gen.y:9279
 		{
 			sqlVAL.union.val = &tree.Select{Select: sqlDollar[1].union.selectStmt(), OrderBy: sqlDollar[2].union.orderBy(), Limit: sqlDollar[4].union.limit(), Locking: sqlDollar[3].union.lockingClause()}
 		}
 	case 1556:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:9281
+//line sql-gen.y:9283
 		{
 			sqlVAL.union.val = &tree.Select{Select: sqlDollar[1].union.selectStmt(), OrderBy: sqlDollar[2].union.orderBy(), Limit: sqlDollar[3].union.limit(), Locking: sqlDollar[4].union.lockingClause()}
 		}
 	case 1557:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:9285
+//line sql-gen.y:9287
 		{
 			sqlVAL.union.val = &tree.Select{With: sqlDollar[1].union.with(), Select: sqlDollar[2].union.selectStmt()}
 		}
 	case 1558:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:9289
+//line sql-gen.y:9291
 		{
 			sqlVAL.union.val = &tree.Select{With: sqlDollar[1].union.with(), Select: sqlDollar[2].union.selectStmt(), OrderBy: sqlDollar[3].union.orderBy()}
 		}
 	case 1559:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:9293
+//line sql-gen.y:9295
 		{
 			sqlVAL.union.val = &tree.Select{With: sqlDollar[1].union.with(), Select: sqlDollar[2].union.selectStmt(), OrderBy: sqlDollar[3].union.orderBy(), Limit: sqlDollar[5].union.limit(), Locking: sqlDollar[4].union.lockingClause()}
 		}
 	case 1560:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:9297
+//line sql-gen.y:9299
 		{
 			sqlVAL.union.val = &tree.Select{With: sqlDollar[1].union.with(), Select: sqlDollar[2].union.selectStmt(), OrderBy: sqlDollar[3].union.orderBy(), Limit: sqlDollar[4].union.limit(), Locking: sqlDollar[5].union.lockingClause()}
 		}
 	case 1561:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:9302
+//line sql-gen.y:9304
 		{
 			sqlVAL.union.val = sqlDollar[1].union.lockingClause()
 		}
 	case 1562:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:9303
+//line sql-gen.y:9305
 		{
 			sqlVAL.union.val = (tree.LockingClause)(nil)
 		}
 	case 1563:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:9306
+//line sql-gen.y:9308
 		{
 			sqlVAL.union.val = sqlDollar[1].union.lockingClause()
 		}
 	case 1564:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:9307
+//line sql-gen.y:9309
 		{
 			sqlVAL.union.val = (tree.LockingClause)(nil)
 		}
 	case 1565:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:9311
+//line sql-gen.y:9313
 		{
 			sqlVAL.union.val = tree.LockingClause{sqlDollar[1].union.lockingItem()}
 		}
 	case 1566:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:9315
+//line sql-gen.y:9317
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.lockingClause(), sqlDollar[2].union.lockingItem())
 		}
 	case 1567:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:9321
+//line sql-gen.y:9323
 		{
 			sqlVAL.union.val = &tree.LockingItem{
 				Strength:   sqlDollar[1].union.lockingStrength(),
@@ -31211,85 +31211,85 @@ sqldefault:
 		}
 	case 1568:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:9330
+//line sql-gen.y:9332
 		{
 			sqlVAL.union.val = tree.ForUpdate
 		}
 	case 1569:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:9331
+//line sql-gen.y:9333
 		{
 			sqlVAL.union.val = tree.ForNoKeyUpdate
 		}
 	case 1570:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:9332
+//line sql-gen.y:9334
 		{
 			sqlVAL.union.val = tree.ForShare
 		}
 	case 1571:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:9333
+//line sql-gen.y:9335
 		{
 			sqlVAL.union.val = tree.ForKeyShare
 		}
 	case 1572:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:9336
+//line sql-gen.y:9338
 		{
 			sqlVAL.union.val = tree.TableNames{}
 		}
 	case 1573:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:9337
+//line sql-gen.y:9339
 		{
 			sqlVAL.union.val = sqlDollar[2].union.tableNames()
 		}
 	case 1574:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:9340
+//line sql-gen.y:9342
 		{
 			sqlVAL.union.val = tree.LockWaitBlock
 		}
 	case 1575:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:9341
+//line sql-gen.y:9343
 		{
 			sqlVAL.union.val = tree.LockWaitSkip
 		}
 	case 1576:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:9342
+//line sql-gen.y:9344
 		{
 			sqlVAL.union.val = tree.LockWaitError
 		}
 	case 1577:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:9347
+//line sql-gen.y:9349
 		{
 			return helpWith(sqllex, "<SELECTCLAUSE>")
 		}
 	case 1581:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:9382
+//line sql-gen.y:9384
 		{
 			return helpWith(sqllex, "SELECT")
 		}
 	case 1583:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:9383
+//line sql-gen.y:9385
 		{
 			return helpWith(sqllex, "VALUES")
 		}
 	case 1585:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:9384
+//line sql-gen.y:9386
 		{
 			return helpWith(sqllex, "TABLE")
 		}
 	case 1587:
 		sqlDollar = sqlS[sqlpt-8 : sqlpt+1]
-//line sql-gen.y:9406
+//line sql-gen.y:9408
 		{
 			sqlVAL.union.val = &tree.SelectClause{
 				Exprs:   sqlDollar[3].union.selExprs(),
@@ -31302,7 +31302,7 @@ sqldefault:
 		}
 	case 1588:
 		sqlDollar = sqlS[sqlpt-8 : sqlpt+1]
-//line sql-gen.y:9419
+//line sql-gen.y:9421
 		{
 			sqlVAL.union.val = &tree.SelectClause{
 				Distinct: sqlDollar[2].union.bool(),
@@ -31316,7 +31316,7 @@ sqldefault:
 		}
 	case 1589:
 		sqlDollar = sqlS[sqlpt-8 : sqlpt+1]
-//line sql-gen.y:9433
+//line sql-gen.y:9435
 		{
 			sqlVAL.union.val = &tree.SelectClause{
 				Distinct:   true,
@@ -31331,13 +31331,13 @@ sqldefault:
 		}
 	case 1590:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:9445
+//line sql-gen.y:9447
 		{
 			return helpWith(sqllex, "SELECT")
 		}
 	case 1591:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:9449
+//line sql-gen.y:9451
 		{
 			sqlVAL.union.val = &tree.UnionClause{
 				Type:  tree.UnionOp,
@@ -31348,7 +31348,7 @@ sqldefault:
 		}
 	case 1592:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:9458
+//line sql-gen.y:9460
 		{
 			sqlVAL.union.val = &tree.UnionClause{
 				Type:  tree.IntersectOp,
@@ -31359,7 +31359,7 @@ sqldefault:
 		}
 	case 1593:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:9467
+//line sql-gen.y:9469
 		{
 			sqlVAL.union.val = &tree.UnionClause{
 				Type:  tree.ExceptOp,
@@ -31370,7 +31370,7 @@ sqldefault:
 		}
 	case 1594:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:9482
+//line sql-gen.y:9484
 		{
 			sqlVAL.union.val = &tree.SelectClause{
 				Exprs:       tree.SelectExprs{tree.StarSelectExpr()},
@@ -31380,56 +31380,56 @@ sqldefault:
 		}
 	case 1595:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:9489
+//line sql-gen.y:9491
 		{
 			return helpWith(sqllex, "TABLE")
 		}
 	case 1596:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:9501
+//line sql-gen.y:9503
 		{
 			sqlVAL.union.val = &tree.With{CTEList: sqlDollar[2].union.ctes()}
 		}
 	case 1597:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:9505
+//line sql-gen.y:9507
 		{
 
 			sqlVAL.union.val = &tree.With{CTEList: sqlDollar[2].union.ctes()}
 		}
 	case 1598:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:9510
+//line sql-gen.y:9512
 		{
 			sqlVAL.union.val = &tree.With{Recursive: true, CTEList: sqlDollar[3].union.ctes()}
 		}
 	case 1599:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:9516
+//line sql-gen.y:9518
 		{
 			sqlVAL.union.val = []*tree.CTE{sqlDollar[1].union.cte()}
 		}
 	case 1600:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:9520
+//line sql-gen.y:9522
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.ctes(), sqlDollar[3].union.cte())
 		}
 	case 1601:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:9526
+//line sql-gen.y:9528
 		{
 			sqlVAL.union.val = true
 		}
 	case 1602:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:9530
+//line sql-gen.y:9532
 		{
 			sqlVAL.union.val = false
 		}
 	case 1603:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:9536
+//line sql-gen.y:9538
 		{
 			sqlVAL.union.val = &tree.CTE{
 				Name: tree.AliasClause{Alias: tree.Name(sqlDollar[1].str), Cols: sqlDollar[2].union.nameList()},
@@ -31441,7 +31441,7 @@ sqldefault:
 		}
 	case 1604:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql-gen.y:9546
+//line sql-gen.y:9548
 		{
 			sqlVAL.union.val = &tree.CTE{
 				Name: tree.AliasClause{Alias: tree.Name(sqlDollar[1].str), Cols: sqlDollar[2].union.nameList()},
@@ -31454,132 +31454,132 @@ sqldefault:
 		}
 	case 1605:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:9558
+//line sql-gen.y:9560
 		{
 		}
 	case 1606:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:9559
+//line sql-gen.y:9561
 		{
 		}
 	case 1607:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:9563
+//line sql-gen.y:9565
 		{
 			sqlVAL.union.val = sqlDollar[1].union.with()
 		}
 	case 1608:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:9567
+//line sql-gen.y:9569
 		{
 			sqlVAL.union.val = nil
 		}
 	case 1609:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:9572
+//line sql-gen.y:9574
 		{
 		}
 	case 1610:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:9573
+//line sql-gen.y:9575
 		{
 		}
 	case 1611:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:9577
+//line sql-gen.y:9579
 		{
 			sqlVAL.union.val = true
 		}
 	case 1612:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:9581
+//line sql-gen.y:9583
 		{
 			sqlVAL.union.val = false
 		}
 	case 1613:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:9585
+//line sql-gen.y:9587
 		{
 			sqlVAL.union.val = false
 		}
 	case 1614:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:9591
+//line sql-gen.y:9593
 		{
 			sqlVAL.union.val = true
 		}
 	case 1615:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:9597
+//line sql-gen.y:9599
 		{
 			sqlVAL.union.val = tree.DistinctOn(sqlDollar[4].union.exprs())
 		}
 	case 1616:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:9602
+//line sql-gen.y:9604
 		{
 		}
 	case 1617:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:9603
+//line sql-gen.y:9605
 		{
 		}
 	case 1618:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:9606
+//line sql-gen.y:9608
 		{
 		}
 	case 1619:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:9607
+//line sql-gen.y:9609
 		{
 		}
 	case 1620:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:9611
+//line sql-gen.y:9613
 		{
 			sqlVAL.union.val = sqlDollar[1].union.orderBy()
 		}
 	case 1621:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:9615
+//line sql-gen.y:9617
 		{
 			sqlVAL.union.val = tree.OrderBy(nil)
 		}
 	case 1622:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:9621
+//line sql-gen.y:9623
 		{
 			sqlVAL.union.val = tree.OrderBy(sqlDollar[3].union.orders())
 		}
 	case 1623:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:9627
+//line sql-gen.y:9629
 		{
 			sqlVAL.union.val = tree.OrderBy([]*tree.Order{sqlDollar[3].union.order()})
 		}
 	case 1624:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:9631
+//line sql-gen.y:9633
 		{
 			sqllex.Error("multiple ORDER BY clauses are not supported in this function")
 			return 1
 		}
 	case 1625:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:9638
+//line sql-gen.y:9640
 		{
 			sqlVAL.union.val = []*tree.Order{sqlDollar[1].union.order()}
 		}
 	case 1626:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:9642
+//line sql-gen.y:9644
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.orders(), sqlDollar[3].union.order())
 		}
 	case 1627:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:9648
+//line sql-gen.y:9650
 		{
 
 			dir := sqlDollar[2].union.dir()
@@ -31593,14 +31593,14 @@ sqldefault:
 		}
 	case 1628:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:9660
+//line sql-gen.y:9662
 		{
 			name := sqlDollar[3].union.unresolvedObjectName().ToTableName()
 			sqlVAL.union.val = &tree.Order{OrderType: tree.OrderByIndex, Direction: sqlDollar[4].union.dir(), Table: name}
 		}
 	case 1629:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:9665
+//line sql-gen.y:9667
 		{
 			name := sqlDollar[2].union.unresolvedObjectName().ToTableName()
 			sqlVAL.union.val = &tree.Order{
@@ -31612,25 +31612,25 @@ sqldefault:
 		}
 	case 1630:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:9677
+//line sql-gen.y:9679
 		{
 			sqlVAL.union.val = tree.NullsFirst
 		}
 	case 1631:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:9681
+//line sql-gen.y:9683
 		{
 			sqlVAL.union.val = tree.NullsLast
 		}
 	case 1632:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:9685
+//line sql-gen.y:9687
 		{
 			sqlVAL.union.val = tree.DefaultNullsOrder
 		}
 	case 1633:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:9691
+//line sql-gen.y:9693
 		{
 			if sqlDollar[1].union.limit() == nil {
 				sqlVAL.union.val = sqlDollar[2].union.limit()
@@ -31641,7 +31641,7 @@ sqldefault:
 		}
 	case 1634:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:9700
+//line sql-gen.y:9702
 		{
 			sqlVAL.union.val = sqlDollar[1].union.limit()
 			if sqlDollar[2].union.limit() != nil {
@@ -31651,31 +31651,31 @@ sqldefault:
 		}
 	case 1637:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:9711
+//line sql-gen.y:9713
 		{
 			sqlVAL.union.val = sqlDollar[1].union.limit()
 		}
 	case 1638:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:9712
+//line sql-gen.y:9714
 		{
 			sqlVAL.union.val = (*tree.Limit)(nil)
 		}
 	case 1640:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:9716
+//line sql-gen.y:9718
 		{
 			sqlVAL.union.val = (*tree.Limit)(nil)
 		}
 	case 1641:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:9720
+//line sql-gen.y:9722
 		{
 			sqlVAL.union.val = &tree.Limit{LimitAll: true}
 		}
 	case 1642:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:9724
+//line sql-gen.y:9726
 		{
 			if sqlDollar[2].union.expr() == nil {
 				sqlVAL.union.val = (*tree.Limit)(nil)
@@ -31685,13 +31685,13 @@ sqldefault:
 		}
 	case 1643:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:9738
+//line sql-gen.y:9740
 		{
 			sqlVAL.union.val = &tree.Limit{Count: sqlDollar[3].union.expr()}
 		}
 	case 1644:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:9742
+//line sql-gen.y:9744
 		{
 			sqlVAL.union.val = &tree.Limit{
 				Count: tree.NewNumVal(constant.MakeInt64(1), "", false),
@@ -31699,111 +31699,111 @@ sqldefault:
 		}
 	case 1645:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:9750
+//line sql-gen.y:9752
 		{
 			sqlVAL.union.val = &tree.Limit{Offset: sqlDollar[2].union.expr()}
 		}
 	case 1646:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:9757
+//line sql-gen.y:9759
 		{
 			sqlVAL.union.val = &tree.Limit{Offset: sqlDollar[2].union.expr()}
 		}
 	case 1650:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:9779
+//line sql-gen.y:9781
 		{
 		}
 	case 1651:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:9780
+//line sql-gen.y:9782
 		{
 		}
 	case 1652:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:9783
+//line sql-gen.y:9785
 		{
 		}
 	case 1653:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:9784
+//line sql-gen.y:9786
 		{
 		}
 	case 1654:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:9801
+//line sql-gen.y:9803
 		{
 			sqlVAL.union.val = tree.GroupBy(sqlDollar[3].union.exprs())
 		}
 	case 1655:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:9805
+//line sql-gen.y:9807
 		{
 			sqlVAL.union.val = tree.GroupBy(nil)
 		}
 	case 1656:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:9810
+//line sql-gen.y:9812
 		{
 			sqlVAL.union.val = tree.Exprs{sqlDollar[1].union.expr()}
 		}
 	case 1657:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:9811
+//line sql-gen.y:9813
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.exprs(), sqlDollar[3].union.expr())
 		}
 	case 1658:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:9817
+//line sql-gen.y:9819
 		{
 			sqlVAL.union.val = sqlDollar[1].union.expr()
 		}
 	case 1659:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:9818
+//line sql-gen.y:9820
 		{
 			return unimplementedWithIssueDetail(sqllex, 46280, "rollup")
 		}
 	case 1660:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:9819
+//line sql-gen.y:9821
 		{
 			return unimplementedWithIssueDetail(sqllex, 46280, "cube")
 		}
 	case 1661:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:9820
+//line sql-gen.y:9822
 		{
 			return unimplementedWithIssueDetail(sqllex, 46280, "grouping sets")
 		}
 	case 1662:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:9824
+//line sql-gen.y:9826
 		{
 			sqlVAL.union.val = sqlDollar[2].union.expr()
 		}
 	case 1663:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:9828
+//line sql-gen.y:9830
 		{
 			sqlVAL.union.val = tree.Expr(nil)
 		}
 	case 1664:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:9847
+//line sql-gen.y:9849
 		{
 			sqlVAL.union.val = &tree.ValuesClause{Rows: []tree.Exprs{sqlDollar[3].union.exprs()}}
 		}
 	case 1665:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:9850
+//line sql-gen.y:9852
 		{
 			return helpWith(sqllex, "VALUES")
 		}
 	case 1666:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:9852
+//line sql-gen.y:9854
 		{
 			valNode := sqlDollar[1].union.selectStmt().(*tree.ValuesClause)
 			valNode.Rows = append(valNode.Rows, sqlDollar[4].union.exprs())
@@ -31811,114 +31811,114 @@ sqldefault:
 		}
 	case 1667:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:9864
+//line sql-gen.y:9866
 		{
 			sqlVAL.union.val = tree.From{Tables: sqlDollar[2].union.tblExprs(), AsOf: sqlDollar[3].union.asOfClause()}
 		}
 	case 1668:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:9867
+//line sql-gen.y:9869
 		{
 			return helpWith(sqllex, "<SOURCE>")
 		}
 	case 1669:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:9869
+//line sql-gen.y:9871
 		{
 			sqlVAL.union.val = tree.From{}
 		}
 	case 1670:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:9875
+//line sql-gen.y:9877
 		{
 			sqlVAL.union.val = tree.TableExprs{sqlDollar[1].union.tblExpr()}
 		}
 	case 1671:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:9879
+//line sql-gen.y:9881
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.tblExprs(), sqlDollar[3].union.tblExpr())
 		}
 	case 1672:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:9885
+//line sql-gen.y:9887
 		{
 			sqlVAL.union.val = &tree.IndexFlags{Index: tree.UnrestrictedName(sqlDollar[3].str)}
 		}
 	case 1673:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:9889
+//line sql-gen.y:9891
 		{
 
 			sqlVAL.union.val = &tree.IndexFlags{IndexID: tree.IndexID(sqlDollar[4].union.int64())}
 		}
 	case 1674:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:9894
+//line sql-gen.y:9896
 		{
 
 			sqlVAL.union.val = &tree.IndexFlags{Direction: tree.Ascending}
 		}
 	case 1675:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:9899
+//line sql-gen.y:9901
 		{
 
 			sqlVAL.union.val = &tree.IndexFlags{Direction: tree.Descending}
 		}
 	case 1676:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:9905
+//line sql-gen.y:9907
 		{
 			sqlVAL.union.val = &tree.IndexFlags{NoIndexJoin: true}
 		}
 	case 1677:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:9910
+//line sql-gen.y:9912
 		{
 			sqlVAL.union.val = &tree.IndexFlags{NoZigzagJoin: true}
 		}
 	case 1678:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:9915
+//line sql-gen.y:9917
 		{
 			sqlVAL.union.val = &tree.IndexFlags{NoFullScan: true}
 		}
 	case 1679:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:9920
+//line sql-gen.y:9922
 		{
 
 			sqlVAL.union.val = &tree.IndexFlags{IgnoreForeignKeys: true}
 		}
 	case 1680:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:9926
+//line sql-gen.y:9928
 		{
 			sqlVAL.union.val = &tree.IndexFlags{ForceZigzag: true}
 		}
 	case 1681:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:9931
+//line sql-gen.y:9933
 		{
 			sqlVAL.union.val = &tree.IndexFlags{ZigzagIndexes: []tree.UnrestrictedName{tree.UnrestrictedName(sqlDollar[3].str)}}
 		}
 	case 1682:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:9936
+//line sql-gen.y:9938
 		{
 
 			sqlVAL.union.val = &tree.IndexFlags{ZigzagIndexIDs: []tree.IndexID{tree.IndexID(sqlDollar[4].union.int64())}}
 		}
 	case 1683:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:9943
+//line sql-gen.y:9945
 		{
 			sqlVAL.union.val = sqlDollar[1].union.indexFlags()
 		}
 	case 1684:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:9948
+//line sql-gen.y:9950
 		{
 			a := sqlDollar[1].union.indexFlags()
 			b := sqlDollar[3].union.indexFlags()
@@ -31929,19 +31929,19 @@ sqldefault:
 		}
 	case 1685:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:9959
+//line sql-gen.y:9961
 		{
 			sqlVAL.union.val = &tree.IndexFlags{Index: tree.UnrestrictedName(sqlDollar[2].str)}
 		}
 	case 1686:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:9963
+//line sql-gen.y:9965
 		{
 			sqlVAL.union.val = &tree.IndexFlags{IndexID: tree.IndexID(sqlDollar[3].union.int64())}
 		}
 	case 1687:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:9967
+//line sql-gen.y:9969
 		{
 			flags := sqlDollar[3].union.indexFlags()
 			if err := flags.Check(); err != nil {
@@ -31951,13 +31951,13 @@ sqldefault:
 		}
 	case 1688:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:9975
+//line sql-gen.y:9977
 		{
 			sqlVAL.union.val = (*tree.IndexFlags)(nil)
 		}
 	case 1689:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:10009
+//line sql-gen.y:10011
 		{
 
 			sqlVAL.union.val = &tree.AliasedTableExpr{
@@ -31969,7 +31969,7 @@ sqldefault:
 		}
 	case 1690:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:10019
+//line sql-gen.y:10021
 		{
 			name := sqlDollar[1].union.unresolvedObjectName().ToTableName()
 			sqlVAL.union.val = &tree.AliasedTableExpr{
@@ -31981,7 +31981,7 @@ sqldefault:
 		}
 	case 1691:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:10029
+//line sql-gen.y:10031
 		{
 			sqlVAL.union.val = &tree.AliasedTableExpr{
 				Expr:       &tree.Subquery{Select: sqlDollar[1].union.selectStmt()},
@@ -31991,7 +31991,7 @@ sqldefault:
 		}
 	case 1692:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:10037
+//line sql-gen.y:10039
 		{
 			sqlVAL.union.val = &tree.AliasedTableExpr{
 				Expr:       &tree.Subquery{Select: sqlDollar[2].union.selectStmt()},
@@ -32002,19 +32002,19 @@ sqldefault:
 		}
 	case 1693:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10046
+//line sql-gen.y:10048
 		{
 			sqlVAL.union.val = sqlDollar[1].union.tblExpr()
 		}
 	case 1694:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:10050
+//line sql-gen.y:10052
 		{
 			sqlVAL.union.val = &tree.AliasedTableExpr{Expr: &tree.ParenTableExpr{Expr: sqlDollar[2].union.tblExpr()}, Ordinality: sqlDollar[4].union.bool(), As: sqlDollar[5].union.aliasClause()}
 		}
 	case 1695:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:10054
+//line sql-gen.y:10056
 		{
 			f := sqlDollar[1].union.tblExpr()
 			sqlVAL.union.val = &tree.AliasedTableExpr{
@@ -32026,7 +32026,7 @@ sqldefault:
 		}
 	case 1696:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:10065
+//line sql-gen.y:10067
 		{
 			f := sqlDollar[2].union.tblExpr()
 			sqlVAL.union.val = &tree.AliasedTableExpr{
@@ -32038,13 +32038,13 @@ sqldefault:
 		}
 	case 1697:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:10089
+//line sql-gen.y:10091
 		{
 			sqlVAL.union.val = &tree.AliasedTableExpr{Expr: &tree.StatementSource{Statement: sqlDollar[2].union.stmt()}, Ordinality: sqlDollar[4].union.bool(), As: sqlDollar[5].union.aliasClause()}
 		}
 	case 1698:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:10095
+//line sql-gen.y:10097
 		{
 
 			sqlVAL.union.val = &tree.TableRef{
@@ -32055,276 +32055,276 @@ sqldefault:
 		}
 	case 1699:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10106
+//line sql-gen.y:10108
 		{
 			sqlVAL.union.val = &tree.RowsFromExpr{Items: tree.Exprs{sqlDollar[1].union.expr()}}
 		}
 	case 1700:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:10110
+//line sql-gen.y:10112
 		{
 			sqlVAL.union.val = &tree.RowsFromExpr{Items: sqlDollar[4].union.exprs()}
 		}
 	case 1701:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10116
+//line sql-gen.y:10118
 		{
 			sqlVAL.union.val = tree.Exprs{sqlDollar[1].union.expr()}
 		}
 	case 1702:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:10118
+//line sql-gen.y:10120
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.exprs(), sqlDollar[3].union.expr())
 		}
 	case 1703:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:10122
+//line sql-gen.y:10124
 		{
 			sqlVAL.union.val = sqlDollar[1].union.expr()
 		}
 	case 1704:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:10128
+//line sql-gen.y:10130
 		{
 		}
 	case 1705:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:10130
+//line sql-gen.y:10132
 		{
 			return unimplemented(sqllex, "ROWS FROM with col_def_list")
 		}
 	case 1706:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:10133
+//line sql-gen.y:10135
 		{
 			sqlVAL.union.val = nil
 		}
 	case 1707:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:10134
+//line sql-gen.y:10136
 		{
 			sqlVAL.union.val = []tree.ColumnID{}
 		}
 	case 1708:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:10135
+//line sql-gen.y:10137
 		{
 			sqlVAL.union.val = sqlDollar[2].union.tableRefCols()
 		}
 	case 1709:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10139
+//line sql-gen.y:10141
 		{
 			sqlVAL.union.val = []tree.ColumnID{tree.ColumnID(sqlDollar[1].union.int64())}
 		}
 	case 1710:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:10143
+//line sql-gen.y:10145
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.tableRefCols(), tree.ColumnID(sqlDollar[3].union.int64()))
 		}
 	case 1711:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:10149
+//line sql-gen.y:10151
 		{
 			sqlVAL.union.val = true
 		}
 	case 1712:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:10153
+//line sql-gen.y:10155
 		{
 			sqlVAL.union.val = false
 		}
 	case 1713:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:10173
+//line sql-gen.y:10175
 		{
 			sqlVAL.union.val = &tree.ParenTableExpr{Expr: sqlDollar[2].union.tblExpr()}
 		}
 	case 1714:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:10177
+//line sql-gen.y:10179
 		{
 			sqlVAL.union.val = &tree.JoinTableExpr{JoinType: tree.AstCross, Left: sqlDollar[1].union.tblExpr(), Right: sqlDollar[5].union.tblExpr(), Hint: sqlDollar[3].str}
 		}
 	case 1715:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:10181
+//line sql-gen.y:10183
 		{
 			sqlVAL.union.val = &tree.JoinTableExpr{JoinType: sqlDollar[2].str, Left: sqlDollar[1].union.tblExpr(), Right: sqlDollar[5].union.tblExpr(), Cond: sqlDollar[6].union.joinCond(), Hint: sqlDollar[3].str}
 		}
 	case 1716:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:10185
+//line sql-gen.y:10187
 		{
 			sqlVAL.union.val = &tree.JoinTableExpr{Left: sqlDollar[1].union.tblExpr(), Right: sqlDollar[3].union.tblExpr(), Cond: sqlDollar[4].union.joinCond()}
 		}
 	case 1717:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:10189
+//line sql-gen.y:10191
 		{
 			sqlVAL.union.val = &tree.JoinTableExpr{JoinType: sqlDollar[3].str, Left: sqlDollar[1].union.tblExpr(), Right: sqlDollar[6].union.tblExpr(), Cond: tree.NaturalJoinCond{}, Hint: sqlDollar[4].str}
 		}
 	case 1718:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:10193
+//line sql-gen.y:10195
 		{
 			sqlVAL.union.val = &tree.JoinTableExpr{Left: sqlDollar[1].union.tblExpr(), Right: sqlDollar[4].union.tblExpr(), Cond: tree.NaturalJoinCond{}}
 		}
 	case 1719:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:10199
+//line sql-gen.y:10201
 		{
 			sqlVAL.union.val = tree.AliasClause{Alias: tree.Name(sqlDollar[2].str), Cols: sqlDollar[3].union.nameList()}
 		}
 	case 1720:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:10203
+//line sql-gen.y:10205
 		{
 			sqlVAL.union.val = tree.AliasClause{Alias: tree.Name(sqlDollar[1].str), Cols: sqlDollar[2].union.nameList()}
 		}
 	case 1722:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:10210
+//line sql-gen.y:10212
 		{
 			sqlVAL.union.val = tree.AliasClause{}
 		}
 	case 1723:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:10216
+//line sql-gen.y:10218
 		{
 			sqlVAL.union.val = tree.AsOfClause{Expr: sqlDollar[5].union.expr()}
 		}
 	case 1725:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:10223
+//line sql-gen.y:10225
 		{
 			sqlVAL.union.val = tree.AsOfClause{}
 		}
 	case 1726:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:10229
+//line sql-gen.y:10231
 		{
 			sqlVAL.str = tree.AstFull
 		}
 	case 1727:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:10233
+//line sql-gen.y:10235
 		{
 			sqlVAL.str = tree.AstLeft
 		}
 	case 1728:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:10237
+//line sql-gen.y:10239
 		{
 			sqlVAL.str = tree.AstRight
 		}
 	case 1729:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10241
+//line sql-gen.y:10243
 		{
 			sqlVAL.str = tree.AstInner
 		}
 	case 1730:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10247
+//line sql-gen.y:10249
 		{
 		}
 	case 1731:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:10248
+//line sql-gen.y:10250
 		{
 		}
 	case 1732:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10272
+//line sql-gen.y:10274
 		{
 			sqlVAL.str = tree.AstHash
 		}
 	case 1733:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10276
+//line sql-gen.y:10278
 		{
 			sqlVAL.str = tree.AstMerge
 		}
 	case 1734:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10280
+//line sql-gen.y:10282
 		{
 			sqlVAL.str = tree.AstLookup
 		}
 	case 1735:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10284
+//line sql-gen.y:10286
 		{
 			sqlVAL.str = tree.AstInverted
 		}
 	case 1736:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:10288
+//line sql-gen.y:10290
 		{
 			sqlVAL.str = ""
 		}
 	case 1737:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:10301
+//line sql-gen.y:10303
 		{
 			sqlVAL.union.val = &tree.UsingJoinCond{Cols: sqlDollar[3].union.nameList()}
 		}
 	case 1738:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:10305
+//line sql-gen.y:10307
 		{
 			sqlVAL.union.val = &tree.OnJoinCond{Expr: sqlDollar[2].union.expr()}
 		}
 	case 1739:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10310
+//line sql-gen.y:10312
 		{
 			sqlVAL.union.val = sqlDollar[1].union.unresolvedObjectName()
 		}
 	case 1740:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:10311
+//line sql-gen.y:10313
 		{
 			sqlVAL.union.val = sqlDollar[1].union.unresolvedObjectName()
 		}
 	case 1741:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:10312
+//line sql-gen.y:10314
 		{
 			sqlVAL.union.val = sqlDollar[2].union.unresolvedObjectName()
 		}
 	case 1742:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:10313
+//line sql-gen.y:10315
 		{
 			sqlVAL.union.val = sqlDollar[3].union.unresolvedObjectName()
 		}
 	case 1743:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10317
+//line sql-gen.y:10319
 		{
 			name := sqlDollar[1].union.unresolvedObjectName().ToTableName()
 			sqlVAL.union.val = tree.TableNames{name}
 		}
 	case 1744:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:10322
+//line sql-gen.y:10324
 		{
 			name := sqlDollar[3].union.unresolvedObjectName().ToTableName()
 			sqlVAL.union.val = append(sqlDollar[1].union.tableNames(), name)
 		}
 	case 1745:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10336
+//line sql-gen.y:10338
 		{
 			sqlVAL.union.val = sqlDollar[1].union.tblExpr()
 		}
 	case 1746:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:10340
+//line sql-gen.y:10342
 		{
 			alias := sqlDollar[1].union.tblExpr().(*tree.AliasedTableExpr)
 			alias.As = tree.AliasClause{Alias: tree.Name(sqlDollar[2].str)}
@@ -32332,7 +32332,7 @@ sqldefault:
 		}
 	case 1747:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:10346
+//line sql-gen.y:10348
 		{
 			alias := sqlDollar[1].union.tblExpr().(*tree.AliasedTableExpr)
 			alias.As = tree.AliasClause{Alias: tree.Name(sqlDollar[3].str)}
@@ -32340,7 +32340,7 @@ sqldefault:
 		}
 	case 1748:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:10352
+//line sql-gen.y:10354
 		{
 
 			sqlVAL.union.val = &tree.AliasedTableExpr{
@@ -32350,7 +32350,7 @@ sqldefault:
 		}
 	case 1749:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:10362
+//line sql-gen.y:10364
 		{
 			name := sqlDollar[2].union.unresolvedObjectName().ToTableName()
 			sqlVAL.union.val = &tree.AliasedTableExpr{
@@ -32360,43 +32360,43 @@ sqldefault:
 		}
 	case 1750:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10372
+//line sql-gen.y:10374
 		{
 			sqlVAL.union.val = true
 		}
 	case 1751:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:10376
+//line sql-gen.y:10378
 		{
 			sqlVAL.union.val = false
 		}
 	case 1752:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10382
+//line sql-gen.y:10384
 		{
 			sqlVAL.union.val = true
 		}
 	case 1753:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:10386
+//line sql-gen.y:10388
 		{
 			sqlVAL.union.val = false
 		}
 	case 1754:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:10392
+//line sql-gen.y:10394
 		{
 			sqlVAL.union.val = sqlDollar[2].union.expr()
 		}
 	case 1756:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:10399
+//line sql-gen.y:10401
 		{
 			sqlVAL.union.val = tree.Expr(nil)
 		}
 	case 1757:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:10411
+//line sql-gen.y:10413
 		{
 			if bounds := sqlDollar[2].union.int32s(); bounds != nil {
 				var err error
@@ -32410,7 +32410,7 @@ sqldefault:
 		}
 	case 1758:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:10424
+//line sql-gen.y:10426
 		{
 
 			var err error
@@ -32421,13 +32421,13 @@ sqldefault:
 		}
 	case 1759:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql-gen.y:10432
+//line sql-gen.y:10434
 		{
 			return unimplementedWithIssue(sqllex, 32552)
 		}
 	case 1760:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:10433
+//line sql-gen.y:10435
 		{
 			var err error
 			sqlVAL.union.val, err = arrayOf(sqlDollar[1].union.typeReference(), nil)
@@ -32437,25 +32437,25 @@ sqldefault:
 		}
 	case 1761:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10443
+//line sql-gen.y:10445
 		{
 			sqlVAL.union.val = sqlDollar[1].union.typeReference()
 		}
 	case 1762:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:10450
+//line sql-gen.y:10452
 		{
 			sqlVAL.union.val = []int32{-1}
 		}
 	case 1763:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:10451
+//line sql-gen.y:10453
 		{
 			return unimplementedWithIssue(sqllex, 32552)
 		}
 	case 1764:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:10453
+//line sql-gen.y:10455
 		{
 
 			bound, err := sqlDollar[2].union.numVal().AsInt32()
@@ -32466,19 +32466,19 @@ sqldefault:
 		}
 	case 1765:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:10461
+//line sql-gen.y:10463
 		{
 			return unimplementedWithIssue(sqllex, 32552)
 		}
 	case 1766:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:10462
+//line sql-gen.y:10464
 		{
 			sqlVAL.union.val = []int32(nil)
 		}
 	case 1768:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:10474
+//line sql-gen.y:10476
 		{
 			aIdx := sqllex.(*lexer).NewAnnotation()
 			res, err := tree.NewUnresolvedObjectName(2, [3]string{sqlDollar[3].str, sqlDollar[1].str}, aIdx)
@@ -32489,7 +32489,7 @@ sqldefault:
 		}
 	case 1769:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:10481
+//line sql-gen.y:10483
 		{
 			aIdx := sqllex.(*lexer).NewAnnotation()
 			res, err := tree.NewUnresolvedObjectName(3, [3]string{sqlDollar[5].str, sqlDollar[3].str, sqlDollar[1].str}, aIdx)
@@ -32500,7 +32500,7 @@ sqldefault:
 		}
 	case 1770:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10490
+//line sql-gen.y:10492
 		{
 
 			if sqlDollar[1].str == "char" {
@@ -32537,254 +32537,254 @@ sqldefault:
 		}
 	case 1771:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:10530
+//line sql-gen.y:10532
 		{
 			id := sqlDollar[2].union.int32()
 			sqlVAL.union.val = &tree.OIDTypeReference{OID: oid.Oid(id)}
 		}
 	case 1772:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10535
+//line sql-gen.y:10537
 		{
 			sqlVAL.union.val = sqlDollar[1].union.typeReference()
 		}
 	case 1777:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:10542
+//line sql-gen.y:10544
 		{
 			return unimplementedWithIssueDetail(sqllex, 21286, "point")
 		}
 	case 1778:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:10543
+//line sql-gen.y:10545
 		{
 			return unimplementedWithIssueDetail(sqllex, 21286, "polygon")
 		}
 	case 1779:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10546
+//line sql-gen.y:10548
 		{
 			sqlVAL.union.val = geopb.ShapeType_Point
 		}
 	case 1780:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10547
+//line sql-gen.y:10549
 		{
 			sqlVAL.union.val = geopb.ShapeType_PointM
 		}
 	case 1781:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10548
+//line sql-gen.y:10550
 		{
 			sqlVAL.union.val = geopb.ShapeType_PointZ
 		}
 	case 1782:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10549
+//line sql-gen.y:10551
 		{
 			sqlVAL.union.val = geopb.ShapeType_PointZM
 		}
 	case 1783:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10550
+//line sql-gen.y:10552
 		{
 			sqlVAL.union.val = geopb.ShapeType_LineString
 		}
 	case 1784:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10551
+//line sql-gen.y:10553
 		{
 			sqlVAL.union.val = geopb.ShapeType_LineStringM
 		}
 	case 1785:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10552
+//line sql-gen.y:10554
 		{
 			sqlVAL.union.val = geopb.ShapeType_LineStringZ
 		}
 	case 1786:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10553
+//line sql-gen.y:10555
 		{
 			sqlVAL.union.val = geopb.ShapeType_LineStringZM
 		}
 	case 1787:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10554
+//line sql-gen.y:10556
 		{
 			sqlVAL.union.val = geopb.ShapeType_Polygon
 		}
 	case 1788:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10555
+//line sql-gen.y:10557
 		{
 			sqlVAL.union.val = geopb.ShapeType_PolygonM
 		}
 	case 1789:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10556
+//line sql-gen.y:10558
 		{
 			sqlVAL.union.val = geopb.ShapeType_PolygonZ
 		}
 	case 1790:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10557
+//line sql-gen.y:10559
 		{
 			sqlVAL.union.val = geopb.ShapeType_PolygonZM
 		}
 	case 1791:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10558
+//line sql-gen.y:10560
 		{
 			sqlVAL.union.val = geopb.ShapeType_MultiPoint
 		}
 	case 1792:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10559
+//line sql-gen.y:10561
 		{
 			sqlVAL.union.val = geopb.ShapeType_MultiPointM
 		}
 	case 1793:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10560
+//line sql-gen.y:10562
 		{
 			sqlVAL.union.val = geopb.ShapeType_MultiPointZ
 		}
 	case 1794:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10561
+//line sql-gen.y:10563
 		{
 			sqlVAL.union.val = geopb.ShapeType_MultiPointZM
 		}
 	case 1795:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10562
+//line sql-gen.y:10564
 		{
 			sqlVAL.union.val = geopb.ShapeType_MultiLineString
 		}
 	case 1796:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10563
+//line sql-gen.y:10565
 		{
 			sqlVAL.union.val = geopb.ShapeType_MultiLineStringM
 		}
 	case 1797:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10564
+//line sql-gen.y:10566
 		{
 			sqlVAL.union.val = geopb.ShapeType_MultiLineStringZ
 		}
 	case 1798:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10565
+//line sql-gen.y:10567
 		{
 			sqlVAL.union.val = geopb.ShapeType_MultiLineStringZM
 		}
 	case 1799:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10566
+//line sql-gen.y:10568
 		{
 			sqlVAL.union.val = geopb.ShapeType_MultiPolygon
 		}
 	case 1800:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10567
+//line sql-gen.y:10569
 		{
 			sqlVAL.union.val = geopb.ShapeType_MultiPolygonM
 		}
 	case 1801:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10568
+//line sql-gen.y:10570
 		{
 			sqlVAL.union.val = geopb.ShapeType_MultiPolygonZ
 		}
 	case 1802:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10569
+//line sql-gen.y:10571
 		{
 			sqlVAL.union.val = geopb.ShapeType_MultiPolygonZM
 		}
 	case 1803:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10570
+//line sql-gen.y:10572
 		{
 			sqlVAL.union.val = geopb.ShapeType_GeometryCollection
 		}
 	case 1804:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10571
+//line sql-gen.y:10573
 		{
 			sqlVAL.union.val = geopb.ShapeType_GeometryCollectionM
 		}
 	case 1805:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10572
+//line sql-gen.y:10574
 		{
 			sqlVAL.union.val = geopb.ShapeType_GeometryCollectionZ
 		}
 	case 1806:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10573
+//line sql-gen.y:10575
 		{
 			sqlVAL.union.val = geopb.ShapeType_GeometryCollectionZM
 		}
 	case 1807:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10574
+//line sql-gen.y:10576
 		{
 			sqlVAL.union.val = geopb.ShapeType_Geometry
 		}
 	case 1808:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10575
+//line sql-gen.y:10577
 		{
 			sqlVAL.union.val = geopb.ShapeType_GeometryM
 		}
 	case 1809:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10576
+//line sql-gen.y:10578
 		{
 			sqlVAL.union.val = geopb.ShapeType_GeometryZ
 		}
 	case 1810:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10577
+//line sql-gen.y:10579
 		{
 			sqlVAL.union.val = geopb.ShapeType_GeometryZM
 		}
 	case 1811:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10580
+//line sql-gen.y:10582
 		{
 			sqlVAL.union.val = types.Geography
 		}
 	case 1812:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10581
+//line sql-gen.y:10583
 		{
 			sqlVAL.union.val = types.Geometry
 		}
 	case 1813:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10582
+//line sql-gen.y:10584
 		{
 			sqlVAL.union.val = types.Box2D
 		}
 	case 1814:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:10584
+//line sql-gen.y:10586
 		{
 			sqlVAL.union.val = types.MakeGeometry(sqlDollar[3].union.geoShapeType(), 0)
 		}
 	case 1815:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:10588
+//line sql-gen.y:10590
 		{
 			sqlVAL.union.val = types.MakeGeography(sqlDollar[3].union.geoShapeType(), 0)
 		}
 	case 1816:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:10592
+//line sql-gen.y:10594
 		{
 			val, err := sqlDollar[5].union.numVal().AsInt32()
 			if err != nil {
@@ -32794,7 +32794,7 @@ sqldefault:
 		}
 	case 1817:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:10600
+//line sql-gen.y:10602
 		{
 			val, err := sqlDollar[5].union.numVal().AsInt32()
 			if err != nil {
@@ -32804,7 +32804,7 @@ sqldefault:
 		}
 	case 1823:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:10626
+//line sql-gen.y:10628
 		{
 			dec, err := newDecimal(sqlDollar[2].union.int32(), 0)
 			if err != nil {
@@ -32814,7 +32814,7 @@ sqldefault:
 		}
 	case 1824:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:10634
+//line sql-gen.y:10636
 		{
 			dec, err := newDecimal(sqlDollar[2].union.int32(), sqlDollar[4].union.int32())
 			if err != nil {
@@ -32824,55 +32824,55 @@ sqldefault:
 		}
 	case 1825:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:10642
+//line sql-gen.y:10644
 		{
 			sqlVAL.union.val = nil
 		}
 	case 1826:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10649
+//line sql-gen.y:10651
 		{
 			sqlVAL.union.val = sqllex.(*lexer).nakedIntType
 		}
 	case 1827:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10653
+//line sql-gen.y:10655
 		{
 			sqlVAL.union.val = sqllex.(*lexer).nakedIntType
 		}
 	case 1828:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10657
+//line sql-gen.y:10659
 		{
 			sqlVAL.union.val = types.Int2
 		}
 	case 1829:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10661
+//line sql-gen.y:10663
 		{
 			sqlVAL.union.val = types.Int
 		}
 	case 1830:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10665
+//line sql-gen.y:10667
 		{
 			sqlVAL.union.val = types.Float4
 		}
 	case 1831:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:10669
+//line sql-gen.y:10671
 		{
 			sqlVAL.union.val = sqlDollar[2].union.colType()
 		}
 	case 1832:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:10673
+//line sql-gen.y:10675
 		{
 			sqlVAL.union.val = types.Float
 		}
 	case 1833:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:10677
+//line sql-gen.y:10679
 		{
 			typ := sqlDollar[2].union.colType()
 			if typ == nil {
@@ -32882,7 +32882,7 @@ sqldefault:
 		}
 	case 1834:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:10685
+//line sql-gen.y:10687
 		{
 			typ := sqlDollar[2].union.colType()
 			if typ == nil {
@@ -32892,7 +32892,7 @@ sqldefault:
 		}
 	case 1835:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:10693
+//line sql-gen.y:10695
 		{
 			typ := sqlDollar[2].union.colType()
 			if typ == nil {
@@ -32902,13 +32902,13 @@ sqldefault:
 		}
 	case 1836:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10701
+//line sql-gen.y:10703
 		{
 			sqlVAL.union.val = types.Bool
 		}
 	case 1837:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:10707
+//line sql-gen.y:10709
 		{
 			nv := sqlDollar[2].union.numVal()
 			prec, err := nv.AsInt64()
@@ -32923,13 +32923,13 @@ sqldefault:
 		}
 	case 1838:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:10720
+//line sql-gen.y:10722
 		{
 			sqlVAL.union.val = types.Float
 		}
 	case 1839:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:10726
+//line sql-gen.y:10728
 		{
 			bit, err := newBitType(sqlDollar[4].union.int32(), sqlDollar[2].union.bool())
 			if err != nil {
@@ -32939,7 +32939,7 @@ sqldefault:
 		}
 	case 1840:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:10732
+//line sql-gen.y:10734
 		{
 			bit, err := newBitType(sqlDollar[3].union.int32(), true)
 			if err != nil {
@@ -32949,25 +32949,25 @@ sqldefault:
 		}
 	case 1841:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10740
+//line sql-gen.y:10742
 		{
 			sqlVAL.union.val = types.MakeBit(1)
 		}
 	case 1842:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:10744
+//line sql-gen.y:10746
 		{
 			sqlVAL.union.val = types.VarBit
 		}
 	case 1843:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10748
+//line sql-gen.y:10750
 		{
 			sqlVAL.union.val = types.VarBit
 		}
 	case 1844:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:10754
+//line sql-gen.y:10756
 		{
 			colTyp := *sqlDollar[1].union.colType()
 			n := sqlDollar[3].union.int32()
@@ -32979,55 +32979,55 @@ sqldefault:
 		}
 	case 1845:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10766
+//line sql-gen.y:10768
 		{
 			sqlVAL.union.val = sqlDollar[1].union.colType()
 		}
 	case 1846:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10772
+//line sql-gen.y:10774
 		{
 			sqlVAL.union.val = types.MakeChar(1)
 		}
 	case 1847:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:10776
+//line sql-gen.y:10778
 		{
 			sqlVAL.union.val = types.VarChar
 		}
 	case 1848:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10780
+//line sql-gen.y:10782
 		{
 			sqlVAL.union.val = types.VarChar
 		}
 	case 1849:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10784
+//line sql-gen.y:10786
 		{
 			sqlVAL.union.val = types.String
 		}
 	case 1852:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10793
+//line sql-gen.y:10795
 		{
 			sqlVAL.union.val = true
 		}
 	case 1853:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:10794
+//line sql-gen.y:10796
 		{
 			sqlVAL.union.val = false
 		}
 	case 1854:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10799
+//line sql-gen.y:10801
 		{
 			sqlVAL.union.val = types.Date
 		}
 	case 1855:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:10803
+//line sql-gen.y:10805
 		{
 			if sqlDollar[2].union.bool() {
 				sqlVAL.union.val = types.TimeTZ
@@ -33037,7 +33037,7 @@ sqldefault:
 		}
 	case 1856:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:10811
+//line sql-gen.y:10813
 		{
 			prec := sqlDollar[3].union.int32()
 			if prec < 0 || prec > 6 {
@@ -33052,13 +33052,13 @@ sqldefault:
 		}
 	case 1857:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10823
+//line sql-gen.y:10825
 		{
 			sqlVAL.union.val = types.TimeTZ
 		}
 	case 1858:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:10825
+//line sql-gen.y:10827
 		{
 			prec := sqlDollar[3].union.int32()
 			if prec < 0 || prec > 6 {
@@ -33069,7 +33069,7 @@ sqldefault:
 		}
 	case 1859:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:10834
+//line sql-gen.y:10836
 		{
 			if sqlDollar[2].union.bool() {
 				sqlVAL.union.val = types.TimestampTZ
@@ -33079,7 +33079,7 @@ sqldefault:
 		}
 	case 1860:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:10842
+//line sql-gen.y:10844
 		{
 			prec := sqlDollar[3].union.int32()
 			if prec < 0 || prec > 6 {
@@ -33094,13 +33094,13 @@ sqldefault:
 		}
 	case 1861:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10855
+//line sql-gen.y:10857
 		{
 			sqlVAL.union.val = types.TimestampTZ
 		}
 	case 1862:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:10859
+//line sql-gen.y:10861
 		{
 			prec := sqlDollar[3].union.int32()
 			if prec < 0 || prec > 6 {
@@ -33111,37 +33111,37 @@ sqldefault:
 		}
 	case 1863:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:10869
+//line sql-gen.y:10871
 		{
 			sqlVAL.union.val = true
 		}
 	case 1864:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:10870
+//line sql-gen.y:10872
 		{
 			sqlVAL.union.val = false
 		}
 	case 1865:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:10871
+//line sql-gen.y:10873
 		{
 			sqlVAL.union.val = false
 		}
 	case 1866:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10875
+//line sql-gen.y:10877
 		{
 			sqlVAL.union.val = types.Interval
 		}
 	case 1867:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:10879
+//line sql-gen.y:10881
 		{
 			sqlVAL.union.val = types.MakeInterval(sqlDollar[2].union.intervalTypeMetadata())
 		}
 	case 1868:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:10883
+//line sql-gen.y:10885
 		{
 			prec := sqlDollar[3].union.int32()
 			if prec < 0 || prec > 6 {
@@ -33152,7 +33152,7 @@ sqldefault:
 		}
 	case 1869:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10894
+//line sql-gen.y:10896
 		{
 			sqlVAL.union.val = types.IntervalTypeMetadata{
 				DurationField: types.IntervalDurationField{
@@ -33162,7 +33162,7 @@ sqldefault:
 		}
 	case 1870:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10902
+//line sql-gen.y:10904
 		{
 			sqlVAL.union.val = types.IntervalTypeMetadata{
 				DurationField: types.IntervalDurationField{
@@ -33172,7 +33172,7 @@ sqldefault:
 		}
 	case 1871:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10910
+//line sql-gen.y:10912
 		{
 			sqlVAL.union.val = types.IntervalTypeMetadata{
 				DurationField: types.IntervalDurationField{
@@ -33182,7 +33182,7 @@ sqldefault:
 		}
 	case 1872:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10918
+//line sql-gen.y:10920
 		{
 			sqlVAL.union.val = types.IntervalTypeMetadata{
 				DurationField: types.IntervalDurationField{
@@ -33192,7 +33192,7 @@ sqldefault:
 		}
 	case 1873:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10926
+//line sql-gen.y:10928
 		{
 			sqlVAL.union.val = types.IntervalTypeMetadata{
 				DurationField: types.IntervalDurationField{
@@ -33202,13 +33202,13 @@ sqldefault:
 		}
 	case 1874:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:10934
+//line sql-gen.y:10936
 		{
 			sqlVAL.union.val = sqlDollar[1].union.intervalTypeMetadata()
 		}
 	case 1875:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:10940
+//line sql-gen.y:10942
 		{
 			sqlVAL.union.val = types.IntervalTypeMetadata{
 				DurationField: types.IntervalDurationField{
@@ -33219,7 +33219,7 @@ sqldefault:
 		}
 	case 1876:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:10949
+//line sql-gen.y:10951
 		{
 			sqlVAL.union.val = types.IntervalTypeMetadata{
 				DurationField: types.IntervalDurationField{
@@ -33230,7 +33230,7 @@ sqldefault:
 		}
 	case 1877:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:10958
+//line sql-gen.y:10960
 		{
 			sqlVAL.union.val = types.IntervalTypeMetadata{
 				DurationField: types.IntervalDurationField{
@@ -33241,7 +33241,7 @@ sqldefault:
 		}
 	case 1878:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:10967
+//line sql-gen.y:10969
 		{
 			ret := sqlDollar[3].union.intervalTypeMetadata()
 			ret.DurationField.FromDurationType = types.IntervalDurationType_DAY
@@ -33249,7 +33249,7 @@ sqldefault:
 		}
 	case 1879:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:10973
+//line sql-gen.y:10975
 		{
 			sqlVAL.union.val = types.IntervalTypeMetadata{
 				DurationField: types.IntervalDurationField{
@@ -33260,7 +33260,7 @@ sqldefault:
 		}
 	case 1880:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:10982
+//line sql-gen.y:10984
 		{
 			ret := sqlDollar[3].union.intervalTypeMetadata()
 			ret.DurationField.FromDurationType = types.IntervalDurationType_HOUR
@@ -33268,7 +33268,7 @@ sqldefault:
 		}
 	case 1881:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:10988
+//line sql-gen.y:10990
 		{
 			sqlVAL.union.val = sqlDollar[3].union.intervalTypeMetadata()
 			ret := sqlDollar[3].union.intervalTypeMetadata()
@@ -33277,13 +33277,13 @@ sqldefault:
 		}
 	case 1883:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:10998
+//line sql-gen.y:11000
 		{
 			sqlVAL.union.val = nil
 		}
 	case 1884:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:11004
+//line sql-gen.y:11006
 		{
 			sqlVAL.union.val = types.IntervalTypeMetadata{
 				DurationField: types.IntervalDurationField{
@@ -33293,7 +33293,7 @@ sqldefault:
 		}
 	case 1885:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:11012
+//line sql-gen.y:11014
 		{
 			prec := sqlDollar[3].union.int32()
 			if prec < 0 || prec > 6 {
@@ -33310,254 +33310,254 @@ sqldefault:
 		}
 	case 1887:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11049
+//line sql-gen.y:11051
 		{
 			sqlVAL.union.val = &tree.CastExpr{Expr: sqlDollar[1].union.expr(), Type: sqlDollar[3].union.typeReference(), SyntaxMode: tree.CastShort}
 		}
 	case 1888:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11053
+//line sql-gen.y:11055
 		{
 			sqlVAL.union.val = &tree.AnnotateTypeExpr{Expr: sqlDollar[1].union.expr(), Type: sqlDollar[3].union.typeReference(), SyntaxMode: tree.AnnotateShort}
 		}
 	case 1889:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11057
+//line sql-gen.y:11059
 		{
 			sqlVAL.union.val = &tree.CollateExpr{Expr: sqlDollar[1].union.expr(), Locale: sqlDollar[3].str}
 		}
 	case 1890:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:11061
+//line sql-gen.y:11063
 		{
 			sqlVAL.union.val = &tree.FuncExpr{Func: tree.WrapFunction("timezone"), Exprs: tree.Exprs{sqlDollar[5].union.expr(), sqlDollar[1].union.expr()}}
 		}
 	case 1891:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:11072
+//line sql-gen.y:11074
 		{
 
 			sqlVAL.union.val = sqlDollar[2].union.expr()
 		}
 	case 1892:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:11077
+//line sql-gen.y:11079
 		{
 			sqlVAL.union.val = unaryNegation(sqlDollar[2].union.expr())
 		}
 	case 1893:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:11081
+//line sql-gen.y:11083
 		{
 			sqlVAL.union.val = &tree.UnaryExpr{Operator: tree.MakeUnaryOperator(tree.UnaryComplement), Expr: sqlDollar[2].union.expr()}
 		}
 	case 1894:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:11085
+//line sql-gen.y:11087
 		{
 			sqlVAL.union.val = &tree.UnaryExpr{Operator: tree.MakeUnaryOperator(tree.UnarySqrt), Expr: sqlDollar[2].union.expr()}
 		}
 	case 1895:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:11089
+//line sql-gen.y:11091
 		{
 			sqlVAL.union.val = &tree.UnaryExpr{Operator: tree.MakeUnaryOperator(tree.UnaryCbrt), Expr: sqlDollar[2].union.expr()}
 		}
 	case 1896:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11093
+//line sql-gen.y:11095
 		{
 			sqlVAL.union.val = &tree.BinaryExpr{Operator: tree.MakeBinaryOperator(tree.Plus), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1897:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11097
+//line sql-gen.y:11099
 		{
 			sqlVAL.union.val = &tree.BinaryExpr{Operator: tree.MakeBinaryOperator(tree.Minus), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1898:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11101
+//line sql-gen.y:11103
 		{
 			sqlVAL.union.val = &tree.BinaryExpr{Operator: tree.MakeBinaryOperator(tree.Mult), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1899:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11105
+//line sql-gen.y:11107
 		{
 			sqlVAL.union.val = &tree.BinaryExpr{Operator: tree.MakeBinaryOperator(tree.Div), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1900:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11109
+//line sql-gen.y:11111
 		{
 			sqlVAL.union.val = &tree.BinaryExpr{Operator: tree.MakeBinaryOperator(tree.FloorDiv), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1901:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11113
+//line sql-gen.y:11115
 		{
 			sqlVAL.union.val = &tree.BinaryExpr{Operator: tree.MakeBinaryOperator(tree.Mod), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1902:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11117
+//line sql-gen.y:11119
 		{
 			sqlVAL.union.val = &tree.BinaryExpr{Operator: tree.MakeBinaryOperator(tree.Pow), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1903:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11121
+//line sql-gen.y:11123
 		{
 			sqlVAL.union.val = &tree.BinaryExpr{Operator: tree.MakeBinaryOperator(tree.Bitxor), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1904:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11125
+//line sql-gen.y:11127
 		{
 			sqlVAL.union.val = &tree.BinaryExpr{Operator: tree.MakeBinaryOperator(tree.Bitand), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1905:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11129
+//line sql-gen.y:11131
 		{
 			sqlVAL.union.val = &tree.BinaryExpr{Operator: tree.MakeBinaryOperator(tree.Bitor), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1906:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11133
+//line sql-gen.y:11135
 		{
 			sqlVAL.union.val = &tree.ComparisonExpr{Operator: tree.MakeComparisonOperator(tree.LT), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1907:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11137
+//line sql-gen.y:11139
 		{
 			sqlVAL.union.val = &tree.ComparisonExpr{Operator: tree.MakeComparisonOperator(tree.GT), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1908:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11141
+//line sql-gen.y:11143
 		{
 			sqlVAL.union.val = &tree.ComparisonExpr{Operator: tree.MakeComparisonOperator(tree.JSONExists), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1909:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11145
+//line sql-gen.y:11147
 		{
 			sqlVAL.union.val = &tree.ComparisonExpr{Operator: tree.MakeComparisonOperator(tree.JSONSomeExists), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1910:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11149
+//line sql-gen.y:11151
 		{
 			sqlVAL.union.val = &tree.ComparisonExpr{Operator: tree.MakeComparisonOperator(tree.JSONAllExists), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1911:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11153
+//line sql-gen.y:11155
 		{
 			sqlVAL.union.val = &tree.ComparisonExpr{Operator: tree.MakeComparisonOperator(tree.Contains), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1912:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11157
+//line sql-gen.y:11159
 		{
 			sqlVAL.union.val = &tree.ComparisonExpr{Operator: tree.MakeComparisonOperator(tree.ContainedBy), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1913:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11161
+//line sql-gen.y:11163
 		{
 			sqlVAL.union.val = &tree.ComparisonExpr{Operator: tree.MakeComparisonOperator(tree.EQ), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1914:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11165
+//line sql-gen.y:11167
 		{
 			sqlVAL.union.val = &tree.BinaryExpr{Operator: tree.MakeBinaryOperator(tree.Concat), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1915:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11169
+//line sql-gen.y:11171
 		{
 			sqlVAL.union.val = &tree.BinaryExpr{Operator: tree.MakeBinaryOperator(tree.LShift), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1916:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11173
+//line sql-gen.y:11175
 		{
 			sqlVAL.union.val = &tree.BinaryExpr{Operator: tree.MakeBinaryOperator(tree.RShift), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1917:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11177
+//line sql-gen.y:11179
 		{
 			sqlVAL.union.val = &tree.BinaryExpr{Operator: tree.MakeBinaryOperator(tree.JSONFetchVal), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1918:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11181
+//line sql-gen.y:11183
 		{
 			sqlVAL.union.val = &tree.BinaryExpr{Operator: tree.MakeBinaryOperator(tree.JSONFetchText), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1919:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11185
+//line sql-gen.y:11187
 		{
 			sqlVAL.union.val = &tree.BinaryExpr{Operator: tree.MakeBinaryOperator(tree.JSONFetchValPath), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1920:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11189
+//line sql-gen.y:11191
 		{
 			sqlVAL.union.val = &tree.BinaryExpr{Operator: tree.MakeBinaryOperator(tree.JSONFetchTextPath), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1921:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11193
+//line sql-gen.y:11195
 		{
 			sqlVAL.union.val = &tree.FuncExpr{Func: tree.WrapFunction("json_remove_path"), Exprs: tree.Exprs{sqlDollar[1].union.expr(), sqlDollar[3].union.expr()}}
 		}
 	case 1922:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11197
+//line sql-gen.y:11199
 		{
 			sqlVAL.union.val = &tree.FuncExpr{Func: tree.WrapFunction("inet_contained_by_or_equals"), Exprs: tree.Exprs{sqlDollar[1].union.expr(), sqlDollar[3].union.expr()}}
 		}
 	case 1923:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11201
+//line sql-gen.y:11203
 		{
 			sqlVAL.union.val = &tree.ComparisonExpr{Operator: tree.MakeComparisonOperator(tree.Overlaps), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1924:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11205
+//line sql-gen.y:11207
 		{
 			sqlVAL.union.val = &tree.FuncExpr{Func: tree.WrapFunction("inet_contains_or_equals"), Exprs: tree.Exprs{sqlDollar[1].union.expr(), sqlDollar[3].union.expr()}}
 		}
 	case 1925:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11209
+//line sql-gen.y:11211
 		{
 			sqlVAL.union.val = &tree.ComparisonExpr{Operator: tree.MakeComparisonOperator(tree.LE), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1926:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11213
+//line sql-gen.y:11215
 		{
 			sqlVAL.union.val = &tree.ComparisonExpr{Operator: tree.MakeComparisonOperator(tree.GE), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1927:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11217
+//line sql-gen.y:11219
 		{
 			sqlVAL.union.val = &tree.ComparisonExpr{Operator: tree.MakeComparisonOperator(tree.NE), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1928:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:11221
+//line sql-gen.y:11223
 		{
 			var retCode int
 			sqlVAL.union.val, retCode = processUnaryQualOp(sqllex, sqlDollar[1].union.op(), sqlDollar[2].union.expr())
@@ -33567,7 +33567,7 @@ sqldefault:
 		}
 	case 1929:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11229
+//line sql-gen.y:11231
 		{
 			{
 				var retCode int
@@ -33579,127 +33579,127 @@ sqldefault:
 		}
 	case 1930:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11239
+//line sql-gen.y:11241
 		{
 			sqlVAL.union.val = &tree.AndExpr{Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1931:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11243
+//line sql-gen.y:11245
 		{
 			sqlVAL.union.val = &tree.OrExpr{Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1932:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:11247
+//line sql-gen.y:11249
 		{
 			sqlVAL.union.val = &tree.NotExpr{Expr: sqlDollar[2].union.expr()}
 		}
 	case 1933:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:11251
+//line sql-gen.y:11253
 		{
 			sqlVAL.union.val = &tree.NotExpr{Expr: sqlDollar[2].union.expr()}
 		}
 	case 1934:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11255
+//line sql-gen.y:11257
 		{
 			sqlVAL.union.val = &tree.ComparisonExpr{Operator: tree.MakeComparisonOperator(tree.Like), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1935:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:11259
+//line sql-gen.y:11261
 		{
 			sqlVAL.union.val = &tree.FuncExpr{Func: tree.WrapFunction("like_escape"), Exprs: tree.Exprs{sqlDollar[1].union.expr(), sqlDollar[3].union.expr(), sqlDollar[5].union.expr()}}
 		}
 	case 1936:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:11263
+//line sql-gen.y:11265
 		{
 			sqlVAL.union.val = &tree.ComparisonExpr{Operator: tree.MakeComparisonOperator(tree.NotLike), Left: sqlDollar[1].union.expr(), Right: sqlDollar[4].union.expr()}
 		}
 	case 1937:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:11267
+//line sql-gen.y:11269
 		{
 			sqlVAL.union.val = &tree.FuncExpr{Func: tree.WrapFunction("not_like_escape"), Exprs: tree.Exprs{sqlDollar[1].union.expr(), sqlDollar[4].union.expr(), sqlDollar[6].union.expr()}}
 		}
 	case 1938:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11271
+//line sql-gen.y:11273
 		{
 			sqlVAL.union.val = &tree.ComparisonExpr{Operator: tree.MakeComparisonOperator(tree.ILike), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1939:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:11275
+//line sql-gen.y:11277
 		{
 			sqlVAL.union.val = &tree.FuncExpr{Func: tree.WrapFunction("ilike_escape"), Exprs: tree.Exprs{sqlDollar[1].union.expr(), sqlDollar[3].union.expr(), sqlDollar[5].union.expr()}}
 		}
 	case 1940:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:11279
+//line sql-gen.y:11281
 		{
 			sqlVAL.union.val = &tree.ComparisonExpr{Operator: tree.MakeComparisonOperator(tree.NotILike), Left: sqlDollar[1].union.expr(), Right: sqlDollar[4].union.expr()}
 		}
 	case 1941:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:11283
+//line sql-gen.y:11285
 		{
 			sqlVAL.union.val = &tree.FuncExpr{Func: tree.WrapFunction("not_ilike_escape"), Exprs: tree.Exprs{sqlDollar[1].union.expr(), sqlDollar[4].union.expr(), sqlDollar[6].union.expr()}}
 		}
 	case 1942:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:11287
+//line sql-gen.y:11289
 		{
 			sqlVAL.union.val = &tree.ComparisonExpr{Operator: tree.MakeComparisonOperator(tree.SimilarTo), Left: sqlDollar[1].union.expr(), Right: sqlDollar[4].union.expr()}
 		}
 	case 1943:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:11291
+//line sql-gen.y:11293
 		{
 			sqlVAL.union.val = &tree.FuncExpr{Func: tree.WrapFunction("similar_to_escape"), Exprs: tree.Exprs{sqlDollar[1].union.expr(), sqlDollar[4].union.expr(), sqlDollar[6].union.expr()}}
 		}
 	case 1944:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:11295
+//line sql-gen.y:11297
 		{
 			sqlVAL.union.val = &tree.ComparisonExpr{Operator: tree.MakeComparisonOperator(tree.NotSimilarTo), Left: sqlDollar[1].union.expr(), Right: sqlDollar[5].union.expr()}
 		}
 	case 1945:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql-gen.y:11299
+//line sql-gen.y:11301
 		{
 			sqlVAL.union.val = &tree.FuncExpr{Func: tree.WrapFunction("not_similar_to_escape"), Exprs: tree.Exprs{sqlDollar[1].union.expr(), sqlDollar[5].union.expr(), sqlDollar[7].union.expr()}}
 		}
 	case 1946:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11303
+//line sql-gen.y:11305
 		{
 			sqlVAL.union.val = &tree.ComparisonExpr{Operator: tree.MakeComparisonOperator(tree.RegMatch), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1947:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11307
+//line sql-gen.y:11309
 		{
 			sqlVAL.union.val = &tree.ComparisonExpr{Operator: tree.MakeComparisonOperator(tree.NotRegMatch), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1948:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11311
+//line sql-gen.y:11313
 		{
 			sqlVAL.union.val = &tree.ComparisonExpr{Operator: tree.MakeComparisonOperator(tree.RegIMatch), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1949:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11315
+//line sql-gen.y:11317
 		{
 			sqlVAL.union.val = &tree.ComparisonExpr{Operator: tree.MakeComparisonOperator(tree.NotRegIMatch), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1950:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11319
+//line sql-gen.y:11321
 		{
 			sqlVAL.union.val = &tree.ComparisonExpr{
 				Operator: tree.MakeComparisonOperator(tree.EQ),
@@ -33709,7 +33709,7 @@ sqldefault:
 		}
 	case 1951:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:11327
+//line sql-gen.y:11329
 		{
 			sqlVAL.union.val = &tree.ComparisonExpr{
 				Operator: tree.MakeComparisonOperator(tree.NE),
@@ -33719,133 +33719,133 @@ sqldefault:
 		}
 	case 1952:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11335
+//line sql-gen.y:11337
 		{
 			sqlVAL.union.val = &tree.IsNullExpr{Expr: sqlDollar[1].union.expr()}
 		}
 	case 1953:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:11339
+//line sql-gen.y:11341
 		{
 			sqlVAL.union.val = &tree.IsNullExpr{Expr: sqlDollar[1].union.expr()}
 		}
 	case 1954:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:11343
+//line sql-gen.y:11345
 		{
 			sqlVAL.union.val = &tree.IsNotNullExpr{Expr: sqlDollar[1].union.expr()}
 		}
 	case 1955:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:11347
+//line sql-gen.y:11349
 		{
 			sqlVAL.union.val = &tree.IsNotNullExpr{Expr: sqlDollar[1].union.expr()}
 		}
 	case 1956:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11350
+//line sql-gen.y:11352
 		{
 			return unimplemented(sqllex, "overlaps")
 		}
 	case 1957:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11352
+//line sql-gen.y:11354
 		{
 			sqlVAL.union.val = &tree.ComparisonExpr{Operator: tree.MakeComparisonOperator(tree.IsNotDistinctFrom), Left: sqlDollar[1].union.expr(), Right: tree.MakeDBool(true)}
 		}
 	case 1958:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:11356
+//line sql-gen.y:11358
 		{
 			sqlVAL.union.val = &tree.ComparisonExpr{Operator: tree.MakeComparisonOperator(tree.IsDistinctFrom), Left: sqlDollar[1].union.expr(), Right: tree.MakeDBool(true)}
 		}
 	case 1959:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11360
+//line sql-gen.y:11362
 		{
 			sqlVAL.union.val = &tree.ComparisonExpr{Operator: tree.MakeComparisonOperator(tree.IsNotDistinctFrom), Left: sqlDollar[1].union.expr(), Right: tree.MakeDBool(false)}
 		}
 	case 1960:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:11364
+//line sql-gen.y:11366
 		{
 			sqlVAL.union.val = &tree.ComparisonExpr{Operator: tree.MakeComparisonOperator(tree.IsDistinctFrom), Left: sqlDollar[1].union.expr(), Right: tree.MakeDBool(false)}
 		}
 	case 1961:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11368
+//line sql-gen.y:11370
 		{
 			sqlVAL.union.val = &tree.ComparisonExpr{Operator: tree.MakeComparisonOperator(tree.IsNotDistinctFrom), Left: sqlDollar[1].union.expr(), Right: tree.DNull}
 		}
 	case 1962:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:11372
+//line sql-gen.y:11374
 		{
 			sqlVAL.union.val = &tree.ComparisonExpr{Operator: tree.MakeComparisonOperator(tree.IsDistinctFrom), Left: sqlDollar[1].union.expr(), Right: tree.DNull}
 		}
 	case 1963:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:11376
+//line sql-gen.y:11378
 		{
 			sqlVAL.union.val = &tree.ComparisonExpr{Operator: tree.MakeComparisonOperator(tree.IsDistinctFrom), Left: sqlDollar[1].union.expr(), Right: sqlDollar[5].union.expr()}
 		}
 	case 1964:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:11380
+//line sql-gen.y:11382
 		{
 			sqlVAL.union.val = &tree.ComparisonExpr{Operator: tree.MakeComparisonOperator(tree.IsNotDistinctFrom), Left: sqlDollar[1].union.expr(), Right: sqlDollar[6].union.expr()}
 		}
 	case 1965:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:11384
+//line sql-gen.y:11386
 		{
 			sqlVAL.union.val = &tree.IsOfTypeExpr{Expr: sqlDollar[1].union.expr(), Types: sqlDollar[5].union.typeReferences()}
 		}
 	case 1966:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql-gen.y:11388
+//line sql-gen.y:11390
 		{
 			sqlVAL.union.val = &tree.IsOfTypeExpr{Not: true, Expr: sqlDollar[1].union.expr(), Types: sqlDollar[6].union.typeReferences()}
 		}
 	case 1967:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:11392
+//line sql-gen.y:11394
 		{
 			sqlVAL.union.val = &tree.RangeCond{Left: sqlDollar[1].union.expr(), From: sqlDollar[4].union.expr(), To: sqlDollar[6].union.expr()}
 		}
 	case 1968:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql-gen.y:11396
+//line sql-gen.y:11398
 		{
 			sqlVAL.union.val = &tree.RangeCond{Not: true, Left: sqlDollar[1].union.expr(), From: sqlDollar[5].union.expr(), To: sqlDollar[7].union.expr()}
 		}
 	case 1969:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:11400
+//line sql-gen.y:11402
 		{
 			sqlVAL.union.val = &tree.RangeCond{Symmetric: true, Left: sqlDollar[1].union.expr(), From: sqlDollar[4].union.expr(), To: sqlDollar[6].union.expr()}
 		}
 	case 1970:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql-gen.y:11404
+//line sql-gen.y:11406
 		{
 			sqlVAL.union.val = &tree.RangeCond{Not: true, Symmetric: true, Left: sqlDollar[1].union.expr(), From: sqlDollar[5].union.expr(), To: sqlDollar[7].union.expr()}
 		}
 	case 1971:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11408
+//line sql-gen.y:11410
 		{
 			sqlVAL.union.val = &tree.ComparisonExpr{Operator: tree.MakeComparisonOperator(tree.In), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1972:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:11412
+//line sql-gen.y:11414
 		{
 			sqlVAL.union.val = &tree.ComparisonExpr{Operator: tree.MakeComparisonOperator(tree.NotIn), Left: sqlDollar[1].union.expr(), Right: sqlDollar[4].union.expr()}
 		}
 	case 1973:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:11416
+//line sql-gen.y:11418
 		{
 			op := sqlDollar[3].union.cmpOp()
 			subOp := sqlDollar[2].union.op()
@@ -33864,163 +33864,163 @@ sqldefault:
 		}
 	case 1974:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:11433
+//line sql-gen.y:11435
 		{
 			sqlVAL.union.val = tree.DefaultVal{}
 		}
 	case 1975:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11438
+//line sql-gen.y:11440
 		{
 			return unimplemented(sqllex, "UNIQUE predicate")
 		}
 	case 1977:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11450
+//line sql-gen.y:11452
 		{
 			sqlVAL.union.val = &tree.CastExpr{Expr: sqlDollar[1].union.expr(), Type: sqlDollar[3].union.typeReference(), SyntaxMode: tree.CastShort}
 		}
 	case 1978:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11454
+//line sql-gen.y:11456
 		{
 			sqlVAL.union.val = &tree.AnnotateTypeExpr{Expr: sqlDollar[1].union.expr(), Type: sqlDollar[3].union.typeReference(), SyntaxMode: tree.AnnotateShort}
 		}
 	case 1979:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:11458
+//line sql-gen.y:11460
 		{
 			sqlVAL.union.val = sqlDollar[2].union.expr()
 		}
 	case 1980:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:11462
+//line sql-gen.y:11464
 		{
 			sqlVAL.union.val = unaryNegation(sqlDollar[2].union.expr())
 		}
 	case 1981:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:11466
+//line sql-gen.y:11468
 		{
 			sqlVAL.union.val = &tree.UnaryExpr{Operator: tree.MakeUnaryOperator(tree.UnaryComplement), Expr: sqlDollar[2].union.expr()}
 		}
 	case 1982:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11470
+//line sql-gen.y:11472
 		{
 			sqlVAL.union.val = &tree.BinaryExpr{Operator: tree.MakeBinaryOperator(tree.Plus), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1983:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11474
+//line sql-gen.y:11476
 		{
 			sqlVAL.union.val = &tree.BinaryExpr{Operator: tree.MakeBinaryOperator(tree.Minus), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1984:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11478
+//line sql-gen.y:11480
 		{
 			sqlVAL.union.val = &tree.BinaryExpr{Operator: tree.MakeBinaryOperator(tree.Mult), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1985:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11482
+//line sql-gen.y:11484
 		{
 			sqlVAL.union.val = &tree.BinaryExpr{Operator: tree.MakeBinaryOperator(tree.Div), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1986:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11486
+//line sql-gen.y:11488
 		{
 			sqlVAL.union.val = &tree.BinaryExpr{Operator: tree.MakeBinaryOperator(tree.FloorDiv), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1987:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11490
+//line sql-gen.y:11492
 		{
 			sqlVAL.union.val = &tree.BinaryExpr{Operator: tree.MakeBinaryOperator(tree.Mod), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1988:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11494
+//line sql-gen.y:11496
 		{
 			sqlVAL.union.val = &tree.BinaryExpr{Operator: tree.MakeBinaryOperator(tree.Pow), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1989:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11498
+//line sql-gen.y:11500
 		{
 			sqlVAL.union.val = &tree.BinaryExpr{Operator: tree.MakeBinaryOperator(tree.Bitxor), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1990:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11502
+//line sql-gen.y:11504
 		{
 			sqlVAL.union.val = &tree.BinaryExpr{Operator: tree.MakeBinaryOperator(tree.Bitand), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1991:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11506
+//line sql-gen.y:11508
 		{
 			sqlVAL.union.val = &tree.BinaryExpr{Operator: tree.MakeBinaryOperator(tree.Bitor), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1992:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11510
+//line sql-gen.y:11512
 		{
 			sqlVAL.union.val = &tree.ComparisonExpr{Operator: tree.MakeComparisonOperator(tree.LT), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1993:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11514
+//line sql-gen.y:11516
 		{
 			sqlVAL.union.val = &tree.ComparisonExpr{Operator: tree.MakeComparisonOperator(tree.GT), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1994:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11518
+//line sql-gen.y:11520
 		{
 			sqlVAL.union.val = &tree.ComparisonExpr{Operator: tree.MakeComparisonOperator(tree.EQ), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1995:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11522
+//line sql-gen.y:11524
 		{
 			sqlVAL.union.val = &tree.BinaryExpr{Operator: tree.MakeBinaryOperator(tree.Concat), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1996:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11526
+//line sql-gen.y:11528
 		{
 			sqlVAL.union.val = &tree.BinaryExpr{Operator: tree.MakeBinaryOperator(tree.LShift), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1997:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11530
+//line sql-gen.y:11532
 		{
 			sqlVAL.union.val = &tree.BinaryExpr{Operator: tree.MakeBinaryOperator(tree.RShift), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1998:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11534
+//line sql-gen.y:11536
 		{
 			sqlVAL.union.val = &tree.ComparisonExpr{Operator: tree.MakeComparisonOperator(tree.LE), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 1999:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11538
+//line sql-gen.y:11540
 		{
 			sqlVAL.union.val = &tree.ComparisonExpr{Operator: tree.MakeComparisonOperator(tree.GE), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 2000:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11542
+//line sql-gen.y:11544
 		{
 			sqlVAL.union.val = &tree.ComparisonExpr{Operator: tree.MakeComparisonOperator(tree.NE), Left: sqlDollar[1].union.expr(), Right: sqlDollar[3].union.expr()}
 		}
 	case 2001:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:11546
+//line sql-gen.y:11548
 		{
 			var retCode int
 			sqlVAL.union.val, retCode = processUnaryQualOp(sqllex, sqlDollar[1].union.op(), sqlDollar[2].union.expr())
@@ -34030,7 +34030,7 @@ sqldefault:
 		}
 	case 2002:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11554
+//line sql-gen.y:11556
 		{
 			{
 				var retCode int
@@ -34042,31 +34042,31 @@ sqldefault:
 		}
 	case 2003:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:11564
+//line sql-gen.y:11566
 		{
 			sqlVAL.union.val = &tree.ComparisonExpr{Operator: tree.MakeComparisonOperator(tree.IsDistinctFrom), Left: sqlDollar[1].union.expr(), Right: sqlDollar[5].union.expr()}
 		}
 	case 2004:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:11568
+//line sql-gen.y:11570
 		{
 			sqlVAL.union.val = &tree.ComparisonExpr{Operator: tree.MakeComparisonOperator(tree.IsNotDistinctFrom), Left: sqlDollar[1].union.expr(), Right: sqlDollar[6].union.expr()}
 		}
 	case 2005:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:11572
+//line sql-gen.y:11574
 		{
 			sqlVAL.union.val = &tree.IsOfTypeExpr{Expr: sqlDollar[1].union.expr(), Types: sqlDollar[5].union.typeReferences()}
 		}
 	case 2006:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql-gen.y:11576
+//line sql-gen.y:11578
 		{
 			sqlVAL.union.val = &tree.IsOfTypeExpr{Not: true, Expr: sqlDollar[1].union.expr(), Types: sqlDollar[6].union.typeReferences()}
 		}
 	case 2008:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:11590
+//line sql-gen.y:11592
 		{
 			sqlVAL.union.val = &tree.IndirectionExpr{
 				Expr:        sqlDollar[1].union.expr(),
@@ -34075,37 +34075,37 @@ sqldefault:
 		}
 	case 2010:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:11598
+//line sql-gen.y:11600
 		{
 			sqlVAL.union.val = &tree.Subquery{Select: sqlDollar[2].union.selectStmt(), Exists: true}
 		}
 	case 2011:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:11634
+//line sql-gen.y:11636
 		{
 			sqlVAL.union.val = sqlDollar[1].union.numVal()
 		}
 	case 2012:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:11638
+//line sql-gen.y:11640
 		{
 			sqlVAL.union.val = sqlDollar[1].union.numVal()
 		}
 	case 2013:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:11642
+//line sql-gen.y:11644
 		{
 			sqlVAL.union.val = tree.NewStrVal(sqlDollar[1].str)
 		}
 	case 2014:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:11646
+//line sql-gen.y:11648
 		{
 			sqlVAL.union.val = tree.NewBytesStrVal(sqlDollar[1].str)
 		}
 	case 2015:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:11650
+//line sql-gen.y:11652
 		{
 			d, err := tree.ParseDBitArray(sqlDollar[1].str)
 			if err != nil {
@@ -34115,49 +34115,49 @@ sqldefault:
 		}
 	case 2016:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:11655
+//line sql-gen.y:11657
 		{
 			return unimplemented(sqllex, sqlDollar[1].union.unresolvedName().String()+"(...) SCONST")
 		}
 	case 2017:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:11657
+//line sql-gen.y:11659
 		{
 			sqlVAL.union.val = sqlDollar[1].union.expr()
 		}
 	case 2018:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:11661
+//line sql-gen.y:11663
 		{
 			sqlVAL.union.val = sqlDollar[1].union.expr()
 		}
 	case 2019:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:11665
+//line sql-gen.y:11667
 		{
 			sqlVAL.union.val = tree.MakeDBool(true)
 		}
 	case 2020:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:11669
+//line sql-gen.y:11671
 		{
 			sqlVAL.union.val = tree.MakeDBool(false)
 		}
 	case 2021:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:11673
+//line sql-gen.y:11675
 		{
 			sqlVAL.union.val = tree.DNull
 		}
 	case 2022:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:11677
+//line sql-gen.y:11679
 		{
 			sqlVAL.union.val = tree.Expr(sqlDollar[1].union.unresolvedName())
 		}
 	case 2023:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:11681
+//line sql-gen.y:11683
 		{
 			colNum := sqlDollar[2].union.int64()
 			if colNum < 1 || colNum > int64(MaxInt) {
@@ -34168,7 +34168,7 @@ sqldefault:
 		}
 	case 2024:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:11690
+//line sql-gen.y:11692
 		{
 			p := sqlDollar[1].union.placeholder()
 			sqllex.(*lexer).UpdateNumPlaceholders(p)
@@ -34176,19 +34176,19 @@ sqldefault:
 		}
 	case 2025:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:11697
+//line sql-gen.y:11699
 		{
 			sqlVAL.union.val = &tree.TupleStar{Expr: sqlDollar[2].union.expr()}
 		}
 	case 2026:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:11701
+//line sql-gen.y:11703
 		{
 			sqlVAL.union.val = &tree.ColumnAccessExpr{Expr: sqlDollar[2].union.expr(), ColName: tree.Name(sqlDollar[5].str)}
 		}
 	case 2027:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:11705
+//line sql-gen.y:11707
 		{
 			idx, err := sqlDollar[6].union.numVal().AsInt32()
 			if err != nil {
@@ -34202,97 +34202,97 @@ sqldefault:
 		}
 	case 2028:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11715
+//line sql-gen.y:11717
 		{
 			sqlVAL.union.val = &tree.ParenExpr{Expr: sqlDollar[2].union.expr()}
 		}
 	case 2030:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:11720
+//line sql-gen.y:11722
 		{
 			sqlVAL.union.val = &tree.Subquery{Select: sqlDollar[1].union.selectStmt()}
 		}
 	case 2031:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:11724
+//line sql-gen.y:11726
 		{
 			sqlVAL.union.val = sqlDollar[1].union.tuple()
 		}
 	case 2032:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:11728
+//line sql-gen.y:11730
 		{
 			sqlVAL.union.val = &tree.ArrayFlatten{Subquery: &tree.Subquery{Select: sqlDollar[2].union.selectStmt()}}
 		}
 	case 2033:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:11732
+//line sql-gen.y:11734
 		{
 			sqlVAL.union.val = &tree.Array{Exprs: sqlDollar[2].union.tuple().Exprs}
 		}
 	case 2034:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:11736
+//line sql-gen.y:11738
 		{
 			sqlVAL.union.val = sqlDollar[2].union.expr()
 		}
 	case 2035:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:11739
+//line sql-gen.y:11741
 		{
 			return unimplemented(sqllex, "d_expr grouping")
 		}
 	case 2036:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11743
+//line sql-gen.y:11745
 		{
 			sqlVAL.union.val = &tree.FuncExpr{Func: sqlDollar[1].union.resolvableFuncRefFromName()}
 		}
 	case 2037:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:11747
+//line sql-gen.y:11749
 		{
 			sqlVAL.union.val = &tree.FuncExpr{Func: sqlDollar[1].union.resolvableFuncRefFromName(), Exprs: sqlDollar[3].union.exprs(), OrderBy: sqlDollar[4].union.orderBy(), AggType: tree.GeneralAgg}
 		}
 	case 2038:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:11750
+//line sql-gen.y:11752
 		{
 			return unimplemented(sqllex, "variadic")
 		}
 	case 2039:
 		sqlDollar = sqlS[sqlpt-8 : sqlpt+1]
-//line sql-gen.y:11751
+//line sql-gen.y:11753
 		{
 			return unimplemented(sqllex, "variadic")
 		}
 	case 2040:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:11753
+//line sql-gen.y:11755
 		{
 			sqlVAL.union.val = &tree.FuncExpr{Func: sqlDollar[1].union.resolvableFuncRefFromName(), Type: tree.AllFuncType, Exprs: sqlDollar[4].union.exprs(), OrderBy: sqlDollar[5].union.orderBy(), AggType: tree.GeneralAgg}
 		}
 	case 2041:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:11759
+//line sql-gen.y:11761
 		{
 			sqlVAL.union.val = &tree.FuncExpr{Func: sqlDollar[1].union.resolvableFuncRefFromName(), Type: tree.DistinctFuncType, Exprs: sqlDollar[4].union.exprs()}
 		}
 	case 2042:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:11763
+//line sql-gen.y:11765
 		{
 			sqlVAL.union.val = &tree.FuncExpr{Func: sqlDollar[1].union.resolvableFuncRefFromName(), Exprs: tree.Exprs{tree.StarExpr()}}
 		}
 	case 2043:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11766
+//line sql-gen.y:11768
 		{
 			return helpWithFunction(sqllex, sqlDollar[1].union.resolvableFuncRefFromName())
 		}
 	case 2044:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:11775
+//line sql-gen.y:11777
 		{
 			name := sqlDollar[1].union.unresolvedName()
 			if name.NumParts == 1 {
@@ -34342,13 +34342,13 @@ sqldefault:
 		}
 	case 2045:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:11828
+//line sql-gen.y:11830
 		{
 			sqlVAL.union.val = &tree.CastExpr{Expr: tree.NewStrVal(sqlDollar[2].str), Type: sqlDollar[1].union.colType(), SyntaxMode: tree.CastPrepend}
 		}
 	case 2046:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:11841
+//line sql-gen.y:11843
 		{
 			f := sqlDollar[1].union.expr().(*tree.FuncExpr)
 			w := sqlDollar[2].union.expr().(*tree.FuncExpr)
@@ -34362,433 +34362,433 @@ sqldefault:
 		}
 	case 2047:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:11853
+//line sql-gen.y:11855
 		{
 			sqlVAL.union.val = sqlDollar[1].union.expr()
 		}
 	case 2048:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:11862
+//line sql-gen.y:11864
 		{
 			sqlVAL.union.val = sqlDollar[1].union.expr()
 		}
 	case 2049:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:11863
+//line sql-gen.y:11865
 		{
 			sqlVAL.union.val = sqlDollar[1].union.expr()
 		}
 	case 2050:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:11868
+//line sql-gen.y:11870
 		{
 			sqlVAL.union.val = &tree.FuncExpr{Func: tree.WrapFunction("pg_collation_for"), Exprs: tree.Exprs{sqlDollar[4].union.expr()}}
 		}
 	case 2051:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:11872
+//line sql-gen.y:11874
 		{
 			sqlVAL.union.val = &tree.FuncExpr{Func: tree.WrapFunction(sqlDollar[1].str)}
 		}
 	case 2052:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:11876
+//line sql-gen.y:11878
 		{
 			sqlVAL.union.val = &tree.FuncExpr{Func: tree.WrapFunction(sqlDollar[1].str)}
 		}
 	case 2053:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:11882
+//line sql-gen.y:11884
 		{
 			sqlVAL.union.val = &tree.FuncExpr{Func: tree.WrapFunction("current_database")}
 		}
 	case 2054:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:11886
+//line sql-gen.y:11888
 		{
 			sqlVAL.union.val = &tree.FuncExpr{Func: tree.WrapFunction(sqlDollar[1].str)}
 		}
 	case 2055:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:11890
+//line sql-gen.y:11892
 		{
 			sqlVAL.union.val = &tree.FuncExpr{Func: tree.WrapFunction(sqlDollar[1].str)}
 		}
 	case 2056:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:11894
+//line sql-gen.y:11896
 		{
 			sqlVAL.union.val = &tree.FuncExpr{Func: tree.WrapFunction(sqlDollar[1].str)}
 		}
 	case 2057:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:11898
+//line sql-gen.y:11900
 		{
 			sqlVAL.union.val = &tree.FuncExpr{Func: tree.WrapFunction(sqlDollar[1].str)}
 		}
 	case 2058:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:11902
+//line sql-gen.y:11904
 		{
 			sqlVAL.union.val = &tree.FuncExpr{Func: tree.WrapFunction(sqlDollar[1].str)}
 		}
 	case 2059:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:11908
+//line sql-gen.y:11910
 		{
 			sqlVAL.union.val = &tree.FuncExpr{Func: tree.WrapFunction("current_user")}
 		}
 	case 2060:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:11912
+//line sql-gen.y:11914
 		{
 			sqlVAL.union.val = &tree.FuncExpr{Func: tree.WrapFunction("session_user")}
 		}
 	case 2061:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:11916
+//line sql-gen.y:11918
 		{
 			sqlVAL.union.val = &tree.FuncExpr{Func: tree.WrapFunction("current_user")}
 		}
 	case 2062:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:11920
+//line sql-gen.y:11922
 		{
 			sqlVAL.union.val = &tree.CastExpr{Expr: sqlDollar[3].union.expr(), Type: sqlDollar[5].union.typeReference(), SyntaxMode: tree.CastExplicit}
 		}
 	case 2063:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:11924
+//line sql-gen.y:11926
 		{
 			sqlVAL.union.val = &tree.AnnotateTypeExpr{Expr: sqlDollar[3].union.expr(), Type: sqlDollar[5].union.typeReference(), SyntaxMode: tree.AnnotateExplicit}
 		}
 	case 2064:
 		sqlDollar = sqlS[sqlpt-8 : sqlpt+1]
-//line sql-gen.y:11928
+//line sql-gen.y:11930
 		{
 			sqlVAL.union.val = &tree.IfExpr{Cond: sqlDollar[3].union.expr(), True: sqlDollar[5].union.expr(), Else: sqlDollar[7].union.expr()}
 		}
 	case 2065:
 		sqlDollar = sqlS[sqlpt-8 : sqlpt+1]
-//line sql-gen.y:11932
+//line sql-gen.y:11934
 		{
 			sqlVAL.union.val = &tree.IfErrExpr{Cond: sqlDollar[3].union.expr(), Else: sqlDollar[5].union.expr(), ErrCode: sqlDollar[7].union.expr()}
 		}
 	case 2066:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:11936
+//line sql-gen.y:11938
 		{
 			sqlVAL.union.val = &tree.IfErrExpr{Cond: sqlDollar[3].union.expr(), Else: sqlDollar[5].union.expr()}
 		}
 	case 2067:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:11940
+//line sql-gen.y:11942
 		{
 			sqlVAL.union.val = &tree.IfErrExpr{Cond: sqlDollar[3].union.expr()}
 		}
 	case 2068:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:11944
+//line sql-gen.y:11946
 		{
 			sqlVAL.union.val = &tree.IfErrExpr{Cond: sqlDollar[3].union.expr(), ErrCode: sqlDollar[5].union.expr()}
 		}
 	case 2069:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:11948
+//line sql-gen.y:11950
 		{
 			sqlVAL.union.val = &tree.NullIfExpr{Expr1: sqlDollar[3].union.expr(), Expr2: sqlDollar[5].union.expr()}
 		}
 	case 2070:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:11952
+//line sql-gen.y:11954
 		{
 			sqlVAL.union.val = &tree.CoalesceExpr{Name: "IFNULL", Exprs: tree.Exprs{sqlDollar[3].union.expr(), sqlDollar[5].union.expr()}}
 		}
 	case 2071:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:11956
+//line sql-gen.y:11958
 		{
 			sqlVAL.union.val = &tree.CoalesceExpr{Name: "COALESCE", Exprs: sqlDollar[3].union.exprs()}
 		}
 	case 2073:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11963
+//line sql-gen.y:11965
 		{
 			sqlVAL.union.val = &tree.FuncExpr{Func: tree.WrapFunction(sqlDollar[1].str)}
 		}
 	case 2074:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11966
+//line sql-gen.y:11968
 		{
 			return helpWithFunctionByName(sqllex, sqlDollar[1].str)
 		}
 	case 2075:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11968
+//line sql-gen.y:11970
 		{
 			sqlVAL.union.val = &tree.FuncExpr{Func: tree.WrapFunction(sqlDollar[1].str)}
 		}
 	case 2076:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11971
+//line sql-gen.y:11973
 		{
 			return helpWithFunctionByName(sqllex, sqlDollar[1].str)
 		}
 	case 2077:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11973
+//line sql-gen.y:11975
 		{
 			sqlVAL.union.val = &tree.FuncExpr{Func: tree.WrapFunction(sqlDollar[1].str)}
 		}
 	case 2078:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:11977
+//line sql-gen.y:11979
 		{
 			sqlVAL.union.val = &tree.FuncExpr{Func: tree.WrapFunction(sqlDollar[1].str), Exprs: tree.Exprs{sqlDollar[3].union.expr()}}
 		}
 	case 2079:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11980
+//line sql-gen.y:11982
 		{
 			return helpWithFunctionByName(sqllex, sqlDollar[1].str)
 		}
 	case 2080:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11982
+//line sql-gen.y:11984
 		{
 			sqlVAL.union.val = &tree.FuncExpr{Func: tree.WrapFunction(sqlDollar[1].str)}
 		}
 	case 2081:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:11986
+//line sql-gen.y:11988
 		{
 			sqlVAL.union.val = &tree.FuncExpr{Func: tree.WrapFunction(sqlDollar[1].str), Exprs: tree.Exprs{sqlDollar[3].union.expr()}}
 		}
 	case 2082:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11989
+//line sql-gen.y:11991
 		{
 			return helpWithFunctionByName(sqllex, sqlDollar[1].str)
 		}
 	case 2083:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11991
+//line sql-gen.y:11993
 		{
 			sqlVAL.union.val = &tree.FuncExpr{Func: tree.WrapFunction(sqlDollar[1].str)}
 		}
 	case 2084:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:11995
+//line sql-gen.y:11997
 		{
 			sqlVAL.union.val = &tree.FuncExpr{Func: tree.WrapFunction(sqlDollar[1].str), Exprs: tree.Exprs{sqlDollar[3].union.expr()}}
 		}
 	case 2085:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:11998
+//line sql-gen.y:12000
 		{
 			return helpWithFunctionByName(sqllex, sqlDollar[1].str)
 		}
 	case 2086:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:12000
+//line sql-gen.y:12002
 		{
 			sqlVAL.union.val = &tree.FuncExpr{Func: tree.WrapFunction(sqlDollar[1].str)}
 		}
 	case 2087:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:12004
+//line sql-gen.y:12006
 		{
 			sqlVAL.union.val = &tree.FuncExpr{Func: tree.WrapFunction(sqlDollar[1].str), Exprs: tree.Exprs{sqlDollar[3].union.expr()}}
 		}
 	case 2088:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:12007
+//line sql-gen.y:12009
 		{
 			return helpWithFunctionByName(sqllex, sqlDollar[1].str)
 		}
 	case 2089:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:12009
+//line sql-gen.y:12011
 		{
 			sqlVAL.union.val = &tree.FuncExpr{Func: tree.WrapFunction(sqlDollar[1].str)}
 		}
 	case 2090:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:12012
+//line sql-gen.y:12014
 		{
 			return helpWithFunctionByName(sqllex, sqlDollar[1].str)
 		}
 	case 2091:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:12014
+//line sql-gen.y:12016
 		{
 			sqlVAL.union.val = &tree.FuncExpr{Func: tree.WrapFunction(sqlDollar[1].str)}
 		}
 	case 2092:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:12017
+//line sql-gen.y:12019
 		{
 			return helpWithFunctionByName(sqllex, sqlDollar[1].str)
 		}
 	case 2093:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:12019
+//line sql-gen.y:12021
 		{
 			sqlVAL.union.val = &tree.FuncExpr{Func: tree.WrapFunction(sqlDollar[1].str), Exprs: sqlDollar[3].union.exprs()}
 		}
 	case 2094:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:12022
+//line sql-gen.y:12024
 		{
 			return helpWithFunctionByName(sqllex, sqlDollar[1].str)
 		}
 	case 2095:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:12024
+//line sql-gen.y:12026
 		{
 			sqlVAL.union.val = &tree.FuncExpr{Func: tree.WrapFunction(sqlDollar[1].str), Exprs: sqlDollar[3].union.exprs()}
 		}
 	case 2096:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:12027
+//line sql-gen.y:12029
 		{
 			return helpWithFunctionByName(sqllex, sqlDollar[1].str)
 		}
 	case 2097:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:12029
+//line sql-gen.y:12031
 		{
 			sqlVAL.union.val = &tree.FuncExpr{Func: tree.WrapFunction(sqlDollar[1].str), Exprs: sqlDollar[3].union.exprs()}
 		}
 	case 2098:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:12032
+//line sql-gen.y:12034
 		{
 			return helpWithFunctionByName(sqllex, sqlDollar[1].str)
 		}
 	case 2099:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:12034
+//line sql-gen.y:12036
 		{
 			sqlVAL.union.val = &tree.FuncExpr{Func: tree.WrapFunction("strpos"), Exprs: sqlDollar[3].union.exprs()}
 		}
 	case 2100:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:12038
+//line sql-gen.y:12040
 		{
 			sqlVAL.union.val = &tree.FuncExpr{Func: tree.WrapFunction(sqlDollar[1].str), Exprs: sqlDollar[3].union.exprs()}
 		}
 	case 2101:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:12041
+//line sql-gen.y:12043
 		{
 			return helpWithFunctionByName(sqllex, sqlDollar[1].str)
 		}
 	case 2102:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:12042
+//line sql-gen.y:12044
 		{
 			return unimplemented(sqllex, "treat")
 		}
 	case 2103:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:12044
+//line sql-gen.y:12046
 		{
 			sqlVAL.union.val = &tree.FuncExpr{Func: tree.WrapFunction("btrim"), Exprs: sqlDollar[4].union.exprs()}
 		}
 	case 2104:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:12048
+//line sql-gen.y:12050
 		{
 			sqlVAL.union.val = &tree.FuncExpr{Func: tree.WrapFunction("ltrim"), Exprs: sqlDollar[4].union.exprs()}
 		}
 	case 2105:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:12052
+//line sql-gen.y:12054
 		{
 			sqlVAL.union.val = &tree.FuncExpr{Func: tree.WrapFunction("rtrim"), Exprs: sqlDollar[4].union.exprs()}
 		}
 	case 2106:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:12056
+//line sql-gen.y:12058
 		{
 			sqlVAL.union.val = &tree.FuncExpr{Func: tree.WrapFunction("btrim"), Exprs: sqlDollar[3].union.exprs()}
 		}
 	case 2107:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:12060
+//line sql-gen.y:12062
 		{
 			sqlVAL.union.val = &tree.FuncExpr{Func: tree.WrapFunction(sqlDollar[1].str), Exprs: sqlDollar[3].union.exprs()}
 		}
 	case 2108:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:12063
+//line sql-gen.y:12065
 		{
 			return helpWithFunctionByName(sqllex, sqlDollar[1].str)
 		}
 	case 2109:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:12065
+//line sql-gen.y:12067
 		{
 			sqlVAL.union.val = &tree.FuncExpr{Func: tree.WrapFunction(sqlDollar[1].str), Exprs: sqlDollar[3].union.exprs()}
 		}
 	case 2110:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:12068
+//line sql-gen.y:12070
 		{
 			return helpWithFunctionByName(sqllex, sqlDollar[1].str)
 		}
 	case 2111:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:12074
+//line sql-gen.y:12076
 		{
 			sqlVAL.union.val = &tree.FuncExpr{OrderBy: sqlDollar[4].union.orderBy(), AggType: tree.OrderedSetAgg}
 		}
 	case 2112:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:12078
+//line sql-gen.y:12080
 		{
 			sqlVAL.union.val = &tree.FuncExpr{}
 		}
 	case 2113:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:12084
+//line sql-gen.y:12086
 		{
 			sqlVAL.union.val = sqlDollar[4].union.expr()
 		}
 	case 2114:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:12088
+//line sql-gen.y:12090
 		{
 			sqlVAL.union.val = tree.Expr(nil)
 		}
 	case 2115:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:12095
+//line sql-gen.y:12097
 		{
 			sqlVAL.union.val = sqlDollar[2].union.window()
 		}
 	case 2116:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:12099
+//line sql-gen.y:12101
 		{
 			sqlVAL.union.val = tree.Window(nil)
 		}
 	case 2117:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12105
+//line sql-gen.y:12107
 		{
 			sqlVAL.union.val = tree.Window{sqlDollar[1].union.windowDef()}
 		}
 	case 2118:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:12109
+//line sql-gen.y:12111
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.window(), sqlDollar[3].union.windowDef())
 		}
 	case 2119:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:12115
+//line sql-gen.y:12117
 		{
 			n := sqlDollar[3].union.windowDef()
 			n.Name = tree.Name(sqlDollar[1].str)
@@ -34796,25 +34796,25 @@ sqldefault:
 		}
 	case 2120:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:12123
+//line sql-gen.y:12125
 		{
 			sqlVAL.union.val = sqlDollar[2].union.windowDef()
 		}
 	case 2121:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:12127
+//line sql-gen.y:12129
 		{
 			sqlVAL.union.val = &tree.WindowDef{Name: tree.Name(sqlDollar[2].str)}
 		}
 	case 2122:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:12131
+//line sql-gen.y:12133
 		{
 			sqlVAL.union.val = (*tree.WindowDef)(nil)
 		}
 	case 2123:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql-gen.y:12138
+//line sql-gen.y:12140
 		{
 			sqlVAL.union.val = &tree.WindowDef{
 				RefName:    tree.Name(sqlDollar[2].str),
@@ -34825,25 +34825,25 @@ sqldefault:
 		}
 	case 2125:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:12158
+//line sql-gen.y:12160
 		{
 			sqlVAL.str = ""
 		}
 	case 2126:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:12164
+//line sql-gen.y:12166
 		{
 			sqlVAL.union.val = sqlDollar[3].union.exprs()
 		}
 	case 2127:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:12168
+//line sql-gen.y:12170
 		{
 			sqlVAL.union.val = tree.Exprs(nil)
 		}
 	case 2128:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:12174
+//line sql-gen.y:12176
 		{
 			sqlVAL.union.val = &tree.WindowFrame{
 				Mode:      tree.RANGE,
@@ -34853,7 +34853,7 @@ sqldefault:
 		}
 	case 2129:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:12182
+//line sql-gen.y:12184
 		{
 			sqlVAL.union.val = &tree.WindowFrame{
 				Mode:      tree.ROWS,
@@ -34863,7 +34863,7 @@ sqldefault:
 		}
 	case 2130:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:12190
+//line sql-gen.y:12192
 		{
 			sqlVAL.union.val = &tree.WindowFrame{
 				Mode:      tree.GROUPS,
@@ -34873,13 +34873,13 @@ sqldefault:
 		}
 	case 2131:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:12198
+//line sql-gen.y:12200
 		{
 			sqlVAL.union.val = (*tree.WindowFrame)(nil)
 		}
 	case 2132:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12204
+//line sql-gen.y:12206
 		{
 			startBound := sqlDollar[1].union.windowFrameBound()
 			switch {
@@ -34894,7 +34894,7 @@ sqldefault:
 		}
 	case 2133:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:12217
+//line sql-gen.y:12219
 		{
 			startBound := sqlDollar[2].union.windowFrameBound()
 			endBound := sqlDollar[4].union.windowFrameBound()
@@ -34919,25 +34919,25 @@ sqldefault:
 		}
 	case 2134:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:12245
+//line sql-gen.y:12247
 		{
 			sqlVAL.union.val = &tree.WindowFrameBound{BoundType: tree.UnboundedPreceding}
 		}
 	case 2135:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:12249
+//line sql-gen.y:12251
 		{
 			sqlVAL.union.val = &tree.WindowFrameBound{BoundType: tree.UnboundedFollowing}
 		}
 	case 2136:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:12253
+//line sql-gen.y:12255
 		{
 			sqlVAL.union.val = &tree.WindowFrameBound{BoundType: tree.CurrentRow}
 		}
 	case 2137:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:12257
+//line sql-gen.y:12259
 		{
 			sqlVAL.union.val = &tree.WindowFrameBound{
 				OffsetExpr: sqlDollar[1].union.expr(),
@@ -34946,7 +34946,7 @@ sqldefault:
 		}
 	case 2138:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:12264
+//line sql-gen.y:12266
 		{
 			sqlVAL.union.val = &tree.WindowFrameBound{
 				OffsetExpr: sqlDollar[1].union.expr(),
@@ -34955,50 +34955,50 @@ sqldefault:
 		}
 	case 2139:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:12273
+//line sql-gen.y:12275
 		{
 			sqlVAL.union.val = tree.ExcludeCurrentRow
 		}
 	case 2140:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:12277
+//line sql-gen.y:12279
 		{
 			sqlVAL.union.val = tree.ExcludeGroup
 		}
 	case 2141:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:12281
+//line sql-gen.y:12283
 		{
 			sqlVAL.union.val = tree.ExcludeTies
 		}
 	case 2142:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:12285
+//line sql-gen.y:12287
 		{
 
 			sqlVAL.union.val = tree.NoExclusion
 		}
 	case 2143:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:12290
+//line sql-gen.y:12292
 		{
 			sqlVAL.union.val = tree.NoExclusion
 		}
 	case 2144:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:12303
+//line sql-gen.y:12305
 		{
 			sqlVAL.union.val = &tree.Tuple{Exprs: sqlDollar[3].union.exprs(), Row: true}
 		}
 	case 2145:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12307
+//line sql-gen.y:12309
 		{
 			sqlVAL.union.val = sqlDollar[1].union.tuple()
 		}
 	case 2147:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:12314
+//line sql-gen.y:12316
 		{
 			t := sqlDollar[2].union.tuple()
 			labels := sqlDollar[4].union.nameList()
@@ -35010,235 +35010,235 @@ sqldefault:
 		}
 	case 2148:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12326
+//line sql-gen.y:12328
 		{
 			sqlVAL.union.val = tree.MakeComparisonOperator(tree.Any)
 		}
 	case 2149:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12330
+//line sql-gen.y:12332
 		{
 			sqlVAL.union.val = tree.MakeComparisonOperator(tree.Some)
 		}
 	case 2150:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12334
+//line sql-gen.y:12336
 		{
 			sqlVAL.union.val = tree.MakeComparisonOperator(tree.All)
 		}
 	case 2151:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12350
+//line sql-gen.y:12352
 		{
 			sqlVAL.union.val = tree.MakeBinaryOperator(tree.Plus)
 		}
 	case 2152:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12351
+//line sql-gen.y:12353
 		{
 			sqlVAL.union.val = tree.MakeBinaryOperator(tree.Minus)
 		}
 	case 2153:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12352
+//line sql-gen.y:12354
 		{
 			sqlVAL.union.val = tree.MakeBinaryOperator(tree.Mult)
 		}
 	case 2154:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12353
+//line sql-gen.y:12355
 		{
 			sqlVAL.union.val = tree.MakeBinaryOperator(tree.Div)
 		}
 	case 2155:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12354
+//line sql-gen.y:12356
 		{
 			sqlVAL.union.val = tree.MakeBinaryOperator(tree.Mod)
 		}
 	case 2156:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12355
+//line sql-gen.y:12357
 		{
 			sqlVAL.union.val = tree.MakeBinaryOperator(tree.Pow)
 		}
 	case 2157:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12356
+//line sql-gen.y:12358
 		{
 			sqlVAL.union.val = tree.MakeComparisonOperator(tree.LT)
 		}
 	case 2158:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12357
+//line sql-gen.y:12359
 		{
 			sqlVAL.union.val = tree.MakeComparisonOperator(tree.GT)
 		}
 	case 2159:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12358
+//line sql-gen.y:12360
 		{
 			sqlVAL.union.val = tree.MakeComparisonOperator(tree.EQ)
 		}
 	case 2160:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12359
+//line sql-gen.y:12361
 		{
 			sqlVAL.union.val = tree.MakeComparisonOperator(tree.LE)
 		}
 	case 2161:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12360
+//line sql-gen.y:12362
 		{
 			sqlVAL.union.val = tree.MakeComparisonOperator(tree.GE)
 		}
 	case 2162:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12361
+//line sql-gen.y:12363
 		{
 			sqlVAL.union.val = tree.MakeComparisonOperator(tree.NE)
 		}
 	case 2163:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12363
+//line sql-gen.y:12365
 		{
 			sqlVAL.union.val = tree.MakeComparisonOperator(tree.JSONExists)
 		}
 	case 2164:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12364
+//line sql-gen.y:12366
 		{
 			sqlVAL.union.val = tree.MakeBinaryOperator(tree.Bitand)
 		}
 	case 2165:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12365
+//line sql-gen.y:12367
 		{
 			sqlVAL.union.val = tree.MakeBinaryOperator(tree.Bitor)
 		}
 	case 2166:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12366
+//line sql-gen.y:12368
 		{
 			sqlVAL.union.val = tree.MakeBinaryOperator(tree.Bitxor)
 		}
 	case 2167:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12367
+//line sql-gen.y:12369
 		{
 			sqlVAL.union.val = tree.MakeBinaryOperator(tree.FloorDiv)
 		}
 	case 2168:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12368
+//line sql-gen.y:12370
 		{
 			sqlVAL.union.val = tree.MakeComparisonOperator(tree.Contains)
 		}
 	case 2169:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12369
+//line sql-gen.y:12371
 		{
 			sqlVAL.union.val = tree.MakeComparisonOperator(tree.ContainedBy)
 		}
 	case 2170:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12370
+//line sql-gen.y:12372
 		{
 			sqlVAL.union.val = tree.MakeBinaryOperator(tree.LShift)
 		}
 	case 2171:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12371
+//line sql-gen.y:12373
 		{
 			sqlVAL.union.val = tree.MakeBinaryOperator(tree.RShift)
 		}
 	case 2172:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12372
+//line sql-gen.y:12374
 		{
 			sqlVAL.union.val = tree.MakeBinaryOperator(tree.Concat)
 		}
 	case 2173:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12373
+//line sql-gen.y:12375
 		{
 			sqlVAL.union.val = tree.MakeBinaryOperator(tree.JSONFetchVal)
 		}
 	case 2174:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12374
+//line sql-gen.y:12376
 		{
 			sqlVAL.union.val = tree.MakeBinaryOperator(tree.JSONFetchText)
 		}
 	case 2175:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12375
+//line sql-gen.y:12377
 		{
 			sqlVAL.union.val = tree.MakeBinaryOperator(tree.JSONFetchValPath)
 		}
 	case 2176:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12376
+//line sql-gen.y:12378
 		{
 			sqlVAL.union.val = tree.MakeBinaryOperator(tree.JSONFetchTextPath)
 		}
 	case 2177:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12377
+//line sql-gen.y:12379
 		{
 			sqlVAL.union.val = tree.MakeComparisonOperator(tree.JSONSomeExists)
 		}
 	case 2178:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12378
+//line sql-gen.y:12380
 		{
 			sqlVAL.union.val = tree.MakeComparisonOperator(tree.JSONAllExists)
 		}
 	case 2179:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12379
+//line sql-gen.y:12381
 		{
 			sqlVAL.union.val = tree.MakeComparisonOperator(tree.NotRegMatch)
 		}
 	case 2180:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12380
+//line sql-gen.y:12382
 		{
 			sqlVAL.union.val = tree.MakeComparisonOperator(tree.RegIMatch)
 		}
 	case 2181:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12381
+//line sql-gen.y:12383
 		{
 			sqlVAL.union.val = tree.MakeComparisonOperator(tree.NotRegIMatch)
 		}
 	case 2182:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12382
+//line sql-gen.y:12384
 		{
 			sqlVAL.union.val = tree.MakeComparisonOperator(tree.Overlaps)
 		}
 	case 2183:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12383
+//line sql-gen.y:12385
 		{
 			sqlVAL.union.val = tree.MakeUnaryOperator(tree.UnaryComplement)
 		}
 	case 2184:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12384
+//line sql-gen.y:12386
 		{
 			sqlVAL.union.val = tree.MakeUnaryOperator(tree.UnarySqrt)
 		}
 	case 2185:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12385
+//line sql-gen.y:12387
 		{
 			sqlVAL.union.val = tree.MakeUnaryOperator(tree.UnaryCbrt)
 		}
 	case 2187:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:12390
+//line sql-gen.y:12392
 		{
 
 			if sqlDollar[1].str != "pg_catalog" {
@@ -35248,401 +35248,401 @@ sqldefault:
 		}
 	case 2188:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:12406
+//line sql-gen.y:12408
 		{
 			sqlVAL.union = sqlDollar[3].union
 		}
 	case 2191:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12413
+//line sql-gen.y:12415
 		{
 			sqlVAL.union.val = tree.MakeComparisonOperator(tree.Like)
 		}
 	case 2192:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:12414
+//line sql-gen.y:12416
 		{
 			sqlVAL.union.val = tree.MakeComparisonOperator(tree.NotLike)
 		}
 	case 2193:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12415
+//line sql-gen.y:12417
 		{
 			sqlVAL.union.val = tree.MakeComparisonOperator(tree.ILike)
 		}
 	case 2194:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:12416
+//line sql-gen.y:12418
 		{
 			sqlVAL.union.val = tree.MakeComparisonOperator(tree.NotILike)
 		}
 	case 2195:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:12439
+//line sql-gen.y:12441
 		{
 			sqlVAL.union.val = &tree.Tuple{}
 		}
 	case 2196:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:12443
+//line sql-gen.y:12445
 		{
 			sqlVAL.union.val = &tree.Tuple{Exprs: sqlDollar[2].union.exprs()}
 		}
 	case 2197:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12449
+//line sql-gen.y:12451
 		{
 			sqlVAL.union.val = tree.Exprs{sqlDollar[1].union.expr()}
 		}
 	case 2198:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:12453
+//line sql-gen.y:12455
 		{
 			sqlVAL.union.val = tree.Exprs{sqlDollar[1].union.expr()}
 		}
 	case 2199:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:12457
+//line sql-gen.y:12459
 		{
 			sqlVAL.union.val = append(tree.Exprs{sqlDollar[1].union.expr()}, sqlDollar[3].union.exprs()...)
 		}
 	case 2200:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:12468
+//line sql-gen.y:12470
 		{
 			sqlVAL.union.val = &tree.Tuple{}
 		}
 	case 2201:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:12472
+//line sql-gen.y:12474
 		{
 			sqlVAL.union.val = &tree.Tuple{Exprs: sqlDollar[2].union.exprs()}
 		}
 	case 2202:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:12478
+//line sql-gen.y:12480
 		{
 			sqlVAL.union.val = tree.Exprs{sqlDollar[1].union.expr()}
 		}
 	case 2203:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:12482
+//line sql-gen.y:12484
 		{
 			sqlVAL.union.val = append(tree.Exprs{sqlDollar[1].union.expr()}, sqlDollar[3].union.exprs()...)
 		}
 	case 2205:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:12489
+//line sql-gen.y:12491
 		{
 			sqlVAL.union.val = tree.Exprs(nil)
 		}
 	case 2206:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12495
+//line sql-gen.y:12497
 		{
 			sqlVAL.union.val = tree.Exprs{sqlDollar[1].union.expr()}
 		}
 	case 2207:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:12499
+//line sql-gen.y:12501
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.exprs(), sqlDollar[3].union.expr())
 		}
 	case 2208:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12505
+//line sql-gen.y:12507
 		{
 			sqlVAL.union.val = []tree.ResolvableTypeReference{sqlDollar[1].union.typeReference()}
 		}
 	case 2209:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:12509
+//line sql-gen.y:12511
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.typeReferences(), sqlDollar[3].union.typeReference())
 		}
 	case 2210:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:12515
+//line sql-gen.y:12517
 		{
 			sqlVAL.union.val = &tree.Array{Exprs: sqlDollar[2].union.exprs()}
 		}
 	case 2211:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:12519
+//line sql-gen.y:12521
 		{
 			sqlVAL.union.val = &tree.Array{Exprs: sqlDollar[2].union.exprs()}
 		}
 	case 2212:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12525
+//line sql-gen.y:12527
 		{
 			sqlVAL.union.val = tree.Exprs{sqlDollar[1].union.expr()}
 		}
 	case 2213:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:12529
+//line sql-gen.y:12531
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.exprs(), sqlDollar[3].union.expr())
 		}
 	case 2214:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:12535
+//line sql-gen.y:12537
 		{
 			sqlVAL.union.val = tree.Exprs{tree.NewStrVal(strings.ToLower(sqlDollar[1].str)), sqlDollar[3].union.expr()}
 		}
 	case 2215:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12539
+//line sql-gen.y:12541
 		{
 			sqlVAL.union.val = sqlDollar[1].union.exprs()
 		}
 	case 2224:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:12562
+//line sql-gen.y:12564
 		{
 			sqlVAL.union.val = tree.Exprs{sqlDollar[1].union.expr(), sqlDollar[2].union.expr(), sqlDollar[3].union.expr(), sqlDollar[4].union.expr()}
 		}
 	case 2225:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:12566
+//line sql-gen.y:12568
 		{
 			sqlVAL.union.val = tree.Exprs{sqlDollar[1].union.expr(), sqlDollar[2].union.expr(), sqlDollar[3].union.expr()}
 		}
 	case 2226:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12570
+//line sql-gen.y:12572
 		{
 			sqlVAL.union.val = sqlDollar[1].union.exprs()
 		}
 	case 2227:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:12576
+//line sql-gen.y:12578
 		{
 			sqlVAL.union.val = sqlDollar[2].union.expr()
 		}
 	case 2228:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:12583
+//line sql-gen.y:12585
 		{
 			sqlVAL.union.val = tree.Exprs{sqlDollar[3].union.expr(), sqlDollar[1].union.expr()}
 		}
 	case 2229:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:12587
+//line sql-gen.y:12589
 		{
 			sqlVAL.union.val = tree.Exprs(nil)
 		}
 	case 2230:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:12604
+//line sql-gen.y:12606
 		{
 			sqlVAL.union.val = tree.Exprs{sqlDollar[1].union.expr(), sqlDollar[2].union.expr(), sqlDollar[3].union.expr()}
 		}
 	case 2231:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:12608
+//line sql-gen.y:12610
 		{
 			sqlVAL.union.val = tree.Exprs{sqlDollar[1].union.expr(), sqlDollar[3].union.expr(), sqlDollar[2].union.expr()}
 		}
 	case 2232:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:12612
+//line sql-gen.y:12614
 		{
 			sqlVAL.union.val = tree.Exprs{sqlDollar[1].union.expr(), sqlDollar[2].union.expr()}
 		}
 	case 2233:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:12616
+//line sql-gen.y:12618
 		{
 			sqlVAL.union.val = tree.Exprs{sqlDollar[1].union.expr(), tree.NewDInt(1), sqlDollar[2].union.expr()}
 		}
 	case 2234:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12620
+//line sql-gen.y:12622
 		{
 			sqlVAL.union.val = sqlDollar[1].union.exprs()
 		}
 	case 2235:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:12626
+//line sql-gen.y:12628
 		{
 			sqlVAL.union.val = sqlDollar[2].union.expr()
 		}
 	case 2236:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:12632
+//line sql-gen.y:12634
 		{
 			sqlVAL.union.val = sqlDollar[2].union.expr()
 		}
 	case 2237:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:12638
+//line sql-gen.y:12640
 		{
 			sqlVAL.union.val = append(sqlDollar[3].union.exprs(), sqlDollar[1].union.expr())
 		}
 	case 2238:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:12642
+//line sql-gen.y:12644
 		{
 			sqlVAL.union.val = sqlDollar[2].union.exprs()
 		}
 	case 2239:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12646
+//line sql-gen.y:12648
 		{
 			sqlVAL.union.val = sqlDollar[1].union.exprs()
 		}
 	case 2240:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12652
+//line sql-gen.y:12654
 		{
 			sqlVAL.union.val = &tree.Subquery{Select: sqlDollar[1].union.selectStmt()}
 		}
 	case 2242:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:12664
+//line sql-gen.y:12666
 		{
 			sqlVAL.union.val = &tree.CaseExpr{Expr: sqlDollar[2].union.expr(), Whens: sqlDollar[3].union.whens(), Else: sqlDollar[4].union.expr()}
 		}
 	case 2243:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12671
+//line sql-gen.y:12673
 		{
 			sqlVAL.union.val = []*tree.When{sqlDollar[1].union.when()}
 		}
 	case 2244:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:12675
+//line sql-gen.y:12677
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.whens(), sqlDollar[2].union.when())
 		}
 	case 2245:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql-gen.y:12681
+//line sql-gen.y:12683
 		{
 			sqlVAL.union.val = &tree.When{Cond: sqlDollar[2].union.expr(), Val: sqlDollar[4].union.expr()}
 		}
 	case 2246:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:12687
+//line sql-gen.y:12689
 		{
 			sqlVAL.union.val = sqlDollar[2].union.expr()
 		}
 	case 2247:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:12691
+//line sql-gen.y:12693
 		{
 			sqlVAL.union.val = tree.Expr(nil)
 		}
 	case 2249:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:12698
+//line sql-gen.y:12700
 		{
 			sqlVAL.union.val = tree.Expr(nil)
 		}
 	case 2250:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:12704
+//line sql-gen.y:12706
 		{
 			sqlVAL.union.val = &tree.ArraySubscript{Begin: sqlDollar[2].union.expr()}
 		}
 	case 2251:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:12708
+//line sql-gen.y:12710
 		{
 			sqlVAL.union.val = &tree.ArraySubscript{Begin: sqlDollar[2].union.expr(), End: sqlDollar[4].union.expr(), Slice: true}
 		}
 	case 2253:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:12715
+//line sql-gen.y:12717
 		{
 			sqlVAL.union.val = tree.Expr(nil)
 		}
 	case 2254:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12721
+//line sql-gen.y:12723
 		{
 			sqlVAL.union.val = tree.ArraySubscripts{sqlDollar[1].union.arraySubscript()}
 		}
 	case 2255:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:12725
+//line sql-gen.y:12727
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.arraySubscripts(), sqlDollar[2].union.arraySubscript())
 		}
 	case 2256:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12730
+//line sql-gen.y:12732
 		{
 		}
 	case 2257:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:12731
+//line sql-gen.y:12733
 		{
 		}
 	case 2258:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12735
+//line sql-gen.y:12737
 		{
 			sqlVAL.union.val = tree.SelectExprs{sqlDollar[1].union.selExpr()}
 		}
 	case 2259:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:12739
+//line sql-gen.y:12741
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.selExprs(), sqlDollar[3].union.selExpr())
 		}
 	case 2260:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:12745
+//line sql-gen.y:12747
 		{
 			sqlVAL.union.val = tree.SelectExpr{Expr: sqlDollar[1].union.expr(), As: tree.UnrestrictedName(sqlDollar[3].str)}
 		}
 	case 2261:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:12754
+//line sql-gen.y:12756
 		{
 			sqlVAL.union.val = tree.SelectExpr{Expr: sqlDollar[1].union.expr(), As: tree.UnrestrictedName(sqlDollar[2].str)}
 		}
 	case 2262:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12758
+//line sql-gen.y:12760
 		{
 			sqlVAL.union.val = tree.SelectExpr{Expr: sqlDollar[1].union.expr()}
 		}
 	case 2263:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12762
+//line sql-gen.y:12764
 		{
 			sqlVAL.union.val = tree.StarSelectExpr()
 		}
 	case 2264:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12770
+//line sql-gen.y:12772
 		{
 			sqlVAL.union.val = tree.TableIndexNames{sqlDollar[1].union.newTableIndexName()}
 		}
 	case 2265:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:12774
+//line sql-gen.y:12776
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.newTableIndexNames(), sqlDollar[3].union.newTableIndexName())
 		}
 	case 2266:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12780
+//line sql-gen.y:12782
 		{
 			sqlVAL.union.val = tree.TablePatterns{sqlDollar[1].union.unresolvedName()}
 		}
 	case 2267:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:12784
+//line sql-gen.y:12786
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.tablePatterns(), sqlDollar[3].union.unresolvedName())
 		}
 	case 2268:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:12803
+//line sql-gen.y:12805
 		{
 			name := sqlDollar[1].union.unresolvedObjectName().ToTableName()
 			sqlVAL.union.val = tree.TableIndexName{
@@ -35652,7 +35652,7 @@ sqldefault:
 		}
 	case 2269:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12811
+//line sql-gen.y:12813
 		{
 
 			name := sqlDollar[1].union.unresolvedObjectName().ToTableName()
@@ -35665,55 +35665,55 @@ sqldefault:
 		}
 	case 2270:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12834
+//line sql-gen.y:12836
 		{
 			sqlVAL.union.val = sqlDollar[1].union.unresolvedObjectName().ToUnresolvedName()
 		}
 	case 2272:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12843
+//line sql-gen.y:12845
 		{
 			sqlVAL.union.val = sqlDollar[1].union.unresolvedObjectName().ToUnresolvedName()
 		}
 	case 2273:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:12847
+//line sql-gen.y:12849
 		{
 			sqlVAL.union.val = &tree.UnresolvedName{Star: true, NumParts: 3, Parts: tree.NameParts{"", sqlDollar[3].str, sqlDollar[1].str}}
 		}
 	case 2274:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:12851
+//line sql-gen.y:12853
 		{
 			sqlVAL.union.val = &tree.UnresolvedName{Star: true, NumParts: 2, Parts: tree.NameParts{"", sqlDollar[1].str}}
 		}
 	case 2275:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12855
+//line sql-gen.y:12857
 		{
 			sqlVAL.union.val = &tree.UnresolvedName{Star: true, NumParts: 1}
 		}
 	case 2276:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12861
+//line sql-gen.y:12863
 		{
 			sqlVAL.union.val = tree.NameList{tree.Name(sqlDollar[1].str)}
 		}
 	case 2277:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:12865
+//line sql-gen.y:12867
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.nameList(), tree.Name(sqlDollar[3].str))
 		}
 	case 2282:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:12880
+//line sql-gen.y:12882
 		{
 			sqlVAL.union.val = sqlDollar[2].union.numVal()
 		}
 	case 2283:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:12884
+//line sql-gen.y:12886
 		{
 			n := sqlDollar[2].union.numVal()
 			n.SetNegative()
@@ -35721,13 +35721,13 @@ sqldefault:
 		}
 	case 2286:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:12896
+//line sql-gen.y:12898
 		{
 			sqlVAL.union.val = sqlDollar[2].union.numVal()
 		}
 	case 2287:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql-gen.y:12900
+//line sql-gen.y:12902
 		{
 			n := sqlDollar[2].union.numVal()
 			n.SetNegative()
@@ -35735,7 +35735,7 @@ sqldefault:
 		}
 	case 2288:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12909
+//line sql-gen.y:12911
 		{
 			val, err := sqlDollar[1].union.numVal().AsInt32()
 			if err != nil {
@@ -35745,7 +35745,7 @@ sqldefault:
 		}
 	case 2289:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12920
+//line sql-gen.y:12922
 		{
 			val, err := sqlDollar[1].union.numVal().AsInt64()
 			if err != nil {
@@ -35755,7 +35755,7 @@ sqldefault:
 		}
 	case 2290:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:12929
+//line sql-gen.y:12931
 		{
 			val, err := sqlDollar[1].union.numVal().AsInt64()
 			if err != nil {
@@ -35765,7 +35765,7 @@ sqldefault:
 		}
 	case 2291:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:12937
+//line sql-gen.y:12939
 		{
 			var t *types.T
 			if sqlDollar[3].union.val == nil {
@@ -35782,7 +35782,7 @@ sqldefault:
 		}
 	case 2292:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:12954
+//line sql-gen.y:12956
 		{
 			prec := sqlDollar[3].union.int32()
 			if prec < 0 || prec > 6 {
@@ -35800,97 +35800,97 @@ sqldefault:
 		}
 	case 2311:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:13039
+//line sql-gen.y:13041
 		{
 			sqlVAL.union.val = sqlDollar[1].union.nameList()
 		}
 	case 2313:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:13047
+//line sql-gen.y:13049
 		{
 			sqlVAL.union.val = tree.ObjectNamePrefix{SchemaName: tree.Name(sqlDollar[1].str), ExplicitSchema: true}
 		}
 	case 2314:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:13051
+//line sql-gen.y:13053
 		{
 			sqlVAL.union.val = tree.ObjectNamePrefix{CatalogName: tree.Name(sqlDollar[1].str), SchemaName: tree.Name(sqlDollar[3].str), ExplicitCatalog: true, ExplicitSchema: true}
 		}
 	case 2315:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:13057
+//line sql-gen.y:13059
 		{
 			sqlVAL.union.val = tree.ObjectNamePrefixList{sqlDollar[1].union.objectNamePrefix()}
 		}
 	case 2316:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:13061
+//line sql-gen.y:13063
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.objectNamePrefixList(), sqlDollar[3].union.objectNamePrefix())
 		}
 	case 2318:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:13069
+//line sql-gen.y:13071
 		{
 			sqlVAL.union.val = tree.ObjectNamePrefix{ExplicitSchema: false}
 		}
 	case 2324:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:13096
+//line sql-gen.y:13098
 		{
 			sqlVAL.union.val = &tree.UnresolvedName{NumParts: 1, Parts: tree.NameParts{sqlDollar[1].str}}
 		}
 	case 2326:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:13103
+//line sql-gen.y:13105
 		{
 			sqlVAL.union.val = &tree.UnresolvedName{NumParts: 2, Parts: tree.NameParts{sqlDollar[3].str, sqlDollar[1].str}}
 		}
 	case 2327:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:13107
+//line sql-gen.y:13109
 		{
 			sqlVAL.union.val = &tree.UnresolvedName{NumParts: 3, Parts: tree.NameParts{sqlDollar[5].str, sqlDollar[3].str, sqlDollar[1].str}}
 		}
 	case 2328:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql-gen.y:13111
+//line sql-gen.y:13113
 		{
 			sqlVAL.union.val = &tree.UnresolvedName{NumParts: 4, Parts: tree.NameParts{sqlDollar[7].str, sqlDollar[5].str, sqlDollar[3].str, sqlDollar[1].str}}
 		}
 	case 2330:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql-gen.y:13125
+//line sql-gen.y:13127
 		{
 			sqlVAL.union.val = &tree.UnresolvedName{Star: true, NumParts: 4, Parts: tree.NameParts{"", sqlDollar[5].str, sqlDollar[3].str, sqlDollar[1].str}}
 		}
 	case 2331:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:13129
+//line sql-gen.y:13131
 		{
 			sqlVAL.union.val = &tree.UnresolvedName{Star: true, NumParts: 3, Parts: tree.NameParts{"", sqlDollar[3].str, sqlDollar[1].str}}
 		}
 	case 2332:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:13133
+//line sql-gen.y:13135
 		{
 			sqlVAL.union.val = &tree.UnresolvedName{Star: true, NumParts: 2, Parts: tree.NameParts{"", sqlDollar[1].str}}
 		}
 	case 2333:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:13146
+//line sql-gen.y:13148
 		{
 			sqlVAL.union.val = &tree.UnresolvedName{NumParts: 1, Parts: tree.NameParts{sqlDollar[1].str}}
 		}
 	case 2335:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:13155
+//line sql-gen.y:13157
 		{
 			sqlVAL.union.val = &tree.UnresolvedName{NumParts: 1, Parts: tree.NameParts{sqlDollar[1].str}}
 		}
 	case 2339:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql-gen.y:13173
+//line sql-gen.y:13175
 		{
 			aIdx := sqllex.(*lexer).NewAnnotation()
 			res, err := tree.NewUnresolvedObjectName(1, [3]string{sqlDollar[1].str}, aIdx)
@@ -35901,7 +35901,7 @@ sqldefault:
 		}
 	case 2340:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:13186
+//line sql-gen.y:13188
 		{
 			aIdx := sqllex.(*lexer).NewAnnotation()
 			res, err := tree.NewUnresolvedObjectName(2, [3]string{sqlDollar[3].str, sqlDollar[1].str}, aIdx)
@@ -35912,7 +35912,7 @@ sqldefault:
 		}
 	case 2341:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql-gen.y:13193
+//line sql-gen.y:13195
 		{
 			aIdx := sqllex.(*lexer).NewAnnotation()
 			res, err := tree.NewUnresolvedObjectName(3, [3]string{sqlDollar[5].str, sqlDollar[3].str, sqlDollar[1].str}, aIdx)
@@ -35923,19 +35923,19 @@ sqldefault:
 		}
 	case 2349:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:13218
+//line sql-gen.y:13220
 		{
 			sqlVAL.str = ""
 		}
 	case 2350:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql-gen.y:13224
+//line sql-gen.y:13226
 		{
 			sqlVAL.str = sqlDollar[2].str
 		}
 	case 2351:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql-gen.y:13228
+//line sql-gen.y:13230
 		{
 			sqlVAL.str = ""
 		}
