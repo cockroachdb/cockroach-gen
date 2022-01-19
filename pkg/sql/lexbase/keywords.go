@@ -292,6 +292,7 @@ var KeywordsCategories = map[string]string{
 	"none":                         "T",
 	"nonvoters":                    "U",
 	"normal":                       "U",
+	"nosqllogin":                   "U",
 	"not":                          "R",
 	"nothing":                      "R",
 	"notnull":                      "T",
@@ -435,6 +436,7 @@ var KeywordsCategories = map[string]string{
 	"some":                         "R",
 	"split":                        "U",
 	"sql":                          "U",
+	"sqllogin":                     "U",
 	"start":                        "U",
 	"statements":                   "U",
 	"statistics":                   "U",
@@ -815,6 +817,7 @@ var KeywordNames = []string{
 	"none",
 	"nonvoters",
 	"normal",
+	"nosqllogin",
 	"not",
 	"nothing",
 	"notnull",
@@ -958,6 +961,7 @@ var KeywordNames = []string{
 	"some",
 	"split",
 	"sql",
+	"sqllogin",
 	"start",
 	"statements",
 	"statistics",
@@ -1632,6 +1636,8 @@ func GetKeywordID(k string) int32 {
 		return NONVOTERS
 	case "normal":
 		return NORMAL
+	case "nosqllogin":
+		return NOSQLLOGIN
 	case "not":
 		return NOT
 	case "nothing":
@@ -1918,6 +1924,8 @@ func GetKeywordID(k string) int32 {
 		return SPLIT
 	case "sql":
 		return SQL
+	case "sqllogin":
+		return SQLLOGIN
 	case "start":
 		return START
 	case "statements":
