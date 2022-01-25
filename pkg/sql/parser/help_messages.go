@@ -1577,12 +1577,12 @@ WEBDOCS/create-table.html
 WEBDOCS/create-table-as.html
 `,
 	},
-	//line sql.y: 7402
+	//line sql.y: 7416
 	`CREATE SEQUENCE`: {
 		ShortDescription: `create a new sequence`,
-		//line sql.y: 7403
+		//line sql.y: 7417
 		Category: hDDL,
-		//line sql.y: 7404
+		//line sql.y: 7418
 		Text: `
 CREATE [TEMPORARY | TEMP] SEQUENCE <seqname>
   [AS <typename>]
@@ -1595,76 +1595,76 @@ CREATE [TEMPORARY | TEMP] SEQUENCE <seqname>
   [VIRTUAL]
 
 `,
-		//line sql.y: 7415
+		//line sql.y: 7429
 		SeeAlso: `CREATE TABLE
 `,
 	},
-	//line sql.y: 7487
+	//line sql.y: 7501
 	`TRUNCATE`: {
 		ShortDescription: `empty one or more tables`,
-		//line sql.y: 7488
+		//line sql.y: 7502
 		Category: hDML,
-		//line sql.y: 7489
+		//line sql.y: 7503
 		Text: `TRUNCATE [TABLE] <tablename> [, ...] [CASCADE | RESTRICT]
 `,
-		//line sql.y: 7490
+		//line sql.y: 7504
 		SeeAlso: `WEBDOCS/truncate.html
 `,
 	},
-	//line sql.y: 7514
+	//line sql.y: 7528
 	`CREATE ROLE`: {
 		ShortDescription: `define a new role`,
-		//line sql.y: 7515
+		//line sql.y: 7529
 		Category: hPriv,
-		//line sql.y: 7516
+		//line sql.y: 7530
 		Text: `CREATE ROLE [IF NOT EXISTS] <name> [ [WITH] <OPTIONS...> ]
 `,
-		//line sql.y: 7517
+		//line sql.y: 7531
 		SeeAlso: `ALTER ROLE, DROP ROLE, SHOW ROLES
 `,
 	},
-	//line sql.y: 7529
+	//line sql.y: 7543
 	`ALTER ROLE`: {
 		ShortDescription: `alter a role`,
-		//line sql.y: 7530
+		//line sql.y: 7544
 		Category: hPriv,
-		//line sql.y: 7531
+		//line sql.y: 7545
 		Text: `
 ALTER ROLE <name> [WITH] <options...>
 ALTER ROLE { name | ALL } [ IN DATABASE database_name ] SET var { TO | = } { value | DEFAULT }
 ALTER ROLE { name | ALL } [ IN DATABASE database_name ] RESET { var | ALL }
 `,
-		//line sql.y: 7535
+		//line sql.y: 7549
 		SeeAlso: `CREATE ROLE, DROP ROLE, SHOW ROLES
 `,
 	},
-	//line sql.y: 7604
+	//line sql.y: 7618
 	`CREATE VIEW`: {
 		ShortDescription: `create a new view`,
-		//line sql.y: 7605
+		//line sql.y: 7619
 		Category: hDDL,
-		//line sql.y: 7606
+		//line sql.y: 7620
 		Text: `CREATE [TEMPORARY | TEMP] [MATERIALIZED] VIEW [IF NOT EXISTS] <viewname> [( <colnames...> )] AS <source>
 `,
-		//line sql.y: 7607
+		//line sql.y: 7621
 		SeeAlso: `CREATE TABLE, SHOW CREATE, WEBDOCS/create-view.html
 `,
 	},
-	//line sql.y: 7811
+	//line sql.y: 7825
 	`CREATE TYPE`: {
 		ShortDescription: `- create a type`,
-		//line sql.y: 7812
+		//line sql.y: 7826
 		Category: hDDL,
-		//line sql.y: 7813
+		//line sql.y: 7827
 		Text: `CREATE TYPE [IF NOT EXISTS] <type_name> AS ENUM (...)
 `,
 	},
-	//line sql.y: 7865
+	//line sql.y: 7879
 	`CREATE INDEX`: {
 		ShortDescription: `create a new index`,
-		//line sql.y: 7866
+		//line sql.y: 7880
 		Category: hDDL,
-		//line sql.y: 7867
+		//line sql.y: 7881
 		Text: `
 CREATE [UNIQUE | INVERTED] INDEX [CONCURRENTLY] [IF NOT EXISTS] [<idxname>]
        ON <tablename> ( <colname> [ASC | DESC] [, ...] )
@@ -1673,55 +1673,55 @@ CREATE [UNIQUE | INVERTED] INDEX [CONCURRENTLY] [IF NOT EXISTS] [<idxname>]
        [WITH <storage_parameter_list] [WHERE <where_conds...>]
 
 `,
-		//line sql.y: 7874
+		//line sql.y: 7888
 		SeeAlso: `CREATE TABLE, SHOW INDEXES, SHOW CREATE,
 WEBDOCS/create-index.html
 `,
 	},
-	//line sql.y: 8373
+	//line sql.y: 8387
 	`ALTER DEFAULT PRIVILEGES`: {
 		ShortDescription: `alter default privileges on an object`,
-		//line sql.y: 8374
+		//line sql.y: 8388
 		Category: hDDL,
-		//line sql.y: 8375
+		//line sql.y: 8389
 		Text: `
 
 Commands:
   ALTER DEFAULT PRIVILEGES [ FOR { ROLE | USER } target_roles... ] [ IN SCHEMA schema_name...] abbreviated_grant_or_revoke
 `,
 	},
-	//line sql.y: 8511
+	//line sql.y: 8525
 	`RELEASE`: {
 		ShortDescription: `complete a sub-transaction`,
-		//line sql.y: 8512
+		//line sql.y: 8526
 		Category: hTxn,
-		//line sql.y: 8513
+		//line sql.y: 8527
 		Text: `RELEASE [SAVEPOINT] <savepoint name>
 `,
-		//line sql.y: 8514
+		//line sql.y: 8528
 		SeeAlso: `SAVEPOINT, WEBDOCS/savepoint.html
 `,
 	},
-	//line sql.y: 8522
+	//line sql.y: 8536
 	`RESUME JOBS`: {
 		ShortDescription: `resume background jobs`,
-		//line sql.y: 8523
+		//line sql.y: 8537
 		Category: hMisc,
-		//line sql.y: 8524
+		//line sql.y: 8538
 		Text: `
 RESUME JOBS <selectclause>
 RESUME JOB <jobid>
 `,
-		//line sql.y: 8527
+		//line sql.y: 8541
 		SeeAlso: `SHOW JOBS, CANCEL JOBS, PAUSE JOBS
 `,
 	},
-	//line sql.y: 8549
+	//line sql.y: 8563
 	`RESUME SCHEDULES`: {
 		ShortDescription: `resume executing scheduled jobs`,
-		//line sql.y: 8550
+		//line sql.y: 8564
 		Category: hMisc,
-		//line sql.y: 8551
+		//line sql.y: 8565
 		Text: `
 RESUME SCHEDULES <selectclause>
  selectclause: select statement returning schedule IDs to resume.
@@ -1729,16 +1729,16 @@ RESUME SCHEDULES <selectclause>
 RESUME SCHEDULE <scheduleID>
 
 `,
-		//line sql.y: 8557
+		//line sql.y: 8571
 		SeeAlso: `PAUSE SCHEDULES, SHOW JOBS, RESUME JOBS
 `,
 	},
-	//line sql.y: 8578
+	//line sql.y: 8592
 	`DROP SCHEDULES`: {
 		ShortDescription: `destroy specified schedules`,
-		//line sql.y: 8579
+		//line sql.y: 8593
 		Category: hMisc,
-		//line sql.y: 8580
+		//line sql.y: 8594
 		Text: `
 DROP SCHEDULES <selectclause>
  selectclause: select statement returning schedule IDs to resume.
@@ -1746,28 +1746,28 @@ DROP SCHEDULES <selectclause>
 DROP SCHEDULE <scheduleID>
 
 `,
-		//line sql.y: 8586
+		//line sql.y: 8600
 		SeeAlso: `PAUSE SCHEDULES, SHOW JOBS, CANCEL JOBS
 `,
 	},
-	//line sql.y: 8607
+	//line sql.y: 8621
 	`SAVEPOINT`: {
 		ShortDescription: `start a sub-transaction`,
-		//line sql.y: 8608
+		//line sql.y: 8622
 		Category: hTxn,
-		//line sql.y: 8609
+		//line sql.y: 8623
 		Text: `SAVEPOINT <savepoint name>
 `,
-		//line sql.y: 8610
+		//line sql.y: 8624
 		SeeAlso: `RELEASE, WEBDOCS/savepoint.html
 `,
 	},
-	//line sql.y: 8625
+	//line sql.y: 8639
 	`BEGIN`: {
 		ShortDescription: `start a transaction`,
-		//line sql.y: 8626
+		//line sql.y: 8640
 		Category: hTxn,
-		//line sql.y: 8627
+		//line sql.y: 8641
 		Text: `
 BEGIN [TRANSACTION] [ <txnparameter> [[,] ...] ]
 START TRANSACTION [ <txnparameter> [[,] ...] ]
@@ -1777,56 +1777,56 @@ Transaction parameters:
    PRIORITY { LOW | NORMAL | HIGH }
 
 `,
-		//line sql.y: 8635
+		//line sql.y: 8649
 		SeeAlso: `COMMIT, ROLLBACK, WEBDOCS/begin-transaction.html
 `,
 	},
-	//line sql.y: 8648
+	//line sql.y: 8662
 	`COMMIT`: {
 		ShortDescription: `commit the current transaction`,
-		//line sql.y: 8649
+		//line sql.y: 8663
 		Category: hTxn,
-		//line sql.y: 8650
+		//line sql.y: 8664
 		Text: `
 COMMIT [TRANSACTION]
 END [TRANSACTION]
 `,
-		//line sql.y: 8653
+		//line sql.y: 8667
 		SeeAlso: `BEGIN, ROLLBACK, WEBDOCS/commit-transaction.html
 `,
 	},
-	//line sql.y: 8677
+	//line sql.y: 8691
 	`ROLLBACK`: {
 		ShortDescription: `abort the current (sub-)transaction`,
-		//line sql.y: 8678
+		//line sql.y: 8692
 		Category: hTxn,
-		//line sql.y: 8679
+		//line sql.y: 8693
 		Text: `
 ROLLBACK [TRANSACTION]
 ROLLBACK [TRANSACTION] TO [SAVEPOINT] <savepoint name>
 `,
-		//line sql.y: 8682
+		//line sql.y: 8696
 		SeeAlso: `BEGIN, COMMIT, SAVEPOINT, WEBDOCS/rollback-transaction.html
 `,
 	},
-	//line sql.y: 8796
+	//line sql.y: 8810
 	`CREATE DATABASE`: {
 		ShortDescription: `create a new database`,
-		//line sql.y: 8797
+		//line sql.y: 8811
 		Category: hDDL,
-		//line sql.y: 8798
+		//line sql.y: 8812
 		Text: `CREATE DATABASE [IF NOT EXISTS] <name>
 `,
-		//line sql.y: 8799
+		//line sql.y: 8813
 		SeeAlso: `WEBDOCS/create-database.html
 `,
 	},
-	//line sql.y: 8976
+	//line sql.y: 8990
 	`INSERT`: {
 		ShortDescription: `create new rows in a table`,
-		//line sql.y: 8977
+		//line sql.y: 8991
 		Category: hDML,
-		//line sql.y: 8978
+		//line sql.y: 8992
 		Text: `
 INSERT INTO <tablename> [[AS] <name>] [( <colnames...> )]
        <selectclause>
@@ -1836,31 +1836,31 @@ INSERT INTO <tablename> [[AS] <name>] [( <colnames...> )]
        }
        [RETURNING <exprs...>]
 `,
-		//line sql.y: 8986
+		//line sql.y: 9000
 		SeeAlso: `UPSERT, UPDATE, DELETE, WEBDOCS/insert.html
 `,
 	},
-	//line sql.y: 9005
+	//line sql.y: 9019
 	`UPSERT`: {
 		ShortDescription: `create or replace rows in a table`,
-		//line sql.y: 9006
+		//line sql.y: 9020
 		Category: hDML,
-		//line sql.y: 9007
+		//line sql.y: 9021
 		Text: `
 UPSERT INTO <tablename> [AS <name>] [( <colnames...> )]
        <selectclause>
        [RETURNING <exprs...>]
 `,
-		//line sql.y: 9011
+		//line sql.y: 9025
 		SeeAlso: `INSERT, UPDATE, DELETE, WEBDOCS/upsert.html
 `,
 	},
-	//line sql.y: 9141
+	//line sql.y: 9155
 	`UPDATE`: {
 		ShortDescription: `update rows of a table`,
-		//line sql.y: 9142
+		//line sql.y: 9156
 		Category: hDML,
-		//line sql.y: 9143
+		//line sql.y: 9157
 		Text: `
 UPDATE <tablename> [[AS] <name>]
        SET ...
@@ -1869,42 +1869,42 @@ UPDATE <tablename> [[AS] <name>]
        [LIMIT <expr>]
        [RETURNING <exprs...>]
 `,
-		//line sql.y: 9150
+		//line sql.y: 9164
 		SeeAlso: `INSERT, UPSERT, DELETE, WEBDOCS/update.html
 `,
 	},
-	//line sql.y: 9206
+	//line sql.y: 9220
 	`REASSIGN OWNED BY`: {
 		ShortDescription: `change ownership of all objects`,
-		//line sql.y: 9207
+		//line sql.y: 9221
 		Category: hPriv,
-		//line sql.y: 9208
+		//line sql.y: 9222
 		Text: `REASSIGN OWNED BY {<name> | CURRENT_USER | SESSION_USER}[,...]
 TO {<name> | CURRENT_USER | SESSION_USER}
 `,
-		//line sql.y: 9210
+		//line sql.y: 9224
 		SeeAlso: `DROP OWNED BY
 `,
 	},
-	//line sql.y: 9221
+	//line sql.y: 9235
 	`DROP OWNED BY`: {
 		ShortDescription: `remove database objects owned by role(s).`,
-		//line sql.y: 9222
+		//line sql.y: 9236
 		Category: hPriv,
-		//line sql.y: 9223
+		//line sql.y: 9237
 		Text: `DROP OWNED BY {<name> | CURRENT_USER | SESSION_USER}[,...]
 [RESTRICT | CASCADE]
 `,
-		//line sql.y: 9225
+		//line sql.y: 9239
 		SeeAlso: `REASSIGN OWNED BY
 `,
 	},
-	//line sql.y: 9405
+	//line sql.y: 9419
 	`<SELECTCLAUSE>`: {
 		ShortDescription: `access tabular data`,
-		//line sql.y: 9406
+		//line sql.y: 9420
 		Category: hDML,
-		//line sql.y: 9407
+		//line sql.y: 9421
 		Text: `
 Select clause:
   TABLE <tablename>
@@ -1912,12 +1912,12 @@ Select clause:
   SELECT ... [ { INTERSECT | UNION | EXCEPT } [ ALL | DISTINCT ] <selectclause> ]
 `,
 	},
-	//line sql.y: 9418
+	//line sql.y: 9432
 	`SELECT`: {
 		ShortDescription: `retrieve rows from a data source and compute a result`,
-		//line sql.y: 9419
+		//line sql.y: 9433
 		Category: hDML,
-		//line sql.y: 9420
+		//line sql.y: 9434
 		Text: `
 SELECT [DISTINCT [ ON ( <expr> [ , ... ] ) ] ]
        { <expr> [[AS] <name>] | [ [<dbname>.] <tablename>. ] * } [, ...]
@@ -1931,40 +1931,40 @@ SELECT [DISTINCT [ ON ( <expr> [ , ... ] ) ] ]
        [ LIMIT { <expr> | ALL } ]
        [ OFFSET <expr> [ ROW | ROWS ] ]
 `,
-		//line sql.y: 9432
+		//line sql.y: 9446
 		SeeAlso: `WEBDOCS/select-clause.html
 `,
 	},
-	//line sql.y: 9507
+	//line sql.y: 9521
 	`TABLE`: {
 		ShortDescription: `select an entire table`,
-		//line sql.y: 9508
+		//line sql.y: 9522
 		Category: hDML,
-		//line sql.y: 9509
+		//line sql.y: 9523
 		Text: `TABLE <tablename>
 `,
-		//line sql.y: 9510
+		//line sql.y: 9524
 		SeeAlso: `SELECT, VALUES, WEBDOCS/table-expressions.html
 `,
 	},
-	//line sql.y: 9872
+	//line sql.y: 9886
 	`VALUES`: {
 		ShortDescription: `select a given set of values`,
-		//line sql.y: 9873
+		//line sql.y: 9887
 		Category: hDML,
-		//line sql.y: 9874
+		//line sql.y: 9888
 		Text: `VALUES ( <exprs...> ) [, ...]
 `,
-		//line sql.y: 9875
+		//line sql.y: 9889
 		SeeAlso: `SELECT, TABLE, WEBDOCS/table-expressions.html
 `,
 	},
-	//line sql.y: 10010
+	//line sql.y: 10024
 	`<SOURCE>`: {
 		ShortDescription: `define a data source for SELECT`,
-		//line sql.y: 10011
+		//line sql.y: 10025
 		Category: hDML,
-		//line sql.y: 10012
+		//line sql.y: 10026
 		Text: `
 Data sources:
   <tablename> [ @ { <idxname> | <indexflags> } ]
@@ -1991,7 +1991,7 @@ Join types:
   { INNER | { LEFT | RIGHT | FULL } [OUTER] } [ { HASH | MERGE | LOOKUP | INVERTED } ]
 
 `,
-		//line sql.y: 10037
+		//line sql.y: 10051
 		SeeAlso: `WEBDOCS/table-expressions.html
 `,
 	},
