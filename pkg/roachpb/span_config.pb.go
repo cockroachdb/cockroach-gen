@@ -5,6 +5,7 @@ package roachpb
 
 import (
 	fmt "fmt"
+	hlc "github.com/cockroachdb/cockroach/pkg/util/hlc"
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
 	io "io"
@@ -50,7 +51,7 @@ func (x Constraint_Type) String() string {
 }
 
 func (Constraint_Type) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_91c9f1dcea14470a, []int{1, 0}
+	return fileDescriptor_91c9f1dcea14470a, []int{2, 0}
 }
 
 // GCPolicy dictates the garbage collection policy to apply over a given span.
@@ -60,6 +61,12 @@ type GCPolicy struct {
 	// before garbage collection. A value <= 0 means older versions are never
 	// GC-ed.
 	TTLSeconds int32 `protobuf:"varint,1,opt,name=ttl_seconds,json=ttlSeconds,proto3" json:"ttl_seconds,omitempty"`
+	// ProtectionPolicies is a list of policies that dictate GC behavior for a
+	// range (in conjunction with the GC TTL). A ProtectionPolicy can be used
+	// to indicate a timestamp above which GC should not run, regardless of the
+	// GC TTL. The data it applies over is guaranteed to not be GC-ed provided it
+	// wasn't GC-ed before the config applied.
+	ProtectionPolicies []ProtectionPolicy `protobuf:"bytes,2,rep,name=protection_policies,json=protectionPolicies,proto3" json:"protection_policies"`
 }
 
 func (m *GCPolicy) Reset()         { *m = GCPolicy{} }
@@ -91,6 +98,43 @@ func (m *GCPolicy) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_GCPolicy proto.InternalMessageInfo
 
+// ProtectionPolicy dictates a protection policy against garbage collection that
+// applies over a given span.
+type ProtectionPolicy struct {
+	// ProtectedTimestamp is a timestamp above which GC should not run, regardless
+	// of the GC TTL.
+	ProtectedTimestamp hlc.Timestamp `protobuf:"bytes,1,opt,name=protected_timestamp,json=protectedTimestamp,proto3" json:"protected_timestamp"`
+}
+
+func (m *ProtectionPolicy) Reset()         { *m = ProtectionPolicy{} }
+func (m *ProtectionPolicy) String() string { return proto.CompactTextString(m) }
+func (*ProtectionPolicy) ProtoMessage()    {}
+func (*ProtectionPolicy) Descriptor() ([]byte, []int) {
+	return fileDescriptor_91c9f1dcea14470a, []int{1}
+}
+func (m *ProtectionPolicy) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ProtectionPolicy) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	b = b[:cap(b)]
+	n, err := m.MarshalToSizedBuffer(b)
+	if err != nil {
+		return nil, err
+	}
+	return b[:n], nil
+}
+func (m *ProtectionPolicy) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ProtectionPolicy.Merge(m, src)
+}
+func (m *ProtectionPolicy) XXX_Size() int {
+	return m.Size()
+}
+func (m *ProtectionPolicy) XXX_DiscardUnknown() {
+	xxx_messageInfo_ProtectionPolicy.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ProtectionPolicy proto.InternalMessageInfo
+
 // Constraint constrains the stores that a replica can be stored on. It
 // parallels the definition found in zonepb/zone.proto.
 type Constraint struct {
@@ -105,7 +149,7 @@ type Constraint struct {
 func (m *Constraint) Reset()      { *m = Constraint{} }
 func (*Constraint) ProtoMessage() {}
 func (*Constraint) Descriptor() ([]byte, []int) {
-	return fileDescriptor_91c9f1dcea14470a, []int{1}
+	return fileDescriptor_91c9f1dcea14470a, []int{2}
 }
 func (m *Constraint) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -148,7 +192,7 @@ type ConstraintsConjunction struct {
 func (m *ConstraintsConjunction) Reset()      { *m = ConstraintsConjunction{} }
 func (*ConstraintsConjunction) ProtoMessage() {}
 func (*ConstraintsConjunction) Descriptor() ([]byte, []int) {
-	return fileDescriptor_91c9f1dcea14470a, []int{2}
+	return fileDescriptor_91c9f1dcea14470a, []int{3}
 }
 func (m *ConstraintsConjunction) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -185,7 +229,7 @@ func (m *LeasePreference) Reset()         { *m = LeasePreference{} }
 func (m *LeasePreference) String() string { return proto.CompactTextString(m) }
 func (*LeasePreference) ProtoMessage()    {}
 func (*LeasePreference) Descriptor() ([]byte, []int) {
-	return fileDescriptor_91c9f1dcea14470a, []int{3}
+	return fileDescriptor_91c9f1dcea14470a, []int{4}
 }
 func (m *LeasePreference) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -210,8 +254,8 @@ func (m *LeasePreference) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_LeasePreference proto.InternalMessageInfo
 
-// SpanConfig holds the configuration that applies to a given keyspan. It
-// parallels the definition found in zonepb/zone.proto.
+// SpanConfig holds the configuration that applies to a given keyspan. It is a
+// superset of the fields found in zonepb.zone.proto.
 type SpanConfig struct {
 	// RangeMinBytes is the minimum size, in bytes, a range can have. When a range
 	// is less than this size, it'll be merged with an adjacent range.
@@ -261,7 +305,7 @@ func (m *SpanConfig) Reset()         { *m = SpanConfig{} }
 func (m *SpanConfig) String() string { return proto.CompactTextString(m) }
 func (*SpanConfig) ProtoMessage()    {}
 func (*SpanConfig) Descriptor() ([]byte, []int) {
-	return fileDescriptor_91c9f1dcea14470a, []int{4}
+	return fileDescriptor_91c9f1dcea14470a, []int{5}
 }
 func (m *SpanConfig) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -298,7 +342,7 @@ func (m *SpanConfigEntry) Reset()         { *m = SpanConfigEntry{} }
 func (m *SpanConfigEntry) String() string { return proto.CompactTextString(m) }
 func (*SpanConfigEntry) ProtoMessage()    {}
 func (*SpanConfigEntry) Descriptor() ([]byte, []int) {
-	return fileDescriptor_91c9f1dcea14470a, []int{5}
+	return fileDescriptor_91c9f1dcea14470a, []int{6}
 }
 func (m *SpanConfigEntry) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -323,6 +367,122 @@ func (m *SpanConfigEntry) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_SpanConfigEntry proto.InternalMessageInfo
 
+// SystemSpanConfig is a system installed configuration that may apply to
+// multiple spans.
+type SystemSpanConfig struct {
+	// ProtectionPolicies is a list of policies which protect data from being
+	// GC-ed.
+	ProtectionPolicies []ProtectionPolicy `protobuf:"bytes,1,rep,name=protection_policies,json=protectionPolicies,proto3" json:"protection_policies"`
+}
+
+func (m *SystemSpanConfig) Reset()         { *m = SystemSpanConfig{} }
+func (m *SystemSpanConfig) String() string { return proto.CompactTextString(m) }
+func (*SystemSpanConfig) ProtoMessage()    {}
+func (*SystemSpanConfig) Descriptor() ([]byte, []int) {
+	return fileDescriptor_91c9f1dcea14470a, []int{7}
+}
+func (m *SystemSpanConfig) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *SystemSpanConfig) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	b = b[:cap(b)]
+	n, err := m.MarshalToSizedBuffer(b)
+	if err != nil {
+		return nil, err
+	}
+	return b[:n], nil
+}
+func (m *SystemSpanConfig) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SystemSpanConfig.Merge(m, src)
+}
+func (m *SystemSpanConfig) XXX_Size() int {
+	return m.Size()
+}
+func (m *SystemSpanConfig) XXX_DiscardUnknown() {
+	xxx_messageInfo_SystemSpanConfig.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_SystemSpanConfig proto.InternalMessageInfo
+
+// SystemSpanConfigTarget is used to specify the target of a SystemSpanConfig.
+type SystemSpanConfigTarget struct {
+	// TenantID indicates the tenant ID of the logical cluster being targeted.
+	// For secondary tenants this field is left unset. For the host we can use
+	// this field to protect a specific secondary tenant.
+	//
+	// TODO(arul): Ensure that secondary tenants don't populate this field when
+	// we make use of these in the RPC.
+	TenantID *TenantID `protobuf:"bytes,1,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`
+}
+
+func (m *SystemSpanConfigTarget) Reset()         { *m = SystemSpanConfigTarget{} }
+func (m *SystemSpanConfigTarget) String() string { return proto.CompactTextString(m) }
+func (*SystemSpanConfigTarget) ProtoMessage()    {}
+func (*SystemSpanConfigTarget) Descriptor() ([]byte, []int) {
+	return fileDescriptor_91c9f1dcea14470a, []int{8}
+}
+func (m *SystemSpanConfigTarget) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *SystemSpanConfigTarget) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	b = b[:cap(b)]
+	n, err := m.MarshalToSizedBuffer(b)
+	if err != nil {
+		return nil, err
+	}
+	return b[:n], nil
+}
+func (m *SystemSpanConfigTarget) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SystemSpanConfigTarget.Merge(m, src)
+}
+func (m *SystemSpanConfigTarget) XXX_Size() int {
+	return m.Size()
+}
+func (m *SystemSpanConfigTarget) XXX_DiscardUnknown() {
+	xxx_messageInfo_SystemSpanConfigTarget.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_SystemSpanConfigTarget proto.InternalMessageInfo
+
+// SystemSpanConfigEntry is a SystemSpanConfigTarget and its corresponding
+// SystemSpanConfig.
+type SystemSpanConfigEntry struct {
+	// SystemSpanConfigTarget represents the target over which the config is said
+	// to apply.
+	SystemSpanConfigTarget SystemSpanConfigTarget `protobuf:"bytes,1,opt,name=system_span_config_target,json=systemSpanConfigTarget,proto3" json:"system_span_config_target"`
+	// SystemSpanConfig is the config that applies.
+	SystemSpanConfig SystemSpanConfig `protobuf:"bytes,2,opt,name=system_span_config,json=systemSpanConfig,proto3" json:"system_span_config"`
+}
+
+func (m *SystemSpanConfigEntry) Reset()         { *m = SystemSpanConfigEntry{} }
+func (m *SystemSpanConfigEntry) String() string { return proto.CompactTextString(m) }
+func (*SystemSpanConfigEntry) ProtoMessage()    {}
+func (*SystemSpanConfigEntry) Descriptor() ([]byte, []int) {
+	return fileDescriptor_91c9f1dcea14470a, []int{9}
+}
+func (m *SystemSpanConfigEntry) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *SystemSpanConfigEntry) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	b = b[:cap(b)]
+	n, err := m.MarshalToSizedBuffer(b)
+	if err != nil {
+		return nil, err
+	}
+	return b[:n], nil
+}
+func (m *SystemSpanConfigEntry) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SystemSpanConfigEntry.Merge(m, src)
+}
+func (m *SystemSpanConfigEntry) XXX_Size() int {
+	return m.Size()
+}
+func (m *SystemSpanConfigEntry) XXX_DiscardUnknown() {
+	xxx_messageInfo_SystemSpanConfigEntry.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_SystemSpanConfigEntry proto.InternalMessageInfo
+
 // GetSpanConfigsRequest is used to fetch the span configurations over the
 // specified keyspans.
 type GetSpanConfigsRequest struct {
@@ -335,7 +495,7 @@ func (m *GetSpanConfigsRequest) Reset()         { *m = GetSpanConfigsRequest{} }
 func (m *GetSpanConfigsRequest) String() string { return proto.CompactTextString(m) }
 func (*GetSpanConfigsRequest) ProtoMessage()    {}
 func (*GetSpanConfigsRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_91c9f1dcea14470a, []int{6}
+	return fileDescriptor_91c9f1dcea14470a, []int{10}
 }
 func (m *GetSpanConfigsRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -375,7 +535,7 @@ func (m *GetSpanConfigsResponse) Reset()         { *m = GetSpanConfigsResponse{}
 func (m *GetSpanConfigsResponse) String() string { return proto.CompactTextString(m) }
 func (*GetSpanConfigsResponse) ProtoMessage()    {}
 func (*GetSpanConfigsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_91c9f1dcea14470a, []int{7}
+	return fileDescriptor_91c9f1dcea14470a, []int{11}
 }
 func (m *GetSpanConfigsResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -427,7 +587,7 @@ func (m *UpdateSpanConfigsRequest) Reset()         { *m = UpdateSpanConfigsReque
 func (m *UpdateSpanConfigsRequest) String() string { return proto.CompactTextString(m) }
 func (*UpdateSpanConfigsRequest) ProtoMessage()    {}
 func (*UpdateSpanConfigsRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_91c9f1dcea14470a, []int{8}
+	return fileDescriptor_91c9f1dcea14470a, []int{12}
 }
 func (m *UpdateSpanConfigsRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -459,7 +619,7 @@ func (m *UpdateSpanConfigsResponse) Reset()         { *m = UpdateSpanConfigsResp
 func (m *UpdateSpanConfigsResponse) String() string { return proto.CompactTextString(m) }
 func (*UpdateSpanConfigsResponse) ProtoMessage()    {}
 func (*UpdateSpanConfigsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_91c9f1dcea14470a, []int{9}
+	return fileDescriptor_91c9f1dcea14470a, []int{13}
 }
 func (m *UpdateSpanConfigsResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -487,11 +647,15 @@ var xxx_messageInfo_UpdateSpanConfigsResponse proto.InternalMessageInfo
 func init() {
 	proto.RegisterEnum("cockroach.roachpb.Constraint_Type", Constraint_Type_name, Constraint_Type_value)
 	proto.RegisterType((*GCPolicy)(nil), "cockroach.roachpb.GCPolicy")
+	proto.RegisterType((*ProtectionPolicy)(nil), "cockroach.roachpb.ProtectionPolicy")
 	proto.RegisterType((*Constraint)(nil), "cockroach.roachpb.Constraint")
 	proto.RegisterType((*ConstraintsConjunction)(nil), "cockroach.roachpb.ConstraintsConjunction")
 	proto.RegisterType((*LeasePreference)(nil), "cockroach.roachpb.LeasePreference")
 	proto.RegisterType((*SpanConfig)(nil), "cockroach.roachpb.SpanConfig")
 	proto.RegisterType((*SpanConfigEntry)(nil), "cockroach.roachpb.SpanConfigEntry")
+	proto.RegisterType((*SystemSpanConfig)(nil), "cockroach.roachpb.SystemSpanConfig")
+	proto.RegisterType((*SystemSpanConfigTarget)(nil), "cockroach.roachpb.SystemSpanConfigTarget")
+	proto.RegisterType((*SystemSpanConfigEntry)(nil), "cockroach.roachpb.SystemSpanConfigEntry")
 	proto.RegisterType((*GetSpanConfigsRequest)(nil), "cockroach.roachpb.GetSpanConfigsRequest")
 	proto.RegisterType((*GetSpanConfigsResponse)(nil), "cockroach.roachpb.GetSpanConfigsResponse")
 	proto.RegisterType((*UpdateSpanConfigsRequest)(nil), "cockroach.roachpb.UpdateSpanConfigsRequest")
@@ -501,54 +665,66 @@ func init() {
 func init() { proto.RegisterFile("roachpb/span_config.proto", fileDescriptor_91c9f1dcea14470a) }
 
 var fileDescriptor_91c9f1dcea14470a = []byte{
-	// 752 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x55, 0x41, 0x4f, 0xdb, 0x48,
-	0x14, 0xce, 0x90, 0x04, 0x9c, 0x17, 0x16, 0x92, 0x59, 0x96, 0x35, 0x20, 0x9c, 0x60, 0xad, 0x56,
-	0xe1, 0x12, 0xb4, 0x41, 0xda, 0x03, 0xbd, 0x25, 0x44, 0x94, 0x8a, 0xaa, 0x60, 0x92, 0xaa, 0xaa,
-	0xaa, 0x5a, 0x8e, 0x33, 0xa4, 0x2e, 0xce, 0x8c, 0xeb, 0x99, 0x20, 0x72, 0xec, 0xbd, 0x87, 0x1e,
-	0x2b, 0xb5, 0x95, 0xf8, 0x19, 0xfd, 0x09, 0x1c, 0x39, 0x72, 0x42, 0x6d, 0xb8, 0xf4, 0x67, 0x54,
-	0x1e, 0x3b, 0xc4, 0x40, 0x44, 0x11, 0xb7, 0xc9, 0xe7, 0xef, 0x7d, 0xef, 0x7b, 0xcf, 0x9f, 0x27,
-	0xb0, 0xe0, 0x33, 0xcb, 0x7e, 0xe3, 0xb5, 0xd6, 0xb8, 0x67, 0x51, 0xd3, 0x66, 0xf4, 0xc0, 0xe9,
-	0x94, 0x3d, 0x9f, 0x09, 0x86, 0xf3, 0x36, 0xb3, 0x0f, 0xe5, 0xe3, 0x72, 0x44, 0x5a, 0xc4, 0x43,
-	0x76, 0xdb, 0x12, 0x56, 0x48, 0x5b, 0x9c, 0xeb, 0xb0, 0x0e, 0x93, 0xc7, 0xb5, 0xe0, 0x14, 0xa2,
-	0x7a, 0x1d, 0x94, 0xad, 0xda, 0x2e, 0x73, 0x1d, 0xbb, 0x8f, 0xd7, 0x20, 0x2b, 0x84, 0x6b, 0x72,
-	0x62, 0x33, 0xda, 0xe6, 0x2a, 0x2a, 0xa2, 0x52, 0xba, 0x3a, 0x33, 0xb8, 0x28, 0x40, 0xa3, 0xb1,
-	0xb3, 0x1f, 0xa2, 0x06, 0x08, 0xe1, 0x46, 0xe7, 0x0d, 0xe5, 0xdb, 0x49, 0x01, 0xfd, 0x3c, 0x29,
-	0x20, 0xfd, 0x0b, 0x02, 0xa8, 0x31, 0xca, 0x85, 0x6f, 0x39, 0x54, 0xe0, 0xff, 0x21, 0x25, 0xfa,
-	0x1e, 0x91, 0x12, 0x33, 0x15, 0xbd, 0x7c, 0xcb, 0x61, 0x79, 0x44, 0x2e, 0x37, 0xfa, 0x1e, 0x31,
-	0x24, 0x1f, 0xe7, 0x20, 0x79, 0x48, 0xfa, 0xea, 0x44, 0x11, 0x95, 0x32, 0x46, 0x70, 0xc4, 0x73,
-	0x90, 0x3e, 0xb2, 0xdc, 0x1e, 0x51, 0x93, 0x12, 0x0b, 0x7f, 0xe8, 0xff, 0x40, 0x2a, 0xa8, 0xc2,
-	0xd3, 0xa0, 0x18, 0xf5, 0xbd, 0xe6, 0xb6, 0x51, 0xdf, 0xcc, 0x25, 0xf0, 0x0c, 0xc0, 0xae, 0xf1,
-	0xec, 0xf1, 0x76, 0x75, 0xbb, 0x51, 0xdf, 0xcc, 0xa1, 0x0d, 0xe5, 0xd3, 0x49, 0x21, 0x21, 0xed,
-	0x7d, 0x40, 0x30, 0x3f, 0xea, 0xc8, 0x6b, 0x8c, 0xbe, 0xed, 0x51, 0x5b, 0x38, 0x8c, 0xe2, 0x15,
-	0x98, 0xa6, 0xbd, 0xae, 0xe9, 0x13, 0xcf, 0x75, 0x6c, 0x2b, 0x9a, 0xda, 0xc8, 0xd2, 0x5e, 0xd7,
-	0x88, 0x20, 0x5c, 0x87, 0xac, 0x3d, 0x2a, 0x56, 0x27, 0x8a, 0xc9, 0x52, 0xb6, 0xb2, 0x7c, 0xe7,
-	0x50, 0xd5, 0xd4, 0xe9, 0x45, 0x21, 0x61, 0xc4, 0xeb, 0x62, 0x76, 0x5e, 0xc3, 0xec, 0x0e, 0xb1,
-	0x38, 0xd9, 0xf5, 0xc9, 0x01, 0xf1, 0x09, 0xb5, 0xc9, 0xcd, 0x1e, 0xe8, 0x81, 0x3d, 0x52, 0x52,
-	0xff, 0x73, 0x0a, 0x60, 0xdf, 0xb3, 0x68, 0x4d, 0xc6, 0x04, 0xff, 0x0b, 0xb3, 0xbe, 0x45, 0x3b,
-	0xc4, 0xec, 0x3a, 0xd4, 0x6c, 0xf5, 0x05, 0x09, 0xa7, 0x4c, 0x1a, 0x7f, 0x48, 0xf8, 0xa9, 0x43,
-	0xab, 0x01, 0x18, 0xe3, 0x59, 0xc7, 0x11, 0x6f, 0x22, 0xce, 0xb3, 0x8e, 0x43, 0xde, 0x13, 0xc8,
-	0x74, 0x6c, 0xd3, 0x93, 0xa1, 0x91, 0xef, 0x25, 0x5b, 0x59, 0x1a, 0xe3, 0x74, 0x98, 0xab, 0x6a,
-	0x2e, 0xf0, 0x39, 0xb8, 0x28, 0x5c, 0x25, 0xcd, 0x50, 0x3a, 0x76, 0x94, 0xb9, 0x15, 0x98, 0xee,
-	0xb8, 0xac, 0x65, 0xb9, 0xa6, 0x4f, 0xac, 0x36, 0x57, 0x53, 0x45, 0x54, 0x52, 0x8c, 0x6c, 0x88,
-	0x19, 0x01, 0x74, 0xeb, 0x0d, 0xa5, 0x6f, 0xbf, 0xa1, 0x65, 0x80, 0x80, 0x72, 0xc4, 0x04, 0xf1,
-	0xb9, 0x3a, 0x29, 0x09, 0x19, 0xda, 0xeb, 0x3e, 0x97, 0x00, 0xde, 0xbb, 0xbe, 0xdc, 0x29, 0xb9,
-	0xdc, 0xd5, 0x3b, 0x97, 0x1b, 0xcf, 0xc8, 0x98, 0x45, 0xe3, 0x57, 0x90, 0x97, 0xdd, 0xcc, 0xb8,
-	0xb0, 0xf2, 0x30, 0xe1, 0x9c, 0x54, 0x8a, 0x51, 0x70, 0x13, 0xf2, 0x6e, 0x10, 0x10, 0xd3, 0xbb,
-	0x4a, 0x08, 0x57, 0x33, 0x52, 0x7d, 0xdc, 0xc7, 0x74, 0x23, 0x4c, 0x43, 0x59, 0xf7, 0x3a, 0x3c,
-	0x4c, 0xc7, 0x7b, 0x04, 0xb3, 0xa3, 0x74, 0xd4, 0xa9, 0xf0, 0xfb, 0xf8, 0x3f, 0x48, 0x05, 0x17,
-	0x8b, 0xcc, 0x45, 0xb6, 0xf2, 0xf7, 0x98, 0x1e, 0x41, 0x45, 0x24, 0x2c, 0xa9, 0xf8, 0x11, 0x4c,
-	0x86, 0xd7, 0x90, 0x0c, 0xc9, 0xf8, 0xb0, 0x8e, 0xda, 0x44, 0xa5, 0x51, 0x89, 0xbe, 0x03, 0x7f,
-	0x6d, 0x11, 0x31, 0x7a, 0xcc, 0x0d, 0xf2, 0xae, 0x47, 0xb8, 0xc0, 0xeb, 0x90, 0x0e, 0xd4, 0x87,
-	0x5f, 0xc0, 0x6f, 0x9c, 0x84, 0x5c, 0xdd, 0x87, 0xf9, 0x9b, 0x6a, 0xdc, 0x63, 0x94, 0x13, 0xfc,
-	0x02, 0xfe, 0x8c, 0x5d, 0x98, 0x26, 0xa1, 0xc2, 0x77, 0xc8, 0x50, 0x5c, 0xbf, 0xd3, 0xb1, 0x5c,
-	0x4c, 0xd4, 0x27, 0xcf, 0xaf, 0xc1, 0x0e, 0xe1, 0xfa, 0x57, 0x04, 0x6a, 0xd3, 0x6b, 0x5b, 0x82,
-	0x8c, 0x99, 0x62, 0x03, 0x32, 0x82, 0x99, 0x6d, 0xe2, 0x12, 0x41, 0xee, 0x37, 0x89, 0x22, 0xd8,
-	0xa6, 0xa4, 0xe3, 0xba, 0xac, 0xed, 0x79, 0x9c, 0xf8, 0x22, 0xba, 0x6b, 0xee, 0x6f, 0x54, 0x11,
-	0xac, 0x29, 0x2b, 0xf5, 0x25, 0x58, 0x18, 0x63, 0x2f, 0x5c, 0x4b, 0x75, 0xf5, 0xf4, 0x87, 0x96,
-	0x38, 0x1d, 0x68, 0xe8, 0x6c, 0xa0, 0xa1, 0xf3, 0x81, 0x86, 0xbe, 0x0f, 0x34, 0xf4, 0xf1, 0x52,
-	0x4b, 0x9c, 0x5d, 0x6a, 0x89, 0xf3, 0x4b, 0x2d, 0xf1, 0x72, 0x2a, 0xea, 0xd3, 0x9a, 0x94, 0xff,
-	0x13, 0xeb, 0xbf, 0x02, 0x00, 0x00, 0xff, 0xff, 0xc2, 0x30, 0xc2, 0x33, 0x81, 0x06, 0x00, 0x00,
+	// 940 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x56, 0x41, 0x6f, 0x1b, 0x45,
+	0x14, 0xf6, 0x24, 0x4e, 0xba, 0x7e, 0x0e, 0x89, 0x33, 0x6d, 0x83, 0xd3, 0x2a, 0x76, 0xba, 0x45,
+	0x28, 0xbd, 0xd8, 0x22, 0x95, 0x38, 0x84, 0x9b, 0x13, 0xab, 0x18, 0x05, 0x91, 0x6e, 0x1c, 0x40,
+	0x15, 0x62, 0x35, 0xd9, 0x7d, 0x75, 0xb6, 0x5d, 0xcf, 0x2c, 0x3b, 0xe3, 0xaa, 0x3e, 0x72, 0xe7,
+	0xc0, 0x11, 0x09, 0x90, 0xc2, 0xbf, 0xe0, 0x27, 0xe4, 0xd8, 0x63, 0x0f, 0x28, 0x02, 0xe7, 0xc2,
+	0xcf, 0x40, 0x3b, 0x3b, 0xb6, 0x37, 0xce, 0x12, 0xa2, 0x8a, 0xdb, 0xf8, 0x9b, 0xef, 0xbd, 0xef,
+	0xbd, 0x37, 0xdf, 0xcc, 0x1a, 0xd6, 0x63, 0xc1, 0xbc, 0x93, 0xe8, 0xb8, 0x29, 0x23, 0xc6, 0x5d,
+	0x4f, 0xf0, 0xe7, 0x41, 0xaf, 0x11, 0xc5, 0x42, 0x09, 0xba, 0xea, 0x09, 0xef, 0xa5, 0xde, 0x6e,
+	0x18, 0xd2, 0x3d, 0x3a, 0x66, 0xfb, 0x4c, 0xb1, 0x94, 0x76, 0xef, 0x4e, 0x4f, 0xf4, 0x84, 0x5e,
+	0x36, 0x93, 0x95, 0x41, 0xab, 0x03, 0x15, 0x84, 0xcd, 0x93, 0xd0, 0x6b, 0xaa, 0xa0, 0x8f, 0x52,
+	0xb1, 0x7e, 0x94, 0xee, 0xd8, 0xbf, 0x11, 0xb0, 0x9e, 0xec, 0x1e, 0x88, 0x30, 0xf0, 0x86, 0xb4,
+	0x09, 0x65, 0xa5, 0x42, 0x57, 0xa2, 0x27, 0xb8, 0x2f, 0xab, 0x64, 0x93, 0x6c, 0x2d, 0xb4, 0x96,
+	0x47, 0xe7, 0x75, 0xe8, 0x76, 0xf7, 0x0f, 0x53, 0xd4, 0x01, 0xa5, 0x42, 0xb3, 0xa6, 0xcf, 0xe0,
+	0x76, 0x92, 0x06, 0x3d, 0x15, 0x08, 0xee, 0x46, 0x49, 0x96, 0x00, 0x65, 0x75, 0x6e, 0x73, 0x7e,
+	0xab, 0xbc, 0xfd, 0xb0, 0x71, 0xa5, 0xe4, 0xc6, 0xc1, 0x84, 0x9d, 0x4a, 0xb6, 0x8a, 0x67, 0xe7,
+	0xf5, 0x82, 0x43, 0xa3, 0xcb, 0x78, 0x80, 0x72, 0xc7, 0xfa, 0xfd, 0xb4, 0x4e, 0xfe, 0x3e, 0xad,
+	0x13, 0x3b, 0x86, 0xca, 0x6c, 0x1c, 0xed, 0x4e, 0x94, 0xd1, 0x77, 0x27, 0x4d, 0xe9, 0x92, 0xcb,
+	0xdb, 0x1b, 0x19, 0xe5, 0xa4, 0xf3, 0xc6, 0x49, 0xe8, 0x35, 0xba, 0x63, 0xd2, 0x8c, 0x26, 0xfa,
+	0x93, 0x9d, 0x8c, 0xe6, 0x2f, 0x04, 0x60, 0x57, 0x70, 0xa9, 0x62, 0x16, 0x70, 0x45, 0x3f, 0x86,
+	0xa2, 0x1a, 0x46, 0xa8, 0xf3, 0x2f, 0x6f, 0xdb, 0x39, 0x9d, 0x4d, 0xc9, 0x8d, 0xee, 0x30, 0x42,
+	0x47, 0xf3, 0x69, 0x05, 0xe6, 0x5f, 0xe2, 0xb0, 0x3a, 0xb7, 0x49, 0xb6, 0x4a, 0x4e, 0xb2, 0xa4,
+	0x77, 0x60, 0xe1, 0x15, 0x0b, 0x07, 0x58, 0x9d, 0xd7, 0x58, 0xfa, 0xc3, 0xfe, 0x00, 0x8a, 0x49,
+	0x14, 0x5d, 0x02, 0xcb, 0x69, 0x3f, 0x3d, 0xea, 0x38, 0xed, 0xbd, 0x4a, 0x81, 0x2e, 0x03, 0x1c,
+	0x38, 0x5f, 0x7c, 0xda, 0x69, 0x75, 0xba, 0xed, 0xbd, 0x0a, 0xd9, 0xb1, 0x7e, 0x3a, 0xad, 0x17,
+	0x74, 0x79, 0x3f, 0x10, 0x58, 0x9b, 0x2a, 0xca, 0x5d, 0xc1, 0x5f, 0x0c, 0xb8, 0x9e, 0x0f, 0x7d,
+	0x00, 0x4b, 0x7c, 0xd0, 0x77, 0x63, 0x8c, 0xc2, 0xc0, 0x63, 0xe6, 0x14, 0x9d, 0x32, 0x1f, 0xf4,
+	0x1d, 0x03, 0xd1, 0x36, 0x94, 0xbd, 0x69, 0xb0, 0x39, 0xae, 0x8d, 0x6b, 0x9b, 0x32, 0x43, 0xcb,
+	0xc6, 0x65, 0xca, 0xf9, 0x16, 0x56, 0xf6, 0x91, 0x49, 0x3c, 0x88, 0xf1, 0x39, 0xc6, 0xc8, 0x3d,
+	0x9c, 0xd5, 0x20, 0xef, 0xa8, 0x51, 0xd4, 0xf9, 0x7f, 0x2e, 0x02, 0x1c, 0x46, 0x8c, 0xef, 0xea,
+	0x1b, 0x41, 0x3f, 0x84, 0x95, 0x98, 0xf1, 0x1e, 0xba, 0xfd, 0x80, 0xbb, 0xc7, 0x43, 0x85, 0x69,
+	0x97, 0xf3, 0xce, 0x7b, 0x1a, 0xfe, 0x3c, 0xe0, 0xad, 0x04, 0xcc, 0xf0, 0xd8, 0x6b, 0xc3, 0x9b,
+	0xcb, 0xf2, 0xd8, 0xeb, 0x94, 0xf7, 0x19, 0x94, 0x7a, 0x5e, 0x6a, 0xdf, 0xa1, 0x3e, 0x97, 0xf2,
+	0xf6, 0xfd, 0x9c, 0x4a, 0xc7, 0xf7, 0xa4, 0x55, 0x49, 0xea, 0x1c, 0x9d, 0xd7, 0x27, 0x37, 0xc7,
+	0xb1, 0x7a, 0x9e, 0x31, 0xe6, 0x03, 0x58, 0xea, 0x85, 0xe2, 0x98, 0x85, 0x6e, 0x8c, 0xcc, 0x97,
+	0xd5, 0xe2, 0x26, 0xd9, 0xb2, 0x9c, 0x72, 0x8a, 0x39, 0x09, 0x74, 0xe5, 0x84, 0x16, 0xae, 0x9e,
+	0xd0, 0x06, 0x40, 0x42, 0x79, 0x25, 0x14, 0xc6, 0xb2, 0xba, 0xa8, 0x09, 0x25, 0x3e, 0xe8, 0x7f,
+	0xa9, 0x01, 0xfa, 0xf4, 0xf2, 0x70, 0x6f, 0xe9, 0xe1, 0x3e, 0xba, 0x76, 0xb8, 0x59, 0x8f, 0xe4,
+	0x0c, 0x9a, 0x7e, 0x03, 0xab, 0x5a, 0xcd, 0xcd, 0x26, 0xb6, 0xde, 0x2d, 0x71, 0x45, 0x67, 0xca,
+	0x50, 0xe8, 0x11, 0xac, 0x86, 0x89, 0x41, 0xdc, 0x68, 0xe2, 0x10, 0x59, 0x2d, 0xe9, 0xec, 0x79,
+	0x97, 0x69, 0xc6, 0x4c, 0xe3, 0xb4, 0xe1, 0x65, 0x78, 0xec, 0x8e, 0xef, 0x09, 0xac, 0x4c, 0xdd,
+	0xd1, 0xe6, 0x2a, 0x1e, 0xd2, 0x8f, 0xa0, 0x98, 0xbc, 0xa1, 0xe6, 0x41, 0x78, 0x3f, 0x47, 0x23,
+	0x89, 0x30, 0x89, 0x35, 0x95, 0x7e, 0x02, 0x8b, 0xe9, 0x8b, 0xab, 0x4d, 0x92, 0x6f, 0xd6, 0xa9,
+	0x8c, 0x09, 0x35, 0x21, 0xb6, 0x82, 0xca, 0xe1, 0x50, 0x2a, 0xec, 0x67, 0x6c, 0xfa, 0x2f, 0xaf,
+	0x23, 0xf9, 0x3f, 0x5e, 0xc7, 0xb4, 0x73, 0x1f, 0xd6, 0x66, 0x55, 0xbb, 0x2c, 0xee, 0xa1, 0x4a,
+	0x2c, 0xad, 0x90, 0x33, 0xae, 0xdc, 0xc0, 0x37, 0x43, 0xc8, 0xb3, 0x74, 0x57, 0x73, 0x3a, 0x7b,
+	0xda, 0xd2, 0x24, 0xb1, 0xf4, 0x18, 0x71, 0xac, 0x34, 0xbe, 0xe3, 0xdb, 0x7f, 0x10, 0xb8, 0x3b,
+	0x2b, 0x93, 0x4e, 0xf9, 0x05, 0xac, 0x4b, 0xbd, 0xe1, 0x66, 0x3e, 0x58, 0xae, 0xd2, 0x25, 0x18,
+	0xd5, 0x3c, 0xf3, 0xe4, 0xd7, 0x6c, 0xba, 0x5d, 0x93, 0xf9, 0x1d, 0x7d, 0x05, 0xf4, 0xaa, 0x96,
+	0x39, 0xaa, 0x87, 0x37, 0x10, 0x19, 0x9b, 0x68, 0x36, 0xbd, 0xbd, 0x0f, 0x77, 0x9f, 0xa0, 0x9a,
+	0x02, 0xd2, 0xc1, 0xef, 0x06, 0x28, 0x15, 0x7d, 0x0c, 0x0b, 0x89, 0xd4, 0xf8, 0xc4, 0xfe, 0xc3,
+	0x44, 0x29, 0xd7, 0x8e, 0x61, 0x6d, 0x36, 0x9b, 0x8c, 0x04, 0x97, 0x48, 0xbf, 0x86, 0xdb, 0xd9,
+	0x29, 0x21, 0x57, 0xf1, 0xd4, 0x0e, 0xf6, 0xb5, 0x66, 0xd3, 0xd3, 0x36, 0x3a, 0xab, 0xf2, 0x12,
+	0x1c, 0xa0, 0xb4, 0x7f, 0x25, 0x50, 0x3d, 0x8a, 0x7c, 0xa6, 0x30, 0xa7, 0x8b, 0x1d, 0x28, 0x29,
+	0xe1, 0xfa, 0x18, 0xa2, 0xc2, 0x9b, 0x75, 0x62, 0x29, 0xb1, 0xa7, 0xe9, 0xb4, 0xad, 0x63, 0x07,
+	0x91, 0xc4, 0x58, 0x99, 0xcf, 0xc4, 0xcd, 0x0b, 0xb5, 0x94, 0x38, 0xd2, 0x91, 0xf6, 0x7d, 0x58,
+	0xcf, 0x29, 0x2f, 0x1d, 0x4b, 0xeb, 0xd1, 0xd9, 0x5f, 0xb5, 0xc2, 0xd9, 0xa8, 0x46, 0xde, 0x8c,
+	0x6a, 0xe4, 0xed, 0xa8, 0x46, 0xfe, 0x1c, 0xd5, 0xc8, 0x8f, 0x17, 0xb5, 0xc2, 0x9b, 0x8b, 0x5a,
+	0xe1, 0xed, 0x45, 0xad, 0xf0, 0xec, 0x96, 0xd1, 0x39, 0x5e, 0xd4, 0xff, 0x59, 0x1e, 0xff, 0x13,
+	0x00, 0x00, 0xff, 0xff, 0x6e, 0x19, 0xc3, 0xd2, 0x27, 0x09, 0x00, 0x00,
 }
 
 func (this *GCPolicy) Equal(that interface{}) bool {
@@ -571,6 +747,38 @@ func (this *GCPolicy) Equal(that interface{}) bool {
 		return false
 	}
 	if this.TTLSeconds != that1.TTLSeconds {
+		return false
+	}
+	if len(this.ProtectionPolicies) != len(that1.ProtectionPolicies) {
+		return false
+	}
+	for i := range this.ProtectionPolicies {
+		if !this.ProtectionPolicies[i].Equal(&that1.ProtectionPolicies[i]) {
+			return false
+		}
+	}
+	return true
+}
+func (this *ProtectionPolicy) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*ProtectionPolicy)
+	if !ok {
+		that2, ok := that.(ProtectionPolicy)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !this.ProtectedTimestamp.Equal(&that1.ProtectedTimestamp) {
 		return false
 	}
 	return true
@@ -729,6 +937,35 @@ func (this *SpanConfig) Equal(that interface{}) bool {
 	}
 	return true
 }
+func (this *SystemSpanConfig) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*SystemSpanConfig)
+	if !ok {
+		that2, ok := that.(SystemSpanConfig)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if len(this.ProtectionPolicies) != len(that1.ProtectionPolicies) {
+		return false
+	}
+	for i := range this.ProtectionPolicies {
+		if !this.ProtectionPolicies[i].Equal(&that1.ProtectionPolicies[i]) {
+			return false
+		}
+	}
+	return true
+}
 func (m *GCPolicy) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -749,11 +986,58 @@ func (m *GCPolicy) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	if len(m.ProtectionPolicies) > 0 {
+		for iNdEx := len(m.ProtectionPolicies) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.ProtectionPolicies[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintSpanConfig(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x12
+		}
+	}
 	if m.TTLSeconds != 0 {
 		i = encodeVarintSpanConfig(dAtA, i, uint64(m.TTLSeconds))
 		i--
 		dAtA[i] = 0x8
 	}
+	return len(dAtA) - i, nil
+}
+
+func (m *ProtectionPolicy) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ProtectionPolicy) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ProtectionPolicy) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	{
+		size, err := m.ProtectedTimestamp.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintSpanConfig(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
 	return len(dAtA) - i, nil
 }
 
@@ -1026,6 +1310,121 @@ func (m *SpanConfigEntry) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
+func (m *SystemSpanConfig) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *SystemSpanConfig) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *SystemSpanConfig) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.ProtectionPolicies) > 0 {
+		for iNdEx := len(m.ProtectionPolicies) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.ProtectionPolicies[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintSpanConfig(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0xa
+		}
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *SystemSpanConfigTarget) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *SystemSpanConfigTarget) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *SystemSpanConfigTarget) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.TenantID != nil {
+		{
+			size, err := m.TenantID.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintSpanConfig(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *SystemSpanConfigEntry) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *SystemSpanConfigEntry) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *SystemSpanConfigEntry) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	{
+		size, err := m.SystemSpanConfig.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintSpanConfig(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x12
+	{
+		size, err := m.SystemSpanConfigTarget.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintSpanConfig(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
+}
+
 func (m *GetSpanConfigsRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -1191,6 +1590,23 @@ func NewPopulatedGCPolicy(r randySpanConfig, easy bool) *GCPolicy {
 	if r.Intn(2) == 0 {
 		this.TTLSeconds *= -1
 	}
+	if r.Intn(5) != 0 {
+		v1 := r.Intn(5)
+		this.ProtectionPolicies = make([]ProtectionPolicy, v1)
+		for i := 0; i < v1; i++ {
+			v2 := NewPopulatedProtectionPolicy(r, easy)
+			this.ProtectionPolicies[i] = *v2
+		}
+	}
+	if !easy && r.Intn(10) != 0 {
+	}
+	return this
+}
+
+func NewPopulatedProtectionPolicy(r randySpanConfig, easy bool) *ProtectionPolicy {
+	this := &ProtectionPolicy{}
+	v3 := hlc.NewPopulatedTimestamp(r, easy)
+	this.ProtectedTimestamp = *v3
 	if !easy && r.Intn(10) != 0 {
 	}
 	return this
@@ -1215,9 +1631,9 @@ func randUTF8RuneSpanConfig(r randySpanConfig) rune {
 	return rune(ru + 61)
 }
 func randStringSpanConfig(r randySpanConfig) string {
-	v1 := r.Intn(100)
-	tmps := make([]rune, v1)
-	for i := 0; i < v1; i++ {
+	v4 := r.Intn(100)
+	tmps := make([]rune, v4)
+	for i := 0; i < v4; i++ {
 		tmps[i] = randUTF8RuneSpanConfig(r)
 	}
 	return string(tmps)
@@ -1239,11 +1655,11 @@ func randFieldSpanConfig(dAtA []byte, r randySpanConfig, fieldNumber int, wire i
 	switch wire {
 	case 0:
 		dAtA = encodeVarintPopulateSpanConfig(dAtA, uint64(key))
-		v2 := r.Int63()
+		v5 := r.Int63()
 		if r.Intn(2) == 0 {
-			v2 *= -1
+			v5 *= -1
 		}
-		dAtA = encodeVarintPopulateSpanConfig(dAtA, uint64(v2))
+		dAtA = encodeVarintPopulateSpanConfig(dAtA, uint64(v5))
 	case 1:
 		dAtA = encodeVarintPopulateSpanConfig(dAtA, uint64(key))
 		dAtA = append(dAtA, byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)))
@@ -1277,6 +1693,23 @@ func (m *GCPolicy) Size() (n int) {
 	if m.TTLSeconds != 0 {
 		n += 1 + sovSpanConfig(uint64(m.TTLSeconds))
 	}
+	if len(m.ProtectionPolicies) > 0 {
+		for _, e := range m.ProtectionPolicies {
+			l = e.Size()
+			n += 1 + l + sovSpanConfig(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *ProtectionPolicy) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = m.ProtectedTimestamp.Size()
+	n += 1 + l + sovSpanConfig(uint64(l))
 	return n
 }
 
@@ -1386,6 +1819,47 @@ func (m *SpanConfigEntry) Size() (n int) {
 	l = m.Span.Size()
 	n += 1 + l + sovSpanConfig(uint64(l))
 	l = m.Config.Size()
+	n += 1 + l + sovSpanConfig(uint64(l))
+	return n
+}
+
+func (m *SystemSpanConfig) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if len(m.ProtectionPolicies) > 0 {
+		for _, e := range m.ProtectionPolicies {
+			l = e.Size()
+			n += 1 + l + sovSpanConfig(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *SystemSpanConfigTarget) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.TenantID != nil {
+		l = m.TenantID.Size()
+		n += 1 + l + sovSpanConfig(uint64(l))
+	}
+	return n
+}
+
+func (m *SystemSpanConfigEntry) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = m.SystemSpanConfigTarget.Size()
+	n += 1 + l + sovSpanConfig(uint64(l))
+	l = m.SystemSpanConfig.Size()
 	n += 1 + l + sovSpanConfig(uint64(l))
 	return n
 }
@@ -1504,6 +1978,123 @@ func (m *GCPolicy) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ProtectionPolicies", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowSpanConfig
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthSpanConfig
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthSpanConfig
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ProtectionPolicies = append(m.ProtectionPolicies, ProtectionPolicy{})
+			if err := m.ProtectionPolicies[len(m.ProtectionPolicies)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipSpanConfig(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthSpanConfig
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ProtectionPolicy) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowSpanConfig
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ProtectionPolicy: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ProtectionPolicy: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ProtectedTimestamp", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowSpanConfig
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthSpanConfig
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthSpanConfig
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.ProtectedTimestamp.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipSpanConfig(dAtA[iNdEx:])
@@ -2218,6 +2809,292 @@ func (m *SpanConfigEntry) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if err := m.Config.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipSpanConfig(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthSpanConfig
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *SystemSpanConfig) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowSpanConfig
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: SystemSpanConfig: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: SystemSpanConfig: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ProtectionPolicies", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowSpanConfig
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthSpanConfig
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthSpanConfig
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ProtectionPolicies = append(m.ProtectionPolicies, ProtectionPolicy{})
+			if err := m.ProtectionPolicies[len(m.ProtectionPolicies)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipSpanConfig(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthSpanConfig
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *SystemSpanConfigTarget) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowSpanConfig
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: SystemSpanConfigTarget: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: SystemSpanConfigTarget: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TenantID", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowSpanConfig
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthSpanConfig
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthSpanConfig
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.TenantID == nil {
+				m.TenantID = &TenantID{}
+			}
+			if err := m.TenantID.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipSpanConfig(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthSpanConfig
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *SystemSpanConfigEntry) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowSpanConfig
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: SystemSpanConfigEntry: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: SystemSpanConfigEntry: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SystemSpanConfigTarget", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowSpanConfig
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthSpanConfig
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthSpanConfig
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.SystemSpanConfigTarget.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SystemSpanConfig", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowSpanConfig
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthSpanConfig
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthSpanConfig
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.SystemSpanConfig.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
