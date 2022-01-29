@@ -4675,8 +4675,9 @@ var xxx_messageInfo_AddSSTableResponse proto.InternalMessageInfo
 // requests.
 type RefreshRequest struct {
 	RequestHeader `protobuf:"bytes,1,opt,name=header,proto3,embedded=header" json:"header"`
-	// refresh_from specifies the lower-bound of the verification. The request verifies that
-	// there's no write in the range [refresh_from, txn.read_timestamp].
+	// refresh_from specifies the exclusive lower-bound of the verification. The
+	// request verifies that there are no writes (committed or provisional) in the
+	// range (refresh_from, txn.read_timestamp].
 	RefreshFrom hlc.Timestamp `protobuf:"bytes,3,opt,name=refresh_from,json=refreshFrom,proto3" json:"refresh_from"`
 }
 
@@ -4748,8 +4749,9 @@ var xxx_messageInfo_RefreshResponse proto.InternalMessageInfo
 // a key span instead of a single key.
 type RefreshRangeRequest struct {
 	RequestHeader `protobuf:"bytes,1,opt,name=header,proto3,embedded=header" json:"header"`
-	// refresh_from specifies the lower-bound of the verification. The request verifies that
-	// there's no write in the range [refresh_from, txn.read_timestamp].
+	// refresh_from specifies the exclusive lower-bound of the verification. The
+	// request verifies that there are no writes (committed or provisional) in the
+	// range (refresh_from, txn.read_timestamp].
 	RefreshFrom hlc.Timestamp `protobuf:"bytes,3,opt,name=refresh_from,json=refreshFrom,proto3" json:"refresh_from"`
 }
 
