@@ -648,6 +648,7 @@ func (f *Factory) ConstructLookupJoin(
 	remoteLookupExpr tree.TypedExpr,
 	lookupCols exec.TableColumnOrdinalSet,
 	onCond tree.TypedExpr,
+	isFirstJoinInPairedJoiner bool,
 	isSecondJoinInPairedJoiner bool,
 	reqOrdering exec.OutputOrdering,
 	locking *tree.LockingItem,
@@ -664,6 +665,7 @@ func (f *Factory) ConstructLookupJoin(
 		RemoteLookupExpr:           remoteLookupExpr,
 		LookupCols:                 lookupCols,
 		OnCond:                     onCond,
+		IsFirstJoinInPairedJoiner:  isFirstJoinInPairedJoiner,
 		IsSecondJoinInPairedJoiner: isSecondJoinInPairedJoiner,
 		ReqOrdering:                reqOrdering,
 		Locking:                    locking,
@@ -684,6 +686,7 @@ func (f *Factory) ConstructLookupJoin(
 		remoteLookupExpr,
 		lookupCols,
 		onCond,
+		isFirstJoinInPairedJoiner,
 		isSecondJoinInPairedJoiner,
 		reqOrdering,
 		locking,
@@ -2072,6 +2075,7 @@ type lookupJoinArgs struct {
 	RemoteLookupExpr           tree.TypedExpr
 	LookupCols                 exec.TableColumnOrdinalSet
 	OnCond                     tree.TypedExpr
+	IsFirstJoinInPairedJoiner  bool
 	IsSecondJoinInPairedJoiner bool
 	ReqOrdering                exec.OutputOrdering
 	Locking                    *tree.LockingItem

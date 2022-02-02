@@ -3313,9 +3313,21 @@ type LookupJoinPrivate struct {
 	// table (and thus each left row matches with at most one table row).
 	LookupColsAreTableKey bool
 
-	// IsSecondJoinInPairedJoiner is true if this is the second join of a
-	// paired-joiner used for left joins.
+	// At most one of Is{First,Second}JoinInPairedJoiner can be true.
+	//
+	// IsFirstJoinInPairedJoiner is true if this is the first (i.e., lower in the
+	// plan tree) join of a paired-joiner used for left joins.
+	IsFirstJoinInPairedJoiner bool
+
+	// IsSecondJoinInPairedJoiner is true if this is the second (i.e., higher in
+	// the plan tree) join of a paired-joiner used for left joins.
 	IsSecondJoinInPairedJoiner bool
+
+	// ContinuationCol is the column ID of the continuation column when
+	// IsFirstJoinInPairedJoiner is true. The continuation column is a boolean
+	// column that indicates whether an output row is a continuation of a group
+	// corresponding to a single left input row.
+	ContinuationCol opt.ColumnID
 
 	// LocalityOptimized is true if this lookup join is part of a locality
 	// optimized search strategy. For semi, inner, and left joins, this means
@@ -25645,7 +25657,9 @@ func (in *interner) InternLookupJoin(val *LookupJoinExpr) *LookupJoinExpr {
 	in.hasher.HashFiltersExpr(val.RemoteLookupExpr)
 	in.hasher.HashColSet(val.Cols)
 	in.hasher.HashBool(val.LookupColsAreTableKey)
+	in.hasher.HashBool(val.IsFirstJoinInPairedJoiner)
 	in.hasher.HashBool(val.IsSecondJoinInPairedJoiner)
+	in.hasher.HashColumnID(val.ContinuationCol)
 	in.hasher.HashBool(val.LocalityOptimized)
 	in.hasher.HashFiltersExpr(val.ConstFilters)
 	in.hasher.HashJoinFlags(val.Flags)
@@ -25664,7 +25678,9 @@ func (in *interner) InternLookupJoin(val *LookupJoinExpr) *LookupJoinExpr {
 				in.hasher.IsFiltersExprEqual(val.RemoteLookupExpr, existing.RemoteLookupExpr) &&
 				in.hasher.IsColSetEqual(val.Cols, existing.Cols) &&
 				in.hasher.IsBoolEqual(val.LookupColsAreTableKey, existing.LookupColsAreTableKey) &&
+				in.hasher.IsBoolEqual(val.IsFirstJoinInPairedJoiner, existing.IsFirstJoinInPairedJoiner) &&
 				in.hasher.IsBoolEqual(val.IsSecondJoinInPairedJoiner, existing.IsSecondJoinInPairedJoiner) &&
+				in.hasher.IsColumnIDEqual(val.ContinuationCol, existing.ContinuationCol) &&
 				in.hasher.IsBoolEqual(val.LocalityOptimized, existing.LocalityOptimized) &&
 				in.hasher.IsFiltersExprEqual(val.ConstFilters, existing.ConstFilters) &&
 				in.hasher.IsJoinFlagsEqual(val.Flags, existing.Flags) &&
