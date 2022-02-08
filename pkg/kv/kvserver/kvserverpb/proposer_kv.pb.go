@@ -288,10 +288,8 @@ type ReplicatedEvalResult struct {
 	IsProbe         bool             `protobuf:"varint,23,opt,name=is_probe,json=isProbe,proto3" json:"is_probe,omitempty"`
 	// The timestamp at which this command is writing. Used to verify the validity
 	// of the command against the GC threshold and to update the followers'
-	// clocks. If the request that produced this command is not a write that cares
-	// about the timestamp cache, then the request's write timestamp is
-	// meaningless; for such request's, this field is simply a clock reading from
-	// the proposer.
+	// clocks. Only set if the request that produced this command is a write that
+	// cares about the timestamp cache.
 	WriteTimestamp hlc.Timestamp `protobuf:"bytes,8,opt,name=write_timestamp,json=writeTimestamp,proto3" json:"write_timestamp"`
 	// The stats delta corresponding to the data in this WriteBatch. On
 	// a split, contains only the contributions to the left-hand side.
