@@ -373,119 +373,6 @@ func (m *SpanConfigEntry) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_SpanConfigEntry proto.InternalMessageInfo
 
-// SystemSpanConfig is a system installed configuration that may apply to
-// multiple spans.
-type SystemSpanConfig struct {
-	// ProtectionPolicies is a list of policies which protect data from being
-	// GC-ed.
-	ProtectionPolicies []ProtectionPolicy `protobuf:"bytes,1,rep,name=protection_policies,json=protectionPolicies,proto3" json:"protection_policies"`
-}
-
-func (m *SystemSpanConfig) Reset()         { *m = SystemSpanConfig{} }
-func (m *SystemSpanConfig) String() string { return proto.CompactTextString(m) }
-func (*SystemSpanConfig) ProtoMessage()    {}
-func (*SystemSpanConfig) Descriptor() ([]byte, []int) {
-	return fileDescriptor_91c9f1dcea14470a, []int{7}
-}
-func (m *SystemSpanConfig) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *SystemSpanConfig) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	b = b[:cap(b)]
-	n, err := m.MarshalToSizedBuffer(b)
-	if err != nil {
-		return nil, err
-	}
-	return b[:n], nil
-}
-func (m *SystemSpanConfig) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_SystemSpanConfig.Merge(m, src)
-}
-func (m *SystemSpanConfig) XXX_Size() int {
-	return m.Size()
-}
-func (m *SystemSpanConfig) XXX_DiscardUnknown() {
-	xxx_messageInfo_SystemSpanConfig.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_SystemSpanConfig proto.InternalMessageInfo
-
-// SystemSpanConfigTarget is used to specify the target of a SystemSpanConfig.
-type SystemSpanConfigTarget struct {
-	// TenantID indicates the tenant ID of the logical cluster being targeted.
-	// For secondary tenants this field is left unset. For the host we can use
-	// this field to protect a specific secondary tenant.
-	TenantID *TenantID `protobuf:"bytes,1,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`
-}
-
-func (m *SystemSpanConfigTarget) Reset()         { *m = SystemSpanConfigTarget{} }
-func (m *SystemSpanConfigTarget) String() string { return proto.CompactTextString(m) }
-func (*SystemSpanConfigTarget) ProtoMessage()    {}
-func (*SystemSpanConfigTarget) Descriptor() ([]byte, []int) {
-	return fileDescriptor_91c9f1dcea14470a, []int{8}
-}
-func (m *SystemSpanConfigTarget) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *SystemSpanConfigTarget) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	b = b[:cap(b)]
-	n, err := m.MarshalToSizedBuffer(b)
-	if err != nil {
-		return nil, err
-	}
-	return b[:n], nil
-}
-func (m *SystemSpanConfigTarget) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_SystemSpanConfigTarget.Merge(m, src)
-}
-func (m *SystemSpanConfigTarget) XXX_Size() int {
-	return m.Size()
-}
-func (m *SystemSpanConfigTarget) XXX_DiscardUnknown() {
-	xxx_messageInfo_SystemSpanConfigTarget.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_SystemSpanConfigTarget proto.InternalMessageInfo
-
-// SystemSpanConfigEntry is a SystemSpanConfigTarget and its corresponding
-// SystemSpanConfig.
-type SystemSpanConfigEntry struct {
-	// SystemSpanConfigTarget represents the target over which the config is said
-	// to apply.
-	SystemSpanConfigTarget SystemSpanConfigTarget `protobuf:"bytes,1,opt,name=system_span_config_target,json=systemSpanConfigTarget,proto3" json:"system_span_config_target"`
-	// SystemSpanConfig is the config that applies.
-	SystemSpanConfig SystemSpanConfig `protobuf:"bytes,2,opt,name=system_span_config,json=systemSpanConfig,proto3" json:"system_span_config"`
-}
-
-func (m *SystemSpanConfigEntry) Reset()         { *m = SystemSpanConfigEntry{} }
-func (m *SystemSpanConfigEntry) String() string { return proto.CompactTextString(m) }
-func (*SystemSpanConfigEntry) ProtoMessage()    {}
-func (*SystemSpanConfigEntry) Descriptor() ([]byte, []int) {
-	return fileDescriptor_91c9f1dcea14470a, []int{9}
-}
-func (m *SystemSpanConfigEntry) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *SystemSpanConfigEntry) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	b = b[:cap(b)]
-	n, err := m.MarshalToSizedBuffer(b)
-	if err != nil {
-		return nil, err
-	}
-	return b[:n], nil
-}
-func (m *SystemSpanConfigEntry) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_SystemSpanConfigEntry.Merge(m, src)
-}
-func (m *SystemSpanConfigEntry) XXX_Size() int {
-	return m.Size()
-}
-func (m *SystemSpanConfigEntry) XXX_DiscardUnknown() {
-	xxx_messageInfo_SystemSpanConfigEntry.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_SystemSpanConfigEntry proto.InternalMessageInfo
-
 // GetSpanConfigsRequest is used to fetch the span configurations over the
 // specified keyspans.
 type GetSpanConfigsRequest struct {
@@ -498,7 +385,7 @@ func (m *GetSpanConfigsRequest) Reset()         { *m = GetSpanConfigsRequest{} }
 func (m *GetSpanConfigsRequest) String() string { return proto.CompactTextString(m) }
 func (*GetSpanConfigsRequest) ProtoMessage()    {}
 func (*GetSpanConfigsRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_91c9f1dcea14470a, []int{10}
+	return fileDescriptor_91c9f1dcea14470a, []int{7}
 }
 func (m *GetSpanConfigsRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -538,7 +425,7 @@ func (m *GetSpanConfigsResponse) Reset()         { *m = GetSpanConfigsResponse{}
 func (m *GetSpanConfigsResponse) String() string { return proto.CompactTextString(m) }
 func (*GetSpanConfigsResponse) ProtoMessage()    {}
 func (*GetSpanConfigsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_91c9f1dcea14470a, []int{11}
+	return fileDescriptor_91c9f1dcea14470a, []int{8}
 }
 func (m *GetSpanConfigsResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -562,77 +449,6 @@ func (m *GetSpanConfigsResponse) XXX_DiscardUnknown() {
 }
 
 var xxx_messageInfo_GetSpanConfigsResponse proto.InternalMessageInfo
-
-// GetSystemSpanConfigsRequest is used to fetch all system span configurations
-// installed by the requesting tenant.
-type GetSystemSpanConfigsRequest struct {
-}
-
-func (m *GetSystemSpanConfigsRequest) Reset()         { *m = GetSystemSpanConfigsRequest{} }
-func (m *GetSystemSpanConfigsRequest) String() string { return proto.CompactTextString(m) }
-func (*GetSystemSpanConfigsRequest) ProtoMessage()    {}
-func (*GetSystemSpanConfigsRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_91c9f1dcea14470a, []int{12}
-}
-func (m *GetSystemSpanConfigsRequest) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *GetSystemSpanConfigsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	b = b[:cap(b)]
-	n, err := m.MarshalToSizedBuffer(b)
-	if err != nil {
-		return nil, err
-	}
-	return b[:n], nil
-}
-func (m *GetSystemSpanConfigsRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GetSystemSpanConfigsRequest.Merge(m, src)
-}
-func (m *GetSystemSpanConfigsRequest) XXX_Size() int {
-	return m.Size()
-}
-func (m *GetSystemSpanConfigsRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_GetSystemSpanConfigsRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_GetSystemSpanConfigsRequest proto.InternalMessageInfo
-
-// GetSystemSpanConfigsResponse lists out all system span configurations that
-// are installed by the requesting tenant.
-type GetSystemSpanConfigsResponse struct {
-	// SystemSpanConfigEntries captures the system span configurations that have
-	// been set by the tenant.
-	SystemSpanConfigEntries []SystemSpanConfigEntry `protobuf:"bytes,1,rep,name=system_span_config_entries,json=systemSpanConfigEntries,proto3" json:"system_span_config_entries"`
-}
-
-func (m *GetSystemSpanConfigsResponse) Reset()         { *m = GetSystemSpanConfigsResponse{} }
-func (m *GetSystemSpanConfigsResponse) String() string { return proto.CompactTextString(m) }
-func (*GetSystemSpanConfigsResponse) ProtoMessage()    {}
-func (*GetSystemSpanConfigsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_91c9f1dcea14470a, []int{13}
-}
-func (m *GetSystemSpanConfigsResponse) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *GetSystemSpanConfigsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	b = b[:cap(b)]
-	n, err := m.MarshalToSizedBuffer(b)
-	if err != nil {
-		return nil, err
-	}
-	return b[:n], nil
-}
-func (m *GetSystemSpanConfigsResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GetSystemSpanConfigsResponse.Merge(m, src)
-}
-func (m *GetSystemSpanConfigsResponse) XXX_Size() int {
-	return m.Size()
-}
-func (m *GetSystemSpanConfigsResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_GetSystemSpanConfigsResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_GetSystemSpanConfigsResponse proto.InternalMessageInfo
 
 // UpdateSpanConfigsRequest is used to update the span configurations over the
 // given spans.
@@ -661,7 +477,7 @@ func (m *UpdateSpanConfigsRequest) Reset()         { *m = UpdateSpanConfigsReque
 func (m *UpdateSpanConfigsRequest) String() string { return proto.CompactTextString(m) }
 func (*UpdateSpanConfigsRequest) ProtoMessage()    {}
 func (*UpdateSpanConfigsRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_91c9f1dcea14470a, []int{14}
+	return fileDescriptor_91c9f1dcea14470a, []int{9}
 }
 func (m *UpdateSpanConfigsRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -693,7 +509,7 @@ func (m *UpdateSpanConfigsResponse) Reset()         { *m = UpdateSpanConfigsResp
 func (m *UpdateSpanConfigsResponse) String() string { return proto.CompactTextString(m) }
 func (*UpdateSpanConfigsResponse) ProtoMessage()    {}
 func (*UpdateSpanConfigsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_91c9f1dcea14470a, []int{15}
+	return fileDescriptor_91c9f1dcea14470a, []int{10}
 }
 func (m *UpdateSpanConfigsResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -718,80 +534,6 @@ func (m *UpdateSpanConfigsResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_UpdateSpanConfigsResponse proto.InternalMessageInfo
 
-// System span config targets being deleted are expected to have been present.
-// Targets are not allowed to be duplicated in the same list or across lists;
-// existing span configs should be updated by including in the upsert list
-// without deleting their targets first.
-type UpdateSystemSpanConfigsRequest struct {
-	// SystemSpanConfigsToDelete captures the targets of the system span
-	// configurations to delete.
-	ToDelete []SystemSpanConfigTarget `protobuf:"bytes,1,rep,name=to_delete,json=toDelete,proto3" json:"to_delete"`
-	// SystemSpanConfigsToUpsert captures the system span configurations we want
-	// to upsert with.
-	ToUpsert []SystemSpanConfigEntry `protobuf:"bytes,2,rep,name=to_upsert,json=toUpsert,proto3" json:"to_upsert"`
-}
-
-func (m *UpdateSystemSpanConfigsRequest) Reset()         { *m = UpdateSystemSpanConfigsRequest{} }
-func (m *UpdateSystemSpanConfigsRequest) String() string { return proto.CompactTextString(m) }
-func (*UpdateSystemSpanConfigsRequest) ProtoMessage()    {}
-func (*UpdateSystemSpanConfigsRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_91c9f1dcea14470a, []int{16}
-}
-func (m *UpdateSystemSpanConfigsRequest) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *UpdateSystemSpanConfigsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	b = b[:cap(b)]
-	n, err := m.MarshalToSizedBuffer(b)
-	if err != nil {
-		return nil, err
-	}
-	return b[:n], nil
-}
-func (m *UpdateSystemSpanConfigsRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_UpdateSystemSpanConfigsRequest.Merge(m, src)
-}
-func (m *UpdateSystemSpanConfigsRequest) XXX_Size() int {
-	return m.Size()
-}
-func (m *UpdateSystemSpanConfigsRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_UpdateSystemSpanConfigsRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_UpdateSystemSpanConfigsRequest proto.InternalMessageInfo
-
-type UpdateSystemSpanConfigsResponse struct {
-}
-
-func (m *UpdateSystemSpanConfigsResponse) Reset()         { *m = UpdateSystemSpanConfigsResponse{} }
-func (m *UpdateSystemSpanConfigsResponse) String() string { return proto.CompactTextString(m) }
-func (*UpdateSystemSpanConfigsResponse) ProtoMessage()    {}
-func (*UpdateSystemSpanConfigsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_91c9f1dcea14470a, []int{17}
-}
-func (m *UpdateSystemSpanConfigsResponse) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *UpdateSystemSpanConfigsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	b = b[:cap(b)]
-	n, err := m.MarshalToSizedBuffer(b)
-	if err != nil {
-		return nil, err
-	}
-	return b[:n], nil
-}
-func (m *UpdateSystemSpanConfigsResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_UpdateSystemSpanConfigsResponse.Merge(m, src)
-}
-func (m *UpdateSystemSpanConfigsResponse) XXX_Size() int {
-	return m.Size()
-}
-func (m *UpdateSystemSpanConfigsResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_UpdateSystemSpanConfigsResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_UpdateSystemSpanConfigsResponse proto.InternalMessageInfo
-
 func init() {
 	proto.RegisterEnum("cockroach.roachpb.Constraint_Type", Constraint_Type_name, Constraint_Type_value)
 	proto.RegisterType((*GCPolicy)(nil), "cockroach.roachpb.GCPolicy")
@@ -801,90 +543,72 @@ func init() {
 	proto.RegisterType((*LeasePreference)(nil), "cockroach.roachpb.LeasePreference")
 	proto.RegisterType((*SpanConfig)(nil), "cockroach.roachpb.SpanConfig")
 	proto.RegisterType((*SpanConfigEntry)(nil), "cockroach.roachpb.SpanConfigEntry")
-	proto.RegisterType((*SystemSpanConfig)(nil), "cockroach.roachpb.SystemSpanConfig")
-	proto.RegisterType((*SystemSpanConfigTarget)(nil), "cockroach.roachpb.SystemSpanConfigTarget")
-	proto.RegisterType((*SystemSpanConfigEntry)(nil), "cockroach.roachpb.SystemSpanConfigEntry")
 	proto.RegisterType((*GetSpanConfigsRequest)(nil), "cockroach.roachpb.GetSpanConfigsRequest")
 	proto.RegisterType((*GetSpanConfigsResponse)(nil), "cockroach.roachpb.GetSpanConfigsResponse")
-	proto.RegisterType((*GetSystemSpanConfigsRequest)(nil), "cockroach.roachpb.GetSystemSpanConfigsRequest")
-	proto.RegisterType((*GetSystemSpanConfigsResponse)(nil), "cockroach.roachpb.GetSystemSpanConfigsResponse")
 	proto.RegisterType((*UpdateSpanConfigsRequest)(nil), "cockroach.roachpb.UpdateSpanConfigsRequest")
 	proto.RegisterType((*UpdateSpanConfigsResponse)(nil), "cockroach.roachpb.UpdateSpanConfigsResponse")
-	proto.RegisterType((*UpdateSystemSpanConfigsRequest)(nil), "cockroach.roachpb.UpdateSystemSpanConfigsRequest")
-	proto.RegisterType((*UpdateSystemSpanConfigsResponse)(nil), "cockroach.roachpb.UpdateSystemSpanConfigsResponse")
 }
 
 func init() { proto.RegisterFile("roachpb/span_config.proto", fileDescriptor_91c9f1dcea14470a) }
 
 var fileDescriptor_91c9f1dcea14470a = []byte{
-	// 1067 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x56, 0x41, 0x4f, 0x1b, 0x47,
-	0x14, 0xf6, 0x04, 0x43, 0xec, 0x67, 0x0a, 0x66, 0x92, 0x80, 0x81, 0x62, 0xc3, 0xa6, 0xaa, 0x88,
-	0x2a, 0x19, 0x95, 0x48, 0x3d, 0xd0, 0x9b, 0xc1, 0x4a, 0x69, 0xa9, 0x4a, 0x16, 0xd3, 0x56, 0x51,
-	0xd5, 0xd5, 0xb2, 0xfb, 0x30, 0x1b, 0xd6, 0x33, 0xdb, 0x9d, 0x71, 0x14, 0x1f, 0x7b, 0x6e, 0x0f,
-	0x3d, 0xf6, 0xd0, 0x4a, 0xfc, 0x8c, 0x4a, 0xfd, 0x03, 0x1c, 0x73, 0xcc, 0xa1, 0x45, 0xad, 0xb9,
-	0xf4, 0x67, 0x54, 0x3b, 0x3b, 0xf6, 0x2e, 0xf6, 0x42, 0x49, 0xd4, 0xdb, 0xf2, 0xde, 0x37, 0xef,
-	0x7d, 0xef, 0x7b, 0xdf, 0x8c, 0x81, 0xc5, 0x90, 0xdb, 0xce, 0x49, 0x70, 0xb4, 0x21, 0x02, 0x9b,
-	0x59, 0x0e, 0x67, 0xc7, 0x5e, 0xbb, 0x1e, 0x84, 0x5c, 0x72, 0x3a, 0xe7, 0x70, 0xe7, 0x54, 0xa5,
-	0xeb, 0x1a, 0xb4, 0x44, 0x07, 0x68, 0xd7, 0x96, 0x76, 0x0c, 0x5b, 0xba, 0xdf, 0xe6, 0x6d, 0xae,
-	0x3e, 0x37, 0xa2, 0x2f, 0x1d, 0xad, 0x74, 0xa5, 0xe7, 0x6f, 0x9c, 0xf8, 0xce, 0x86, 0xf4, 0x3a,
-	0x28, 0xa4, 0xdd, 0x09, 0xe2, 0x8c, 0xf1, 0x27, 0x81, 0xc2, 0x93, 0xed, 0x7d, 0xee, 0x7b, 0x4e,
-	0x8f, 0x6e, 0x40, 0x49, 0x4a, 0xdf, 0x12, 0xe8, 0x70, 0xe6, 0x8a, 0x0a, 0x59, 0x25, 0xeb, 0x93,
-	0x8d, 0x99, 0xfe, 0x45, 0x0d, 0x5a, 0xad, 0xbd, 0x83, 0x38, 0x6a, 0x82, 0x94, 0xbe, 0xfe, 0xa6,
-	0xcf, 0xe0, 0x5e, 0x54, 0x06, 0x1d, 0xe9, 0x71, 0x66, 0x05, 0x51, 0x15, 0x0f, 0x45, 0xe5, 0xce,
-	0xea, 0xc4, 0x7a, 0x69, 0xf3, 0x61, 0x7d, 0x8c, 0x72, 0x7d, 0x7f, 0x88, 0x8e, 0x5b, 0x36, 0xf2,
-	0xe7, 0x17, 0xb5, 0x9c, 0x49, 0x83, 0xab, 0x71, 0x0f, 0x05, 0xdd, 0x82, 0x45, 0xaf, 0xcd, 0x78,
-	0x88, 0x96, 0x90, 0xa1, 0xe7, 0x48, 0x0b, 0xd9, 0x31, 0x0f, 0x1d, 0xec, 0x20, 0x93, 0x95, 0x89,
-	0x55, 0xb2, 0x5e, 0x30, 0x17, 0x62, 0xc0, 0x81, 0xca, 0x37, 0x93, 0xf4, 0x56, 0xe1, 0xb7, 0xb3,
-	0x1a, 0xf9, 0xe7, 0xac, 0x46, 0x8c, 0x10, 0xca, 0xa3, 0x3d, 0x69, 0x6b, 0xc8, 0x1a, 0x5d, 0x6b,
-	0x28, 0x88, 0x1a, 0xb7, 0xb4, 0xb9, 0x92, 0x62, 0x1d, 0xa9, 0x56, 0x3f, 0xf1, 0x9d, 0x7a, 0x6b,
-	0x00, 0x1a, 0xe1, 0x8b, 0xee, 0x30, 0x93, 0xea, 0xf9, 0x0b, 0x01, 0xd8, 0xe6, 0x4c, 0xc8, 0xd0,
-	0xf6, 0x98, 0xa4, 0x1f, 0x41, 0x5e, 0xf6, 0x02, 0x54, 0xf5, 0x67, 0x36, 0x8d, 0x0c, 0x55, 0x12,
-	0x70, 0xbd, 0xd5, 0x0b, 0xd0, 0x54, 0x78, 0x5a, 0x86, 0x89, 0x53, 0xec, 0x55, 0xee, 0xac, 0x92,
-	0xf5, 0xa2, 0x19, 0x7d, 0xd2, 0xfb, 0x30, 0xf9, 0xc2, 0xf6, 0xbb, 0xa8, 0xc6, 0x2f, 0x9a, 0xf1,
-	0x1f, 0xc6, 0x7b, 0x90, 0x8f, 0x4e, 0xd1, 0x69, 0x28, 0x98, 0xcd, 0xa7, 0x87, 0xbb, 0x66, 0x73,
-	0xa7, 0x9c, 0xa3, 0x33, 0x00, 0xfb, 0xe6, 0x17, 0x9f, 0xec, 0x36, 0x76, 0x5b, 0xcd, 0x9d, 0x32,
-	0xd9, 0x2a, 0xfc, 0x7c, 0x56, 0xcb, 0x29, 0x7a, 0x3f, 0x12, 0x98, 0x4f, 0x3a, 0x8a, 0x6d, 0xce,
-	0x9e, 0x77, 0x99, 0xd2, 0x87, 0xae, 0xc1, 0x34, 0xeb, 0x76, 0xac, 0x10, 0x03, 0xdf, 0x73, 0x6c,
-	0xed, 0x00, 0xb3, 0xc4, 0xba, 0x1d, 0x53, 0x87, 0x68, 0x13, 0x4a, 0x4e, 0x72, 0x58, 0xaf, 0x7a,
-	0xe5, 0xc6, 0xa1, 0xb4, 0x68, 0xe9, 0x73, 0x29, 0x3a, 0xdf, 0xc2, 0xec, 0x1e, 0xda, 0x02, 0xf7,
-	0x43, 0x3c, 0xc6, 0x10, 0x99, 0x83, 0xa3, 0x3d, 0xc8, 0x5b, 0xf6, 0xc8, 0xab, 0xfa, 0xe7, 0x79,
-	0x80, 0x83, 0xc0, 0x66, 0xdb, 0xea, 0x36, 0xd1, 0xf7, 0x61, 0x36, 0xb4, 0x59, 0x1b, 0xad, 0x8e,
-	0xc7, 0xac, 0xa3, 0x9e, 0xc4, 0x78, 0xca, 0x09, 0xf3, 0x1d, 0x15, 0xfe, 0xdc, 0x63, 0x8d, 0x28,
-	0x98, 0xc2, 0xd9, 0x2f, 0x35, 0xee, 0x4e, 0x1a, 0x67, 0xbf, 0x8c, 0x71, 0x9f, 0x42, 0xb1, 0xed,
-	0xc4, 0xd6, 0xef, 0xa9, 0xbd, 0x94, 0x36, 0x97, 0x33, 0x98, 0x0e, 0xee, 0x58, 0xa3, 0x1c, 0xf1,
-	0xec, 0x5f, 0xd4, 0x86, 0xb7, 0xce, 0x2c, 0xb4, 0x1d, 0x6d, 0xcc, 0x35, 0x98, 0x6e, 0xfb, 0xfc,
-	0xc8, 0xf6, 0xad, 0x10, 0x6d, 0x57, 0x54, 0xf2, 0xca, 0xe5, 0xa5, 0x38, 0x66, 0x46, 0xa1, 0xb1,
-	0x0d, 0x4d, 0x8e, 0x6f, 0x68, 0x05, 0x20, 0x82, 0xbc, 0xe0, 0x12, 0x43, 0x51, 0x99, 0x52, 0x80,
-	0x22, 0xeb, 0x76, 0xbe, 0x54, 0x01, 0xfa, 0xf4, 0xaa, 0xb8, 0x77, 0x95, 0xb8, 0x8f, 0x6e, 0x14,
-	0x37, 0xed, 0x91, 0x0c, 0xa1, 0xe9, 0x37, 0x30, 0xa7, 0xba, 0x59, 0xe9, 0xc2, 0x85, 0xb7, 0x2b,
-	0x5c, 0x56, 0x95, 0x52, 0x10, 0x7a, 0x08, 0x73, 0x7e, 0x64, 0x10, 0x2b, 0x18, 0x3a, 0x44, 0x54,
-	0x8a, 0xaa, 0x7a, 0xd6, 0x65, 0x1a, 0x31, 0xd3, 0xa0, 0xac, 0x7f, 0x35, 0x2c, 0xe8, 0x07, 0x30,
-	0xa7, 0x36, 0x79, 0x8c, 0xe8, 0x5a, 0xc8, 0xec, 0x23, 0x1f, 0xdd, 0x0a, 0x28, 0xc5, 0xcb, 0xc3,
-	0x44, 0x33, 0x8e, 0x6b, 0x2b, 0x7d, 0x4f, 0x60, 0x36, 0xb1, 0x52, 0x93, 0xc9, 0xb0, 0x47, 0x3f,
-	0x84, 0x7c, 0xf4, 0x58, 0xeb, 0xd7, 0x63, 0x21, 0x83, 0x50, 0x74, 0x42, 0xb3, 0x50, 0x50, 0xfa,
-	0x31, 0x4c, 0xc5, 0x4f, 0xbb, 0x72, 0x54, 0xb6, 0xb3, 0x93, 0x36, 0xfa, 0xa8, 0x3e, 0x62, 0x48,
-	0x28, 0x1f, 0xf4, 0x84, 0xc4, 0x4e, 0xca, 0xd3, 0xd7, 0x3c, 0xc3, 0xe4, 0x7f, 0x78, 0x86, 0xf5,
-	0xe4, 0x2e, 0xcc, 0x8f, 0x76, 0x6d, 0xd9, 0x61, 0x1b, 0x65, 0xe4, 0x7f, 0x89, 0xcc, 0x66, 0xd2,
-	0xf2, 0x5c, 0x2d, 0x42, 0x96, 0xff, 0x5b, 0x0a, 0xb3, 0xbb, 0xa3, 0xfc, 0x4f, 0x22, 0xff, 0x0f,
-	0x22, 0x66, 0x21, 0x3e, 0xbf, 0xeb, 0x1a, 0x7f, 0x10, 0x78, 0x30, 0xda, 0x26, 0x56, 0xf9, 0x39,
-	0x2c, 0x0a, 0x95, 0xb0, 0x52, 0xbf, 0x8c, 0x96, 0x54, 0x14, 0x74, 0xd7, 0x2c, 0xa7, 0x65, 0x73,
-	0xd6, 0xd3, 0xce, 0x8b, 0xec, 0x89, 0xbe, 0x02, 0x3a, 0xde, 0x4b, 0xaf, 0xea, 0xe1, 0x2d, 0x9a,
-	0x0c, 0x1c, 0x37, 0x5a, 0xde, 0xd8, 0x83, 0x07, 0x4f, 0x50, 0x26, 0x01, 0x61, 0xe2, 0x77, 0x5d,
-	0x14, 0x92, 0x3e, 0x86, 0xc9, 0xa8, 0xd5, 0x60, 0x63, 0xff, 0x61, 0xa2, 0x18, 0x6b, 0x84, 0x30,
-	0x3f, 0x5a, 0x4d, 0x04, 0x9c, 0x09, 0xa4, 0x5f, 0xc3, 0xbd, 0xb4, 0x4a, 0xc8, 0x64, 0x98, 0xd8,
-	0xc1, 0xb8, 0xd1, 0x6c, 0x4a, 0x6d, 0xdd, 0x67, 0x4e, 0x5c, 0x09, 0x7b, 0x28, 0x8c, 0x15, 0x58,
-	0x8e, 0x7a, 0x8e, 0x0c, 0x36, 0x98, 0xc3, 0xf8, 0x81, 0xc0, 0xbb, 0xd9, 0x79, 0xcd, 0xec, 0x14,
-	0x96, 0x32, 0xd6, 0x78, 0x95, 0xe0, 0xfa, 0x2d, 0x24, 0x4e, 0xd3, 0x5c, 0x10, 0x19, 0xc9, 0x88,
-	0xec, 0xaf, 0x04, 0x2a, 0x87, 0x81, 0x6b, 0x4b, 0xcc, 0x90, 0x7c, 0x0b, 0x8a, 0x92, 0x5b, 0x2e,
-	0xfa, 0x28, 0xf1, 0x76, 0xb2, 0x17, 0x24, 0xdf, 0x51, 0x70, 0xda, 0x54, 0x67, 0xbb, 0x81, 0xc0,
-	0x50, 0xea, 0x1f, 0xc0, 0xdb, 0xab, 0x5a, 0x90, 0xfc, 0x50, 0x9d, 0x34, 0x96, 0x61, 0x31, 0x83,
-	0x5e, 0xac, 0x94, 0xf1, 0x3b, 0x81, 0xaa, 0xce, 0x5e, 0xa3, 0x36, 0xdd, 0x1b, 0x1f, 0xe1, 0x8d,
-	0xef, 0x40, 0x32, 0xd4, 0x67, 0xe3, 0x43, 0xbd, 0xe9, 0x26, 0x92, 0xd1, 0xd6, 0xa0, 0x76, 0x2d,
-	0xf9, 0x78, 0xc0, 0xc6, 0xa3, 0xf3, 0xbf, 0xab, 0xb9, 0xf3, 0x7e, 0x95, 0xbc, 0xea, 0x57, 0xc9,
-	0xeb, 0x7e, 0x95, 0xfc, 0xd5, 0xaf, 0x92, 0x9f, 0x2e, 0xab, 0xb9, 0x57, 0x97, 0xd5, 0xdc, 0xeb,
-	0xcb, 0x6a, 0xee, 0xd9, 0x5d, 0xdd, 0xf3, 0x68, 0x4a, 0xfd, 0xab, 0xfa, 0xf8, 0xdf, 0x00, 0x00,
-	0x00, 0xff, 0xff, 0xbc, 0x29, 0xc0, 0xa7, 0x1e, 0x0b, 0x00, 0x00,
+	// 894 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x55, 0x41, 0x6f, 0x1b, 0x45,
+	0x14, 0xf6, 0x26, 0x4e, 0xba, 0x7e, 0x0e, 0x89, 0x3d, 0x2d, 0xed, 0xa6, 0x55, 0xec, 0x74, 0x41,
+	0x28, 0x15, 0x92, 0x2d, 0x52, 0x89, 0x43, 0xb8, 0x39, 0xb1, 0x4a, 0x50, 0x10, 0xe9, 0xc6, 0x41,
+	0xa8, 0x42, 0xac, 0xc6, 0xbb, 0x2f, 0xce, 0xd2, 0xf5, 0xcc, 0x32, 0x33, 0xae, 0xea, 0x23, 0x77,
+	0x0e, 0x1c, 0x39, 0x80, 0x94, 0x9f, 0xc1, 0x4f, 0xc8, 0xb1, 0xc7, 0x5e, 0x88, 0xc0, 0xb9, 0xf0,
+	0x33, 0xd0, 0xce, 0x8e, 0xed, 0xb5, 0x63, 0x85, 0xaa, 0xb7, 0xd9, 0xf7, 0xbe, 0xf7, 0xde, 0x37,
+	0xdf, 0x7c, 0x33, 0x0b, 0x9b, 0x82, 0xd3, 0xe0, 0x3c, 0xe9, 0x36, 0x65, 0x42, 0x99, 0x1f, 0x70,
+	0x76, 0x16, 0xf5, 0x1a, 0x89, 0xe0, 0x8a, 0x93, 0x6a, 0xc0, 0x83, 0x97, 0x3a, 0xdd, 0x30, 0xa0,
+	0x87, 0x64, 0x8c, 0x0e, 0xa9, 0xa2, 0x19, 0xec, 0xe1, 0xbd, 0x1e, 0xef, 0x71, 0xbd, 0x6c, 0xa6,
+	0x2b, 0x13, 0x75, 0x06, 0x2a, 0x8a, 0x9b, 0xe7, 0x71, 0xd0, 0x54, 0x51, 0x1f, 0xa5, 0xa2, 0xfd,
+	0x24, 0xcb, 0xb8, 0x7f, 0x59, 0x60, 0x3f, 0xdb, 0x3f, 0xe6, 0x71, 0x14, 0x0c, 0x49, 0x13, 0xca,
+	0x4a, 0xc5, 0xbe, 0xc4, 0x80, 0xb3, 0x50, 0x3a, 0xd6, 0xb6, 0xb5, 0xb3, 0xd2, 0x5a, 0x1f, 0x5d,
+	0xd5, 0xa1, 0xd3, 0x39, 0x3a, 0xc9, 0xa2, 0x1e, 0x28, 0x15, 0x9b, 0x35, 0x79, 0x01, 0x77, 0xd3,
+	0x36, 0x18, 0xa8, 0x88, 0x33, 0x3f, 0x49, 0xbb, 0x44, 0x28, 0x9d, 0xa5, 0xed, 0xe5, 0x9d, 0xf2,
+	0xee, 0x47, 0x8d, 0x1b, 0x94, 0x1b, 0xc7, 0x13, 0x74, 0x36, 0xb2, 0x55, 0xbc, 0xbc, 0xaa, 0x17,
+	0x3c, 0x92, 0xcc, 0xc6, 0x23, 0x94, 0x64, 0x0f, 0x36, 0xa3, 0x1e, 0xe3, 0x02, 0x7d, 0xa9, 0x44,
+	0x14, 0x28, 0x1f, 0xd9, 0x19, 0x17, 0x01, 0xf6, 0x91, 0x29, 0x67, 0x79, 0xdb, 0xda, 0xb1, 0xbd,
+	0x07, 0x19, 0xe0, 0x44, 0xe7, 0xdb, 0xd3, 0xf4, 0x9e, 0xfd, 0xe7, 0x45, 0xdd, 0xfa, 0xf7, 0xa2,
+	0x6e, 0xb9, 0x02, 0x2a, 0xf3, 0x33, 0x49, 0x67, 0xc2, 0x1a, 0x43, 0x7f, 0x22, 0x88, 0xde, 0x6e,
+	0x79, 0x77, 0x2b, 0xc7, 0x3a, 0x55, 0xad, 0x71, 0x1e, 0x07, 0x8d, 0xce, 0x18, 0x34, 0xc7, 0x17,
+	0xc3, 0x49, 0x26, 0x37, 0xf3, 0x77, 0x0b, 0x60, 0x9f, 0x33, 0xa9, 0x04, 0x8d, 0x98, 0x22, 0x9f,
+	0x43, 0x51, 0x0d, 0x13, 0xd4, 0xfd, 0xd7, 0x77, 0xdd, 0x05, 0xaa, 0x4c, 0xc1, 0x8d, 0xce, 0x30,
+	0x41, 0x4f, 0xe3, 0x49, 0x05, 0x96, 0x5f, 0xe2, 0xd0, 0x59, 0xda, 0xb6, 0x76, 0x4a, 0x5e, 0xba,
+	0x24, 0xf7, 0x60, 0xe5, 0x15, 0x8d, 0x07, 0xa8, 0xb7, 0x5f, 0xf2, 0xb2, 0x0f, 0xf7, 0x63, 0x28,
+	0xa6, 0x55, 0x64, 0x0d, 0x6c, 0xaf, 0xfd, 0xfc, 0xf4, 0xd0, 0x6b, 0x1f, 0x54, 0x0a, 0x64, 0x1d,
+	0xe0, 0xd8, 0xfb, 0xe6, 0xcb, 0xc3, 0xd6, 0x61, 0xa7, 0x7d, 0x50, 0xb1, 0xf6, 0xec, 0xdf, 0x2e,
+	0xea, 0x05, 0x4d, 0xef, 0x17, 0x0b, 0xee, 0x4f, 0x27, 0xca, 0x7d, 0xce, 0x7e, 0x1c, 0x30, 0xad,
+	0x0f, 0x79, 0x0c, 0x6b, 0x6c, 0xd0, 0xf7, 0x05, 0x26, 0x71, 0x14, 0x50, 0xe3, 0x00, 0xaf, 0xcc,
+	0x06, 0x7d, 0xcf, 0x84, 0x48, 0x1b, 0xca, 0xc1, 0xb4, 0xd8, 0x1c, 0xf5, 0xd6, 0xad, 0x9b, 0x32,
+	0xa2, 0xe5, 0xeb, 0x72, 0x74, 0x7e, 0x80, 0x8d, 0x23, 0xa4, 0x12, 0x8f, 0x05, 0x9e, 0xa1, 0x40,
+	0x16, 0xe0, 0xfc, 0x0c, 0xeb, 0x3d, 0x67, 0x14, 0x75, 0xff, 0xcb, 0x22, 0xc0, 0x49, 0x42, 0xd9,
+	0xbe, 0xbe, 0x4d, 0xe4, 0x13, 0xd8, 0x10, 0x94, 0xf5, 0xd0, 0xef, 0x47, 0xcc, 0xef, 0x0e, 0x15,
+	0x66, 0xbb, 0x5c, 0xf6, 0x3e, 0xd0, 0xe1, 0xaf, 0x23, 0xd6, 0x4a, 0x83, 0x39, 0x1c, 0x7d, 0x6d,
+	0x70, 0x4b, 0x79, 0x1c, 0x7d, 0x9d, 0xe1, 0xbe, 0x82, 0x52, 0x2f, 0xc8, 0xac, 0x3f, 0xd4, 0xe7,
+	0x52, 0xde, 0x7d, 0xb4, 0x80, 0xe9, 0xf8, 0x8e, 0xb5, 0x2a, 0x29, 0xcf, 0xd1, 0x55, 0x7d, 0x72,
+	0xeb, 0x3c, 0xbb, 0x17, 0x18, 0x63, 0x3e, 0x86, 0xb5, 0x5e, 0xcc, 0xbb, 0x34, 0xf6, 0x05, 0xd2,
+	0x50, 0x3a, 0x45, 0xed, 0xf2, 0x72, 0x16, 0xf3, 0xd2, 0xd0, 0x8d, 0x13, 0x5a, 0xb9, 0x79, 0x42,
+	0x5b, 0x00, 0x29, 0xe4, 0x15, 0x57, 0x28, 0xa4, 0xb3, 0xaa, 0x01, 0x25, 0x36, 0xe8, 0x7f, 0xab,
+	0x03, 0xe4, 0xf9, 0xac, 0xb8, 0x77, 0xb4, 0xb8, 0x4f, 0x6e, 0x15, 0x37, 0xef, 0x91, 0x05, 0x42,
+	0x93, 0xef, 0xa1, 0xaa, 0xa7, 0xf9, 0xf9, 0xc6, 0xf6, 0xfb, 0x35, 0xae, 0xe8, 0x4e, 0x39, 0x08,
+	0x39, 0x85, 0x6a, 0x9c, 0x1a, 0xc4, 0x4f, 0x26, 0x0e, 0x91, 0x4e, 0x49, 0x77, 0x5f, 0x74, 0x99,
+	0xe6, 0xcc, 0x34, 0x6e, 0x1b, 0xcf, 0x86, 0x25, 0xf9, 0x14, 0xaa, 0xfa, 0x24, 0xcf, 0x10, 0x43,
+	0x1f, 0x19, 0xed, 0xc6, 0x18, 0x3a, 0xa0, 0x15, 0xaf, 0x4c, 0x12, 0xed, 0x2c, 0x6e, 0xac, 0xf4,
+	0xb3, 0x05, 0x1b, 0x53, 0x2b, 0xb5, 0x99, 0x12, 0x43, 0xf2, 0x19, 0x14, 0xd3, 0xc7, 0xda, 0xbc,
+	0x1e, 0x0f, 0x16, 0x10, 0x4a, 0x2b, 0x0c, 0x0b, 0x0d, 0x25, 0x5f, 0xc0, 0x6a, 0xf6, 0xb4, 0x6b,
+	0x47, 0x2d, 0x76, 0xf6, 0x74, 0x8c, 0x29, 0x35, 0x25, 0xee, 0x11, 0x7c, 0xf8, 0x0c, 0xd5, 0x34,
+	0x2d, 0x3d, 0xfc, 0x69, 0x80, 0x52, 0x91, 0xa7, 0xb0, 0x92, 0x76, 0x1f, 0x5f, 0x97, 0xff, 0x61,
+	0x92, 0x61, 0x5d, 0x01, 0xf7, 0xe7, 0xbb, 0xc9, 0x84, 0x33, 0x89, 0xe4, 0x3b, 0xb8, 0x9b, 0xfb,
+	0x09, 0xf9, 0xc8, 0x94, 0x88, 0x70, 0xdc, 0xdc, 0xbd, 0x95, 0xb1, 0x16, 0xc6, 0xcc, 0xa9, 0xca,
+	0x99, 0x70, 0x84, 0xd2, 0xfd, 0xc3, 0x02, 0xe7, 0x34, 0x09, 0xa9, 0xc2, 0x05, 0xbb, 0xd8, 0x83,
+	0x92, 0xe2, 0x7e, 0x88, 0x31, 0x2a, 0x7c, 0xb7, 0x9d, 0xd8, 0x8a, 0x1f, 0x68, 0x38, 0x69, 0xeb,
+	0xda, 0x41, 0x22, 0x51, 0x28, 0xf3, 0x30, 0xbd, 0x3b, 0x51, 0x5b, 0xf1, 0x53, 0x5d, 0xe9, 0x3e,
+	0x82, 0xcd, 0x05, 0xf4, 0x32, 0x59, 0x5a, 0x4f, 0x2e, 0xff, 0xa9, 0x15, 0x2e, 0x47, 0x35, 0xeb,
+	0xcd, 0xa8, 0x66, 0xbd, 0x1d, 0xd5, 0xac, 0xbf, 0x47, 0x35, 0xeb, 0xd7, 0xeb, 0x5a, 0xe1, 0xcd,
+	0x75, 0xad, 0xf0, 0xf6, 0xba, 0x56, 0x78, 0x71, 0xc7, 0xcc, 0xe9, 0xae, 0xea, 0x3f, 0xec, 0xd3,
+	0xff, 0x02, 0x00, 0x00, 0xff, 0xff, 0x23, 0x54, 0x4e, 0xe6, 0xd5, 0x07, 0x00, 0x00,
 }
 
 func (this *GCPolicy) Equal(that interface{}) bool {
@@ -1100,35 +824,6 @@ func (this *SpanConfig) Equal(that interface{}) bool {
 	}
 	if this.RangefeedEnabled != that1.RangefeedEnabled {
 		return false
-	}
-	return true
-}
-func (this *SystemSpanConfig) Equal(that interface{}) bool {
-	if that == nil {
-		return this == nil
-	}
-
-	that1, ok := that.(*SystemSpanConfig)
-	if !ok {
-		that2, ok := that.(SystemSpanConfig)
-		if ok {
-			that1 = &that2
-		} else {
-			return false
-		}
-	}
-	if that1 == nil {
-		return this == nil
-	} else if this == nil {
-		return false
-	}
-	if len(this.ProtectionPolicies) != len(that1.ProtectionPolicies) {
-		return false
-	}
-	for i := range this.ProtectionPolicies {
-		if !this.ProtectionPolicies[i].Equal(&that1.ProtectionPolicies[i]) {
-			return false
-		}
 	}
 	return true
 }
@@ -1496,121 +1191,6 @@ func (m *SpanConfigEntry) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *SystemSpanConfig) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *SystemSpanConfig) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *SystemSpanConfig) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.ProtectionPolicies) > 0 {
-		for iNdEx := len(m.ProtectionPolicies) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.ProtectionPolicies[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintSpanConfig(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0xa
-		}
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *SystemSpanConfigTarget) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *SystemSpanConfigTarget) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *SystemSpanConfigTarget) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.TenantID != nil {
-		{
-			size, err := m.TenantID.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintSpanConfig(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *SystemSpanConfigEntry) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *SystemSpanConfigEntry) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *SystemSpanConfigEntry) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	{
-		size, err := m.SystemSpanConfig.MarshalToSizedBuffer(dAtA[:i])
-		if err != nil {
-			return 0, err
-		}
-		i -= size
-		i = encodeVarintSpanConfig(dAtA, i, uint64(size))
-	}
-	i--
-	dAtA[i] = 0x12
-	{
-		size, err := m.SystemSpanConfigTarget.MarshalToSizedBuffer(dAtA[:i])
-		if err != nil {
-			return 0, err
-		}
-		i -= size
-		i = encodeVarintSpanConfig(dAtA, i, uint64(size))
-	}
-	i--
-	dAtA[i] = 0xa
-	return len(dAtA) - i, nil
-}
-
 func (m *GetSpanConfigsRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -1672,66 +1252,6 @@ func (m *GetSpanConfigsResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) 
 		for iNdEx := len(m.SpanConfigEntries) - 1; iNdEx >= 0; iNdEx-- {
 			{
 				size, err := m.SpanConfigEntries[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintSpanConfig(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0xa
-		}
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *GetSystemSpanConfigsRequest) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *GetSystemSpanConfigsRequest) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *GetSystemSpanConfigsRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	return len(dAtA) - i, nil
-}
-
-func (m *GetSystemSpanConfigsResponse) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *GetSystemSpanConfigsResponse) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *GetSystemSpanConfigsResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.SystemSpanConfigEntries) > 0 {
-		for iNdEx := len(m.SystemSpanConfigEntries) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.SystemSpanConfigEntries[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -1812,80 +1332,6 @@ func (m *UpdateSpanConfigsResponse) MarshalTo(dAtA []byte) (int, error) {
 }
 
 func (m *UpdateSpanConfigsResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	return len(dAtA) - i, nil
-}
-
-func (m *UpdateSystemSpanConfigsRequest) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *UpdateSystemSpanConfigsRequest) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *UpdateSystemSpanConfigsRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.ToUpsert) > 0 {
-		for iNdEx := len(m.ToUpsert) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.ToUpsert[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintSpanConfig(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0x12
-		}
-	}
-	if len(m.ToDelete) > 0 {
-		for iNdEx := len(m.ToDelete) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.ToDelete[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintSpanConfig(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0xa
-		}
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *UpdateSystemSpanConfigsResponse) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *UpdateSystemSpanConfigsResponse) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *UpdateSystemSpanConfigsResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -2150,47 +1596,6 @@ func (m *SpanConfigEntry) Size() (n int) {
 	return n
 }
 
-func (m *SystemSpanConfig) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if len(m.ProtectionPolicies) > 0 {
-		for _, e := range m.ProtectionPolicies {
-			l = e.Size()
-			n += 1 + l + sovSpanConfig(uint64(l))
-		}
-	}
-	return n
-}
-
-func (m *SystemSpanConfigTarget) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.TenantID != nil {
-		l = m.TenantID.Size()
-		n += 1 + l + sovSpanConfig(uint64(l))
-	}
-	return n
-}
-
-func (m *SystemSpanConfigEntry) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = m.SystemSpanConfigTarget.Size()
-	n += 1 + l + sovSpanConfig(uint64(l))
-	l = m.SystemSpanConfig.Size()
-	n += 1 + l + sovSpanConfig(uint64(l))
-	return n
-}
-
 func (m *GetSpanConfigsRequest) Size() (n int) {
 	if m == nil {
 		return 0
@@ -2221,30 +1626,6 @@ func (m *GetSpanConfigsResponse) Size() (n int) {
 	return n
 }
 
-func (m *GetSystemSpanConfigsRequest) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	return n
-}
-
-func (m *GetSystemSpanConfigsResponse) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if len(m.SystemSpanConfigEntries) > 0 {
-		for _, e := range m.SystemSpanConfigEntries {
-			l = e.Size()
-			n += 1 + l + sovSpanConfig(uint64(l))
-		}
-	}
-	return n
-}
-
 func (m *UpdateSpanConfigsRequest) Size() (n int) {
 	if m == nil {
 		return 0
@@ -2267,36 +1648,6 @@ func (m *UpdateSpanConfigsRequest) Size() (n int) {
 }
 
 func (m *UpdateSpanConfigsResponse) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	return n
-}
-
-func (m *UpdateSystemSpanConfigsRequest) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if len(m.ToDelete) > 0 {
-		for _, e := range m.ToDelete {
-			l = e.Size()
-			n += 1 + l + sovSpanConfig(uint64(l))
-		}
-	}
-	if len(m.ToUpsert) > 0 {
-		for _, e := range m.ToUpsert {
-			l = e.Size()
-			n += 1 + l + sovSpanConfig(uint64(l))
-		}
-	}
-	return n
-}
-
-func (m *UpdateSystemSpanConfigsResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -3254,292 +2605,6 @@ func (m *SpanConfigEntry) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *SystemSpanConfig) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowSpanConfig
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: SystemSpanConfig: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: SystemSpanConfig: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ProtectionPolicies", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowSpanConfig
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthSpanConfig
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthSpanConfig
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.ProtectionPolicies = append(m.ProtectionPolicies, ProtectionPolicy{})
-			if err := m.ProtectionPolicies[len(m.ProtectionPolicies)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipSpanConfig(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthSpanConfig
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *SystemSpanConfigTarget) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowSpanConfig
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: SystemSpanConfigTarget: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: SystemSpanConfigTarget: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TenantID", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowSpanConfig
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthSpanConfig
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthSpanConfig
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.TenantID == nil {
-				m.TenantID = &TenantID{}
-			}
-			if err := m.TenantID.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipSpanConfig(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthSpanConfig
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *SystemSpanConfigEntry) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowSpanConfig
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: SystemSpanConfigEntry: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: SystemSpanConfigEntry: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SystemSpanConfigTarget", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowSpanConfig
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthSpanConfig
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthSpanConfig
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.SystemSpanConfigTarget.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SystemSpanConfig", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowSpanConfig
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthSpanConfig
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthSpanConfig
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.SystemSpanConfig.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipSpanConfig(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthSpanConfig
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
 func (m *GetSpanConfigsRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -3684,140 +2749,6 @@ func (m *GetSpanConfigsResponse) Unmarshal(dAtA []byte) error {
 			}
 			m.SpanConfigEntries = append(m.SpanConfigEntries, SpanConfigEntry{})
 			if err := m.SpanConfigEntries[len(m.SpanConfigEntries)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipSpanConfig(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthSpanConfig
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *GetSystemSpanConfigsRequest) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowSpanConfig
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: GetSystemSpanConfigsRequest: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: GetSystemSpanConfigsRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		default:
-			iNdEx = preIndex
-			skippy, err := skipSpanConfig(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthSpanConfig
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *GetSystemSpanConfigsResponse) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowSpanConfig
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: GetSystemSpanConfigsResponse: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: GetSystemSpanConfigsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SystemSpanConfigEntries", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowSpanConfig
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthSpanConfig
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthSpanConfig
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.SystemSpanConfigEntries = append(m.SystemSpanConfigEntries, SystemSpanConfigEntry{})
-			if err := m.SystemSpanConfigEntries[len(m.SystemSpanConfigEntries)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -3987,174 +2918,6 @@ func (m *UpdateSpanConfigsResponse) Unmarshal(dAtA []byte) error {
 		}
 		if fieldNum <= 0 {
 			return fmt.Errorf("proto: UpdateSpanConfigsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		default:
-			iNdEx = preIndex
-			skippy, err := skipSpanConfig(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthSpanConfig
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *UpdateSystemSpanConfigsRequest) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowSpanConfig
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: UpdateSystemSpanConfigsRequest: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: UpdateSystemSpanConfigsRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ToDelete", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowSpanConfig
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthSpanConfig
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthSpanConfig
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.ToDelete = append(m.ToDelete, SystemSpanConfigTarget{})
-			if err := m.ToDelete[len(m.ToDelete)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ToUpsert", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowSpanConfig
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthSpanConfig
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthSpanConfig
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.ToUpsert = append(m.ToUpsert, SystemSpanConfigEntry{})
-			if err := m.ToUpsert[len(m.ToUpsert)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipSpanConfig(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthSpanConfig
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *UpdateSystemSpanConfigsResponse) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowSpanConfig
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: UpdateSystemSpanConfigsResponse: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: UpdateSystemSpanConfigsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:
