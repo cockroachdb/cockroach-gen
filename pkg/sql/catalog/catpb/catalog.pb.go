@@ -391,7 +391,7 @@ var xxx_messageInfo_LocalityConfig_Global proto.InternalMessageInfo
 // As as example, sample field values for the following table:
 //
 // CREATE TABLE abc (
-//   a INT PRIMARY KEY USING HASH WITH BUCKET_COUNT=10,  // column id: 1
+//   a INT PRIMARY KEY USING HASH WITH (bucket_count=10),  // column id: 1
 //   b BYTES
 // );
 //
