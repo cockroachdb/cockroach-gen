@@ -281,7 +281,7 @@ Options:
    encryption_passphrase="secret": encrypt backups
    kms="[kms_provider]://[kms_host]/[master_key_identifier]?[parameters]" : encrypt backups using KMS
    detached: execute backup job asynchronously, without waiting for its completion
-   incremental_storage: specify a different path to store the incremental backup
+   incremental_location: specify a different path to store the incremental backup
 
 `,
 		//line sql.y: 2725
