@@ -5,6 +5,7 @@ package scpb
 
 import (
 	fmt "fmt"
+	github_com_cockroachdb_cockroach_pkg_sql_catalog_catpb "github.com/cockroachdb/cockroach/pkg/sql/catalog/catpb"
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
 	io "io"
@@ -121,6 +122,10 @@ type TargetMetadata struct {
 	SourceElementID SourceElementID `protobuf:"varint,2,opt,name=source_element_id,json=sourceElementId,proto3,casttype=SourceElementID" json:"source_element_id,omitempty"`
 	// StatementID refers to the statement that produced this element, where
 	// the ID indexes into the State structure.
+	//
+	// TODO(ajwerner): Potentially multiple statements in a transaction affect
+	// the same target. We'll need to retain a set of ids to deal with that case.
+	// Fortunately making a field repeated is backwards compatible.
 	StatementID uint32 `protobuf:"varint,3,opt,name=statement_id,json=statementId,proto3" json:"statement_id,omitempty"`
 }
 
@@ -257,6 +262,99 @@ func (m *Authorization) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Authorization proto.InternalMessageInfo
 
+// DescriptorState contains the portion of a schema change state
+// corresponding to an individual descriptor. The combination of
+// these messages for all descriptors involved in a schema change produces the
+// current state of the entire schema change.
+type DescriptorState struct {
+	// JobID is the ID of the job responsible for this DescriptorState.
+	JobID github_com_cockroachdb_cockroach_pkg_sql_catalog_catpb.JobID `protobuf:"varint,5,opt,name=job_id,json=jobId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/sql/catalog/catpb.JobID" json:"job_id,omitempty"`
+	// Targets is the set of targets in the schema change belonging to this
+	// descriptor.
+	Targets []Target `protobuf:"bytes,1,rep,name=targets,proto3" json:"targets"`
+	// CurrentStatuses is parallel to Targets and stores the current status for
+	// those targets.
+	CurrentStatuses []Status `protobuf:"varint,4,rep,packed,name=current_statuses,json=currentStatuses,proto3,enum=cockroach.sql.schemachanger.scpb.Status" json:"current_statuses,omitempty"`
+	// TargetRanks is parallel to Targets and stores the rank of the target in
+	// the complete schema change. These ranks are used to deterministically
+	// reconstruct the complete TargetState from a collection of DescriptorState
+	// messages.
+	TargetRanks []uint32 `protobuf:"varint,6,rep,packed,name=target_ranks,json=targetRanks,proto3" json:"target_ranks,omitempty"`
+	// RelevantStatements is the set of statements which are relevant to any of
+	// the targets. It is sorted internally by StatementRank.
+	RelevantStatements []DescriptorState_Statement `protobuf:"bytes,2,rep,name=relevant_statements,json=relevantStatements,proto3" json:"relevant_statements"`
+	// Authorization is information about the creator of the schema change.
+	Authorization Authorization `protobuf:"bytes,3,opt,name=authorization,proto3" json:"authorization"`
+}
+
+func (m *DescriptorState) Reset()         { *m = DescriptorState{} }
+func (m *DescriptorState) String() string { return proto.CompactTextString(m) }
+func (*DescriptorState) ProtoMessage()    {}
+func (*DescriptorState) Descriptor() ([]byte, []int) {
+	return fileDescriptor_5413c88842564e28, []int{5}
+}
+func (m *DescriptorState) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *DescriptorState) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	b = b[:cap(b)]
+	n, err := m.MarshalToSizedBuffer(b)
+	if err != nil {
+		return nil, err
+	}
+	return b[:n], nil
+}
+func (m *DescriptorState) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DescriptorState.Merge(m, src)
+}
+func (m *DescriptorState) XXX_Size() int {
+	return m.Size()
+}
+func (m *DescriptorState) XXX_DiscardUnknown() {
+	xxx_messageInfo_DescriptorState.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DescriptorState proto.InternalMessageInfo
+
+// Statement is a statement which is associated with one or more targets
+// in the current DescriptorState.
+type DescriptorState_Statement struct {
+	// Statement is a statement that is relevant to one or more targets
+	// in this descriptor.
+	Statement Statement `protobuf:"bytes,1,opt,name=statement,proto3" json:"statement"`
+	// StatementRank is the rank of the statement in the transaction.
+	StatementRank uint32 `protobuf:"varint,2,opt,name=statement_rank,json=statementRank,proto3" json:"statement_rank,omitempty"`
+}
+
+func (m *DescriptorState_Statement) Reset()         { *m = DescriptorState_Statement{} }
+func (m *DescriptorState_Statement) String() string { return proto.CompactTextString(m) }
+func (*DescriptorState_Statement) ProtoMessage()    {}
+func (*DescriptorState_Statement) Descriptor() ([]byte, []int) {
+	return fileDescriptor_5413c88842564e28, []int{5, 0}
+}
+func (m *DescriptorState_Statement) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *DescriptorState_Statement) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	b = b[:cap(b)]
+	n, err := m.MarshalToSizedBuffer(b)
+	if err != nil {
+		return nil, err
+	}
+	return b[:n], nil
+}
+func (m *DescriptorState_Statement) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DescriptorState_Statement.Merge(m, src)
+}
+func (m *DescriptorState_Statement) XXX_Size() int {
+	return m.Size()
+}
+func (m *DescriptorState_Statement) XXX_DiscardUnknown() {
+	xxx_messageInfo_DescriptorState_Statement.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DescriptorState_Statement proto.InternalMessageInfo
+
 func init() {
 	proto.RegisterEnum("cockroach.sql.schemachanger.scpb.Status", Status_name, Status_value)
 	proto.RegisterType((*Target)(nil), "cockroach.sql.schemachanger.scpb.Target")
@@ -264,56 +362,313 @@ func init() {
 	proto.RegisterType((*TargetState)(nil), "cockroach.sql.schemachanger.scpb.TargetState")
 	proto.RegisterType((*Statement)(nil), "cockroach.sql.schemachanger.scpb.Statement")
 	proto.RegisterType((*Authorization)(nil), "cockroach.sql.schemachanger.scpb.Authorization")
+	proto.RegisterType((*DescriptorState)(nil), "cockroach.sql.schemachanger.scpb.DescriptorState")
+	proto.RegisterType((*DescriptorState_Statement)(nil), "cockroach.sql.schemachanger.scpb.DescriptorState.Statement")
 }
 
 func init() { proto.RegisterFile("sql/schemachanger/scpb/scpb.proto", fileDescriptor_5413c88842564e28) }
 
 var fileDescriptor_5413c88842564e28 = []byte{
-	// 657 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x94, 0xcd, 0x6e, 0xda, 0x4a,
-	0x14, 0xc7, 0x31, 0xe4, 0x02, 0x3e, 0x8e, 0x03, 0x19, 0xdd, 0x2b, 0x91, 0xdc, 0xca, 0x50, 0xaa,
-	0x46, 0xa8, 0x55, 0x4c, 0x45, 0x9f, 0x00, 0xc7, 0x6e, 0x6b, 0x85, 0x38, 0xd4, 0x38, 0x4d, 0x3f,
-	0x54, 0x59, 0x83, 0x3d, 0x02, 0x94, 0x80, 0x89, 0xc7, 0xa8, 0x52, 0xa5, 0xae, 0x2b, 0x75, 0xd5,
-	0x55, 0x5f, 0xa9, 0x59, 0x66, 0x99, 0x15, 0x6a, 0x9d, 0xb7, 0xe8, 0xaa, 0xf2, 0xd8, 0x98, 0xa0,
-	0xaa, 0x22, 0x1b, 0x34, 0xfc, 0xcf, 0xf9, 0xff, 0xce, 0x17, 0x02, 0xee, 0xd3, 0x8b, 0xf3, 0x26,
-	0x75, 0x86, 0x64, 0x8c, 0x9d, 0x21, 0x9e, 0x0c, 0x88, 0xdf, 0xa4, 0xce, 0xb4, 0xcf, 0x3e, 0xe4,
-	0xa9, 0xef, 0x05, 0x1e, 0xaa, 0x39, 0x9e, 0x73, 0xe6, 0x7b, 0xd8, 0x19, 0xca, 0xf4, 0xe2, 0x5c,
-	0x5e, 0x49, 0x96, 0xa3, 0xbc, 0xdd, 0x87, 0x7f, 0x81, 0x90, 0x73, 0x32, 0x26, 0x93, 0x80, 0xc6,
-	0xa0, 0xdd, 0x7f, 0x07, 0xde, 0xc0, 0x63, 0xcf, 0x66, 0xf4, 0x8a, 0xd5, 0xfa, 0x97, 0x2c, 0xe4,
-	0x2d, 0xec, 0x0f, 0x48, 0x80, 0xde, 0x83, 0x98, 0x58, 0x6c, 0x16, 0xab, 0x70, 0x35, 0xae, 0x21,
-	0xb4, 0x64, 0x79, 0x5d, 0x07, 0xb2, 0x16, 0xdb, 0xba, 0x91, 0x4b, 0x29, 0x5e, 0xce, 0xab, 0x99,
-	0xab, 0x79, 0x95, 0x33, 0x37, 0xc9, 0x2d, 0x1d, 0x99, 0x50, 0x1c, 0x93, 0x00, 0xbb, 0x38, 0xc0,
-	0x95, 0x2c, 0x23, 0x3f, 0x59, 0x4f, 0x8e, 0x5b, 0x3b, 0x4a, 0x7c, 0xca, 0x46, 0xc4, 0x36, 0x53,
-	0x0e, 0x3a, 0x02, 0x31, 0x60, 0x19, 0x36, 0x0d, 0x70, 0x30, 0xa3, 0x95, 0x5c, 0x8d, 0x6b, 0x6c,
-	0xb5, 0x1a, 0xeb, 0xc1, 0x3d, 0x96, 0x6f, 0x6e, 0xc6, 0xf6, 0xf8, 0x5b, 0xfd, 0x3b, 0x07, 0x5b,
-	0xab, 0x15, 0xd1, 0x3e, 0x08, 0x74, 0xd6, 0xb7, 0x3f, 0x78, 0xfe, 0x99, 0x3d, 0x72, 0xd9, 0x4a,
-	0x44, 0x45, 0x0c, 0xe7, 0x55, 0xbe, 0x37, 0xeb, 0x9f, 0x7a, 0xfe, 0x99, 0xae, 0x9a, 0x3c, 0x4d,
-	0x9e, 0x2e, 0x32, 0x61, 0x9b, 0x7a, 0x33, 0xdf, 0x21, 0xf6, 0x62, 0x95, 0x23, 0x97, 0x4d, 0x2b,
-	0x2a, 0x7b, 0xe1, 0xbc, 0x5a, 0xea, 0xb1, 0x60, 0xb2, 0x2f, 0x5d, 0xfd, 0xf5, 0xa7, 0x64, 0x96,
-	0xe8, 0x8a, 0xe0, 0xa2, 0x16, 0x6c, 0x46, 0xd3, 0xa5, 0xb8, 0x1c, 0xc3, 0x95, 0xc2, 0x79, 0x55,
-	0xe8, 0x2d, 0x74, 0x5d, 0x35, 0x85, 0x34, 0x49, 0x77, 0xeb, 0x9f, 0xb3, 0x20, 0x58, 0xe9, 0x68,
-	0x04, 0xbd, 0x80, 0x42, 0x3c, 0x29, 0xad, 0x70, 0xb5, 0x5c, 0x43, 0xb8, 0xcb, 0x8a, 0x62, 0x7f,
-	0xb2, 0xf3, 0x85, 0x1d, 0xbd, 0x04, 0x48, 0x0b, 0xd1, 0x4a, 0x96, 0xc1, 0x1e, 0xdf, 0x6d, 0xdf,
-	0xcc, 0x93, 0xf0, 0x6e, 0x41, 0xd0, 0x3b, 0x10, 0xf1, 0x2c, 0x18, 0x7a, 0xfe, 0xe8, 0x23, 0x0e,
-	0x46, 0xde, 0x84, 0x4d, 0x28, 0xb4, 0x9a, 0xeb, 0xa9, 0xed, 0xdb, 0xb6, 0x84, 0xbc, 0xca, 0xaa,
-	0x7f, 0x02, 0x3e, 0xad, 0x8d, 0xee, 0x01, 0x9f, 0xd6, 0x65, 0xb7, 0xe4, 0xcd, 0xa5, 0x80, 0xf6,
-	0x01, 0xf9, 0xc4, 0xc5, 0x4e, 0x40, 0x5c, 0x7b, 0x99, 0x96, 0x65, 0x69, 0xdb, 0x8b, 0xc8, 0x12,
-	0xf6, 0x00, 0xc4, 0xe5, 0x5d, 0x02, 0x3c, 0x60, 0x6d, 0xf3, 0xe6, 0xf2, 0x58, 0x16, 0x1e, 0xd4,
-	0x9f, 0x83, 0xb8, 0xd2, 0x24, 0xfa, 0x1f, 0xf8, 0x19, 0x25, 0xbe, 0x3d, 0xc1, 0x63, 0x92, 0xb4,
-	0x50, 0x8c, 0x04, 0x03, 0x8f, 0x09, 0xda, 0x81, 0x22, 0x9e, 0x4e, 0xe3, 0x58, 0x5c, 0xb7, 0x80,
-	0xa7, 0xd3, 0x28, 0xf4, 0xe8, 0x1b, 0x07, 0xf9, 0xf8, 0x67, 0x8a, 0x04, 0x28, 0x9c, 0x18, 0x87,
-	0xc6, 0xf1, 0xa9, 0x51, 0xce, 0x20, 0x80, 0x7c, 0x5b, 0xe9, 0x69, 0x86, 0x55, 0xe6, 0xa2, 0x80,
-	0x6a, 0x1e, 0x77, 0xbb, 0x9a, 0x5a, 0xce, 0xa2, 0x12, 0x08, 0xaa, 0xd6, 0xd1, 0x2c, 0xcd, 0x3e,
-	0x36, 0x3a, 0x6f, 0xca, 0x39, 0xb4, 0x03, 0xff, 0x25, 0x42, 0xdb, 0x50, 0xed, 0x53, 0x53, 0x5f,
-	0x84, 0x36, 0xd0, 0x16, 0x80, 0xd2, 0x3e, 0x38, 0x7c, 0xa6, 0x77, 0x3a, 0x9a, 0x5a, 0xfe, 0x07,
-	0x89, 0xc0, 0xbf, 0x6a, 0x77, 0x74, 0xb5, 0x6d, 0x69, 0x6a, 0x39, 0x1f, 0xa1, 0xac, 0xd7, 0x86,
-	0xbd, 0x60, 0x17, 0xa2, 0xa2, 0xdd, 0x13, 0xa5, 0xa3, 0x1f, 0x94, 0x8b, 0xca, 0xde, 0xe5, 0x4f,
-	0x29, 0x73, 0x19, 0x4a, 0xdc, 0x55, 0x28, 0x71, 0xd7, 0xa1, 0xc4, 0xfd, 0x08, 0x25, 0xee, 0xeb,
-	0x8d, 0x94, 0xb9, 0xba, 0x91, 0x32, 0xd7, 0x37, 0x52, 0xe6, 0xed, 0x46, 0x74, 0xab, 0x7e, 0x9e,
-	0xfd, 0xa9, 0x3c, 0xfd, 0x1d, 0x00, 0x00, 0xff, 0xff, 0xa8, 0x44, 0x05, 0xc9, 0xf4, 0x04, 0x00,
-	0x00,
+	// 860 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x95, 0x4d, 0x8f, 0xdb, 0x44,
+	0x18, 0xc7, 0xe3, 0xbc, 0x6d, 0xf2, 0x78, 0xbd, 0x49, 0x07, 0x90, 0xd2, 0x05, 0x39, 0x69, 0x50,
+	0x51, 0x54, 0x54, 0x07, 0x2d, 0x37, 0xe0, 0x12, 0xd7, 0x01, 0x4c, 0xd3, 0x6c, 0x70, 0x52, 0x96,
+	0x17, 0x21, 0x33, 0xb6, 0x47, 0x4e, 0x9a, 0x17, 0xbb, 0x33, 0x0e, 0x48, 0x48, 0x9c, 0x38, 0x20,
+	0x21, 0x0e, 0x9c, 0x38, 0x73, 0xe4, 0xa3, 0xec, 0x05, 0x69, 0x8f, 0x3d, 0x45, 0xe0, 0xbd, 0xf0,
+	0x19, 0x38, 0xa1, 0x19, 0x3b, 0x6f, 0xad, 0x50, 0x0a, 0x42, 0x5c, 0x92, 0xc9, 0xf3, 0xf2, 0x7b,
+	0x66, 0xfe, 0xf3, 0x3c, 0x13, 0xb8, 0xc5, 0x1e, 0xcf, 0xda, 0xcc, 0x1d, 0x93, 0x39, 0x76, 0xc7,
+	0x78, 0xe1, 0x13, 0xda, 0x66, 0x6e, 0xe8, 0x88, 0x0f, 0x2d, 0xa4, 0x41, 0x14, 0xa0, 0x86, 0x1b,
+	0xb8, 0x53, 0x1a, 0x60, 0x77, 0xac, 0xb1, 0xc7, 0x33, 0x6d, 0x2f, 0x58, 0xe3, 0x71, 0xa7, 0xb7,
+	0xff, 0x06, 0x42, 0x66, 0x64, 0x4e, 0x16, 0x11, 0x4b, 0x40, 0xa7, 0x2f, 0xfa, 0x81, 0x1f, 0x88,
+	0x65, 0x9b, 0xaf, 0x12, 0x6b, 0xf3, 0xfb, 0x2c, 0x14, 0x47, 0x98, 0xfa, 0x24, 0x42, 0x9f, 0x83,
+	0x92, 0xa6, 0xd8, 0xc2, 0x57, 0x93, 0x1a, 0x52, 0x4b, 0x3e, 0xd3, 0xb4, 0x43, 0x3b, 0xd0, 0xba,
+	0x49, 0xda, 0x80, 0x67, 0xe9, 0xa5, 0xcb, 0x55, 0x3d, 0x73, 0xb5, 0xaa, 0x4b, 0xd6, 0x31, 0xd9,
+	0xb1, 0x23, 0x0b, 0x4a, 0x73, 0x12, 0x61, 0x0f, 0x47, 0xb8, 0x96, 0x15, 0xe4, 0x37, 0x0e, 0x93,
+	0x93, 0xad, 0x3d, 0x48, 0xf3, 0xf4, 0x3c, 0x67, 0x5b, 0x1b, 0x0e, 0x7a, 0x00, 0x4a, 0x24, 0x22,
+	0x6c, 0x16, 0xe1, 0x68, 0xc9, 0x6a, 0xb9, 0x86, 0xd4, 0x3a, 0x39, 0x6b, 0x1d, 0x06, 0x0f, 0x45,
+	0xbc, 0x75, 0x9c, 0xa4, 0x27, 0xbf, 0x9a, 0xbf, 0x4a, 0x70, 0xb2, 0x5f, 0x11, 0xdd, 0x05, 0x99,
+	0x2d, 0x1d, 0xfb, 0xab, 0x80, 0x4e, 0xed, 0x89, 0x27, 0x24, 0x51, 0x74, 0x25, 0x5e, 0xd5, 0xcb,
+	0xc3, 0xa5, 0x73, 0x11, 0xd0, 0xa9, 0x69, 0x58, 0x65, 0x96, 0x2e, 0x3d, 0x64, 0xc1, 0x0d, 0x16,
+	0x2c, 0xa9, 0x4b, 0xec, 0xb5, 0x94, 0x13, 0x4f, 0x9c, 0x56, 0xd1, 0x5f, 0x8b, 0x57, 0xf5, 0xca,
+	0x50, 0x38, 0x53, 0xbd, 0x4c, 0xe3, 0xcf, 0x67, 0x4d, 0x56, 0x85, 0xed, 0x19, 0x3c, 0x74, 0x06,
+	0xc7, 0xfc, 0x74, 0x1b, 0x5c, 0x4e, 0xe0, 0x2a, 0xf1, 0xaa, 0x2e, 0x0f, 0xd7, 0x76, 0xd3, 0xb0,
+	0xe4, 0x4d, 0x90, 0xe9, 0xbd, 0x95, 0xff, 0xe3, 0xe7, 0xba, 0xd4, 0xfc, 0x2e, 0x0b, 0xf2, 0x68,
+	0x73, 0x40, 0x82, 0xde, 0x87, 0xa3, 0xe4, 0xbc, 0xac, 0x26, 0x35, 0x72, 0x2d, 0xf9, 0x79, 0x84,
+	0x4a, 0xf2, 0x53, 0xe5, 0xd7, 0xe9, 0xe8, 0x43, 0x80, 0x4d, 0x39, 0x56, 0xcb, 0x0a, 0xd8, 0xeb,
+	0xcf, 0xa7, 0xba, 0xc8, 0x49, 0x79, 0x3b, 0x10, 0xf4, 0x19, 0x28, 0x78, 0x19, 0x8d, 0x03, 0x3a,
+	0xf9, 0x1a, 0x47, 0x93, 0x60, 0x21, 0xce, 0x29, 0x9f, 0xb5, 0x0f, 0x53, 0x3b, 0xbb, 0x69, 0x29,
+	0x79, 0x9f, 0xd5, 0xfc, 0x06, 0xca, 0x9b, 0xda, 0xe8, 0x15, 0x28, 0x6f, 0xea, 0x8a, 0x1b, 0x2d,
+	0x5b, 0x5b, 0x03, 0xba, 0x0b, 0x88, 0x12, 0x0f, 0xbb, 0x11, 0xf1, 0xec, 0x6d, 0x58, 0x56, 0x84,
+	0xdd, 0x58, 0x7b, 0xb6, 0xb0, 0x57, 0x41, 0xd9, 0xde, 0x4e, 0x84, 0x7d, 0xb1, 0xed, 0xb2, 0xb5,
+	0xbd, 0xb2, 0x11, 0xf6, 0x9b, 0xef, 0x81, 0xb2, 0xb7, 0x49, 0xf4, 0x32, 0x94, 0x97, 0x8c, 0x50,
+	0x7b, 0x81, 0xe7, 0x24, 0xdd, 0x42, 0x89, 0x1b, 0xfa, 0x78, 0x4e, 0xd0, 0x4d, 0x28, 0xe1, 0x30,
+	0x4c, 0x7c, 0x49, 0xdd, 0x23, 0x1c, 0x86, 0xdc, 0xd5, 0xfc, 0xa1, 0x00, 0x15, 0x83, 0x30, 0x97,
+	0x4e, 0xc2, 0x28, 0xa0, 0xc9, 0xad, 0x7e, 0x01, 0xc5, 0x47, 0x81, 0xc3, 0x3b, 0xa3, 0xd0, 0x90,
+	0x5a, 0x39, 0xdd, 0x8c, 0x57, 0xf5, 0xc2, 0x07, 0x81, 0x23, 0xda, 0xeb, 0x1d, 0x7f, 0x12, 0x8d,
+	0x97, 0x8e, 0xe6, 0x06, 0xf3, 0xf6, 0x46, 0x48, 0xcf, 0xd9, 0xae, 0xdb, 0xe1, 0xd4, 0x6f, 0xf3,
+	0x17, 0xc4, 0xc5, 0x11, 0x9e, 0x05, 0x3e, 0xff, 0x0e, 0x1d, 0x4d, 0xe4, 0x5b, 0x85, 0x47, 0x81,
+	0x63, 0x7a, 0xff, 0x61, 0xdf, 0x0c, 0xa1, 0xea, 0x2e, 0x29, 0xe5, 0x5a, 0x25, 0x13, 0x4b, 0x58,
+	0x2d, 0xdf, 0xc8, 0xfd, 0xa3, 0x99, 0xad, 0xa4, 0x84, 0x61, 0x0a, 0x40, 0xb7, 0x20, 0x1d, 0x63,
+	0x9b, 0xe2, 0xc5, 0x94, 0xd5, 0x8a, 0x8d, 0x5c, 0x4b, 0xb1, 0xe4, 0xc4, 0x66, 0x71, 0x13, 0xa2,
+	0xf0, 0x02, 0x25, 0x33, 0xf2, 0x25, 0x4e, 0x0b, 0xef, 0x35, 0xee, 0xdb, 0x87, 0x4b, 0x3f, 0xa5,
+	0xf9, 0x33, 0x8d, 0x8c, 0xd6, 0xf4, 0xe1, 0xff, 0xd3, 0xd0, 0xa7, 0xdf, 0x4a, 0xbb, 0x1d, 0x7d,
+	0xfe, 0x74, 0x47, 0xff, 0xab, 0x69, 0xdc, 0x19, 0x82, 0xdb, 0x70, 0xb2, 0xed, 0x6a, 0xae, 0x6a,
+	0xf2, 0x88, 0x59, 0xdb, 0x5e, 0xe7, 0xba, 0xde, 0xf9, 0x49, 0x82, 0x62, 0x72, 0x0d, 0x48, 0x86,
+	0xa3, 0x87, 0xfd, 0xfb, 0xfd, 0xf3, 0x8b, 0x7e, 0x35, 0x83, 0x00, 0x8a, 0x1d, 0x7d, 0xd8, 0xed,
+	0x8f, 0xaa, 0x12, 0x77, 0x18, 0xd6, 0xf9, 0x60, 0xd0, 0x35, 0xaa, 0x59, 0x54, 0x01, 0xd9, 0xe8,
+	0xf6, 0xba, 0xa3, 0xae, 0x7d, 0xde, 0xef, 0x7d, 0x52, 0xcd, 0xa1, 0x9b, 0xf0, 0x52, 0x6a, 0xe8,
+	0xf4, 0x0d, 0xfb, 0xc2, 0x32, 0xd7, 0xae, 0x3c, 0x3a, 0x01, 0xd0, 0x3b, 0xf7, 0xee, 0xbf, 0x6b,
+	0xf6, 0x7a, 0x5d, 0xa3, 0x5a, 0x40, 0x0a, 0x94, 0x3f, 0xea, 0xf4, 0x4c, 0xa3, 0x33, 0xea, 0x1a,
+	0xd5, 0x22, 0x47, 0x8d, 0x3e, 0xee, 0xdb, 0x6b, 0xf6, 0x11, 0x2f, 0x3a, 0x78, 0xa8, 0xf7, 0xcc,
+	0x7b, 0xd5, 0x92, 0x7e, 0xe7, 0xf2, 0x77, 0x35, 0xf3, 0x4b, 0xac, 0x4a, 0x97, 0xb1, 0x2a, 0x5d,
+	0xc5, 0xaa, 0xf4, 0x24, 0x56, 0xa5, 0xdf, 0x62, 0x55, 0xfa, 0xf1, 0x5a, 0xcd, 0x5c, 0x5d, 0xab,
+	0x99, 0x27, 0xd7, 0x6a, 0xe6, 0xd3, 0x3c, 0x97, 0xc1, 0x29, 0x8a, 0x7f, 0xbb, 0x37, 0xff, 0x0a,
+	0x00, 0x00, 0xff, 0xff, 0xb3, 0x6f, 0x39, 0xc3, 0x8d, 0x07, 0x00, 0x00,
 }
 
+func (this *Target) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*Target)
+	if !ok {
+		that2, ok := that.(Target)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !this.ElementProto.Equal(&that1.ElementProto) {
+		return false
+	}
+	if !this.Metadata.Equal(&that1.Metadata) {
+		return false
+	}
+	if this.TargetStatus != that1.TargetStatus {
+		return false
+	}
+	return true
+}
+func (this *TargetMetadata) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*TargetMetadata)
+	if !ok {
+		that2, ok := that.(TargetMetadata)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if this.SubWorkID != that1.SubWorkID {
+		return false
+	}
+	if this.SourceElementID != that1.SourceElementID {
+		return false
+	}
+	if this.StatementID != that1.StatementID {
+		return false
+	}
+	return true
+}
+func (this *TargetState) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*TargetState)
+	if !ok {
+		that2, ok := that.(TargetState)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if len(this.Targets) != len(that1.Targets) {
+		return false
+	}
+	for i := range this.Targets {
+		if !this.Targets[i].Equal(&that1.Targets[i]) {
+			return false
+		}
+	}
+	if len(this.Statements) != len(that1.Statements) {
+		return false
+	}
+	for i := range this.Statements {
+		if !this.Statements[i].Equal(&that1.Statements[i]) {
+			return false
+		}
+	}
+	if !this.Authorization.Equal(&that1.Authorization) {
+		return false
+	}
+	return true
+}
+func (this *Statement) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*Statement)
+	if !ok {
+		that2, ok := that.(Statement)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if this.Statement != that1.Statement {
+		return false
+	}
+	if this.RedactedStatement != that1.RedactedStatement {
+		return false
+	}
+	if this.StatementTag != that1.StatementTag {
+		return false
+	}
+	return true
+}
+func (this *Authorization) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*Authorization)
+	if !ok {
+		that2, ok := that.(Authorization)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if this.UserName != that1.UserName {
+		return false
+	}
+	if this.AppName != that1.AppName {
+		return false
+	}
+	return true
+}
+func (this *DescriptorState) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*DescriptorState)
+	if !ok {
+		that2, ok := that.(DescriptorState)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if this.JobID != that1.JobID {
+		return false
+	}
+	if len(this.Targets) != len(that1.Targets) {
+		return false
+	}
+	for i := range this.Targets {
+		if !this.Targets[i].Equal(&that1.Targets[i]) {
+			return false
+		}
+	}
+	if len(this.CurrentStatuses) != len(that1.CurrentStatuses) {
+		return false
+	}
+	for i := range this.CurrentStatuses {
+		if this.CurrentStatuses[i] != that1.CurrentStatuses[i] {
+			return false
+		}
+	}
+	if len(this.TargetRanks) != len(that1.TargetRanks) {
+		return false
+	}
+	for i := range this.TargetRanks {
+		if this.TargetRanks[i] != that1.TargetRanks[i] {
+			return false
+		}
+	}
+	if len(this.RelevantStatements) != len(that1.RelevantStatements) {
+		return false
+	}
+	for i := range this.RelevantStatements {
+		if !this.RelevantStatements[i].Equal(&that1.RelevantStatements[i]) {
+			return false
+		}
+	}
+	if !this.Authorization.Equal(&that1.Authorization) {
+		return false
+	}
+	return true
+}
+func (this *DescriptorState_Statement) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*DescriptorState_Statement)
+	if !ok {
+		that2, ok := that.(DescriptorState_Statement)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !this.Statement.Equal(&that1.Statement) {
+		return false
+	}
+	if this.StatementRank != that1.StatementRank {
+		return false
+	}
+	return true
+}
 func (m *Target) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -542,6 +897,146 @@ func (m *Authorization) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
+func (m *DescriptorState) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *DescriptorState) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *DescriptorState) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.TargetRanks) > 0 {
+		dAtA5 := make([]byte, len(m.TargetRanks)*10)
+		var j4 int
+		for _, num := range m.TargetRanks {
+			for num >= 1<<7 {
+				dAtA5[j4] = uint8(uint64(num)&0x7f | 0x80)
+				num >>= 7
+				j4++
+			}
+			dAtA5[j4] = uint8(num)
+			j4++
+		}
+		i -= j4
+		copy(dAtA[i:], dAtA5[:j4])
+		i = encodeVarintScpb(dAtA, i, uint64(j4))
+		i--
+		dAtA[i] = 0x32
+	}
+	if m.JobID != 0 {
+		i = encodeVarintScpb(dAtA, i, uint64(m.JobID))
+		i--
+		dAtA[i] = 0x28
+	}
+	if len(m.CurrentStatuses) > 0 {
+		dAtA7 := make([]byte, len(m.CurrentStatuses)*10)
+		var j6 int
+		for _, num := range m.CurrentStatuses {
+			for num >= 1<<7 {
+				dAtA7[j6] = uint8(uint64(num)&0x7f | 0x80)
+				num >>= 7
+				j6++
+			}
+			dAtA7[j6] = uint8(num)
+			j6++
+		}
+		i -= j6
+		copy(dAtA[i:], dAtA7[:j6])
+		i = encodeVarintScpb(dAtA, i, uint64(j6))
+		i--
+		dAtA[i] = 0x22
+	}
+	{
+		size, err := m.Authorization.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintScpb(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x1a
+	if len(m.RelevantStatements) > 0 {
+		for iNdEx := len(m.RelevantStatements) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.RelevantStatements[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintScpb(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x12
+		}
+	}
+	if len(m.Targets) > 0 {
+		for iNdEx := len(m.Targets) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Targets[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintScpb(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0xa
+		}
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *DescriptorState_Statement) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *DescriptorState_Statement) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *DescriptorState_Statement) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.StatementRank != 0 {
+		i = encodeVarintScpb(dAtA, i, uint64(m.StatementRank))
+		i--
+		dAtA[i] = 0x10
+	}
+	{
+		size, err := m.Statement.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintScpb(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintScpb(dAtA []byte, offset int, v uint64) int {
 	offset -= sovScpb(v)
 	base := offset
@@ -644,6 +1139,60 @@ func (m *Authorization) Size() (n int) {
 	l = len(m.AppName)
 	if l > 0 {
 		n += 1 + l + sovScpb(uint64(l))
+	}
+	return n
+}
+
+func (m *DescriptorState) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if len(m.Targets) > 0 {
+		for _, e := range m.Targets {
+			l = e.Size()
+			n += 1 + l + sovScpb(uint64(l))
+		}
+	}
+	if len(m.RelevantStatements) > 0 {
+		for _, e := range m.RelevantStatements {
+			l = e.Size()
+			n += 1 + l + sovScpb(uint64(l))
+		}
+	}
+	l = m.Authorization.Size()
+	n += 1 + l + sovScpb(uint64(l))
+	if len(m.CurrentStatuses) > 0 {
+		l = 0
+		for _, e := range m.CurrentStatuses {
+			l += sovScpb(uint64(e))
+		}
+		n += 1 + sovScpb(uint64(l)) + l
+	}
+	if m.JobID != 0 {
+		n += 1 + sovScpb(uint64(m.JobID))
+	}
+	if len(m.TargetRanks) > 0 {
+		l = 0
+		for _, e := range m.TargetRanks {
+			l += sovScpb(uint64(e))
+		}
+		n += 1 + sovScpb(uint64(l)) + l
+	}
+	return n
+}
+
+func (m *DescriptorState_Statement) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = m.Statement.Size()
+	n += 1 + l + sovScpb(uint64(l))
+	if m.StatementRank != 0 {
+		n += 1 + sovScpb(uint64(m.StatementRank))
 	}
 	return n
 }
@@ -1286,6 +1835,423 @@ func (m *Authorization) Unmarshal(dAtA []byte) error {
 			}
 			m.AppName = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipScpb(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthScpb
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *DescriptorState) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowScpb
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: DescriptorState: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: DescriptorState: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Targets", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowScpb
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthScpb
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthScpb
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Targets = append(m.Targets, Target{})
+			if err := m.Targets[len(m.Targets)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RelevantStatements", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowScpb
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthScpb
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthScpb
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.RelevantStatements = append(m.RelevantStatements, DescriptorState_Statement{})
+			if err := m.RelevantStatements[len(m.RelevantStatements)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Authorization", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowScpb
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthScpb
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthScpb
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Authorization.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType == 0 {
+				var v Status
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowScpb
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					v |= Status(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				m.CurrentStatuses = append(m.CurrentStatuses, v)
+			} else if wireType == 2 {
+				var packedLen int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowScpb
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					packedLen |= int(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				if packedLen < 0 {
+					return ErrInvalidLengthScpb
+				}
+				postIndex := iNdEx + packedLen
+				if postIndex < 0 {
+					return ErrInvalidLengthScpb
+				}
+				if postIndex > l {
+					return io.ErrUnexpectedEOF
+				}
+				var elementCount int
+				if elementCount != 0 && len(m.CurrentStatuses) == 0 {
+					m.CurrentStatuses = make([]Status, 0, elementCount)
+				}
+				for iNdEx < postIndex {
+					var v Status
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowScpb
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						v |= Status(b&0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					m.CurrentStatuses = append(m.CurrentStatuses, v)
+				}
+			} else {
+				return fmt.Errorf("proto: wrong wireType = %d for field CurrentStatuses", wireType)
+			}
+		case 5:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field JobID", wireType)
+			}
+			m.JobID = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowScpb
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.JobID |= github_com_cockroachdb_cockroach_pkg_sql_catalog_catpb.JobID(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 6:
+			if wireType == 0 {
+				var v uint32
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowScpb
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					v |= uint32(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				m.TargetRanks = append(m.TargetRanks, v)
+			} else if wireType == 2 {
+				var packedLen int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowScpb
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					packedLen |= int(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				if packedLen < 0 {
+					return ErrInvalidLengthScpb
+				}
+				postIndex := iNdEx + packedLen
+				if postIndex < 0 {
+					return ErrInvalidLengthScpb
+				}
+				if postIndex > l {
+					return io.ErrUnexpectedEOF
+				}
+				var elementCount int
+				var count int
+				for _, integer := range dAtA[iNdEx:postIndex] {
+					if integer < 128 {
+						count++
+					}
+				}
+				elementCount = count
+				if elementCount != 0 && len(m.TargetRanks) == 0 {
+					m.TargetRanks = make([]uint32, 0, elementCount)
+				}
+				for iNdEx < postIndex {
+					var v uint32
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowScpb
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						v |= uint32(b&0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					m.TargetRanks = append(m.TargetRanks, v)
+				}
+			} else {
+				return fmt.Errorf("proto: wrong wireType = %d for field TargetRanks", wireType)
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipScpb(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthScpb
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *DescriptorState_Statement) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowScpb
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: Statement: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: Statement: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Statement", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowScpb
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthScpb
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthScpb
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Statement.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field StatementRank", wireType)
+			}
+			m.StatementRank = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowScpb
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.StatementRank |= uint32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipScpb(dAtA[iNdEx:])
