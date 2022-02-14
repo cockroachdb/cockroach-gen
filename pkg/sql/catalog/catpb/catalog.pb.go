@@ -4,6 +4,7 @@
 package catpb
 
 import (
+	bytes "bytes"
 	fmt "fmt"
 	github_com_cockroachdb_cockroach_pkg_sql_sem_catid "github.com/cockroachdb/cockroach/pkg/sql/sem/catid"
 	_ "github.com/gogo/protobuf/gogoproto"
@@ -476,6 +477,145 @@ func (m *ScheduledRowLevelTTLArgs) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_ScheduledRowLevelTTLArgs proto.InternalMessageInfo
 
+// PartitioningDescriptor represents the partitioning of an index into spans
+// of keys addressable by a zone config. The key encoding is unchanged. Each
+// partition may optionally be itself divided into further partitions, called
+// subpartitions.
+type PartitioningDescriptor struct {
+	// NumColumns is how large of a prefix of the columns in an index are used in
+	// the function mapping column values to partitions. If this is a
+	// subpartition, this is offset to start from the end of the parent
+	// partition's columns. If NumColumns is 0, then there is no partitioning.
+	NumColumns uint32 `protobuf:"varint,1,opt,name=num_columns,json=numColumns" json:"num_columns"`
+	// NumImplicitColumns specifies the number of columns that implicitly prefix a given index.
+	// This occurs if a user specifies a PARTITION BY which is not a prefix of the given index,
+	// in which case the ColumnIDs are added in front of the index and this field denotes
+	// the number of columns added as a prefix.
+	// If NumImplicitColumns is 0, there are no implicit columns defined for the index."
+	NumImplicitColumns uint32 `protobuf:"varint,4,opt,name=num_implicit_columns,json=numImplicitColumns" json:"num_implicit_columns"`
+	// Exactly one of List or Range is required to be non-empty if NumColumns is
+	// non-zero.
+	List  []PartitioningDescriptor_List  `protobuf:"bytes,2,rep,name=list" json:"list"`
+	Range []PartitioningDescriptor_Range `protobuf:"bytes,3,rep,name=range" json:"range"`
+}
+
+func (m *PartitioningDescriptor) Reset()         { *m = PartitioningDescriptor{} }
+func (m *PartitioningDescriptor) String() string { return proto.CompactTextString(m) }
+func (*PartitioningDescriptor) ProtoMessage()    {}
+func (*PartitioningDescriptor) Descriptor() ([]byte, []int) {
+	return fileDescriptor_98c5e4146b266e21, []int{3}
+}
+func (m *PartitioningDescriptor) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *PartitioningDescriptor) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	b = b[:cap(b)]
+	n, err := m.MarshalToSizedBuffer(b)
+	if err != nil {
+		return nil, err
+	}
+	return b[:n], nil
+}
+func (m *PartitioningDescriptor) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PartitioningDescriptor.Merge(m, src)
+}
+func (m *PartitioningDescriptor) XXX_Size() int {
+	return m.Size()
+}
+func (m *PartitioningDescriptor) XXX_DiscardUnknown() {
+	xxx_messageInfo_PartitioningDescriptor.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_PartitioningDescriptor proto.InternalMessageInfo
+
+// List represents a list partitioning, which maps individual tuples to
+// partitions.
+type PartitioningDescriptor_List struct {
+	// Name is the partition name.
+	Name string `protobuf:"bytes,1,opt,name=name" json:"name"`
+	// Values is an unordered set of the tuples included in this partition. Each
+	// tuple is encoded with the EncDatum value encoding. DEFAULT is encoded as
+	// NOT NULL followed by PartitionDefaultVal encoded as a non-sorting
+	// uvarint.
+	Values [][]byte `protobuf:"bytes,2,rep,name=values" json:"values,omitempty"`
+	// Subpartitioning represents a further partitioning of this list partition.
+	Subpartitioning PartitioningDescriptor `protobuf:"bytes,3,opt,name=subpartitioning" json:"subpartitioning"`
+}
+
+func (m *PartitioningDescriptor_List) Reset()         { *m = PartitioningDescriptor_List{} }
+func (m *PartitioningDescriptor_List) String() string { return proto.CompactTextString(m) }
+func (*PartitioningDescriptor_List) ProtoMessage()    {}
+func (*PartitioningDescriptor_List) Descriptor() ([]byte, []int) {
+	return fileDescriptor_98c5e4146b266e21, []int{3, 0}
+}
+func (m *PartitioningDescriptor_List) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *PartitioningDescriptor_List) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	b = b[:cap(b)]
+	n, err := m.MarshalToSizedBuffer(b)
+	if err != nil {
+		return nil, err
+	}
+	return b[:n], nil
+}
+func (m *PartitioningDescriptor_List) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PartitioningDescriptor_List.Merge(m, src)
+}
+func (m *PartitioningDescriptor_List) XXX_Size() int {
+	return m.Size()
+}
+func (m *PartitioningDescriptor_List) XXX_DiscardUnknown() {
+	xxx_messageInfo_PartitioningDescriptor_List.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_PartitioningDescriptor_List proto.InternalMessageInfo
+
+// Range represents a range partitioning, which maps ranges of tuples to
+// partitions by specifying exclusive upper bounds. The range partitions in a
+// PartitioningDescriptor are required to be sorted by UpperBound.
+type PartitioningDescriptor_Range struct {
+	// Name is the partition name.
+	Name string `protobuf:"bytes,1,opt,name=name" json:"name"`
+	// FromInclusive is the inclusive lower bound of this range partition. It is
+	// encoded with the EncDatum value encoding. MINVALUE and MAXVALUE are
+	// encoded as NOT NULL followed by a PartitionSpecialValCode encoded as a
+	// non-sorting uvarint.
+	FromInclusive []byte `protobuf:"bytes,3,opt,name=from_inclusive,json=fromInclusive" json:"from_inclusive,omitempty"`
+	// ToExclusive is the exclusive upper bound of this range partition. It is
+	// encoded in the same way as From.
+	ToExclusive []byte `protobuf:"bytes,2,opt,name=to_exclusive,json=toExclusive" json:"to_exclusive,omitempty"`
+}
+
+func (m *PartitioningDescriptor_Range) Reset()         { *m = PartitioningDescriptor_Range{} }
+func (m *PartitioningDescriptor_Range) String() string { return proto.CompactTextString(m) }
+func (*PartitioningDescriptor_Range) ProtoMessage()    {}
+func (*PartitioningDescriptor_Range) Descriptor() ([]byte, []int) {
+	return fileDescriptor_98c5e4146b266e21, []int{3, 1}
+}
+func (m *PartitioningDescriptor_Range) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *PartitioningDescriptor_Range) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	b = b[:cap(b)]
+	n, err := m.MarshalToSizedBuffer(b)
+	if err != nil {
+		return nil, err
+	}
+	return b[:n], nil
+}
+func (m *PartitioningDescriptor_Range) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PartitioningDescriptor_Range.Merge(m, src)
+}
+func (m *PartitioningDescriptor_Range) XXX_Size() int {
+	return m.Size()
+}
+func (m *PartitioningDescriptor_Range) XXX_DiscardUnknown() {
+	xxx_messageInfo_PartitioningDescriptor_Range.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_PartitioningDescriptor_Range proto.InternalMessageInfo
+
 func init() {
 	proto.RegisterEnum("cockroach.sql.catalog.catpb.ForeignKeyAction", ForeignKeyAction_name, ForeignKeyAction_value)
 	proto.RegisterEnum("cockroach.sql.catalog.catpb.SystemColumnKind", SystemColumnKind_name, SystemColumnKind_value)
@@ -486,58 +626,73 @@ func init() {
 	proto.RegisterType((*LocalityConfig_Global)(nil), "cockroach.sql.catalog.catpb.LocalityConfig.Global")
 	proto.RegisterType((*ShardedDescriptor)(nil), "cockroach.sql.catalog.catpb.ShardedDescriptor")
 	proto.RegisterType((*ScheduledRowLevelTTLArgs)(nil), "cockroach.sql.catalog.catpb.ScheduledRowLevelTTLArgs")
+	proto.RegisterType((*PartitioningDescriptor)(nil), "cockroach.sql.catalog.catpb.PartitioningDescriptor")
+	proto.RegisterType((*PartitioningDescriptor_List)(nil), "cockroach.sql.catalog.catpb.PartitioningDescriptor.List")
+	proto.RegisterType((*PartitioningDescriptor_Range)(nil), "cockroach.sql.catalog.catpb.PartitioningDescriptor.Range")
 }
 
 func init() { proto.RegisterFile("sql/catalog/catpb/catalog.proto", fileDescriptor_98c5e4146b266e21) }
 
 var fileDescriptor_98c5e4146b266e21 = []byte{
-	// 723 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x53, 0xcd, 0x6e, 0xe3, 0x54,
-	0x14, 0xb6, 0x93, 0x4c, 0x9b, 0x9c, 0xfc, 0xb9, 0x97, 0x48, 0x13, 0x05, 0xc9, 0x19, 0x8a, 0x80,
-	0x51, 0x17, 0x8e, 0x34, 0xbb, 0x82, 0x10, 0xf2, 0xdf, 0xb4, 0xd6, 0x38, 0x0e, 0xb2, 0x6f, 0x41,
-	0x65, 0x63, 0xf9, 0xe7, 0xe2, 0x58, 0x75, 0x7c, 0x33, 0xb6, 0x43, 0x95, 0x35, 0x2f, 0xc0, 0x23,
-	0xb0, 0x60, 0xc1, 0x13, 0x20, 0x1e, 0xa1, 0xcb, 0x59, 0xce, 0x2a, 0x82, 0x74, 0xc3, 0x33, 0xcc,
-	0x0a, 0xf9, 0xda, 0xd3, 0x1f, 0x16, 0x48, 0xb0, 0xb1, 0xef, 0x39, 0xe7, 0x3b, 0xdf, 0x77, 0xfc,
-	0x5d, 0x1f, 0x98, 0xe6, 0xaf, 0x93, 0x59, 0xe0, 0x15, 0x5e, 0x42, 0xa3, 0xf2, 0xbd, 0xf6, 0xdf,
-	0x47, 0xd2, 0x3a, 0xa3, 0x05, 0x45, 0x1f, 0x06, 0x34, 0xb8, 0xca, 0xa8, 0x17, 0x2c, 0xa5, 0xfc,
-	0x75, 0x22, 0xbd, 0x2f, 0x32, 0xe8, 0x64, 0x14, 0xd1, 0x88, 0x32, 0xdc, 0xac, 0x3c, 0x55, 0x2d,
-	0xc7, 0xbf, 0x37, 0x61, 0x60, 0xd2, 0xc0, 0x4b, 0xe2, 0x62, 0xab, 0xd2, 0xf4, 0xfb, 0x38, 0x42,
-	0x26, 0x1c, 0x44, 0x09, 0xf5, 0xbd, 0x64, 0xcc, 0x3f, 0xe3, 0x9f, 0x77, 0x5f, 0xbc, 0x90, 0xfe,
-	0x85, 0x56, 0x7a, 0xdc, 0x2c, 0x9d, 0xb1, 0xce, 0x73, 0xce, 0xae, 0x39, 0x50, 0x0c, 0x47, 0x19,
-	0x89, 0x62, 0x9a, 0x7a, 0x89, 0xeb, 0x6f, 0xdd, 0xc2, 0xf3, 0x13, 0x32, 0x6e, 0x30, 0xe2, 0x2f,
-	0xfe, 0x0b, 0xb1, 0x5d, 0x93, 0x28, 0x5b, 0x5c, 0x52, 0x9c, 0x73, 0xf6, 0x30, 0x7b, 0x9c, 0x42,
-	0x01, 0x0c, 0x1f, 0x4a, 0x65, 0xf4, 0x7a, 0xdc, 0x64, 0x42, 0xa7, 0xff, 0x4f, 0xc8, 0xa6, 0xd7,
-	0xe7, 0x9c, 0xdd, 0xcf, 0x1e, 0x26, 0x26, 0x5f, 0xc1, 0xf0, 0x1f, 0xa3, 0xa0, 0x4f, 0xe1, 0xa0,
-	0xc2, 0x30, 0xc3, 0x3a, 0xca, 0xe0, 0xdd, 0x6e, 0x0a, 0x15, 0xc8, 0xf2, 0x56, 0xc4, 0xae, 0xab,
-	0x9f, 0xb7, 0xfe, 0xfa, 0x79, 0xca, 0x4f, 0x3e, 0x81, 0xfe, 0x23, 0x09, 0x34, 0x80, 0x86, 0x97,
-	0x57, 0xad, 0x76, 0xc3, 0xcb, 0x6b, 0xd8, 0x00, 0x0e, 0x2a, 0x2f, 0xab, 0xb8, 0x7a, 0x2a, 0x00,
-	0xed, 0xa4, 0x1e, 0xf7, 0xf8, 0x37, 0x1e, 0x8e, 0x9c, 0xa5, 0x97, 0x85, 0x24, 0xd4, 0x48, 0x1e,
-	0x64, 0xf1, 0xba, 0xa0, 0x19, 0xfa, 0x18, 0x20, 0xce, 0xdd, 0xbc, 0xca, 0x33, 0xd6, 0xb6, 0xd2,
-	0xba, 0xd9, 0x4d, 0x39, 0xbb, 0x13, 0xe7, 0x35, 0x1c, 0x8d, 0xa1, 0x95, 0x7a, 0xab, 0xea, 0x1e,
-	0x3a, 0x75, 0x99, 0x65, 0xd0, 0x29, 0xf4, 0x59, 0xaf, 0xeb, 0x6f, 0x82, 0x2b, 0x52, 0xe4, 0xcc,
-	0xc1, 0x27, 0xca, 0xa8, 0x84, 0xec, 0x77, 0xd3, 0x1e, 0x63, 0x50, 0xaa, 0x9a, 0xdd, 0xcb, 0x1f,
-	0x44, 0xe8, 0x23, 0xe8, 0x05, 0x34, 0xd9, 0xac, 0x52, 0xb7, 0x64, 0xca, 0xc7, 0xad, 0x67, 0xcd,
-	0xe7, 0x1d, 0xbb, 0x5b, 0xe5, 0x4a, 0x23, 0xea, 0x4f, 0x3b, 0xfe, 0x91, 0x87, 0xb1, 0x13, 0x2c,
-	0x49, 0xb8, 0x49, 0x48, 0x68, 0xd3, 0x6b, 0x93, 0xfc, 0x40, 0x12, 0x8c, 0x4d, 0x39, 0x8b, 0x72,
-	0x14, 0x41, 0x9b, 0xfd, 0x23, 0x6e, 0x5c, 0x4d, 0xdf, 0x57, 0xcc, 0x5a, 0xfb, 0x90, 0xb9, 0x6d,
-	0x68, 0xef, 0x76, 0xd3, 0xd3, 0x28, 0x2e, 0x96, 0x1b, 0x5f, 0x0a, 0xe8, 0x6a, 0x76, 0x77, 0xb5,
-	0xa1, 0x7f, 0x7f, 0x9e, 0xad, 0xaf, 0xa2, 0x59, 0xb9, 0x2e, 0x39, 0x59, 0x95, 0x4b, 0x12, 0x87,
-	0x52, 0xe9, 0x91, 0xa1, 0xd9, 0x87, 0x8c, 0xdd, 0x08, 0x4f, 0x3c, 0x10, 0x5e, 0xd2, 0x8c, 0xc4,
-	0x51, 0xfa, 0x8a, 0x6c, 0xe5, 0xa0, 0x88, 0x69, 0x8a, 0xfa, 0xd0, 0xb1, 0x16, 0xae, 0xac, 0x62,
-	0x63, 0x61, 0x09, 0x1c, 0xea, 0x41, 0xdb, 0xd6, 0x1d, 0x6c, 0x1b, 0x2a, 0x16, 0xf8, 0x32, 0x72,
-	0x74, 0xec, 0x5a, 0x17, 0xa6, 0x29, 0x34, 0xd0, 0x10, 0xba, 0x65, 0xa4, 0xe9, 0x2f, 0xe5, 0x0b,
-	0x13, 0x0b, 0x4d, 0xd4, 0x85, 0x43, 0x55, 0x76, 0x54, 0x59, 0xd3, 0x85, 0xd6, 0xa4, 0xf5, 0xeb,
-	0x2f, 0x22, 0x77, 0xf2, 0x25, 0x08, 0xce, 0x36, 0x2f, 0xc8, 0x4a, 0x65, 0x1e, 0xbc, 0x8a, 0xd3,
-	0x10, 0xb5, 0xa1, 0x65, 0x2d, 0x2c, 0x5d, 0xe0, 0xd0, 0x11, 0xf4, 0xe7, 0xdf, 0xa8, 0x2a, 0x36,
-	0xe6, 0xba, 0x83, 0xe5, 0xf9, 0xd7, 0x95, 0x04, 0x96, 0x15, 0x53, 0x5f, 0x18, 0x9a, 0xd0, 0x38,
-	0xf1, 0xe1, 0xe9, 0x19, 0x49, 0x49, 0xe6, 0x15, 0x24, 0x94, 0x73, 0x23, 0x24, 0x69, 0x11, 0x17,
-	0x5b, 0xbc, 0x5d, 0x13, 0xf4, 0x14, 0x3e, 0xb0, 0x16, 0xd8, 0x35, 0x34, 0xdd, 0xc2, 0x06, 0xbe,
-	0x74, 0xd5, 0x85, 0x79, 0x31, 0x2f, 0x47, 0x1e, 0x81, 0x70, 0xa6, 0x5b, 0xba, 0x2d, 0x63, 0x5d,
-	0x73, 0x65, 0xf3, 0x5b, 0xf9, 0xd2, 0x11, 0x78, 0x34, 0x86, 0xd1, 0x7d, 0x56, 0xb9, 0xbc, 0x9b,
-	0xba, 0xa1, 0x7c, 0x76, 0xf3, 0xa7, 0xc8, 0xdd, 0xec, 0x45, 0xfe, 0xcd, 0x5e, 0xe4, 0xdf, 0xee,
-	0x45, 0xfe, 0x8f, 0xbd, 0xc8, 0xff, 0x74, 0x2b, 0x72, 0x6f, 0x6e, 0x45, 0xee, 0xed, 0xad, 0xc8,
-	0x7d, 0xf7, 0x84, 0x6d, 0xc9, 0xdf, 0x01, 0x00, 0x00, 0xff, 0xff, 0x34, 0xf6, 0x3a, 0xc9, 0x7d,
-	0x04, 0x00, 0x00,
+	// 919 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x53, 0x4f, 0x6f, 0xe3, 0x44,
+	0x14, 0xb7, 0x13, 0xf7, 0xdf, 0x4b, 0xd2, 0xba, 0x43, 0xb5, 0x1b, 0x15, 0x29, 0x29, 0x45, 0x85,
+	0xaa, 0x87, 0x54, 0x2a, 0x12, 0xa2, 0x20, 0x84, 0xec, 0xc4, 0xdb, 0x5a, 0xeb, 0x26, 0x2b, 0xc7,
+	0x05, 0x95, 0x8b, 0xe5, 0xd8, 0xb3, 0xee, 0xa8, 0xb6, 0x27, 0xf5, 0xd8, 0x2d, 0x39, 0xf3, 0x05,
+	0xf8, 0x08, 0x48, 0x70, 0xe0, 0x13, 0x20, 0xae, 0xdc, 0x7a, 0xdc, 0xe3, 0x9e, 0x2a, 0x68, 0x2f,
+	0x7c, 0x86, 0x3d, 0xa1, 0x19, 0x3b, 0xdd, 0x74, 0x41, 0x95, 0xb6, 0x97, 0xc4, 0xef, 0x37, 0xbf,
+	0xf7, 0x7b, 0xbf, 0x79, 0xf3, 0x1e, 0xb4, 0xd9, 0x79, 0xb4, 0xeb, 0x7b, 0x99, 0x17, 0xd1, 0x90,
+	0xff, 0x8f, 0x47, 0xd3, 0xa8, 0x33, 0x4e, 0x69, 0x46, 0xd1, 0x87, 0x3e, 0xf5, 0xcf, 0x52, 0xea,
+	0xf9, 0xa7, 0x1d, 0x76, 0x1e, 0x75, 0xa6, 0x87, 0x82, 0xba, 0xbe, 0x16, 0xd2, 0x90, 0x0a, 0xde,
+	0x2e, 0xff, 0x2a, 0x52, 0x36, 0xff, 0xa8, 0xc2, 0xb2, 0x45, 0x7d, 0x2f, 0x22, 0xd9, 0xa4, 0x4b,
+	0x93, 0x97, 0x24, 0x44, 0x16, 0xcc, 0x87, 0x11, 0x1d, 0x79, 0x51, 0x53, 0xde, 0x90, 0xb7, 0x6b,
+	0x7b, 0x7b, 0x9d, 0x07, 0x64, 0x3b, 0xf7, 0x93, 0x3b, 0x07, 0x22, 0xf3, 0x50, 0xb2, 0x4b, 0x0d,
+	0x44, 0x60, 0x35, 0xc5, 0x21, 0xa1, 0x89, 0x17, 0xb9, 0xa3, 0x89, 0x9b, 0x79, 0xa3, 0x08, 0x37,
+	0x2b, 0x42, 0xf8, 0xab, 0xf7, 0x11, 0xb6, 0x4b, 0x11, 0x7d, 0xe2, 0x70, 0x89, 0x43, 0xc9, 0x5e,
+	0x49, 0xef, 0x43, 0xc8, 0x87, 0x95, 0xd9, 0x52, 0x29, 0xbd, 0x6c, 0x56, 0x45, 0xa1, 0xfd, 0xc7,
+	0x15, 0xb2, 0xe9, 0xe5, 0xa1, 0x64, 0x37, 0xd2, 0x59, 0x60, 0xfd, 0x1b, 0x58, 0x79, 0xc7, 0x0a,
+	0xfa, 0x04, 0xe6, 0x0b, 0x8e, 0x68, 0xd8, 0x92, 0xbe, 0xfc, 0xe6, 0xba, 0x0d, 0x05, 0xa9, 0xef,
+	0xc5, 0xd8, 0x2e, 0x4f, 0xbf, 0x54, 0xfe, 0xf9, 0xb9, 0x2d, 0xaf, 0x6f, 0x41, 0xe3, 0x5e, 0x09,
+	0xb4, 0x0c, 0x15, 0x8f, 0x15, 0xa9, 0x76, 0xc5, 0x63, 0x25, 0x6d, 0x19, 0xe6, 0x8b, 0x5e, 0x16,
+	0x71, 0xf1, 0xab, 0x03, 0x2c, 0x46, 0xa5, 0xdd, 0xcd, 0xdf, 0x65, 0x58, 0x1d, 0x9e, 0x7a, 0x69,
+	0x80, 0x83, 0x1e, 0x66, 0x7e, 0x4a, 0xc6, 0x19, 0x4d, 0xd1, 0xc7, 0x00, 0x84, 0xb9, 0xac, 0xc0,
+	0x85, 0xea, 0xa2, 0xae, 0x5c, 0x5d, 0xb7, 0x25, 0x7b, 0x89, 0xb0, 0x92, 0x8e, 0x9a, 0xa0, 0x24,
+	0x5e, 0x5c, 0xbc, 0xc3, 0x52, 0x79, 0x2c, 0x10, 0xb4, 0x0f, 0x0d, 0x91, 0xeb, 0x8e, 0x72, 0xff,
+	0x0c, 0x67, 0x4c, 0x74, 0x70, 0x4e, 0x5f, 0xe3, 0x94, 0x9b, 0xeb, 0x76, 0x5d, 0x28, 0xe8, 0xc5,
+	0x99, 0x5d, 0x67, 0x33, 0x11, 0xfa, 0x08, 0xea, 0x3e, 0x8d, 0xf2, 0x38, 0x71, 0xb9, 0x12, 0x6b,
+	0x2a, 0x1b, 0xd5, 0xed, 0x25, 0xbb, 0x56, 0x60, 0xbc, 0x11, 0xe5, 0xd5, 0x36, 0x7f, 0x94, 0xa1,
+	0x39, 0xf4, 0x4f, 0x71, 0x90, 0x47, 0x38, 0xb0, 0xe9, 0xa5, 0x85, 0x2f, 0x70, 0xe4, 0x38, 0x96,
+	0x96, 0x86, 0x0c, 0x85, 0xb0, 0x28, 0x66, 0xc4, 0x25, 0x85, 0xfb, 0x86, 0x6e, 0x95, 0xb5, 0x17,
+	0x44, 0xb7, 0xcd, 0xde, 0x9b, 0xeb, 0xf6, 0x7e, 0x48, 0xb2, 0xd3, 0x7c, 0xd4, 0xf1, 0x69, 0xbc,
+	0x7b, 0xf7, 0xb4, 0xc1, 0xe8, 0xed, 0xf7, 0xee, 0xf8, 0x2c, 0xdc, 0xe5, 0xeb, 0xc2, 0x70, 0xcc,
+	0x97, 0x84, 0x04, 0x1d, 0xde, 0x23, 0xb3, 0x67, 0x2f, 0x08, 0x75, 0x33, 0xd8, 0xfc, 0x53, 0x81,
+	0x27, 0x2f, 0xbc, 0x34, 0x23, 0x19, 0xa1, 0x09, 0x49, 0xc2, 0x99, 0x1e, 0x6e, 0x41, 0x2d, 0xc9,
+	0x63, 0xb7, 0x70, 0xce, 0x4a, 0x1b, 0x45, 0x97, 0x20, 0xc9, 0xe3, 0x6e, 0x81, 0xa3, 0xcf, 0x61,
+	0x8d, 0xd3, 0x48, 0x3c, 0x8e, 0x88, 0x4f, 0xb2, 0x3b, 0xbe, 0x32, 0xc3, 0x47, 0x49, 0x1e, 0x9b,
+	0x25, 0x61, 0x9a, 0x67, 0x83, 0x12, 0x11, 0x96, 0x35, 0x2b, 0x1b, 0xd5, 0xed, 0xda, 0xde, 0x17,
+	0x0f, 0x0e, 0xe7, 0xff, 0x3b, 0xec, 0x58, 0x84, 0x65, 0xd3, 0x77, 0xe3, 0x5a, 0xe8, 0x18, 0xe6,
+	0x52, 0x2f, 0x09, 0x71, 0xb3, 0x2a, 0x44, 0xf7, 0x1f, 0x23, 0x6a, 0x73, 0x81, 0x52, 0xb5, 0x50,
+	0x5b, 0xff, 0x45, 0x06, 0x85, 0xd7, 0xba, 0x9b, 0x18, 0xf9, 0x3f, 0x13, 0xf3, 0x04, 0xe6, 0x2f,
+	0xbc, 0x28, 0xc7, 0x4c, 0xdc, 0xa7, 0x6e, 0x97, 0x11, 0xdf, 0x46, 0x96, 0x8f, 0xc6, 0x33, 0xa5,
+	0xca, 0x6d, 0xfc, 0xec, 0x11, 0xde, 0xca, 0x8a, 0xef, 0x2a, 0x96, 0xbb, 0x72, 0x0e, 0x73, 0xc2,
+	0xfb, 0x03, 0x2e, 0xb7, 0x60, 0xf9, 0x65, 0x4a, 0x63, 0x97, 0x24, 0x7e, 0x94, 0x33, 0x72, 0x81,
+	0x85, 0x99, 0xba, 0xdd, 0xe0, 0xa8, 0x39, 0x05, 0xf9, 0x0c, 0x67, 0xd4, 0xc5, 0x3f, 0x4c, 0x49,
+	0x15, 0x41, 0xaa, 0x65, 0xd4, 0x98, 0x42, 0xb3, 0xeb, 0xb8, 0xe3, 0x81, 0xfa, 0x8c, 0xa6, 0x98,
+	0x84, 0xc9, 0x73, 0x3c, 0xd1, 0x7c, 0xee, 0x0a, 0x35, 0x60, 0xa9, 0x3f, 0x70, 0xb5, 0xae, 0x63,
+	0x0e, 0xfa, 0xaa, 0x84, 0xea, 0xb0, 0x68, 0x1b, 0x43, 0xc7, 0x36, 0xbb, 0x8e, 0x2a, 0xf3, 0x68,
+	0x68, 0x38, 0x6e, 0xff, 0xd8, 0xb2, 0xd4, 0x0a, 0x5a, 0x81, 0x1a, 0x8f, 0x7a, 0xc6, 0x33, 0xed,
+	0xd8, 0x72, 0xd4, 0x2a, 0xaa, 0xc1, 0x42, 0x57, 0x1b, 0x76, 0xb5, 0x9e, 0xa1, 0x2a, 0xeb, 0xca,
+	0x6f, 0xbf, 0xb6, 0xa4, 0x9d, 0xaf, 0x41, 0x1d, 0x4e, 0x58, 0x86, 0xcb, 0xa9, 0x7b, 0x4e, 0x92,
+	0x00, 0x2d, 0x82, 0xd2, 0x1f, 0xf4, 0x0d, 0x55, 0x42, 0xab, 0xd0, 0x38, 0xfa, 0xb6, 0xdb, 0x75,
+	0xcc, 0x23, 0x63, 0xe8, 0x68, 0x47, 0x2f, 0x8a, 0x12, 0x8e, 0xa6, 0x5b, 0xc6, 0xc0, 0xec, 0xa9,
+	0x95, 0x9d, 0x11, 0x3c, 0x3d, 0xc0, 0x09, 0x4e, 0xbd, 0x0c, 0x07, 0x1a, 0x33, 0x03, 0x9c, 0x64,
+	0x24, 0x9b, 0x38, 0x93, 0x31, 0x46, 0x4f, 0xe1, 0x83, 0xfe, 0xc0, 0x71, 0xcd, 0x9e, 0xd1, 0x77,
+	0x4c, 0xe7, 0xc4, 0xed, 0x0e, 0xac, 0xe3, 0x23, 0x6e, 0x79, 0x0d, 0xd4, 0x03, 0xa3, 0x6f, 0xd8,
+	0x9a, 0x63, 0xf4, 0x5c, 0xcd, 0xfa, 0x4e, 0x3b, 0x19, 0xaa, 0x32, 0x6a, 0xc2, 0xda, 0x5b, 0x54,
+	0x3f, 0xb9, 0x73, 0x5d, 0xd1, 0x3f, 0xbd, 0xfa, 0xbb, 0x25, 0x5d, 0xdd, 0xb4, 0xe4, 0x57, 0x37,
+	0x2d, 0xf9, 0xf5, 0x4d, 0x4b, 0xfe, 0xeb, 0xa6, 0x25, 0xff, 0x74, 0xdb, 0x92, 0x5e, 0xdd, 0xb6,
+	0xa4, 0xd7, 0xb7, 0x2d, 0xe9, 0xfb, 0x39, 0xf1, 0xb6, 0xff, 0x06, 0x00, 0x00, 0xff, 0xff, 0x7c,
+	0x3b, 0x77, 0x29, 0xc1, 0x06, 0x00, 0x00,
 }
 
 func (this *LocalityConfig) Equal(that interface{}) bool {
@@ -758,6 +913,114 @@ func (this *ShardedDescriptor) Equal(that interface{}) bool {
 		if this.ColumnNames[i] != that1.ColumnNames[i] {
 			return false
 		}
+	}
+	return true
+}
+func (this *PartitioningDescriptor) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*PartitioningDescriptor)
+	if !ok {
+		that2, ok := that.(PartitioningDescriptor)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if this.NumColumns != that1.NumColumns {
+		return false
+	}
+	if this.NumImplicitColumns != that1.NumImplicitColumns {
+		return false
+	}
+	if len(this.List) != len(that1.List) {
+		return false
+	}
+	for i := range this.List {
+		if !this.List[i].Equal(&that1.List[i]) {
+			return false
+		}
+	}
+	if len(this.Range) != len(that1.Range) {
+		return false
+	}
+	for i := range this.Range {
+		if !this.Range[i].Equal(&that1.Range[i]) {
+			return false
+		}
+	}
+	return true
+}
+func (this *PartitioningDescriptor_List) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*PartitioningDescriptor_List)
+	if !ok {
+		that2, ok := that.(PartitioningDescriptor_List)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if this.Name != that1.Name {
+		return false
+	}
+	if len(this.Values) != len(that1.Values) {
+		return false
+	}
+	for i := range this.Values {
+		if !bytes.Equal(this.Values[i], that1.Values[i]) {
+			return false
+		}
+	}
+	if !this.Subpartitioning.Equal(&that1.Subpartitioning) {
+		return false
+	}
+	return true
+}
+func (this *PartitioningDescriptor_Range) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*PartitioningDescriptor_Range)
+	if !ok {
+		that2, ok := that.(PartitioningDescriptor_Range)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if this.Name != that1.Name {
+		return false
+	}
+	if !bytes.Equal(this.FromInclusive, that1.FromInclusive) {
+		return false
+	}
+	if !bytes.Equal(this.ToExclusive, that1.ToExclusive) {
+		return false
 	}
 	return true
 }
@@ -1013,6 +1276,152 @@ func (m *ScheduledRowLevelTTLArgs) MarshalToSizedBuffer(dAtA []byte) (int, error
 	return len(dAtA) - i, nil
 }
 
+func (m *PartitioningDescriptor) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *PartitioningDescriptor) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *PartitioningDescriptor) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	i = encodeVarintCatalog(dAtA, i, uint64(m.NumImplicitColumns))
+	i--
+	dAtA[i] = 0x20
+	if len(m.Range) > 0 {
+		for iNdEx := len(m.Range) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Range[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintCatalog(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x1a
+		}
+	}
+	if len(m.List) > 0 {
+		for iNdEx := len(m.List) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.List[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintCatalog(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x12
+		}
+	}
+	i = encodeVarintCatalog(dAtA, i, uint64(m.NumColumns))
+	i--
+	dAtA[i] = 0x8
+	return len(dAtA) - i, nil
+}
+
+func (m *PartitioningDescriptor_List) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *PartitioningDescriptor_List) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *PartitioningDescriptor_List) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	{
+		size, err := m.Subpartitioning.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintCatalog(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x1a
+	if len(m.Values) > 0 {
+		for iNdEx := len(m.Values) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.Values[iNdEx])
+			copy(dAtA[i:], m.Values[iNdEx])
+			i = encodeVarintCatalog(dAtA, i, uint64(len(m.Values[iNdEx])))
+			i--
+			dAtA[i] = 0x12
+		}
+	}
+	i -= len(m.Name)
+	copy(dAtA[i:], m.Name)
+	i = encodeVarintCatalog(dAtA, i, uint64(len(m.Name)))
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
+}
+
+func (m *PartitioningDescriptor_Range) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *PartitioningDescriptor_Range) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *PartitioningDescriptor_Range) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.FromInclusive != nil {
+		i -= len(m.FromInclusive)
+		copy(dAtA[i:], m.FromInclusive)
+		i = encodeVarintCatalog(dAtA, i, uint64(len(m.FromInclusive)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if m.ToExclusive != nil {
+		i -= len(m.ToExclusive)
+		copy(dAtA[i:], m.ToExclusive)
+		i = encodeVarintCatalog(dAtA, i, uint64(len(m.ToExclusive)))
+		i--
+		dAtA[i] = 0x12
+	}
+	i -= len(m.Name)
+	copy(dAtA[i:], m.Name)
+	i = encodeVarintCatalog(dAtA, i, uint64(len(m.Name)))
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintCatalog(dAtA []byte, offset int, v uint64) int {
 	offset -= sovCatalog(v)
 	base := offset
@@ -1133,6 +1542,67 @@ func (m *ScheduledRowLevelTTLArgs) Size() (n int) {
 	var l int
 	_ = l
 	n += 1 + sovCatalog(uint64(m.TableID))
+	return n
+}
+
+func (m *PartitioningDescriptor) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	n += 1 + sovCatalog(uint64(m.NumColumns))
+	if len(m.List) > 0 {
+		for _, e := range m.List {
+			l = e.Size()
+			n += 1 + l + sovCatalog(uint64(l))
+		}
+	}
+	if len(m.Range) > 0 {
+		for _, e := range m.Range {
+			l = e.Size()
+			n += 1 + l + sovCatalog(uint64(l))
+		}
+	}
+	n += 1 + sovCatalog(uint64(m.NumImplicitColumns))
+	return n
+}
+
+func (m *PartitioningDescriptor_List) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Name)
+	n += 1 + l + sovCatalog(uint64(l))
+	if len(m.Values) > 0 {
+		for _, b := range m.Values {
+			l = len(b)
+			n += 1 + l + sovCatalog(uint64(l))
+		}
+	}
+	l = m.Subpartitioning.Size()
+	n += 1 + l + sovCatalog(uint64(l))
+	return n
+}
+
+func (m *PartitioningDescriptor_Range) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Name)
+	n += 1 + l + sovCatalog(uint64(l))
+	if m.ToExclusive != nil {
+		l = len(m.ToExclusive)
+		n += 1 + l + sovCatalog(uint64(l))
+	}
+	if m.FromInclusive != nil {
+		l = len(m.FromInclusive)
+		n += 1 + l + sovCatalog(uint64(l))
+	}
 	return n
 }
 
@@ -1714,6 +2184,459 @@ func (m *ScheduledRowLevelTTLArgs) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipCatalog(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthCatalog
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *PartitioningDescriptor) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowCatalog
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: PartitioningDescriptor: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: PartitioningDescriptor: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field NumColumns", wireType)
+			}
+			m.NumColumns = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowCatalog
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.NumColumns |= uint32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field List", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowCatalog
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthCatalog
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthCatalog
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.List = append(m.List, PartitioningDescriptor_List{})
+			if err := m.List[len(m.List)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Range", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowCatalog
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthCatalog
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthCatalog
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Range = append(m.Range, PartitioningDescriptor_Range{})
+			if err := m.Range[len(m.Range)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field NumImplicitColumns", wireType)
+			}
+			m.NumImplicitColumns = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowCatalog
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.NumImplicitColumns |= uint32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipCatalog(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthCatalog
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *PartitioningDescriptor_List) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowCatalog
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: List: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: List: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowCatalog
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthCatalog
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthCatalog
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Name = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Values", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowCatalog
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthCatalog
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex < 0 {
+				return ErrInvalidLengthCatalog
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Values = append(m.Values, make([]byte, postIndex-iNdEx))
+			copy(m.Values[len(m.Values)-1], dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Subpartitioning", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowCatalog
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthCatalog
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthCatalog
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Subpartitioning.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipCatalog(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthCatalog
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *PartitioningDescriptor_Range) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowCatalog
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: Range: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: Range: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowCatalog
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthCatalog
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthCatalog
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Name = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ToExclusive", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowCatalog
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthCatalog
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex < 0 {
+				return ErrInvalidLengthCatalog
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ToExclusive = append(m.ToExclusive[:0], dAtA[iNdEx:postIndex]...)
+			if m.ToExclusive == nil {
+				m.ToExclusive = []byte{}
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field FromInclusive", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowCatalog
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthCatalog
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex < 0 {
+				return ErrInvalidLengthCatalog
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.FromInclusive = append(m.FromInclusive[:0], dAtA[iNdEx:postIndex]...)
+			if m.FromInclusive == nil {
+				m.FromInclusive = []byte{}
+			}
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipCatalog(dAtA[iNdEx:])
