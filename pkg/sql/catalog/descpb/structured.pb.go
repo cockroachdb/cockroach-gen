@@ -1186,8 +1186,7 @@ type IndexDescriptor struct {
 	// The sort direction of each column in key_column_names.
 	KeyColumnDirections []IndexDescriptor_Direction `protobuf:"varint,8,rep,name=key_column_directions,json=keyColumnDirections,enum=cockroach.sql.sqlbase.IndexDescriptor_Direction" json:"key_column_directions,omitempty"`
 	// An ordered list of column names which the index stores in addition to the
-	// columns which are explicitly part of the index (STORING clause). Only used
-	// for secondary indexes.
+	// columns which are explicitly part of the index (STORING clause).
 	StoreColumnNames []string `protobuf:"bytes,5,rep,name=store_column_names,json=storeColumnNames" json:"store_column_names,omitempty"`
 	// An ordered list of column IDs of which the index key is comprised. This
 	// list parallels the key_column_names list and does not include any
