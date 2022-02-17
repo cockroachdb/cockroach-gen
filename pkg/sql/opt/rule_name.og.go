@@ -282,6 +282,7 @@ const (
 	// ------------------------------------------------------------
 	// Explore Rule Names
 	// ------------------------------------------------------------
+	MemoCycleTestRelRule
 	ReplaceScalarMinMaxWithScalarSubqueries
 	ReplaceFilteredScalarMinMaxWithSubqueries
 	ReplaceScalarMinMaxWithLimit

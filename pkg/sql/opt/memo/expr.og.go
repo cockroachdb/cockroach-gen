@@ -17,6 +17,263 @@ import (
 	"github.com/cockroachdb/errors"
 )
 
+// NormCycleTestRelExpr is a relational operator for testing that normalization rule
+// cycles are detected by the Factory and a stack overflow is prevented. Two
+// rules for this expression, NormCycleTestRelTrueToFalse and
+// NormCycleTestRelFalseToTrue, create a normalization rule cycle. See the cycle
+// test file for tests that use this expression.
+type NormCycleTestRelExpr struct {
+	Scalar opt.ScalarExpr
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &NormCycleTestRelExpr{}
+
+func (e *NormCycleTestRelExpr) Op() opt.Operator {
+	return opt.NormCycleTestRelOp
+}
+
+func (e *NormCycleTestRelExpr) ChildCount() int {
+	return 1
+}
+
+func (e *NormCycleTestRelExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Scalar
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *NormCycleTestRelExpr) Private() interface{} {
+	return nil
+}
+
+func (e *NormCycleTestRelExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *NormCycleTestRelExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Scalar = child.(opt.ScalarExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *NormCycleTestRelExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *NormCycleTestRelExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *NormCycleTestRelExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *NormCycleTestRelExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *NormCycleTestRelExpr) RequiredPhysical() *physical.Required {
+	return e.grp.bestProps().required
+}
+
+func (e *NormCycleTestRelExpr) ProvidedPhysical() *physical.Provided {
+	return e.grp.bestProps().provided
+}
+
+func (e *NormCycleTestRelExpr) Cost() Cost {
+	return e.grp.bestProps().cost
+}
+
+func (e *NormCycleTestRelExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *NormCycleTestRelExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
+}
+
+func (e *NormCycleTestRelExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(errors.AssertionFailedf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *NormCycleTestRelExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(errors.AssertionFailedf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type normCycleTestRelGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	first NormCycleTestRelExpr
+	best  bestProps
+}
+
+var _ exprGroup = &normCycleTestRelGroup{}
+
+func (g *normCycleTestRelGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *normCycleTestRelGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *normCycleTestRelGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *normCycleTestRelGroup) bestProps() *bestProps {
+	return &g.best
+}
+
+// MemoCycleTestRelExpr is a relational expression for testing that memo cycles are
+// detected by the optimizer and a stack overflow is prevented. A cycle in the
+// memo occurs when there is a path from a group member's children back to the
+// group member's group. MemoCycleTestRel is similar in structure to the Select
+// expression, but matches a rule, MemoCycleTestRelRule, that creates a memo
+// cycle.
+type MemoCycleTestRelExpr struct {
+	Input   RelExpr
+	Filters FiltersExpr
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &MemoCycleTestRelExpr{}
+
+func (e *MemoCycleTestRelExpr) Op() opt.Operator {
+	return opt.MemoCycleTestRelOp
+}
+
+func (e *MemoCycleTestRelExpr) ChildCount() int {
+	return 2
+}
+
+func (e *MemoCycleTestRelExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	case 1:
+		return &e.Filters
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *MemoCycleTestRelExpr) Private() interface{} {
+	return nil
+}
+
+func (e *MemoCycleTestRelExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *MemoCycleTestRelExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(RelExpr)
+		return
+	case 1:
+		e.Filters = *child.(*FiltersExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *MemoCycleTestRelExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *MemoCycleTestRelExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *MemoCycleTestRelExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *MemoCycleTestRelExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *MemoCycleTestRelExpr) RequiredPhysical() *physical.Required {
+	return e.grp.bestProps().required
+}
+
+func (e *MemoCycleTestRelExpr) ProvidedPhysical() *physical.Provided {
+	return e.grp.bestProps().provided
+}
+
+func (e *MemoCycleTestRelExpr) Cost() Cost {
+	return e.grp.bestProps().cost
+}
+
+func (e *MemoCycleTestRelExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *MemoCycleTestRelExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
+}
+
+func (e *MemoCycleTestRelExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(errors.AssertionFailedf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *MemoCycleTestRelExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(errors.AssertionFailedf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type memoCycleTestRelGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	first MemoCycleTestRelExpr
+	best  bestProps
+}
+
+var _ exprGroup = &memoCycleTestRelGroup{}
+
+func (g *memoCycleTestRelGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *memoCycleTestRelGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *memoCycleTestRelGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *memoCycleTestRelGroup) bestProps() *bestProps {
+	return &g.best
+}
+
 // SortExpr enforces the ordering of rows returned by its input expression. Rows can
 // be sorted by one or more of the input columns, each of which can be sorted in
 // either ascending or descending order. See the Ordering field in the
@@ -7903,131 +8160,6 @@ func (g *fakeRelGroup) bestProps() *bestProps {
 
 type FakeRelPrivate struct {
 	Props *props.Relational
-}
-
-// NormCycleTestRelExpr is a relational operator for testing that normalization rule
-// cycles are detected by the Factory and a stack overflow is prevented. Two
-// rules for this expression, NormCycleTestRelTrueToFalse and
-// NormCycleTestRelFalseToTrue, create a normalization rule cycle. See the cycle
-// test file for tests that use this expression.
-type NormCycleTestRelExpr struct {
-	Scalar opt.ScalarExpr
-
-	grp  exprGroup
-	next RelExpr
-}
-
-var _ RelExpr = &NormCycleTestRelExpr{}
-
-func (e *NormCycleTestRelExpr) Op() opt.Operator {
-	return opt.NormCycleTestRelOp
-}
-
-func (e *NormCycleTestRelExpr) ChildCount() int {
-	return 1
-}
-
-func (e *NormCycleTestRelExpr) Child(nth int) opt.Expr {
-	switch nth {
-	case 0:
-		return e.Scalar
-	}
-	panic(errors.AssertionFailedf("child index out of range"))
-}
-
-func (e *NormCycleTestRelExpr) Private() interface{} {
-	return nil
-}
-
-func (e *NormCycleTestRelExpr) String() string {
-	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
-	f.FormatExpr(e)
-	return f.Buffer.String()
-}
-
-func (e *NormCycleTestRelExpr) SetChild(nth int, child opt.Expr) {
-	switch nth {
-	case 0:
-		e.Scalar = child.(opt.ScalarExpr)
-		return
-	}
-	panic(errors.AssertionFailedf("child index out of range"))
-}
-
-func (e *NormCycleTestRelExpr) Memo() *Memo {
-	return e.grp.memo()
-}
-
-func (e *NormCycleTestRelExpr) Relational() *props.Relational {
-	return e.grp.relational()
-}
-
-func (e *NormCycleTestRelExpr) FirstExpr() RelExpr {
-	return e.grp.firstExpr()
-}
-
-func (e *NormCycleTestRelExpr) NextExpr() RelExpr {
-	return e.next
-}
-
-func (e *NormCycleTestRelExpr) RequiredPhysical() *physical.Required {
-	return e.grp.bestProps().required
-}
-
-func (e *NormCycleTestRelExpr) ProvidedPhysical() *physical.Provided {
-	return e.grp.bestProps().provided
-}
-
-func (e *NormCycleTestRelExpr) Cost() Cost {
-	return e.grp.bestProps().cost
-}
-
-func (e *NormCycleTestRelExpr) group() exprGroup {
-	return e.grp
-}
-
-func (e *NormCycleTestRelExpr) bestProps() *bestProps {
-	return e.grp.bestProps()
-}
-
-func (e *NormCycleTestRelExpr) setNext(member RelExpr) {
-	if e.next != nil {
-		panic(errors.AssertionFailedf("expression already has its next defined: %s", e))
-	}
-	e.next = member
-}
-
-func (e *NormCycleTestRelExpr) setGroup(member RelExpr) {
-	if e.grp != nil {
-		panic(errors.AssertionFailedf("expression is already in a group: %s", e))
-	}
-	e.grp = member.group()
-	LastGroupMember(member).setNext(e)
-}
-
-type normCycleTestRelGroup struct {
-	mem   *Memo
-	rel   props.Relational
-	first NormCycleTestRelExpr
-	best  bestProps
-}
-
-var _ exprGroup = &normCycleTestRelGroup{}
-
-func (g *normCycleTestRelGroup) memo() *Memo {
-	return g.mem
-}
-
-func (g *normCycleTestRelGroup) relational() *props.Relational {
-	return &g.rel
-}
-
-func (g *normCycleTestRelGroup) firstExpr() RelExpr {
-	return &g.first
-}
-
-func (g *normCycleTestRelGroup) bestProps() *bestProps {
-	return &g.best
 }
 
 // SubqueryExpr is a subquery in a single-row context. Here are some examples:
@@ -18986,6 +19118,52 @@ type AlterRangeRelocatePrivate struct {
 	Props *physical.Required
 }
 
+func (m *Memo) MemoizeNormCycleTestRel(
+	scalar opt.ScalarExpr,
+) RelExpr {
+	const size = int64(unsafe.Sizeof(normCycleTestRelGroup{}))
+	grp := &normCycleTestRelGroup{mem: m, first: NormCycleTestRelExpr{
+		Scalar: scalar,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternNormCycleTestRel(e)
+	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
+		m.logPropsBuilder.buildNormCycleTestRelProps(e, &grp.rel)
+		grp.rel.Populated = true
+		m.memEstimate += size
+		m.CheckExpr(e)
+	}
+	return interned.FirstExpr()
+}
+
+func (m *Memo) MemoizeMemoCycleTestRel(
+	input RelExpr,
+	filters FiltersExpr,
+) RelExpr {
+	const size = int64(unsafe.Sizeof(memoCycleTestRelGroup{}))
+	grp := &memoCycleTestRelGroup{mem: m, first: MemoCycleTestRelExpr{
+		Input:   input,
+		Filters: filters,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternMemoCycleTestRel(e)
+	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
+		m.logPropsBuilder.buildMemoCycleTestRelProps(e, &grp.rel)
+		grp.rel.Populated = true
+		m.memEstimate += size
+		m.CheckExpr(e)
+	}
+	return interned.FirstExpr()
+}
+
 func (m *Memo) MemoizeInsert(
 	input RelExpr,
 	uniqueChecks UniqueChecksExpr,
@@ -20283,28 +20461,6 @@ func (m *Memo) MemoizeFakeRel(
 			m.newGroupFn(e)
 		}
 		m.logPropsBuilder.buildFakeRelProps(e, &grp.rel)
-		grp.rel.Populated = true
-		m.memEstimate += size
-		m.CheckExpr(e)
-	}
-	return interned.FirstExpr()
-}
-
-func (m *Memo) MemoizeNormCycleTestRel(
-	scalar opt.ScalarExpr,
-) RelExpr {
-	const size = int64(unsafe.Sizeof(normCycleTestRelGroup{}))
-	grp := &normCycleTestRelGroup{mem: m, first: NormCycleTestRelExpr{
-		Scalar: scalar,
-	}}
-	e := &grp.first
-	e.grp = grp
-	interned := m.interner.InternNormCycleTestRel(e)
-	if interned == e {
-		if m.newGroupFn != nil {
-			m.newGroupFn(e)
-		}
-		m.logPropsBuilder.buildNormCycleTestRelProps(e, &grp.rel)
 		grp.rel.Populated = true
 		m.memEstimate += size
 		m.CheckExpr(e)
@@ -23555,6 +23711,34 @@ func (m *Memo) MemoizeAlterRangeRelocate(
 	return interned.FirstExpr()
 }
 
+func (m *Memo) AddNormCycleTestRelToGroup(e *NormCycleTestRelExpr, grp RelExpr) *NormCycleTestRelExpr {
+	const size = int64(unsafe.Sizeof(NormCycleTestRelExpr{}))
+	interned := m.interner.InternNormCycleTestRel(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.CheckExpr(e)
+	} else if interned.group() != grp.group() {
+		// This is a group collision, do nothing.
+		return nil
+	}
+	return interned
+}
+
+func (m *Memo) AddMemoCycleTestRelToGroup(e *MemoCycleTestRelExpr, grp RelExpr) *MemoCycleTestRelExpr {
+	const size = int64(unsafe.Sizeof(MemoCycleTestRelExpr{}))
+	interned := m.interner.InternMemoCycleTestRel(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.CheckExpr(e)
+	} else if interned.group() != grp.group() {
+		// This is a group collision, do nothing.
+		return nil
+	}
+	return interned
+}
+
 func (m *Memo) AddInsertToGroup(e *InsertExpr, grp RelExpr) *InsertExpr {
 	const size = int64(unsafe.Sizeof(InsertExpr{}))
 	interned := m.interner.InternInsert(e)
@@ -24263,20 +24447,6 @@ func (m *Memo) AddFakeRelToGroup(e *FakeRelExpr, grp RelExpr) *FakeRelExpr {
 	return interned
 }
 
-func (m *Memo) AddNormCycleTestRelToGroup(e *NormCycleTestRelExpr, grp RelExpr) *NormCycleTestRelExpr {
-	const size = int64(unsafe.Sizeof(NormCycleTestRelExpr{}))
-	interned := m.interner.InternNormCycleTestRel(e)
-	if interned == e {
-		e.setGroup(grp)
-		m.memEstimate += size
-		m.CheckExpr(e)
-	} else if interned.group() != grp.group() {
-		// This is a group collision, do nothing.
-		return nil
-	}
-	return interned
-}
-
 func (m *Memo) AddCreateTableToGroup(e *CreateTableExpr, grp RelExpr) *CreateTableExpr {
 	const size = int64(unsafe.Sizeof(CreateTableExpr{}))
 	interned := m.interner.InternCreateTable(e)
@@ -24531,6 +24701,10 @@ func (m *Memo) AddAlterRangeRelocateToGroup(e *AlterRangeRelocateExpr, grp RelEx
 
 func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 	switch t := e.(type) {
+	case *NormCycleTestRelExpr:
+		return in.InternNormCycleTestRel(t)
+	case *MemoCycleTestRelExpr:
+		return in.InternMemoCycleTestRel(t)
 	case *InsertExpr:
 		return in.InternInsert(t)
 	case *UpdateExpr:
@@ -24639,8 +24813,6 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternRecursiveCTE(t)
 	case *FakeRelExpr:
 		return in.InternFakeRel(t)
-	case *NormCycleTestRelExpr:
-		return in.InternNormCycleTestRel(t)
 	case *SubqueryExpr:
 		return in.InternSubquery(t)
 	case *AnyExpr:
@@ -24986,6 +25158,44 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 	default:
 		panic(errors.AssertionFailedf("unhandled op: %s", e.Op()))
 	}
+}
+
+func (in *interner) InternNormCycleTestRel(val *NormCycleTestRelExpr) *NormCycleTestRelExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.NormCycleTestRelOp)
+	in.hasher.HashScalarExpr(val.Scalar)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*NormCycleTestRelExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Scalar, existing.Scalar) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternMemoCycleTestRel(val *MemoCycleTestRelExpr) *MemoCycleTestRelExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.MemoCycleTestRelOp)
+	in.hasher.HashRelExpr(val.Input)
+	in.hasher.HashFiltersExpr(val.Filters)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*MemoCycleTestRelExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsFiltersExprEqual(val.Filters, existing.Filters) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
 }
 
 func (in *interner) InternInsert(val *InsertExpr) *InsertExpr {
@@ -26531,24 +26741,6 @@ func (in *interner) InternFakeRel(val *FakeRelExpr) *FakeRelExpr {
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*FakeRelExpr); ok {
 			if in.hasher.IsPointerEqual(unsafe.Pointer(val.Props), unsafe.Pointer(existing.Props)) {
-				return existing
-			}
-		}
-	}
-
-	in.cache.Add(val)
-	return val
-}
-
-func (in *interner) InternNormCycleTestRel(val *NormCycleTestRelExpr) *NormCycleTestRelExpr {
-	in.hasher.Init()
-	in.hasher.HashOperator(opt.NormCycleTestRelOp)
-	in.hasher.HashScalarExpr(val.Scalar)
-
-	in.cache.Start(in.hasher.hash)
-	for in.cache.Next() {
-		if existing, ok := in.cache.Item().(*NormCycleTestRelExpr); ok {
-			if in.hasher.IsScalarExprEqual(val.Scalar, existing.Scalar) {
 				return existing
 			}
 		}
@@ -29964,6 +30156,10 @@ func (in *interner) InternAlterRangeRelocate(val *AlterRangeRelocateExpr) *Alter
 
 func (b *logicalPropsBuilder) buildProps(e RelExpr, rel *props.Relational) {
 	switch t := e.(type) {
+	case *NormCycleTestRelExpr:
+		b.buildNormCycleTestRelProps(t, rel)
+	case *MemoCycleTestRelExpr:
+		b.buildMemoCycleTestRelProps(t, rel)
 	case *InsertExpr:
 		b.buildInsertProps(t, rel)
 	case *UpdateExpr:
@@ -30064,8 +30260,6 @@ func (b *logicalPropsBuilder) buildProps(e RelExpr, rel *props.Relational) {
 		b.buildRecursiveCTEProps(t, rel)
 	case *FakeRelExpr:
 		b.buildFakeRelProps(t, rel)
-	case *NormCycleTestRelExpr:
-		b.buildNormCycleTestRelProps(t, rel)
 	case *CreateTableExpr:
 		b.buildCreateTableProps(t, rel)
 	case *CreateViewExpr:

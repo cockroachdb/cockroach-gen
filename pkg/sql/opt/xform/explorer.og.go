@@ -14,6 +14,8 @@ func (_e *explorer) exploreGroupMember(
 	ordinal int,
 ) (_fullyExplored bool) {
 	switch t := member.(type) {
+	case *memo.MemoCycleTestRelExpr:
+		return _e.exploreMemoCycleTestRel(state, t, ordinal)
 	case *memo.ScanExpr:
 		return _e.exploreScan(state, t, ordinal)
 	case *memo.SelectExpr:
@@ -64,6 +66,41 @@ func (_e *explorer) exploreGroupMember(
 
 	// No rules for other operator types.
 	return true
+}
+
+func (_e *explorer) exploreMemoCycleTestRel(
+	_rootState *exploreState,
+	_root *memo.MemoCycleTestRelExpr,
+	_rootOrd int,
+) (_fullyExplored bool) {
+	_fullyExplored = true
+
+	// [MemoCycleTestRelRule]
+	{
+		if _rootOrd >= _rootState.start {
+			input := _root.Input
+			filters := _root.Filters
+			if _e.o.matchedRule == nil || _e.o.matchedRule(opt.MemoCycleTestRelRule) {
+				_expr := &memo.MemoCycleTestRelExpr{
+					Input: _e.f.ConstructMemoCycleTestRel(
+						input,
+						filters,
+					),
+					Filters: filters,
+				}
+				_interned := _e.mem.AddMemoCycleTestRelToGroup(_expr, _root)
+				if _e.o.appliedRule != nil {
+					if _interned != _expr {
+						_e.o.appliedRule(opt.MemoCycleTestRelRule, _root, nil)
+					} else {
+						_e.o.appliedRule(opt.MemoCycleTestRelRule, _root, _interned)
+					}
+				}
+			}
+		}
+	}
+
+	return _fullyExplored
 }
 
 func (_e *explorer) exploreScan(

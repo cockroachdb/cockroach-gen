@@ -11,6 +11,90 @@ import (
 	"github.com/cockroachdb/errors"
 )
 
+// ConstructNormCycleTestRel constructs an expression for the NormCycleTestRel operator.
+// NormCycleTestRel is a relational operator for testing that normalization rule
+// cycles are detected by the Factory and a stack overflow is prevented. Two
+// rules for this expression, NormCycleTestRelTrueToFalse and
+// NormCycleTestRelFalseToTrue, create a normalization rule cycle. See the cycle
+// test file for tests that use this expression.
+func (_f *Factory) ConstructNormCycleTestRel(
+	scalar opt.ScalarExpr,
+) memo.RelExpr {
+	_f.constructorStackDepth++
+	if _f.constructorStackDepth > maxConstructorStackDepth {
+		// If the constructor call stack depth exceeds the limit, call
+		// onMaxConstructorStackDepthExceeded and skip all rules.
+		_f.onMaxConstructorStackDepthExceeded()
+		goto SKIP_RULES
+	}
+
+	// [NormCycleTestRelTrueToFalse]
+	{
+		_true, _ := scalar.(*memo.TrueExpr)
+		if _true != nil {
+			if _f.matchedRule == nil || _f.matchedRule(opt.NormCycleTestRelTrueToFalse) {
+				_expr := _f.ConstructNormCycleTestRel(
+					_f.ConstructFalse(),
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.NormCycleTestRelTrueToFalse, nil, _expr)
+				}
+				_f.constructorStackDepth--
+				return _expr
+			}
+		}
+	}
+
+	// [NormCycleTestRelFalseToTrue]
+	{
+		_false, _ := scalar.(*memo.FalseExpr)
+		if _false != nil {
+			if _f.matchedRule == nil || _f.matchedRule(opt.NormCycleTestRelFalseToTrue) {
+				_expr := _f.ConstructNormCycleTestRel(
+					_f.ConstructTrue(),
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.NormCycleTestRelFalseToTrue, nil, _expr)
+				}
+				_f.constructorStackDepth--
+				return _expr
+			}
+		}
+	}
+
+SKIP_RULES:
+	e := _f.mem.MemoizeNormCycleTestRel(scalar)
+	expr := _f.onConstructRelational(e)
+	_f.constructorStackDepth--
+	return expr
+}
+
+// ConstructMemoCycleTestRel constructs an expression for the MemoCycleTestRel operator.
+// MemoCycleTestRel is a relational expression for testing that memo cycles are
+// detected by the optimizer and a stack overflow is prevented. A cycle in the
+// memo occurs when there is a path from a group member's children back to the
+// group member's group. MemoCycleTestRel is similar in structure to the Select
+// expression, but matches a rule, MemoCycleTestRelRule, that creates a memo
+// cycle.
+func (_f *Factory) ConstructMemoCycleTestRel(
+	input memo.RelExpr,
+	filters memo.FiltersExpr,
+) memo.RelExpr {
+	_f.constructorStackDepth++
+	if _f.constructorStackDepth > maxConstructorStackDepth {
+		// If the constructor call stack depth exceeds the limit, call
+		// onMaxConstructorStackDepthExceeded and skip all rules.
+		_f.onMaxConstructorStackDepthExceeded()
+		goto SKIP_RULES
+	}
+
+SKIP_RULES:
+	e := _f.mem.MemoizeMemoCycleTestRel(input, filters)
+	expr := _f.onConstructRelational(e)
+	_f.constructorStackDepth--
+	return expr
+}
+
 // ConstructInsert constructs an expression for the Insert operator.
 // Insert evaluates a relational input expression, and inserts values from it
 // into a target table. The input may be an arbitrarily complex expression:
@@ -11727,64 +11811,6 @@ SKIP_RULES:
 	return expr
 }
 
-// ConstructNormCycleTestRel constructs an expression for the NormCycleTestRel operator.
-// NormCycleTestRel is a relational operator for testing that normalization rule
-// cycles are detected by the Factory and a stack overflow is prevented. Two
-// rules for this expression, NormCycleTestRelTrueToFalse and
-// NormCycleTestRelFalseToTrue, create a normalization rule cycle. See the cycle
-// test file for tests that use this expression.
-func (_f *Factory) ConstructNormCycleTestRel(
-	scalar opt.ScalarExpr,
-) memo.RelExpr {
-	_f.constructorStackDepth++
-	if _f.constructorStackDepth > maxConstructorStackDepth {
-		// If the constructor call stack depth exceeds the limit, call
-		// onMaxConstructorStackDepthExceeded and skip all rules.
-		_f.onMaxConstructorStackDepthExceeded()
-		goto SKIP_RULES
-	}
-
-	// [NormCycleTestRelTrueToFalse]
-	{
-		_true, _ := scalar.(*memo.TrueExpr)
-		if _true != nil {
-			if _f.matchedRule == nil || _f.matchedRule(opt.NormCycleTestRelTrueToFalse) {
-				_expr := _f.ConstructNormCycleTestRel(
-					_f.ConstructFalse(),
-				)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.NormCycleTestRelTrueToFalse, nil, _expr)
-				}
-				_f.constructorStackDepth--
-				return _expr
-			}
-		}
-	}
-
-	// [NormCycleTestRelFalseToTrue]
-	{
-		_false, _ := scalar.(*memo.FalseExpr)
-		if _false != nil {
-			if _f.matchedRule == nil || _f.matchedRule(opt.NormCycleTestRelFalseToTrue) {
-				_expr := _f.ConstructNormCycleTestRel(
-					_f.ConstructTrue(),
-				)
-				if _f.appliedRule != nil {
-					_f.appliedRule(opt.NormCycleTestRelFalseToTrue, nil, _expr)
-				}
-				_f.constructorStackDepth--
-				return _expr
-			}
-		}
-	}
-
-SKIP_RULES:
-	e := _f.mem.MemoizeNormCycleTestRel(scalar)
-	expr := _f.onConstructRelational(e)
-	_f.constructorStackDepth--
-	return expr
-}
-
 // ConstructSubquery constructs an expression for the Subquery operator.
 // Subquery is a subquery in a single-row context. Here are some examples:
 //
@@ -21674,6 +21700,21 @@ SKIP_RULES:
 // function rather than bottom.
 func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 	switch t := e.(type) {
+	case *memo.NormCycleTestRelExpr:
+		scalar := replace(t.Scalar).(opt.ScalarExpr)
+		if scalar != t.Scalar {
+			return f.ConstructNormCycleTestRel(scalar)
+		}
+		return t
+
+	case *memo.MemoCycleTestRelExpr:
+		input := replace(t.Input).(memo.RelExpr)
+		filters, filtersChanged := f.replaceFiltersExpr(t.Filters, replace)
+		if input != t.Input || filtersChanged {
+			return f.ConstructMemoCycleTestRel(input, filters)
+		}
+		return t
+
 	case *memo.InsertExpr:
 		input := replace(t.Input).(memo.RelExpr)
 		uniqueChecks, uniqueChecksChanged := f.replaceUniqueChecksExpr(t.UniqueChecks, replace)
@@ -22072,13 +22113,6 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		return t
 
 	case *memo.FakeRelExpr:
-		return t
-
-	case *memo.NormCycleTestRelExpr:
-		scalar := replace(t.Scalar).(opt.ScalarExpr)
-		if scalar != t.Scalar {
-			return f.ConstructNormCycleTestRel(scalar)
-		}
 		return t
 
 	case *memo.SubqueryExpr:
@@ -23438,6 +23472,17 @@ func (f *Factory) replaceScalarListExpr(list memo.ScalarListExpr, replace Replac
 // function. See comments for CopyAndReplace for more details.
 func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst opt.Expr) {
 	switch t := src.(type) {
+	case *memo.NormCycleTestRelExpr:
+		return f.ConstructNormCycleTestRel(
+			f.invokeReplace(t.Scalar, replace).(opt.ScalarExpr),
+		)
+
+	case *memo.MemoCycleTestRelExpr:
+		return f.ConstructMemoCycleTestRel(
+			f.invokeReplace(t.Input, replace).(memo.RelExpr),
+			f.copyAndReplaceDefaultFiltersExpr(t.Filters, replace),
+		)
+
 	case *memo.InsertExpr:
 		input := f.invokeReplace(t.Input, replace).(memo.RelExpr)
 		if id := t.WithBindingID(); id != 0 {
@@ -23801,11 +23846,6 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 
 	case *memo.FakeRelExpr:
 		return f.mem.MemoizeFakeRel(&t.FakeRelPrivate)
-
-	case *memo.NormCycleTestRelExpr:
-		return f.ConstructNormCycleTestRel(
-			f.invokeReplace(t.Scalar, replace).(opt.ScalarExpr),
-		)
 
 	case *memo.SubqueryExpr:
 		return f.ConstructSubquery(
@@ -24821,6 +24861,15 @@ func (f *Factory) invokeReplace(src opt.Expr, replace ReplaceFunc) (dst opt.Expr
 
 func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Expr {
 	switch op {
+	case opt.NormCycleTestRelOp:
+		return f.ConstructNormCycleTestRel(
+			args[0].(opt.ScalarExpr),
+		)
+	case opt.MemoCycleTestRelOp:
+		return f.ConstructMemoCycleTestRel(
+			args[0].(memo.RelExpr),
+			*args[1].(*memo.FiltersExpr),
+		)
 	case opt.InsertOp:
 		return f.ConstructInsert(
 			args[0].(memo.RelExpr),
@@ -25118,10 +25167,6 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 	case opt.FakeRelOp:
 		return f.ConstructFakeRel(
 			args[0].(*memo.FakeRelPrivate),
-		)
-	case opt.NormCycleTestRelOp:
-		return f.ConstructNormCycleTestRel(
-			args[0].(opt.ScalarExpr),
 		)
 	case opt.SubqueryOp:
 		return f.ConstructSubquery(
