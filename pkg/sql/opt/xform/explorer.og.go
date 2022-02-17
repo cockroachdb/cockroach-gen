@@ -804,15 +804,17 @@ func (_e *explorer) exploreInnerJoin(
 									projectedVirtualCols := _e.funcs.ProjectionCols(projections)
 									if _e.funcs.ColsAreSubset(projectedVirtualCols, virtualCols) {
 										on := _root.On
-										private := &_root.JoinPrivate
-										if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateLookupJoinsWithVirtualCols) {
-											var _last memo.RelExpr
-											if _e.o.appliedRule != nil {
-												_last = memo.LastGroupMember(_root)
-											}
-											_e.funcs.GenerateLookupJoinsWithVirtualCols(_root, opt.InnerJoinOp, left, _e.funcs.OutputCols(_project), projectedVirtualCols, scanPrivate, on, private)
-											if _e.o.appliedRule != nil {
-												_e.o.appliedRule(opt.GenerateLookupJoinsWithVirtualCols, _root, _last.NextExpr())
+										if _e.funcs.ColsIntersect(projectedVirtualCols, _e.funcs.FilterOuterCols(on)) {
+											private := &_root.JoinPrivate
+											if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateLookupJoinsWithVirtualCols) {
+												var _last memo.RelExpr
+												if _e.o.appliedRule != nil {
+													_last = memo.LastGroupMember(_root)
+												}
+												_e.funcs.GenerateLookupJoinsWithVirtualCols(_root, opt.InnerJoinOp, left, _e.funcs.OutputCols(_project), projectedVirtualCols, scanPrivate, on, private)
+												if _e.o.appliedRule != nil {
+													_e.o.appliedRule(opt.GenerateLookupJoinsWithVirtualCols, _root, _last.NextExpr())
+												}
 											}
 										}
 									}
@@ -881,15 +883,17 @@ func (_e *explorer) exploreInnerJoin(
 											projectedVirtualCols := _e.funcs.ProjectionCols(projections)
 											if _e.funcs.ColsAreSubset(projectedVirtualCols, virtualCols) {
 												on := _root.On
-												private := &_root.JoinPrivate
-												if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateLookupJoinsWithVirtualColsAndFilter) {
-													var _last memo.RelExpr
-													if _e.o.appliedRule != nil {
-														_last = memo.LastGroupMember(_root)
-													}
-													_e.funcs.GenerateLookupJoinsWithVirtualCols(_root, opt.InnerJoinOp, left, _e.funcs.OutputCols(_project), projectedVirtualCols, scanPrivate, _e.funcs.ConcatFilters(on, filters), private)
-													if _e.o.appliedRule != nil {
-														_e.o.appliedRule(opt.GenerateLookupJoinsWithVirtualColsAndFilter, _root, _last.NextExpr())
+												if _e.funcs.ColsIntersect(projectedVirtualCols, _e.funcs.FilterOuterCols(on)) {
+													private := &_root.JoinPrivate
+													if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateLookupJoinsWithVirtualColsAndFilter) {
+														var _last memo.RelExpr
+														if _e.o.appliedRule != nil {
+															_last = memo.LastGroupMember(_root)
+														}
+														_e.funcs.GenerateLookupJoinsWithVirtualCols(_root, opt.InnerJoinOp, left, _e.funcs.OutputCols(_project), projectedVirtualCols, scanPrivate, _e.funcs.ConcatFilters(on, filters), private)
+														if _e.o.appliedRule != nil {
+															_e.o.appliedRule(opt.GenerateLookupJoinsWithVirtualColsAndFilter, _root, _last.NextExpr())
+														}
 													}
 												}
 											}
@@ -1265,6 +1269,151 @@ func (_e *explorer) exploreLeftJoin(
 									_e.funcs.GenerateLookupJoins(_root, opt.LeftJoinOp, left, scanPrivate, _e.funcs.ConcatFilters(on, filters), private)
 									if _e.o.appliedRule != nil {
 										_e.o.appliedRule(opt.GenerateLookupJoinsWithFilter, _root, _last.NextExpr())
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [GenerateLookupJoinsWithVirtualCols]
+	{
+		_partlyExplored := _rootOrd < _rootState.start
+		left := _root.Left
+		project := _root.Right
+		_state := _e.lookupExploreState(project)
+		if !_state.fullyExplored {
+			_fullyExplored = false
+		}
+		var _member memo.RelExpr
+		for _ord := 0; _ord < _state.end; _ord++ {
+			if _member == nil {
+				_member = project.FirstExpr()
+			} else {
+				_member = _member.NextExpr()
+			}
+			_partlyExplored := _partlyExplored && _ord < _state.start
+			_project, _ := _member.(*memo.ProjectExpr)
+			if _project != nil {
+				_state := _e.lookupExploreState(_project.Input)
+				if !_state.fullyExplored {
+					_fullyExplored = false
+				}
+				var _member memo.RelExpr
+				for _ord := 0; _ord < _state.end; _ord++ {
+					if _member == nil {
+						_member = _project.Input.FirstExpr()
+					} else {
+						_member = _member.NextExpr()
+					}
+					if !_partlyExplored || _ord >= _state.start {
+						_scan, _ := _member.(*memo.ScanExpr)
+						if _scan != nil {
+							scanPrivate := &_scan.ScanPrivate
+							if _e.funcs.IsCanonicalScan(scanPrivate) {
+								virtualCols := _e.funcs.VirtualColumns(scanPrivate)
+								if !_e.funcs.ColsAreEmpty(virtualCols) {
+									projections := _project.Projections
+									projectedVirtualCols := _e.funcs.ProjectionCols(projections)
+									if _e.funcs.ColsAreSubset(projectedVirtualCols, virtualCols) {
+										on := _root.On
+										if _e.funcs.ColsIntersect(projectedVirtualCols, _e.funcs.FilterOuterCols(on)) {
+											private := &_root.JoinPrivate
+											if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateLookupJoinsWithVirtualCols) {
+												var _last memo.RelExpr
+												if _e.o.appliedRule != nil {
+													_last = memo.LastGroupMember(_root)
+												}
+												_e.funcs.GenerateLookupJoinsWithVirtualCols(_root, opt.LeftJoinOp, left, _e.funcs.OutputCols(_project), projectedVirtualCols, scanPrivate, on, private)
+												if _e.o.appliedRule != nil {
+													_e.o.appliedRule(opt.GenerateLookupJoinsWithVirtualCols, _root, _last.NextExpr())
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [GenerateLookupJoinsWithVirtualColsAndFilter]
+	{
+		_partlyExplored := _rootOrd < _rootState.start
+		left := _root.Left
+		project := _root.Right
+		_state := _e.lookupExploreState(project)
+		if !_state.fullyExplored {
+			_fullyExplored = false
+		}
+		var _member memo.RelExpr
+		for _ord := 0; _ord < _state.end; _ord++ {
+			if _member == nil {
+				_member = project.FirstExpr()
+			} else {
+				_member = _member.NextExpr()
+			}
+			_partlyExplored := _partlyExplored && _ord < _state.start
+			_project, _ := _member.(*memo.ProjectExpr)
+			if _project != nil {
+				_state := _e.lookupExploreState(_project.Input)
+				if !_state.fullyExplored {
+					_fullyExplored = false
+				}
+				var _member memo.RelExpr
+				for _ord := 0; _ord < _state.end; _ord++ {
+					if _member == nil {
+						_member = _project.Input.FirstExpr()
+					} else {
+						_member = _member.NextExpr()
+					}
+					_partlyExplored := _partlyExplored && _ord < _state.start
+					_select, _ := _member.(*memo.SelectExpr)
+					if _select != nil {
+						_state := _e.lookupExploreState(_select.Input)
+						if !_state.fullyExplored {
+							_fullyExplored = false
+						}
+						var _member memo.RelExpr
+						for _ord := 0; _ord < _state.end; _ord++ {
+							if _member == nil {
+								_member = _select.Input.FirstExpr()
+							} else {
+								_member = _member.NextExpr()
+							}
+							if !_partlyExplored || _ord >= _state.start {
+								_scan, _ := _member.(*memo.ScanExpr)
+								if _scan != nil {
+									scanPrivate := &_scan.ScanPrivate
+									if _e.funcs.IsCanonicalScan(scanPrivate) {
+										virtualCols := _e.funcs.VirtualColumns(scanPrivate)
+										if !_e.funcs.ColsAreEmpty(virtualCols) {
+											filters := _select.Filters
+											projections := _project.Projections
+											projectedVirtualCols := _e.funcs.ProjectionCols(projections)
+											if _e.funcs.ColsAreSubset(projectedVirtualCols, virtualCols) {
+												on := _root.On
+												if _e.funcs.ColsIntersect(projectedVirtualCols, _e.funcs.FilterOuterCols(on)) {
+													private := &_root.JoinPrivate
+													if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateLookupJoinsWithVirtualColsAndFilter) {
+														var _last memo.RelExpr
+														if _e.o.appliedRule != nil {
+															_last = memo.LastGroupMember(_root)
+														}
+														_e.funcs.GenerateLookupJoinsWithVirtualCols(_root, opt.LeftJoinOp, left, _e.funcs.OutputCols(_project), projectedVirtualCols, scanPrivate, _e.funcs.ConcatFilters(on, filters), private)
+														if _e.o.appliedRule != nil {
+															_e.o.appliedRule(opt.GenerateLookupJoinsWithVirtualColsAndFilter, _root, _last.NextExpr())
+														}
+													}
+												}
+											}
+										}
 									}
 								}
 							}
@@ -1723,6 +1872,151 @@ func (_e *explorer) exploreSemiJoin(
 		}
 	}
 
+	// [GenerateLookupJoinsWithVirtualCols]
+	{
+		_partlyExplored := _rootOrd < _rootState.start
+		left := _root.Left
+		project := _root.Right
+		_state := _e.lookupExploreState(project)
+		if !_state.fullyExplored {
+			_fullyExplored = false
+		}
+		var _member memo.RelExpr
+		for _ord := 0; _ord < _state.end; _ord++ {
+			if _member == nil {
+				_member = project.FirstExpr()
+			} else {
+				_member = _member.NextExpr()
+			}
+			_partlyExplored := _partlyExplored && _ord < _state.start
+			_project, _ := _member.(*memo.ProjectExpr)
+			if _project != nil {
+				_state := _e.lookupExploreState(_project.Input)
+				if !_state.fullyExplored {
+					_fullyExplored = false
+				}
+				var _member memo.RelExpr
+				for _ord := 0; _ord < _state.end; _ord++ {
+					if _member == nil {
+						_member = _project.Input.FirstExpr()
+					} else {
+						_member = _member.NextExpr()
+					}
+					if !_partlyExplored || _ord >= _state.start {
+						_scan, _ := _member.(*memo.ScanExpr)
+						if _scan != nil {
+							scanPrivate := &_scan.ScanPrivate
+							if _e.funcs.IsCanonicalScan(scanPrivate) {
+								virtualCols := _e.funcs.VirtualColumns(scanPrivate)
+								if !_e.funcs.ColsAreEmpty(virtualCols) {
+									projections := _project.Projections
+									projectedVirtualCols := _e.funcs.ProjectionCols(projections)
+									if _e.funcs.ColsAreSubset(projectedVirtualCols, virtualCols) {
+										on := _root.On
+										if _e.funcs.ColsIntersect(projectedVirtualCols, _e.funcs.FilterOuterCols(on)) {
+											private := &_root.JoinPrivate
+											if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateLookupJoinsWithVirtualCols) {
+												var _last memo.RelExpr
+												if _e.o.appliedRule != nil {
+													_last = memo.LastGroupMember(_root)
+												}
+												_e.funcs.GenerateLookupJoinsWithVirtualCols(_root, opt.SemiJoinOp, left, _e.funcs.OutputCols(_project), projectedVirtualCols, scanPrivate, on, private)
+												if _e.o.appliedRule != nil {
+													_e.o.appliedRule(opt.GenerateLookupJoinsWithVirtualCols, _root, _last.NextExpr())
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [GenerateLookupJoinsWithVirtualColsAndFilter]
+	{
+		_partlyExplored := _rootOrd < _rootState.start
+		left := _root.Left
+		project := _root.Right
+		_state := _e.lookupExploreState(project)
+		if !_state.fullyExplored {
+			_fullyExplored = false
+		}
+		var _member memo.RelExpr
+		for _ord := 0; _ord < _state.end; _ord++ {
+			if _member == nil {
+				_member = project.FirstExpr()
+			} else {
+				_member = _member.NextExpr()
+			}
+			_partlyExplored := _partlyExplored && _ord < _state.start
+			_project, _ := _member.(*memo.ProjectExpr)
+			if _project != nil {
+				_state := _e.lookupExploreState(_project.Input)
+				if !_state.fullyExplored {
+					_fullyExplored = false
+				}
+				var _member memo.RelExpr
+				for _ord := 0; _ord < _state.end; _ord++ {
+					if _member == nil {
+						_member = _project.Input.FirstExpr()
+					} else {
+						_member = _member.NextExpr()
+					}
+					_partlyExplored := _partlyExplored && _ord < _state.start
+					_select, _ := _member.(*memo.SelectExpr)
+					if _select != nil {
+						_state := _e.lookupExploreState(_select.Input)
+						if !_state.fullyExplored {
+							_fullyExplored = false
+						}
+						var _member memo.RelExpr
+						for _ord := 0; _ord < _state.end; _ord++ {
+							if _member == nil {
+								_member = _select.Input.FirstExpr()
+							} else {
+								_member = _member.NextExpr()
+							}
+							if !_partlyExplored || _ord >= _state.start {
+								_scan, _ := _member.(*memo.ScanExpr)
+								if _scan != nil {
+									scanPrivate := &_scan.ScanPrivate
+									if _e.funcs.IsCanonicalScan(scanPrivate) {
+										virtualCols := _e.funcs.VirtualColumns(scanPrivate)
+										if !_e.funcs.ColsAreEmpty(virtualCols) {
+											filters := _select.Filters
+											projections := _project.Projections
+											projectedVirtualCols := _e.funcs.ProjectionCols(projections)
+											if _e.funcs.ColsAreSubset(projectedVirtualCols, virtualCols) {
+												on := _root.On
+												if _e.funcs.ColsIntersect(projectedVirtualCols, _e.funcs.FilterOuterCols(on)) {
+													private := &_root.JoinPrivate
+													if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateLookupJoinsWithVirtualColsAndFilter) {
+														var _last memo.RelExpr
+														if _e.o.appliedRule != nil {
+															_last = memo.LastGroupMember(_root)
+														}
+														_e.funcs.GenerateLookupJoinsWithVirtualCols(_root, opt.SemiJoinOp, left, _e.funcs.OutputCols(_project), projectedVirtualCols, scanPrivate, _e.funcs.ConcatFilters(on, filters), private)
+														if _e.o.appliedRule != nil {
+															_e.o.appliedRule(opt.GenerateLookupJoinsWithVirtualColsAndFilter, _root, _last.NextExpr())
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	return _fullyExplored
 }
 
@@ -1951,6 +2245,151 @@ func (_e *explorer) exploreAntiJoin(
 									_e.funcs.GenerateLookupJoins(_root, opt.AntiJoinOp, left, scanPrivate, _e.funcs.ConcatFilters(on, filters), private)
 									if _e.o.appliedRule != nil {
 										_e.o.appliedRule(opt.GenerateLookupJoinsWithFilter, _root, _last.NextExpr())
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [GenerateLookupJoinsWithVirtualCols]
+	{
+		_partlyExplored := _rootOrd < _rootState.start
+		left := _root.Left
+		project := _root.Right
+		_state := _e.lookupExploreState(project)
+		if !_state.fullyExplored {
+			_fullyExplored = false
+		}
+		var _member memo.RelExpr
+		for _ord := 0; _ord < _state.end; _ord++ {
+			if _member == nil {
+				_member = project.FirstExpr()
+			} else {
+				_member = _member.NextExpr()
+			}
+			_partlyExplored := _partlyExplored && _ord < _state.start
+			_project, _ := _member.(*memo.ProjectExpr)
+			if _project != nil {
+				_state := _e.lookupExploreState(_project.Input)
+				if !_state.fullyExplored {
+					_fullyExplored = false
+				}
+				var _member memo.RelExpr
+				for _ord := 0; _ord < _state.end; _ord++ {
+					if _member == nil {
+						_member = _project.Input.FirstExpr()
+					} else {
+						_member = _member.NextExpr()
+					}
+					if !_partlyExplored || _ord >= _state.start {
+						_scan, _ := _member.(*memo.ScanExpr)
+						if _scan != nil {
+							scanPrivate := &_scan.ScanPrivate
+							if _e.funcs.IsCanonicalScan(scanPrivate) {
+								virtualCols := _e.funcs.VirtualColumns(scanPrivate)
+								if !_e.funcs.ColsAreEmpty(virtualCols) {
+									projections := _project.Projections
+									projectedVirtualCols := _e.funcs.ProjectionCols(projections)
+									if _e.funcs.ColsAreSubset(projectedVirtualCols, virtualCols) {
+										on := _root.On
+										if _e.funcs.ColsIntersect(projectedVirtualCols, _e.funcs.FilterOuterCols(on)) {
+											private := &_root.JoinPrivate
+											if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateLookupJoinsWithVirtualCols) {
+												var _last memo.RelExpr
+												if _e.o.appliedRule != nil {
+													_last = memo.LastGroupMember(_root)
+												}
+												_e.funcs.GenerateLookupJoinsWithVirtualCols(_root, opt.AntiJoinOp, left, _e.funcs.OutputCols(_project), projectedVirtualCols, scanPrivate, on, private)
+												if _e.o.appliedRule != nil {
+													_e.o.appliedRule(opt.GenerateLookupJoinsWithVirtualCols, _root, _last.NextExpr())
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [GenerateLookupJoinsWithVirtualColsAndFilter]
+	{
+		_partlyExplored := _rootOrd < _rootState.start
+		left := _root.Left
+		project := _root.Right
+		_state := _e.lookupExploreState(project)
+		if !_state.fullyExplored {
+			_fullyExplored = false
+		}
+		var _member memo.RelExpr
+		for _ord := 0; _ord < _state.end; _ord++ {
+			if _member == nil {
+				_member = project.FirstExpr()
+			} else {
+				_member = _member.NextExpr()
+			}
+			_partlyExplored := _partlyExplored && _ord < _state.start
+			_project, _ := _member.(*memo.ProjectExpr)
+			if _project != nil {
+				_state := _e.lookupExploreState(_project.Input)
+				if !_state.fullyExplored {
+					_fullyExplored = false
+				}
+				var _member memo.RelExpr
+				for _ord := 0; _ord < _state.end; _ord++ {
+					if _member == nil {
+						_member = _project.Input.FirstExpr()
+					} else {
+						_member = _member.NextExpr()
+					}
+					_partlyExplored := _partlyExplored && _ord < _state.start
+					_select, _ := _member.(*memo.SelectExpr)
+					if _select != nil {
+						_state := _e.lookupExploreState(_select.Input)
+						if !_state.fullyExplored {
+							_fullyExplored = false
+						}
+						var _member memo.RelExpr
+						for _ord := 0; _ord < _state.end; _ord++ {
+							if _member == nil {
+								_member = _select.Input.FirstExpr()
+							} else {
+								_member = _member.NextExpr()
+							}
+							if !_partlyExplored || _ord >= _state.start {
+								_scan, _ := _member.(*memo.ScanExpr)
+								if _scan != nil {
+									scanPrivate := &_scan.ScanPrivate
+									if _e.funcs.IsCanonicalScan(scanPrivate) {
+										virtualCols := _e.funcs.VirtualColumns(scanPrivate)
+										if !_e.funcs.ColsAreEmpty(virtualCols) {
+											filters := _select.Filters
+											projections := _project.Projections
+											projectedVirtualCols := _e.funcs.ProjectionCols(projections)
+											if _e.funcs.ColsAreSubset(projectedVirtualCols, virtualCols) {
+												on := _root.On
+												if _e.funcs.ColsIntersect(projectedVirtualCols, _e.funcs.FilterOuterCols(on)) {
+													private := &_root.JoinPrivate
+													if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateLookupJoinsWithVirtualColsAndFilter) {
+														var _last memo.RelExpr
+														if _e.o.appliedRule != nil {
+															_last = memo.LastGroupMember(_root)
+														}
+														_e.funcs.GenerateLookupJoinsWithVirtualCols(_root, opt.AntiJoinOp, left, _e.funcs.OutputCols(_project), projectedVirtualCols, scanPrivate, _e.funcs.ConcatFilters(on, filters), private)
+														if _e.o.appliedRule != nil {
+															_e.o.appliedRule(opt.GenerateLookupJoinsWithVirtualColsAndFilter, _root, _last.NextExpr())
+														}
+													}
+												}
+											}
+										}
 									}
 								}
 							}
