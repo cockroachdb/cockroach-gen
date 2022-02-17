@@ -279,6 +279,7 @@ var KeywordsCategories = map[string]string{
 	"natural":                      "T",
 	"never":                        "U",
 	"new_db_name":                  "U",
+	"new_kms":                      "U",
 	"next":                         "U",
 	"no":                           "U",
 	"nocancelquery":                "U",
@@ -310,6 +311,7 @@ var KeywordsCategories = map[string]string{
 	"off":                          "U",
 	"offset":                       "R",
 	"oids":                         "U",
+	"old_kms":                      "U",
 	"on":                           "R",
 	"only":                         "R",
 	"operator":                     "U",
@@ -804,6 +806,7 @@ var KeywordNames = []string{
 	"natural",
 	"never",
 	"new_db_name",
+	"new_kms",
 	"next",
 	"no",
 	"nocancelquery",
@@ -835,6 +838,7 @@ var KeywordNames = []string{
 	"off",
 	"offset",
 	"oids",
+	"old_kms",
 	"on",
 	"only",
 	"operator",
@@ -1610,6 +1614,8 @@ func GetKeywordID(k string) int32 {
 		return NEVER
 	case "new_db_name":
 		return NEW_DB_NAME
+	case "new_kms":
+		return NEW_KMS
 	case "next":
 		return NEXT
 	case "no":
@@ -1672,6 +1678,8 @@ func GetKeywordID(k string) int32 {
 		return OFFSET
 	case "oids":
 		return OIDS
+	case "old_kms":
+		return OLD_KMS
 	case "on":
 		return ON
 	case "only":

@@ -6,6 +6,7 @@ package parser
 var expectedHelpStrings = []string{
 	"<SELECTCLAUSE>",
 	"<SOURCE>",
+	"ALTER BACKUP",
 	"ALTER CHANGEFEED",
 	"ALTER DATABASE",
 	"ALTER DEFAULT PRIVILEGES",
