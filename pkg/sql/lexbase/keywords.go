@@ -440,6 +440,7 @@ var KeywordsCategories = map[string]string{
 	"sql":                          "U",
 	"sqllogin":                     "U",
 	"start":                        "U",
+	"state":                        "U",
 	"statements":                   "U",
 	"statistics":                   "U",
 	"status":                       "U",
@@ -479,6 +480,7 @@ var KeywordsCategories = map[string]string{
 	"trailing":                     "R",
 	"transaction":                  "U",
 	"transactions":                 "U",
+	"transfer":                     "U",
 	"treat":                        "C",
 	"trigger":                      "U",
 	"trim":                         "C",
@@ -967,6 +969,7 @@ var KeywordNames = []string{
 	"sql",
 	"sqllogin",
 	"start",
+	"state",
 	"statements",
 	"statistics",
 	"status",
@@ -1006,6 +1009,7 @@ var KeywordNames = []string{
 	"trailing",
 	"transaction",
 	"transactions",
+	"transfer",
 	"treat",
 	"trigger",
 	"trim",
@@ -1936,6 +1940,8 @@ func GetKeywordID(k string) int32 {
 		return SQLLOGIN
 	case "start":
 		return START
+	case "state":
+		return STATE
 	case "statements":
 		return STATEMENTS
 	case "statistics":
@@ -2014,6 +2020,8 @@ func GetKeywordID(k string) int32 {
 		return TRANSACTION
 	case "transactions":
 		return TRANSACTIONS
+	case "transfer":
+		return TRANSFER
 	case "treat":
 		return TREAT
 	case "trigger":
