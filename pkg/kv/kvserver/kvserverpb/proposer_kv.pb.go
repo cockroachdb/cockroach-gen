@@ -419,8 +419,8 @@ type ReplicatedEvalResult_AddSSTable struct {
 	CRC32 uint32       `protobuf:"varint,2,opt,name=crc32,proto3" json:"crc32,omitempty"`
 	Span  roachpb.Span `protobuf:"bytes,3,opt,name=span,proto3" json:"span"`
 	// If true, all SST MVCC timestamps equal the WriteTimestamp. This is given
-	// by the WriteAtRequestTimestamp request parameter, which was introduced in
-	// 22.1 and only used with the MVCCAddSSTable cluster version.
+	// by the SSTTimestampToRequestTimestamp request parameter, which was
+	// introduced in 22.1 and only used with the MVCCAddSSTable cluster version.
 	//
 	// TODO(erikgrinaker): This field currently controls whether to emit an
 	// AddSSTable event across the rangefeed. We could equivalently check
