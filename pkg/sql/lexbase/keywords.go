@@ -305,6 +305,7 @@ var KeywordsCategories = map[string]string{
 	"notnull":                      "T",
 	"noviewactivity":               "U",
 	"noviewactivityredacted":       "U",
+	"noviewclustersetting":         "U",
 	"nowait":                       "U",
 	"no_full_scan":                 "U",
 	"no_index_join":                "U",
@@ -523,6 +524,7 @@ var KeywordsCategories = map[string]string{
 	"view":                         "U",
 	"viewactivity":                 "U",
 	"viewactivityredacted":         "U",
+	"viewclustersetting":           "U",
 	"virtual":                      "C",
 	"visible":                      "U",
 	"voters":                       "U",
@@ -843,6 +845,7 @@ var KeywordNames = []string{
 	"notnull",
 	"noviewactivity",
 	"noviewactivityredacted",
+	"noviewclustersetting",
 	"nowait",
 	"no_full_scan",
 	"no_index_join",
@@ -1061,6 +1064,7 @@ var KeywordNames = []string{
 	"view",
 	"viewactivity",
 	"viewactivityredacted",
+	"viewclustersetting",
 	"virtual",
 	"visible",
 	"voters",
@@ -1688,6 +1692,8 @@ func GetKeywordID(k string) int32 {
 		return NOVIEWACTIVITY
 	case "noviewactivityredacted":
 		return NOVIEWACTIVITYREDACTED
+	case "noviewclustersetting":
+		return NOVIEWCLUSTERSETTING
 	case "nowait":
 		return NOWAIT
 	case "no_full_scan":
@@ -2124,6 +2130,8 @@ func GetKeywordID(k string) int32 {
 		return VIEWACTIVITY
 	case "viewactivityredacted":
 		return VIEWACTIVITYREDACTED
+	case "viewclustersetting":
+		return VIEWCLUSTERSETTING
 	case "virtual":
 		return VIRTUAL
 	case "visible":

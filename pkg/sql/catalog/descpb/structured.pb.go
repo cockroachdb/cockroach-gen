@@ -2031,9 +2031,9 @@ type TableDescriptor struct {
 	// the table is persistent.
 	Temporary      bool                  `protobuf:"varint,39,opt,name=temporary" json:"temporary"`
 	LocalityConfig *catpb.LocalityConfig `protobuf:"bytes,42,opt,name=locality_config,json=localityConfig" json:"locality_config,omitempty"`
-	// PartitionAllBy is set if PARTITION ALL BY is set on the table.
-	// This means that all indexes implicitly inherit all partitioning
-	// from the PARTITION ALL BY clause.
+	// PartitionAllBy is set if PARTITION ALL BY or LOCALITY REGIONAL BY ROW is
+	// set on the table. This means that all indexes implicitly inherit all
+	// partitioning from the PARTITION ALL BY clause or region configuration.
 	PartitionAllBy bool `protobuf:"varint,44,opt,name=partition_all_by,json=partitionAllBy" json:"partition_all_by"`
 	// RowLevelTTL is set if there is a TTL set on the table.
 	RowLevelTTL *catpb.RowLevelTTL `protobuf:"bytes,47,opt,name=row_level_ttl,json=rowLevelTtl" json:"row_level_ttl,omitempty"`
