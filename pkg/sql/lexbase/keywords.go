@@ -68,6 +68,7 @@ var KeywordsCategories = map[string]string{
 	"committed":                    "U",
 	"compact":                      "U",
 	"complete":                     "U",
+	"completions":                  "U",
 	"concurrently":                 "R",
 	"configuration":                "U",
 	"configurations":               "U",
@@ -609,6 +610,7 @@ var KeywordNames = []string{
 	"committed",
 	"compact",
 	"complete",
+	"completions",
 	"concurrently",
 	"configuration",
 	"configurations",
@@ -1220,6 +1222,8 @@ func GetKeywordID(k string) int32 {
 		return COMPACT
 	case "complete":
 		return COMPLETE
+	case "completions":
+		return COMPLETIONS
 	case "concurrently":
 		return CONCURRENTLY
 	case "configuration":

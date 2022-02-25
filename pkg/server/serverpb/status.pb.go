@@ -2256,7 +2256,8 @@ var xxx_messageInfo_LogFileRequest proto.InternalMessageInfo
 
 type StacksRequest struct {
 	// node_id is a string so that "local" can be used to specify that no
-	// forwarding is necessary.
+	// forwarding is necessary. node_id translates to a KV node ID on a storage
+	// server and SQL instance ID on a SQL only server.
 	NodeId string     `protobuf:"bytes,1,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
 	Type   StacksType `protobuf:"varint,2,opt,name=type,proto3,enum=cockroach.server.serverpb.StacksType" json:"type,omitempty"`
 }
@@ -2328,7 +2329,8 @@ var xxx_messageInfo_File proto.InternalMessageInfo
 
 type GetFilesRequest struct {
 	// node_id is a string so that "local" can be used to specify that no
-	// forwarding is necessary.
+	// forwarding is necessary. node_id translates to a KV node ID on a storage
+	// server and SQL instance ID on a SQL only server.
 	NodeId string `protobuf:"bytes,1,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
 	// If list_only is true then the contents of the files will not be populated
 	// in the response. Only filenames and sizes will be returned.
@@ -2405,7 +2407,8 @@ var xxx_messageInfo_GetFilesResponse proto.InternalMessageInfo
 
 type ProfileRequest struct {
 	// node_id is a string so that "local" can be used to specify that no
-	// forwarding is necessary.
+	// forwarding is necessary. node_id translates to a KV node ID on a storage
+	// server and SQL instance ID on a SQL only server.
 	NodeId string `protobuf:"bytes,1,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
 	// The type of profile to retrieve.
 	Type    ProfileRequest_Type `protobuf:"varint,5,opt,name=type,proto3,enum=cockroach.server.serverpb.ProfileRequest_Type" json:"type,omitempty"`
