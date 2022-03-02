@@ -17,6 +17,7 @@ var expectedHelpStrings = []string{
 	"ALTER SCHEMA",
 	"ALTER SEQUENCE",
 	"ALTER TABLE",
+	"ALTER TENANT",
 	"ALTER TYPE",
 	"ALTER VIEW",
 	"ALTER",
