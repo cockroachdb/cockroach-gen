@@ -3844,6 +3844,77 @@ func (_e *explorer) exploreLimit(
 		}
 	}
 
+	// [SplitLimitedSelectIntoUnionSelects]
+	{
+		_partlyExplored := _rootOrd < _rootState.start
+		_state := _e.lookupExploreState(_root.Input)
+		if !_state.fullyExplored {
+			_fullyExplored = false
+		}
+		var _member memo.RelExpr
+		for _ord := 0; _ord < _state.end; _ord++ {
+			if _member == nil {
+				_member = _root.Input.FirstExpr()
+			} else {
+				_member = _member.NextExpr()
+			}
+			_partlyExplored := _partlyExplored && _ord < _state.start
+			_select, _ := _member.(*memo.SelectExpr)
+			if _select != nil {
+				scan := _select.Input
+				_state := _e.lookupExploreState(scan)
+				if !_state.fullyExplored {
+					_fullyExplored = false
+				}
+				var _member memo.RelExpr
+				for _ord := 0; _ord < _state.end; _ord++ {
+					if _member == nil {
+						_member = scan.FirstExpr()
+					} else {
+						_member = _member.NextExpr()
+					}
+					if !_partlyExplored || _ord >= _state.start {
+						_scan, _ := _member.(*memo.ScanExpr)
+						if _scan != nil {
+							scanPrivate := &_scan.ScanPrivate
+							if !_e.funcs.ScanIsLimited(scanPrivate) {
+								if !_e.funcs.ScanIsInverted(scanPrivate) {
+									filters := _select.Filters
+									limitExpr := _root.Limit
+									_const, _ := limitExpr.(*memo.ConstExpr)
+									if _const != nil {
+										limit := _const.Value
+										if _e.funcs.IsPositiveInt(limit) {
+											ordering := _root.Ordering
+											unionScans, ok := _e.funcs.SplitLimitedSelectIntoUnionScansOrSelects(ordering, _scan, scanPrivate, limit, filters)
+											if ok {
+												if _e.o.matchedRule == nil || _e.o.matchedRule(opt.SplitLimitedSelectIntoUnionSelects) {
+													_expr := &memo.LimitExpr{
+														Input:    unionScans,
+														Limit:    _const,
+														Ordering: ordering,
+													}
+													_interned := _e.mem.AddLimitToGroup(_expr, _root)
+													if _e.o.appliedRule != nil {
+														if _interned != _expr {
+															_e.o.appliedRule(opt.SplitLimitedSelectIntoUnionSelects, _root, nil)
+														} else {
+															_e.o.appliedRule(opt.SplitLimitedSelectIntoUnionSelects, _root, _interned)
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [GenerateTopK]
 	{
 		if _rootOrd >= _rootState.start {

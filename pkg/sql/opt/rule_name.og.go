@@ -313,6 +313,7 @@ const (
 	PushLimitIntoFilteredScan
 	PushLimitIntoIndexJoin
 	SplitLimitedScanIntoUnionScans
+	SplitLimitedSelectIntoUnionSelects
 	GenerateTopK
 	GenerateLimitedTopKScans
 	GeneratePartialOrderTopK
