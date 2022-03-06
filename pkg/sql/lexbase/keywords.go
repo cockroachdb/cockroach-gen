@@ -477,6 +477,7 @@ var KeywordsCategories = map[string]string{
 	"template":                     "U",
 	"temporary":                    "U",
 	"tenant":                       "U",
+	"tenants":                      "U",
 	"testing_relocate":             "U",
 	"text":                         "U",
 	"then":                         "R",
@@ -1019,6 +1020,7 @@ var KeywordNames = []string{
 	"template",
 	"temporary",
 	"tenant",
+	"tenants",
 	"testing_relocate",
 	"text",
 	"then",
@@ -2040,6 +2042,8 @@ func GetKeywordID(k string) int32 {
 		return TEMPORARY
 	case "tenant":
 		return TENANT
+	case "tenants":
+		return TENANTS
 	case "testing_relocate":
 		return TESTING_RELOCATE
 	case "text":
