@@ -465,6 +465,7 @@ var KeywordsCategories = map[string]string{
 	"string":                       "C",
 	"subscription":                 "U",
 	"substring":                    "C",
+	"super":                        "U",
 	"survival":                     "U",
 	"survive":                      "U",
 	"symmetric":                    "R",
@@ -1007,6 +1008,7 @@ var KeywordNames = []string{
 	"string",
 	"subscription",
 	"substring",
+	"super",
 	"survival",
 	"survive",
 	"symmetric",
@@ -2016,6 +2018,8 @@ func GetKeywordID(k string) int32 {
 		return SUBSCRIPTION
 	case "substring":
 		return SUBSTRING
+	case "super":
+		return SUPER
 	case "survival":
 		return SURVIVAL
 	case "survive":
