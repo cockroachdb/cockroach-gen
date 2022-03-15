@@ -8153,8 +8153,8 @@ var xxx_messageInfo_JoinNodeResponse proto.InternalMessageInfo
 type ContentionEvent struct {
 	// Key is the key that this and the other transaction conflicted on.
 	Key Key `protobuf:"bytes,1,opt,name=key,proto3,casttype=Key" json:"key,omitempty"`
-	// TxnMeta is the transaction conflicted
-	// with, i.e. the transaction holding a lock.
+	// TxnMeta is the transaction conflicted with, i.e. the transaction holding a
+	// lock or lock reservation.
 	TxnMeta enginepb.TxnMeta `protobuf:"bytes,2,opt,name=txn_meta,json=txnMeta,proto3" json:"txn_meta"`
 	// Duration spent contending against the other transaction.
 	Duration time.Duration `protobuf:"bytes,3,opt,name=duration,proto3,stdduration" json:"duration"`
