@@ -65,6 +65,7 @@ var expectedHelpStrings = []string{
 	"GRANT",
 	"IMPORT",
 	"INSERT",
+	"MOVE",
 	"PAUSE ALL JOBS",
 	"PAUSE JOBS",
 	"PAUSE SCHEDULES",

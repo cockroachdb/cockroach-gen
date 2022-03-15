@@ -2242,9 +2242,15 @@ type ChangefeedDetails struct {
 	// The names at resolution time are included so that table and database
 	// renames can be tolerated and derived topic names remain immutable.
 	//
-	Tables               ChangefeedTargets               `protobuf:"bytes,6,rep,name=tables,proto3,casttype=ChangefeedTargets,castkey=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"tables" protobuf_key:"varint,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	SinkURI              string                          `protobuf:"bytes,3,opt,name=sink_uri,json=sinkUri,proto3" json:"sink_uri,omitempty"`
-	Opts                 map[string]string               `protobuf:"bytes,4,rep,name=opts,proto3" json:"opts,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	Tables  ChangefeedTargets `protobuf:"bytes,6,rep,name=tables,proto3,casttype=ChangefeedTargets,castkey=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"tables" protobuf_key:"varint,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	SinkURI string            `protobuf:"bytes,3,opt,name=sink_uri,json=sinkUri,proto3" json:"sink_uri,omitempty"`
+	Opts    map[string]string `protobuf:"bytes,4,rep,name=opts,proto3" json:"opts,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	// TODO(sherman): Now that we update the statement time in some situations
+	// while performing an initial scan on newly added targets, StatementTime is
+	// no longer a suitable name for this field. This is because the name
+	// StatementTime gives off an impression that the field indicates the creation
+	// time of the changefeed, which is no longer the case. We should rename this
+	// field to ScanTime instead.
 	StatementTime        hlc.Timestamp                   `protobuf:"bytes,7,opt,name=statement_time,json=statementTime,proto3" json:"statement_time"`
 	TargetSpecifications []ChangefeedTargetSpecification `protobuf:"bytes,8,rep,name=target_specifications,json=targetSpecifications,proto3" json:"target_specifications"`
 }

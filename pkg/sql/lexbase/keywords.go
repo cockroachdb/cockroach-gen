@@ -269,6 +269,7 @@ var KeywordsCategories = map[string]string{
 	"minvalue":                     "U",
 	"modifyclustersetting":         "U",
 	"month":                        "U",
+	"move":                         "U",
 	"multilinestring":              "U",
 	"multilinestringm":             "U",
 	"multilinestringz":             "U",
@@ -812,6 +813,7 @@ var KeywordNames = []string{
 	"minvalue",
 	"modifyclustersetting",
 	"month",
+	"move",
 	"multilinestring",
 	"multilinestringm",
 	"multilinestringz",
@@ -1626,6 +1628,8 @@ func GetKeywordID(k string) int32 {
 		return MODIFYCLUSTERSETTING
 	case "month":
 		return MONTH
+	case "move":
+		return MOVE
 	case "multilinestring":
 		return MULTILINESTRING
 	case "multilinestringm":
