@@ -104,7 +104,7 @@ type IndexFetchSpec_Column struct {
 	// messages.
 	Name string `protobuf:"bytes,2,opt,name=name" json:"name"`
 	// Type of the column. If this is the key column of an inverted index, this
-	// is the actual type of whan the index encodes (usually Bytes), rather than
+	// is the type of the data element (currently always EncodedKey) and not
 	// the table column type (e.g. JSON).
 	Type *types.T `protobuf:"bytes,3,opt,name=type" json:"type,omitempty"`
 	// IsNonNullable indicates that it would be a corruption error if we ever
@@ -151,7 +151,7 @@ type IndexFetchSpec_KeyColumn struct {
 	IsComposite bool `protobuf:"varint,3,opt,name=is_composite,json=isComposite" json:"is_composite"`
 	// IsInverted is true if this column is the inverted key of an inverted index.
 	// In this case, the type of this column is the type of the data element
-	// (currently always Bytes).
+	// (currently always EncodedKey).
 	IsInverted bool `protobuf:"varint,4,opt,name=is_inverted,json=isInverted" json:"is_inverted"`
 }
 
