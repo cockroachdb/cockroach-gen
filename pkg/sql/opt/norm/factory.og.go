@@ -16742,6 +16742,23 @@ func (_f *Factory) ConstructContainedBy(
 		goto SKIP_RULES
 	}
 
+	// [FoldNullComparisonLeft]
+	{
+		_null, _ := left.(*memo.NullExpr)
+		if _null != nil {
+			if _f.matchedRule == nil || _f.matchedRule(opt.FoldNullComparisonLeft) {
+				_expr := _f.ConstructNull(
+					_f.funcs.BoolType(),
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.FoldNullComparisonLeft, nil, _expr)
+				}
+				_f.constructorStackDepth--
+				return _expr
+			}
+		}
+	}
+
 	// [FoldNullComparisonRight]
 	{
 		_null, _ := right.(*memo.NullExpr)
