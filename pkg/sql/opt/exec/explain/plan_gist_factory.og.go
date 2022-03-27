@@ -355,6 +355,7 @@ func (f *PlanGistFactory) ConstructIndexJoin(
 	keyCols []exec.NodeColumnOrdinal,
 	tableCols exec.TableColumnOrdinalSet,
 	reqOrdering exec.OutputOrdering,
+	limitHint int,
 ) (exec.Node, error) {
 	f.encodeOperator(indexJoinOp)
 	f.encodeDataSource(table.ID(), table.Name())
@@ -365,6 +366,7 @@ func (f *PlanGistFactory) ConstructIndexJoin(
 		keyCols,
 		tableCols,
 		reqOrdering,
+		limitHint,
 	)
 	return node, err
 }
@@ -384,6 +386,7 @@ func (f *PlanGistFactory) ConstructLookupJoin(
 	isSecondJoinInPairedJoiner bool,
 	reqOrdering exec.OutputOrdering,
 	locking *tree.LockingItem,
+	limitHint int,
 ) (exec.Node, error) {
 	f.encodeOperator(lookupJoinOp)
 	f.encodeByte(byte(joinType))
@@ -406,6 +409,7 @@ func (f *PlanGistFactory) ConstructLookupJoin(
 		isSecondJoinInPairedJoiner,
 		reqOrdering,
 		locking,
+		limitHint,
 	)
 	return node, err
 }
