@@ -604,6 +604,7 @@ func (f *Factory) ConstructIndexJoin(
 	keyCols []exec.NodeColumnOrdinal,
 	tableCols exec.TableColumnOrdinalSet,
 	reqOrdering exec.OutputOrdering,
+	limitHint int,
 ) (exec.Node, error) {
 	inputNode := input.(*Node)
 	args := &indexJoinArgs{
@@ -612,6 +613,7 @@ func (f *Factory) ConstructIndexJoin(
 		KeyCols:     keyCols,
 		TableCols:   tableCols,
 		ReqOrdering: reqOrdering,
+		LimitHint:   limitHint,
 	}
 	_n, err := f.newNode(indexJoinOp, args, reqOrdering, inputNode)
 	if err != nil {
@@ -624,6 +626,7 @@ func (f *Factory) ConstructIndexJoin(
 		keyCols,
 		tableCols,
 		reqOrdering,
+		limitHint,
 	)
 	if err != nil {
 		return nil, err
@@ -646,6 +649,7 @@ func (f *Factory) ConstructLookupJoin(
 	isSecondJoinInPairedJoiner bool,
 	reqOrdering exec.OutputOrdering,
 	locking *tree.LockingItem,
+	limitHint int,
 ) (exec.Node, error) {
 	inputNode := input.(*Node)
 	args := &lookupJoinArgs{
@@ -662,6 +666,7 @@ func (f *Factory) ConstructLookupJoin(
 		IsSecondJoinInPairedJoiner: isSecondJoinInPairedJoiner,
 		ReqOrdering:                reqOrdering,
 		Locking:                    locking,
+		LimitHint:                  limitHint,
 	}
 	_n, err := f.newNode(lookupJoinOp, args, reqOrdering, inputNode)
 	if err != nil {
@@ -682,6 +687,7 @@ func (f *Factory) ConstructLookupJoin(
 		isSecondJoinInPairedJoiner,
 		reqOrdering,
 		locking,
+		limitHint,
 	)
 	if err != nil {
 		return nil, err
@@ -1988,6 +1994,7 @@ type indexJoinArgs struct {
 	KeyCols     []exec.NodeColumnOrdinal
 	TableCols   exec.TableColumnOrdinalSet
 	ReqOrdering exec.OutputOrdering
+	LimitHint   int
 }
 
 type lookupJoinArgs struct {
@@ -2004,6 +2011,7 @@ type lookupJoinArgs struct {
 	IsSecondJoinInPairedJoiner bool
 	ReqOrdering                exec.OutputOrdering
 	Locking                    *tree.LockingItem
+	LimitHint                  int
 }
 
 type invertedJoinArgs struct {

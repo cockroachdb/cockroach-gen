@@ -318,6 +318,7 @@ type Factory interface {
 		keyCols []NodeColumnOrdinal,
 		tableCols TableColumnOrdinalSet,
 		reqOrdering OutputOrdering,
+		limitHint int,
 	) (Node, error)
 
 	// ConstructLookupJoin creates a node for a LookupJoin operation.
@@ -354,6 +355,7 @@ type Factory interface {
 		isSecondJoinInPairedJoiner bool,
 		reqOrdering OutputOrdering,
 		locking *tree.LockingItem,
+		limitHint int,
 	) (Node, error)
 
 	// ConstructInvertedJoin creates a node for a InvertedJoin operation.
@@ -1041,6 +1043,7 @@ func (StubFactory) ConstructIndexJoin(
 	keyCols []NodeColumnOrdinal,
 	tableCols TableColumnOrdinalSet,
 	reqOrdering OutputOrdering,
+	limitHint int,
 ) (Node, error) {
 	return struct{}{}, nil
 }
@@ -1059,6 +1062,7 @@ func (StubFactory) ConstructLookupJoin(
 	isSecondJoinInPairedJoiner bool,
 	reqOrdering OutputOrdering,
 	locking *tree.LockingItem,
+	limitHint int,
 ) (Node, error) {
 	return struct{}{}, nil
 }
