@@ -300,15 +300,6 @@ type DescriptorState struct {
 	// Note, if this value is true, the targets have had their directions
 	// flipped already.
 	//
-	// TODO(ajwerner): Should we capture the error with which the job
-	// failed for a higher-fidelity restore?
-	//
-	// TODO(ajwerner): Do we need to track this state? In principle the
-	// answer seems like yes, and the reason is that if we've rolled back
-	// and have had the direction of the targets flipped, then we won't
-	// be able to know that and we might try to revert the revert, which
-	// would be confusing.
-	//
 	InRollback bool `protobuf:"varint,8,opt,name=in_rollback,json=inRollback,proto3" json:"in_rollback,omitempty"`
 	// Targets is the set of targets in the schema change belonging to this
 	// descriptor.
