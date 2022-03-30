@@ -1625,12 +1625,12 @@ CREATE [[GLOBAL | LOCAL] {TEMPORARY | TEMP}] TABLE [IF NOT EXISTS] <tablename> [
 Table elements:
    <name> <type> [<qualifiers...>]
    [UNIQUE | INVERTED] INDEX [<name>] ( <colname> [ASC | DESC] [, ...] )
-                           [USING HASH WITH BUCKET_COUNT = <shard_buckets>] [{STORING | INCLUDE | COVERING} ( <colnames...> )]
+                           [USING HASH] [{STORING | INCLUDE | COVERING} ( <colnames...> )]
    FAMILY [<name>] ( <colnames...> )
    [CONSTRAINT <name>] <constraint>
 
 Table constraints:
-   PRIMARY KEY ( <colnames...> ) [USING HASH WITH BUCKET_COUNT = <shard_buckets>]
+   PRIMARY KEY ( <colnames...> ) [USING HASH]
    FOREIGN KEY ( <colnames...> ) REFERENCES <tablename> [( <colnames...> )] [ON DELETE {NO ACTION | RESTRICT}] [ON UPDATE {NO ACTION | RESTRICT}]
    UNIQUE ( <colnames...> ) [{STORING | INCLUDE | COVERING} ( <colnames...> )]
    CHECK ( <expr> )
@@ -1743,7 +1743,7 @@ ALTER ROLE { name | ALL } [ IN DATABASE database_name ] RESET { var | ALL }
 		Text: `
 CREATE [UNIQUE | INVERTED] INDEX [CONCURRENTLY] [IF NOT EXISTS] [<idxname>]
        ON <tablename> ( <colname> [ASC | DESC] [, ...] )
-       [USING HASH WITH BUCKET_COUNT = <shard_buckets>] [STORING ( <colnames...> )]
+       [USING HASH] [STORING ( <colnames...> )]
        [PARTITION BY <partition params>]
        [WITH <storage_parameter_list] [WHERE <where_conds...>]
 
