@@ -494,7 +494,7 @@ type PartitioningDescriptor struct {
 	// This occurs if a user specifies a PARTITION BY which is not a prefix of the given index,
 	// in which case the ColumnIDs are added in front of the index and this field denotes
 	// the number of columns added as a prefix.
-	// If NumImplicitColumns is 0, there are no implicit columns defined for the index."
+	// If NumImplicitColumns is 0, there are no implicit columns defined for the index.
 	NumImplicitColumns uint32 `protobuf:"varint,4,opt,name=num_implicit_columns,json=numImplicitColumns" json:"num_implicit_columns"`
 	// Exactly one of List or Range is required to be non-empty if NumColumns is
 	// non-zero.
