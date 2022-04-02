@@ -297,6 +297,8 @@ const (
 	CommuteLeftJoin
 	CommuteSemiJoin
 	ConvertSemiToInnerJoin
+	SplitDisjunctionOfJoinTerms
+	SplitDisjunctionOfAntiJoinTerms
 	GenerateMergeJoins
 	GenerateLookupJoins
 	GenerateInvertedJoins

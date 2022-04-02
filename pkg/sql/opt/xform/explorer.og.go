@@ -556,6 +556,41 @@ func (_e *explorer) exploreInnerJoin(
 		}
 	}
 
+	// [SplitDisjunctionOfJoinTerms]
+	{
+		if _rootOrd >= _rootState.start {
+			on := _root.On
+			firstJoin, secondJoin, newRelationCols, aggCols, groupingCols, ok := _e.funcs.SplitJoinWithEquijoinDisjuncts(_root, on)
+			if ok {
+				if _e.o.matchedRule == nil || _e.o.matchedRule(opt.SplitDisjunctionOfJoinTerms) {
+					firstJoinCols := _e.funcs.OutputCols(firstJoin)
+					secondJoinCols := _e.funcs.OutputCols(secondJoin)
+					_expr := &memo.ProjectExpr{
+						Input: _e.f.ConstructDistinctOn(
+							_e.f.ConstructUnionAll(
+								firstJoin,
+								secondJoin,
+								_e.funcs.MakeSetPrivate(firstJoinCols, secondJoinCols, newRelationCols),
+							),
+							_e.funcs.MakeAggCols(opt.ConstAggOp, aggCols),
+							_e.funcs.MakeGrouping(groupingCols, _e.funcs.EmptyOrdering()),
+						),
+						Projections: memo.EmptyProjectionsExpr,
+						Passthrough: _e.funcs.OutputCols(_root),
+					}
+					_interned := _e.mem.AddProjectToGroup(_expr, _root)
+					if _e.o.appliedRule != nil {
+						if _interned != _expr {
+							_e.o.appliedRule(opt.SplitDisjunctionOfJoinTerms, _root, nil)
+						} else {
+							_e.o.appliedRule(opt.SplitDisjunctionOfJoinTerms, _root, _interned)
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [GenerateMergeJoins]
 	{
 		if _rootOrd >= _rootState.start {
@@ -1665,6 +1700,41 @@ func (_e *explorer) exploreSemiJoin(
 		}
 	}
 
+	// [SplitDisjunctionOfJoinTerms]
+	{
+		if _rootOrd >= _rootState.start {
+			on := _root.On
+			firstJoin, secondJoin, newRelationCols, aggCols, groupingCols, ok := _e.funcs.SplitJoinWithEquijoinDisjuncts(_root, on)
+			if ok {
+				if _e.o.matchedRule == nil || _e.o.matchedRule(opt.SplitDisjunctionOfJoinTerms) {
+					firstJoinCols := _e.funcs.OutputCols(firstJoin)
+					secondJoinCols := _e.funcs.OutputCols(secondJoin)
+					_expr := &memo.ProjectExpr{
+						Input: _e.f.ConstructDistinctOn(
+							_e.f.ConstructUnionAll(
+								firstJoin,
+								secondJoin,
+								_e.funcs.MakeSetPrivate(firstJoinCols, secondJoinCols, newRelationCols),
+							),
+							_e.funcs.MakeAggCols(opt.ConstAggOp, aggCols),
+							_e.funcs.MakeGrouping(groupingCols, _e.funcs.EmptyOrdering()),
+						),
+						Projections: memo.EmptyProjectionsExpr,
+						Passthrough: _e.funcs.OutputCols(_root),
+					}
+					_interned := _e.mem.AddProjectToGroup(_expr, _root)
+					if _e.o.appliedRule != nil {
+						if _interned != _expr {
+							_e.o.appliedRule(opt.SplitDisjunctionOfJoinTerms, _root, nil)
+						} else {
+							_e.o.appliedRule(opt.SplitDisjunctionOfJoinTerms, _root, _interned)
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [GenerateMergeJoins]
 	{
 		if _rootOrd >= _rootState.start {
@@ -2042,6 +2112,41 @@ func (_e *explorer) exploreAntiJoin(
 					_e.funcs.ReorderJoins(_root)
 					if _e.o.appliedRule != nil {
 						_e.o.appliedRule(opt.ReorderJoins, _root, _last.NextExpr())
+					}
+				}
+			}
+		}
+	}
+
+	// [SplitDisjunctionOfAntiJoinTerms]
+	{
+		if _rootOrd >= _rootState.start {
+			on := _root.On
+			firstJoin, secondJoin, newRelationCols, aggCols, groupingCols, ok := _e.funcs.SplitJoinWithEquijoinDisjuncts(_root, on)
+			if ok {
+				if _e.o.matchedRule == nil || _e.o.matchedRule(opt.SplitDisjunctionOfAntiJoinTerms) {
+					firstJoinCols := _e.funcs.OutputCols(firstJoin)
+					secondJoinCols := _e.funcs.OutputCols(secondJoin)
+					_expr := &memo.ProjectExpr{
+						Input: _e.f.ConstructDistinctOn(
+							_e.f.ConstructIntersectAll(
+								firstJoin,
+								secondJoin,
+								_e.funcs.MakeSetPrivate(firstJoinCols, secondJoinCols, newRelationCols),
+							),
+							_e.funcs.MakeAggCols(opt.ConstAggOp, aggCols),
+							_e.funcs.MakeGrouping(groupingCols, _e.funcs.EmptyOrdering()),
+						),
+						Projections: memo.EmptyProjectionsExpr,
+						Passthrough: _e.funcs.OutputCols(_root),
+					}
+					_interned := _e.mem.AddProjectToGroup(_expr, _root)
+					if _e.o.appliedRule != nil {
+						if _interned != _expr {
+							_e.o.appliedRule(opt.SplitDisjunctionOfAntiJoinTerms, _root, nil)
+						} else {
+							_e.o.appliedRule(opt.SplitDisjunctionOfAntiJoinTerms, _root, _interned)
+						}
 					}
 				}
 			}
