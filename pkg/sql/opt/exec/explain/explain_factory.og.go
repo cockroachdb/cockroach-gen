@@ -609,7 +609,7 @@ func (f *Factory) ConstructIndexJoin(
 	keyCols []exec.NodeColumnOrdinal,
 	tableCols exec.TableColumnOrdinalSet,
 	reqOrdering exec.OutputOrdering,
-	limitHint int,
+	limitHint int64,
 ) (exec.Node, error) {
 	inputNode := input.(*Node)
 	args := &indexJoinArgs{
@@ -655,7 +655,7 @@ func (f *Factory) ConstructLookupJoin(
 	isSecondJoinInPairedJoiner bool,
 	reqOrdering exec.OutputOrdering,
 	locking *tree.LockingItem,
-	limitHint int,
+	limitHint int64,
 ) (exec.Node, error) {
 	inputNode := input.(*Node)
 	args := &lookupJoinArgs{
@@ -2068,7 +2068,7 @@ type indexJoinArgs struct {
 	KeyCols     []exec.NodeColumnOrdinal
 	TableCols   exec.TableColumnOrdinalSet
 	ReqOrdering exec.OutputOrdering
-	LimitHint   int
+	LimitHint   int64
 }
 
 type lookupJoinArgs struct {
@@ -2086,7 +2086,7 @@ type lookupJoinArgs struct {
 	IsSecondJoinInPairedJoiner bool
 	ReqOrdering                exec.OutputOrdering
 	Locking                    *tree.LockingItem
-	LimitHint                  int
+	LimitHint                  int64
 }
 
 type invertedJoinArgs struct {
