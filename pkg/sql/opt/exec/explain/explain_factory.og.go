@@ -654,7 +654,7 @@ func (f *Factory) ConstructLookupJoin(
 	isFirstJoinInPairedJoiner bool,
 	isSecondJoinInPairedJoiner bool,
 	reqOrdering exec.OutputOrdering,
-	locking *tree.LockingItem,
+	locking opt.Locking,
 	limitHint int64,
 ) (exec.Node, error) {
 	inputNode := input.(*Node)
@@ -2085,7 +2085,7 @@ type lookupJoinArgs struct {
 	IsFirstJoinInPairedJoiner  bool
 	IsSecondJoinInPairedJoiner bool
 	ReqOrdering                exec.OutputOrdering
-	Locking                    *tree.LockingItem
+	Locking                    opt.Locking
 	LimitHint                  int64
 }
 

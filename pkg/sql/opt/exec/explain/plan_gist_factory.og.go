@@ -385,7 +385,7 @@ func (f *PlanGistFactory) ConstructLookupJoin(
 	isFirstJoinInPairedJoiner bool,
 	isSecondJoinInPairedJoiner bool,
 	reqOrdering exec.OutputOrdering,
-	locking *tree.LockingItem,
+	locking opt.Locking,
 	limitHint int64,
 ) (exec.Node, error) {
 	f.encodeOperator(lookupJoinOp)

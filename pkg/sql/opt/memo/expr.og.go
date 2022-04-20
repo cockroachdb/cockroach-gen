@@ -1571,9 +1571,14 @@ type ScanPrivate struct {
 	// leave this unset (Strength = ForNone), which indicates that no row-level
 	// locking will be performed while scanning the table. Stronger locking modes
 	// are used by SELECT .. FOR [KEY] UPDATE/SHARE statements and by the initial
-	// row retrieval of DELETE and UPDATE statements. The locking item's Targets
-	// list will always be empty when part of a ScanPrivate.
-	Locking *tree.LockingItem
+	// row retrieval of DELETE and UPDATE statements.
+	//
+	// The row-level locking mode also dictates the policy used by the Scan when
+	// handling conflicting locks held by other active transactions. Most scans
+	// leave the policy set to its default (WaitPolicy = Block), but different
+	// wait policies are used by SELECT .. FOR UPDATE/SHARE SKIP LOCKED/NOWAIT
+	// statements to react differently to conflicting locks.
+	Locking opt.Locking
 
 	// LocalityOptimized is true if this scan is a child of a
 	// LocalityOptimizedSearch operator, indicating that it either contains all
@@ -25500,7 +25505,7 @@ func (in *interner) InternScan(val *ScanExpr) *ScanExpr {
 	in.hasher.HashInvertedSpans(val.InvertedConstraint)
 	in.hasher.HashScanLimit(val.HardLimit)
 	in.hasher.HashScanFlags(val.Flags)
-	in.hasher.HashLockingItem(val.Locking)
+	in.hasher.HashLocking(val.Locking)
 	in.hasher.HashBool(val.LocalityOptimized)
 	in.hasher.HashBool(val.PartitionConstrainedScan)
 	in.hasher.HashInt(val.ExactPrefix)
@@ -25515,7 +25520,7 @@ func (in *interner) InternScan(val *ScanExpr) *ScanExpr {
 				in.hasher.IsInvertedSpansEqual(val.InvertedConstraint, existing.InvertedConstraint) &&
 				in.hasher.IsScanLimitEqual(val.HardLimit, existing.HardLimit) &&
 				in.hasher.IsScanFlagsEqual(val.Flags, existing.Flags) &&
-				in.hasher.IsLockingItemEqual(val.Locking, existing.Locking) &&
+				in.hasher.IsLockingEqual(val.Locking, existing.Locking) &&
 				in.hasher.IsBoolEqual(val.LocalityOptimized, existing.LocalityOptimized) &&
 				in.hasher.IsBoolEqual(val.PartitionConstrainedScan, existing.PartitionConstrainedScan) &&
 				in.hasher.IsIntEqual(val.ExactPrefix, existing.ExactPrefix) {
@@ -25539,7 +25544,7 @@ func (in *interner) InternPlaceholderScan(val *PlaceholderScanExpr) *Placeholder
 	in.hasher.HashInvertedSpans(val.InvertedConstraint)
 	in.hasher.HashScanLimit(val.HardLimit)
 	in.hasher.HashScanFlags(val.Flags)
-	in.hasher.HashLockingItem(val.Locking)
+	in.hasher.HashLocking(val.Locking)
 	in.hasher.HashBool(val.LocalityOptimized)
 	in.hasher.HashBool(val.PartitionConstrainedScan)
 	in.hasher.HashInt(val.ExactPrefix)
@@ -25555,7 +25560,7 @@ func (in *interner) InternPlaceholderScan(val *PlaceholderScanExpr) *Placeholder
 				in.hasher.IsInvertedSpansEqual(val.InvertedConstraint, existing.InvertedConstraint) &&
 				in.hasher.IsScanLimitEqual(val.HardLimit, existing.HardLimit) &&
 				in.hasher.IsScanFlagsEqual(val.Flags, existing.Flags) &&
-				in.hasher.IsLockingItemEqual(val.Locking, existing.Locking) &&
+				in.hasher.IsLockingEqual(val.Locking, existing.Locking) &&
 				in.hasher.IsBoolEqual(val.LocalityOptimized, existing.LocalityOptimized) &&
 				in.hasher.IsBoolEqual(val.PartitionConstrainedScan, existing.PartitionConstrainedScan) &&
 				in.hasher.IsIntEqual(val.ExactPrefix, existing.ExactPrefix) {

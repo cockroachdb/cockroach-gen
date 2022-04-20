@@ -372,7 +372,7 @@ type Factory interface {
 		isFirstJoinInPairedJoiner bool,
 		isSecondJoinInPairedJoiner bool,
 		reqOrdering OutputOrdering,
-		locking *tree.LockingItem,
+		locking opt.Locking,
 		limitHint int64,
 	) (Node, error)
 
@@ -1100,7 +1100,7 @@ func (StubFactory) ConstructLookupJoin(
 	isFirstJoinInPairedJoiner bool,
 	isSecondJoinInPairedJoiner bool,
 	reqOrdering OutputOrdering,
-	locking *tree.LockingItem,
+	locking opt.Locking,
 	limitHint int64,
 ) (Node, error) {
 	return struct{}{}, nil
