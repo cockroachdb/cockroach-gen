@@ -27,6 +27,7 @@ import (
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 	"github.com/cockroachdb/cockroach/pkg/sql/sessiondata"
 	"github.com/cockroachdb/cockroach/pkg/sql/sqlutil"
+	"github.com/cockroachdb/cockroach/pkg/util/hlc"
 	"github.com/cockroachdb/cockroach/pkg/util/log"
 	"github.com/cockroachdb/cockroach/pkg/util/protoutil"
 	"github.com/cockroachdb/errors"
@@ -53,6 +54,7 @@ type KVAccessor struct {
 	// opening a fresh txn.
 	optionalTxn *kv.Txn
 	settings    *cluster.Settings
+	clock       *hlc.Clock
 
 	// configurationsTableFQN is typically 'system.public.span_configurations',
 	// but left configurable for ease-of-testing.
@@ -68,6 +70,7 @@ func New(
 	db *kv.DB,
 	ie sqlutil.InternalExecutor,
 	settings *cluster.Settings,
+	clock *hlc.Clock,
 	configurationsTableFQN string,
 	knobs *spanconfig.TestingKnobs,
 ) *KVAccessor {
@@ -75,7 +78,7 @@ func New(
 		panic(fmt.Sprintf("unabled to parse configurations table FQN: %s", configurationsTableFQN))
 	}
 
-	return newKVAccessor(db, ie, settings, configurationsTableFQN, knobs, nil /* optionalTxn */)
+	return newKVAccessor(db, ie, settings, clock, configurationsTableFQN, knobs, nil /* optionalTxn */)
 }
 
 // WithTxn is part of the KVAccessor interface.
@@ -83,7 +86,7 @@ func (k *KVAccessor) WithTxn(ctx context.Context, txn *kv.Txn) spanconfig.KVAcce
 	if k.optionalTxn != nil {
 		log.Fatalf(ctx, "KVAccessor already scoped to txn (was .WithTxn(...) chained multiple times?)")
 	}
-	return newKVAccessor(k.db, k.ie, k.settings, k.configurationsTableFQN, k.knobs, txn)
+	return newKVAccessor(k.db, k.ie, k.settings, k.clock, k.configurationsTableFQN, k.knobs, txn)
 }
 
 // GetAllSystemSpanConfigsThatApply is part of the spanconfig.KVAccessor
@@ -153,14 +156,27 @@ func (k *KVAccessor) GetSpanConfigRecords(
 
 // UpdateSpanConfigRecords is part of the KVAccessor interface.
 func (k *KVAccessor) UpdateSpanConfigRecords(
-	ctx context.Context, toDelete []spanconfig.Target, toUpsert []spanconfig.Record,
+	ctx context.Context,
+	toDelete []spanconfig.Target,
+	toUpsert []spanconfig.Record,
+	minCommitTS, maxCommitTS hlc.Timestamp,
 ) error {
 	if k.optionalTxn != nil {
-		return k.updateSpanConfigRecordsWithTxn(ctx, toDelete, toUpsert, k.optionalTxn)
+		return k.updateSpanConfigRecordsWithTxn(ctx, toDelete, toUpsert, k.optionalTxn, minCommitTS, maxCommitTS)
 	}
 
+	if fn := k.knobs.KVAccessorPreCommitMinTSWaitInterceptor; fn != nil {
+		fn()
+	}
+	if err := k.clock.SleepUntil(ctx, minCommitTS); err != nil {
+		return errors.Wrapf(err, "waiting for clock to be in advance of minimum commit timestamp (%s)",
+			minCommitTS)
+	}
+	// Given that our clock reading is past the supplied minCommitTS now,
+	// we can go ahead and create a transaction and proceed to perform the
+	// update.
 	return k.db.Txn(ctx, func(ctx context.Context, txn *kv.Txn) error {
-		return k.updateSpanConfigRecordsWithTxn(ctx, toDelete, toUpsert, txn)
+		return k.updateSpanConfigRecordsWithTxn(ctx, toDelete, toUpsert, txn, minCommitTS, maxCommitTS)
 	})
 }
 
@@ -168,6 +184,7 @@ func newKVAccessor(
 	db *kv.DB,
 	ie sqlutil.InternalExecutor,
 	settings *cluster.Settings,
+	clock *hlc.Clock,
 	configurationsTableFQN string,
 	knobs *spanconfig.TestingKnobs,
 	optionalTxn *kv.Txn,
@@ -175,9 +192,11 @@ func newKVAccessor(
 	if knobs == nil {
 		knobs = &spanconfig.TestingKnobs{}
 	}
+
 	return &KVAccessor{
 		db:                     db,
 		ie:                     ie,
+		clock:                  clock,
 		optionalTxn:            optionalTxn,
 		settings:               settings,
 		configurationsTableFQN: configurationsTableFQN,
@@ -246,10 +265,39 @@ func (k *KVAccessor) getSpanConfigRecordsWithTxn(
 }
 
 func (k *KVAccessor) updateSpanConfigRecordsWithTxn(
-	ctx context.Context, toDelete []spanconfig.Target, toUpsert []spanconfig.Record, txn *kv.Txn,
+	ctx context.Context,
+	toDelete []spanconfig.Target,
+	toUpsert []spanconfig.Record,
+	txn *kv.Txn,
+	minCommitTS, maxCommitTS hlc.Timestamp,
 ) error {
 	if txn == nil {
 		log.Fatalf(ctx, "expected non-nil txn")
+	}
+
+	if !minCommitTS.Less(maxCommitTS) {
+		return errors.AssertionFailedf("invalid commit interval [%s, %s)", minCommitTS, maxCommitTS)
+	}
+
+	if txn.ReadTimestamp().Less(minCommitTS) {
+		return errors.AssertionFailedf(
+			"transaction's read timestamp (%s) below the minimum commit timestamp (%s)",
+			txn.ReadTimestamp(), minCommitTS,
+		)
+	}
+
+	if maxCommitTS.Less(txn.ReadTimestamp()) {
+		return spanconfig.NewCommitTimestampOutOfBoundsError()
+	}
+
+	// Set the deadline of the transaction so that it commits before the maximum
+	// commit timestamp.
+	if err := txn.UpdateDeadline(ctx, maxCommitTS); err != nil {
+		return errors.Wrapf(err, "transaction deadline could not be updated")
+	}
+
+	if fn := k.knobs.KVAccessorPostCommitDeadlineSetInterceptor; fn != nil {
+		fn(txn)
 	}
 
 	if err := validateUpdateArgs(toDelete, toUpsert); err != nil {

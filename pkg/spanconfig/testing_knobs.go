@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/cockroachdb/cockroach/pkg/base"
+	"github.com/cockroachdb/cockroach/pkg/kv"
 	"github.com/cockroachdb/cockroach/pkg/util/hlc"
 )
 
@@ -64,6 +65,15 @@ type TestingKnobs struct {
 	// KVAccessorBatchSizeOverride overrides the batch size KVAccessor makes use
 	// of internally.
 	KVAccessorBatchSizeOverrideFn func() int
+
+	// KVAccessorPreCommitMinTSWaitInterceptor, if set, is invoked before
+	// UpdateSpanConfigRecords waits for present time to be in advance of the
+	// minimum commit timestamp.
+	KVAccessorPreCommitMinTSWaitInterceptor func()
+
+	// KVAccessorPostCommitDeadlineSetInterceptor is invoked after we set the
+	// commit deadline.
+	KVAccessorPostCommitDeadlineSetInterceptor func(*kv.Txn)
 
 	// SQLWatcherOnEventInterceptor, if set, is invoked when the SQLWatcher
 	// receives an event on one of its rangefeeds.

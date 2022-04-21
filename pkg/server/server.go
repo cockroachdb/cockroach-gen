@@ -569,7 +569,7 @@ func NewServer(cfg Config, stopper *stop.Stopper) (*Server, error) {
 		}
 
 		scKVAccessor := spanconfigkvaccessor.New(
-			db, internalExecutor, cfg.Settings,
+			db, internalExecutor, cfg.Settings, clock,
 			systemschema.SpanConfigurationsTableName.FQString(),
 			spanConfigKnobs,
 		)
@@ -976,6 +976,7 @@ func (s *Server) PreStart(ctx context.Context) error {
 	// objects hereafter.
 	fileTableInternalExecutor := sql.MakeInternalExecutor(ctx, s.PGServer().SQLServer, sql.MemoryMetrics{}, s.st)
 	s.externalStorageBuilder.init(
+		ctx,
 		s.cfg.ExternalIODirConfig,
 		s.st,
 		s.nodeIDContainer,
