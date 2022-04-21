@@ -1096,6 +1096,40 @@ func (_f *Factory) ConstructSelect(
 		}
 	}
 
+	// [SimplifyIsNullCondition]
+	{
+		for i := range filters {
+			item := &filters[i]
+			_is, _ := item.Condition.(*memo.IsExpr)
+			if _is != nil {
+				_variable, _ := _is.Left.(*memo.VariableExpr)
+				if _variable != nil {
+					col := _variable.Col
+					if _f.funcs.IsColNotNull(col, input) {
+						_null, _ := _is.Right.(*memo.NullExpr)
+						if _null != nil {
+							if _f.matchedRule == nil || _f.matchedRule(opt.SimplifyIsNullCondition) {
+								_expr := _f.ConstructSelect(
+									input,
+									memo.FiltersExpr{
+										_f.ConstructFiltersItem(
+											_f.ConstructFalse(),
+										),
+									},
+								)
+								if _f.appliedRule != nil {
+									_f.appliedRule(opt.SimplifyIsNullCondition, nil, _expr)
+								}
+								_f.constructorStackDepth--
+								return _expr
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// [PushSelectIntoProjectSet]
 	{
 		_projectSet, _ := input.(*memo.ProjectSetExpr)

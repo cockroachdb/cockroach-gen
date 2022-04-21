@@ -258,6 +258,7 @@ const (
 	PushSelectIntoJoinLeft
 	PushSelectIntoGroupBy
 	RemoveNotNullCondition
+	SimplifyIsNullCondition
 	PushSelectIntoProjectSet
 	PushFilterIntoSetOp
 	EliminateSetLeft
