@@ -7079,7 +7079,10 @@ type Header struct {
 	// client_range_info represents the kvclient's knowledge about the state of
 	// the range (i.e. of the range descriptor and lease). The kvserver checks
 	// whether the client's info is up to date and, if it isn't, it will return a
-	// RangeInfo with up-to-date information.
+	// RangeInfo with up-to-date information. Typically this entire field is set
+	// by the client's DistSender, however it will preserve the value of the field
+	// `ExplicitlyRequested` so that requests passed to DistSender can request
+	// `RangeInfos` if desired.
 	ClientRangeInfo ClientRangeInfo `protobuf:"bytes,17,opt,name=client_range_info,json=clientRangeInfo,proto3" json:"client_range_info"`
 	// gateway_node_id is the ID of the gateway node where the request originated.
 	// For requests from tenants, this is set to the NodeID of the KV node handling
