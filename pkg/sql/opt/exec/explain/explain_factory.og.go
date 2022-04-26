@@ -609,6 +609,7 @@ func (f *Factory) ConstructIndexJoin(
 	keyCols []exec.NodeColumnOrdinal,
 	tableCols exec.TableColumnOrdinalSet,
 	reqOrdering exec.OutputOrdering,
+	locking opt.Locking,
 	limitHint int64,
 ) (exec.Node, error) {
 	inputNode := input.(*Node)
@@ -618,6 +619,7 @@ func (f *Factory) ConstructIndexJoin(
 		KeyCols:     keyCols,
 		TableCols:   tableCols,
 		ReqOrdering: reqOrdering,
+		Locking:     locking,
 		LimitHint:   limitHint,
 	}
 	_n, err := newNode(indexJoinOp, args, reqOrdering, inputNode)
@@ -631,6 +633,7 @@ func (f *Factory) ConstructIndexJoin(
 		keyCols,
 		tableCols,
 		reqOrdering,
+		locking,
 		limitHint,
 	)
 	if err != nil {
@@ -715,6 +718,7 @@ func (f *Factory) ConstructInvertedJoin(
 	onCond tree.TypedExpr,
 	isFirstJoinInPairedJoiner bool,
 	reqOrdering exec.OutputOrdering,
+	locking opt.Locking,
 ) (exec.Node, error) {
 	inputNode := input.(*Node)
 	args := &invertedJoinArgs{
@@ -728,6 +732,7 @@ func (f *Factory) ConstructInvertedJoin(
 		OnCond:                    onCond,
 		IsFirstJoinInPairedJoiner: isFirstJoinInPairedJoiner,
 		ReqOrdering:               reqOrdering,
+		Locking:                   locking,
 	}
 	_n, err := newNode(invertedJoinOp, args, reqOrdering, inputNode)
 	if err != nil {
@@ -745,6 +750,7 @@ func (f *Factory) ConstructInvertedJoin(
 		onCond,
 		isFirstJoinInPairedJoiner,
 		reqOrdering,
+		locking,
 	)
 	if err != nil {
 		return nil, err
@@ -765,6 +771,8 @@ func (f *Factory) ConstructZigzagJoin(
 	// leftEqCols are the left table columns that have equality constraints,
 	// corresponding 1-1 to RightEqCols.
 	leftEqCols []exec.TableColumnOrdinal,
+	// Left row-level locking properties.
+	leftLocking opt.Locking,
 	// Right table and index.
 	rightTable cat.Table,
 	rightIndex cat.Index,
@@ -776,6 +784,8 @@ func (f *Factory) ConstructZigzagJoin(
 	// rightEqCols are the right table columns that have equality constraints,
 	// corresponding 1-1 to LeftEqCols.
 	rightEqCols []exec.TableColumnOrdinal,
+	// Right row-level locking properties.
+	rightLocking opt.Locking,
 	// onCond is an extra filter that is evaluated on the results.
 	// TODO(radu): remove this (it can be a separate Select).
 	onCond tree.TypedExpr,
@@ -787,11 +797,13 @@ func (f *Factory) ConstructZigzagJoin(
 		LeftCols:       leftCols,
 		LeftFixedVals:  leftFixedVals,
 		LeftEqCols:     leftEqCols,
+		LeftLocking:    leftLocking,
 		RightTable:     rightTable,
 		RightIndex:     rightIndex,
 		RightCols:      rightCols,
 		RightFixedVals: rightFixedVals,
 		RightEqCols:    rightEqCols,
+		RightLocking:   rightLocking,
 		OnCond:         onCond,
 		ReqOrdering:    reqOrdering,
 	}
@@ -806,11 +818,13 @@ func (f *Factory) ConstructZigzagJoin(
 		leftCols,
 		leftFixedVals,
 		leftEqCols,
+		leftLocking,
 		rightTable,
 		rightIndex,
 		rightCols,
 		rightFixedVals,
 		rightEqCols,
+		rightLocking,
 		onCond,
 		reqOrdering,
 	)
@@ -2068,6 +2082,7 @@ type indexJoinArgs struct {
 	KeyCols     []exec.NodeColumnOrdinal
 	TableCols   exec.TableColumnOrdinalSet
 	ReqOrdering exec.OutputOrdering
+	Locking     opt.Locking
 	LimitHint   int64
 }
 
@@ -2100,6 +2115,7 @@ type invertedJoinArgs struct {
 	OnCond                    tree.TypedExpr
 	IsFirstJoinInPairedJoiner bool
 	ReqOrdering               exec.OutputOrdering
+	Locking                   opt.Locking
 }
 
 type zigzagJoinArgs struct {
@@ -2108,11 +2124,13 @@ type zigzagJoinArgs struct {
 	LeftCols       exec.TableColumnOrdinalSet
 	LeftFixedVals  []tree.TypedExpr
 	LeftEqCols     []exec.TableColumnOrdinal
+	LeftLocking    opt.Locking
 	RightTable     cat.Table
 	RightIndex     cat.Index
 	RightCols      exec.TableColumnOrdinalSet
 	RightFixedVals []tree.TypedExpr
 	RightEqCols    []exec.TableColumnOrdinal
+	RightLocking   opt.Locking
 	OnCond         tree.TypedExpr
 	ReqOrdering    exec.OutputOrdering
 }

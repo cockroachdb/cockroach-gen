@@ -355,6 +355,7 @@ func (f *PlanGistFactory) ConstructIndexJoin(
 	keyCols []exec.NodeColumnOrdinal,
 	tableCols exec.TableColumnOrdinalSet,
 	reqOrdering exec.OutputOrdering,
+	locking opt.Locking,
 	limitHint int64,
 ) (exec.Node, error) {
 	f.encodeOperator(indexJoinOp)
@@ -366,6 +367,7 @@ func (f *PlanGistFactory) ConstructIndexJoin(
 		keyCols,
 		tableCols,
 		reqOrdering,
+		locking,
 		limitHint,
 	)
 	return node, err
@@ -425,6 +427,7 @@ func (f *PlanGistFactory) ConstructInvertedJoin(
 	onCond tree.TypedExpr,
 	isFirstJoinInPairedJoiner bool,
 	reqOrdering exec.OutputOrdering,
+	locking opt.Locking,
 ) (exec.Node, error) {
 	f.encodeOperator(invertedJoinOp)
 	f.encodeByte(byte(joinType))
@@ -442,6 +445,7 @@ func (f *PlanGistFactory) ConstructInvertedJoin(
 		onCond,
 		isFirstJoinInPairedJoiner,
 		reqOrdering,
+		locking,
 	)
 	return node, err
 }
@@ -458,6 +462,8 @@ func (f *PlanGistFactory) ConstructZigzagJoin(
 	// leftEqCols are the left table columns that have equality constraints,
 	// corresponding 1-1 to RightEqCols.
 	leftEqCols []exec.TableColumnOrdinal,
+	// Left row-level locking properties.
+	leftLocking opt.Locking,
 	// Right table and index.
 	rightTable cat.Table,
 	rightIndex cat.Index,
@@ -469,6 +475,8 @@ func (f *PlanGistFactory) ConstructZigzagJoin(
 	// rightEqCols are the right table columns that have equality constraints,
 	// corresponding 1-1 to LeftEqCols.
 	rightEqCols []exec.TableColumnOrdinal,
+	// Right row-level locking properties.
+	rightLocking opt.Locking,
 	// onCond is an extra filter that is evaluated on the results.
 	// TODO(radu): remove this (it can be a separate Select).
 	onCond tree.TypedExpr,
@@ -485,11 +493,13 @@ func (f *PlanGistFactory) ConstructZigzagJoin(
 		leftCols,
 		leftFixedVals,
 		leftEqCols,
+		leftLocking,
 		rightTable,
 		rightIndex,
 		rightCols,
 		rightFixedVals,
 		rightEqCols,
+		rightLocking,
 		onCond,
 		reqOrdering,
 	)

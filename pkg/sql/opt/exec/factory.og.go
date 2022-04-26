@@ -335,6 +335,7 @@ type Factory interface {
 		keyCols []NodeColumnOrdinal,
 		tableCols TableColumnOrdinalSet,
 		reqOrdering OutputOrdering,
+		locking opt.Locking,
 		limitHint int64,
 	) (Node, error)
 
@@ -400,6 +401,7 @@ type Factory interface {
 		onCond tree.TypedExpr,
 		isFirstJoinInPairedJoiner bool,
 		reqOrdering OutputOrdering,
+		locking opt.Locking,
 	) (Node, error)
 
 	// ConstructZigzagJoin creates a node for a ZigzagJoin operation.
@@ -422,6 +424,8 @@ type Factory interface {
 		// leftEqCols are the left table columns that have equality constraints,
 		// corresponding 1-1 to RightEqCols.
 		leftEqCols []TableColumnOrdinal,
+		// Left row-level locking properties.
+		leftLocking opt.Locking,
 		// Right table and index.
 		rightTable cat.Table,
 		rightIndex cat.Index,
@@ -433,6 +437,8 @@ type Factory interface {
 		// rightEqCols are the right table columns that have equality constraints,
 		// corresponding 1-1 to LeftEqCols.
 		rightEqCols []TableColumnOrdinal,
+		// Right row-level locking properties.
+		rightLocking opt.Locking,
 		// onCond is an extra filter that is evaluated on the results.
 		// TODO(radu): remove this (it can be a separate Select).
 		onCond tree.TypedExpr,
@@ -1081,6 +1087,7 @@ func (StubFactory) ConstructIndexJoin(
 	keyCols []NodeColumnOrdinal,
 	tableCols TableColumnOrdinalSet,
 	reqOrdering OutputOrdering,
+	locking opt.Locking,
 	limitHint int64,
 ) (Node, error) {
 	return struct{}{}, nil
@@ -1117,6 +1124,7 @@ func (StubFactory) ConstructInvertedJoin(
 	onCond tree.TypedExpr,
 	isFirstJoinInPairedJoiner bool,
 	reqOrdering OutputOrdering,
+	locking opt.Locking,
 ) (Node, error) {
 	return struct{}{}, nil
 }
@@ -1127,11 +1135,13 @@ func (StubFactory) ConstructZigzagJoin(
 	leftCols TableColumnOrdinalSet,
 	leftFixedVals []tree.TypedExpr,
 	leftEqCols []TableColumnOrdinal,
+	leftLocking opt.Locking,
 	rightTable cat.Table,
 	rightIndex cat.Index,
 	rightCols TableColumnOrdinalSet,
 	rightFixedVals []tree.TypedExpr,
 	rightEqCols []TableColumnOrdinal,
+	rightLocking opt.Locking,
 	onCond tree.TypedExpr,
 	reqOrdering OutputOrdering,
 ) (Node, error) {

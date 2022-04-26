@@ -3363,6 +3363,20 @@ type IndexJoinPrivate struct {
 	// Cols specifies the set of columns that the index join operator projects.
 	// This may be a subset of the columns that the table contains.
 	Cols opt.ColSet
+
+	// Locking represents the row-level locking mode of the IndexJoin in the
+	// lookup table's primary index. Most index joins leave this unset (Strength
+	// = ForNone), which indicates that no row-level locking will be performed
+	// while joining with the table's index. Stronger locking modes are used by
+	// SELECT .. FOR [KEY] UPDATE/SHARE statements and by the initial row
+	// retrieval of DELETE and UPDATE statements.
+	//
+	// The row-level locking mode also dictates the policy used by the IndexJoin
+	// when handling conflicting locks held by other active transactions. Most
+	// index joins leave the policy set to its default (WaitPolicy = Block), but
+	// different wait policies are used by SELECT .. FOR UPDATE/SHARE SKIP
+	// LOCKED/NOWAIT statements to react differently to conflicting locks.
+	Locking opt.Locking
 }
 
 // LookupJoinExpr represents a join between an input expression and an index. The
@@ -3605,6 +3619,20 @@ type LookupJoinPrivate struct {
 	// conditions on the KeyCols. These filters are needed by the statistics code to
 	// correctly estimate selectivity.
 	ConstFilters FiltersExpr
+
+	// Locking represents the row-level locking mode of the LookupJoin in the
+	// lookup table. Most lookup joins leave this unset (Strength = ForNone),
+	// which indicates that no row-level locking will be performed while joining
+	// with the table. Stronger locking modes are used by SELECT .. FOR [KEY]
+	// UPDATE/SHARE statements and by the initial row retrieval of DELETE and
+	// UPDATE statements.
+	//
+	// The row-level locking mode also dictates the policy used by the LookupJoin
+	// when handling conflicting locks held by other active transactions. Most
+	// lookup joins leave the policy set to its default (WaitPolicy = Block), but
+	// different wait policies are used by SELECT .. FOR UPDATE/SHARE SKIP
+	// LOCKED/NOWAIT statements to react differently to conflicting locks.
+	Locking opt.Locking
 	JoinPrivate
 }
 
@@ -3783,6 +3811,21 @@ type InvertedJoinPrivate struct {
 	// equality conditions on the PrefixKeyCols. These filters are needed by the
 	// statistics code to correctly estimate selectivity.
 	ConstFilters FiltersExpr
+
+	// Locking represents the row-level locking mode of the InvertedJoin in the
+	// lookup table. Most inverted joins leave this unset (Strength = ForNone),
+	// which indicates that no row-level locking will be performed while joining
+	// with the table. Stronger locking modes are used by SELECT .. FOR [KEY]
+	// UPDATE/SHARE statements and by the initial row retrieval of DELETE and
+	// UPDATE statements.
+	//
+	// The row-level locking mode also dictates the policy used by the
+	// InvertedJoin when handling conflicting locks held by other active
+	// transactions. Most inverted joins leave the policy set to its default
+	// (WaitPolicy = Block), but different wait policies are used by SELECT ..
+	// FOR UPDATE/SHARE SKIP LOCKED/NOWAIT statements to react differently to
+	// conflicting locks.
+	Locking opt.Locking
 	JoinPrivate
 }
 
@@ -4112,6 +4155,22 @@ type ZigzagJoinPrivate struct {
 	FixedVals      ScalarListExpr
 	LeftFixedCols  opt.ColList
 	RightFixedCols opt.ColList
+
+	// LeftLocking and RightLocking represent the row-level locking modes of the
+	// scans over the ZigzagJoin's two tables. Most zigzag joins leave these
+	// unset (Strength = ForNone), which indicates that no row-level locking will
+	// be performed while joining the two tables. Stronger locking modes are used
+	// by SELECT .. FOR [KEY] UPDATE/SHARE statements and by the initial row
+	// retrieval of DELETE and UPDATE statements.
+	//
+	// The row-level locking modes also dictates the policy used by the
+	// ZigzagJoin when handling conflicting locks held by other active
+	// transactions. Most zigzag joins leave the policies set to the default
+	// (WaitPolicy = Block), but different wait policies are used by SELECT ..
+	// FOR UPDATE/SHARE SKIP LOCKED/NOWAIT statements to react differently to
+	// conflicting locks.
+	LeftLocking  opt.Locking
+	RightLocking opt.Locking
 
 	// Cols is the set of columns produced by the zigzag join. This set can
 	// contain columns from either side's index.
@@ -25843,13 +25902,15 @@ func (in *interner) InternIndexJoin(val *IndexJoinExpr) *IndexJoinExpr {
 	in.hasher.HashRelExpr(val.Input)
 	in.hasher.HashTableID(val.Table)
 	in.hasher.HashColSet(val.Cols)
+	in.hasher.HashLocking(val.Locking)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*IndexJoinExpr); ok {
 			if in.hasher.IsRelExprEqual(val.Input, existing.Input) &&
 				in.hasher.IsTableIDEqual(val.Table, existing.Table) &&
-				in.hasher.IsColSetEqual(val.Cols, existing.Cols) {
+				in.hasher.IsColSetEqual(val.Cols, existing.Cols) &&
+				in.hasher.IsLockingEqual(val.Locking, existing.Locking) {
 				return existing
 			}
 		}
@@ -25877,6 +25938,7 @@ func (in *interner) InternLookupJoin(val *LookupJoinExpr) *LookupJoinExpr {
 	in.hasher.HashColumnID(val.ContinuationCol)
 	in.hasher.HashBool(val.LocalityOptimized)
 	in.hasher.HashFiltersExpr(val.ConstFilters)
+	in.hasher.HashLocking(val.Locking)
 	in.hasher.HashJoinFlags(val.Flags)
 	in.hasher.HashBool(val.SkipReorderJoins)
 
@@ -25898,6 +25960,7 @@ func (in *interner) InternLookupJoin(val *LookupJoinExpr) *LookupJoinExpr {
 				in.hasher.IsColumnIDEqual(val.ContinuationCol, existing.ContinuationCol) &&
 				in.hasher.IsBoolEqual(val.LocalityOptimized, existing.LocalityOptimized) &&
 				in.hasher.IsFiltersExprEqual(val.ConstFilters, existing.ConstFilters) &&
+				in.hasher.IsLockingEqual(val.Locking, existing.Locking) &&
 				in.hasher.IsJoinFlagsEqual(val.Flags, existing.Flags) &&
 				in.hasher.IsBoolEqual(val.SkipReorderJoins, existing.SkipReorderJoins) {
 				return existing
@@ -25923,6 +25986,7 @@ func (in *interner) InternInvertedJoin(val *InvertedJoinExpr) *InvertedJoinExpr 
 	in.hasher.HashColList(val.PrefixKeyCols)
 	in.hasher.HashColSet(val.Cols)
 	in.hasher.HashFiltersExpr(val.ConstFilters)
+	in.hasher.HashLocking(val.Locking)
 	in.hasher.HashJoinFlags(val.Flags)
 	in.hasher.HashBool(val.SkipReorderJoins)
 
@@ -25940,6 +26004,7 @@ func (in *interner) InternInvertedJoin(val *InvertedJoinExpr) *InvertedJoinExpr 
 				in.hasher.IsColListEqual(val.PrefixKeyCols, existing.PrefixKeyCols) &&
 				in.hasher.IsColSetEqual(val.Cols, existing.Cols) &&
 				in.hasher.IsFiltersExprEqual(val.ConstFilters, existing.ConstFilters) &&
+				in.hasher.IsLockingEqual(val.Locking, existing.Locking) &&
 				in.hasher.IsJoinFlagsEqual(val.Flags, existing.Flags) &&
 				in.hasher.IsBoolEqual(val.SkipReorderJoins, existing.SkipReorderJoins) {
 				return existing
@@ -26000,6 +26065,8 @@ func (in *interner) InternZigzagJoin(val *ZigzagJoinExpr) *ZigzagJoinExpr {
 	in.hasher.HashScalarListExpr(val.FixedVals)
 	in.hasher.HashColList(val.LeftFixedCols)
 	in.hasher.HashColList(val.RightFixedCols)
+	in.hasher.HashLocking(val.LeftLocking)
+	in.hasher.HashLocking(val.RightLocking)
 	in.hasher.HashColSet(val.Cols)
 
 	in.cache.Start(in.hasher.hash)
@@ -26015,6 +26082,8 @@ func (in *interner) InternZigzagJoin(val *ZigzagJoinExpr) *ZigzagJoinExpr {
 				in.hasher.IsScalarListExprEqual(val.FixedVals, existing.FixedVals) &&
 				in.hasher.IsColListEqual(val.LeftFixedCols, existing.LeftFixedCols) &&
 				in.hasher.IsColListEqual(val.RightFixedCols, existing.RightFixedCols) &&
+				in.hasher.IsLockingEqual(val.LeftLocking, existing.LeftLocking) &&
+				in.hasher.IsLockingEqual(val.RightLocking, existing.RightLocking) &&
 				in.hasher.IsColSetEqual(val.Cols, existing.Cols) {
 				return existing
 			}
