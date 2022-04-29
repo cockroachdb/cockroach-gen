@@ -719,8 +719,8 @@ type BackupDetails struct {
 	CollectionURI string `protobuf:"bytes,8,opt,name=collection_URI,json=collectionURI,proto3" json:"collection_URI,omitempty"`
 	ScheduleID    int64  `protobuf:"varint,12,opt,name=schedule_id,json=scheduleId,proto3" json:"schedule_id,omitempty"`
 	// SchedulePTSChainingRecord is used by scheduled backups to chain protected
-	// timestamp records. For more details about the chaining scheme refer to
-	// ScheduledBackupExecutionArgs.ChainProtectedTimestampRecords.
+	// timestamp records. For more details about the chaining scheme refer to the
+	// comment at the top of `schedule_pts_chaining.go`.
 	SchedulePTSChainingRecord *SchedulePTSChainingRecord `protobuf:"bytes,10,opt,name=schedule_pts_chaining_record,json=schedulePtsChainingRecord,proto3" json:"schedule_pts_chaining_record,omitempty"`
 	RevisionHistory           bool                       `protobuf:"varint,13,opt,name=revision_history,json=revisionHistory,proto3" json:"revision_history,omitempty"`
 	IncrementalFrom           []string                   `protobuf:"bytes,14,rep,name=incremental_from,json=incrementalFrom,proto3" json:"incremental_from,omitempty"`
