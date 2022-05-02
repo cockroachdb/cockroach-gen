@@ -13,7 +13,7 @@ import (
 	"strings"
 
 	"github.com/cockroachdb/cockroach/pkg/geo/geopb"
-	"github.com/cockroachdb/cockroach/pkg/security"
+	"github.com/cockroachdb/cockroach/pkg/security/username"
 	"github.com/cockroachdb/cockroach/pkg/sql/lexbase"
 	"github.com/cockroachdb/cockroach/pkg/sql/privilege"
 	"github.com/cockroachdb/cockroach/pkg/sql/scanner"
@@ -212,14 +212,14 @@ func (u *sqlSymUnion) roleSpec() tree.RoleSpec {
 func (u *sqlSymUnion) roleSpecList() tree.RoleSpecList {
 	return u.val.(tree.RoleSpecList)
 }
-func (u *sqlSymUnion) user() security.SQLUsername {
-	return u.val.(security.SQLUsername)
+func (u *sqlSymUnion) user() username.SQLUsername {
+	return u.val.(username.SQLUsername)
 }
-func (u *sqlSymUnion) userPtr() *security.SQLUsername {
-	return u.val.(*security.SQLUsername)
+func (u *sqlSymUnion) userPtr() *username.SQLUsername {
+	return u.val.(*username.SQLUsername)
 }
-func (u *sqlSymUnion) users() []security.SQLUsername {
-	return u.val.([]security.SQLUsername)
+func (u *sqlSymUnion) users() []username.SQLUsername {
+	return u.val.([]username.SQLUsername)
 }
 func (u *sqlSymUnion) newTableIndexName() *tree.TableIndexName {
 	tn := u.val.(tree.TableIndexName)
