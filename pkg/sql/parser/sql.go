@@ -13,7 +13,6 @@ import (
 	"strings"
 
 	"github.com/cockroachdb/cockroach/pkg/geo/geopb"
-	"github.com/cockroachdb/cockroach/pkg/roachpb"
 	"github.com/cockroachdb/cockroach/pkg/security"
 	"github.com/cockroachdb/cockroach/pkg/sql/lexbase"
 	"github.com/cockroachdb/cockroach/pkg/sql/privilege"
@@ -24970,7 +24969,7 @@ sqldefault:
 			if tenID == 0 {
 				return setErr(sqllex, errors.New("invalid tenant ID"))
 			}
-			sqlVAL.union.val = tree.TenantID{Specified: true, TenantID: roachpb.MakeTenantID(tenID)}
+			sqlVAL.union.val = tree.TenantID{Specified: true, ID: tenID}
 		}
 	case 307:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
@@ -29627,7 +29626,7 @@ sqldefault:
 			if tenID == 0 {
 				return setErr(sqllex, errors.New("invalid tenant ID"))
 			}
-			sqlVAL.union.val = tree.TargetList{TenantID: tree.TenantID{Specified: true, TenantID: roachpb.MakeTenantID(tenID)}}
+			sqlVAL.union.val = tree.TargetList{TenantID: tree.TenantID{Specified: true, ID: tenID}}
 		}
 	case 1129:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
