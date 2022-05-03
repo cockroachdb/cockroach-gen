@@ -680,11 +680,11 @@ var xxx_messageInfo_RowLevelTTL proto.InternalMessageInfo
 // Each setting is nullable so queries of the descriptor in JSON form
 // only list values which have been set. Protobuf type double is float64 in Go.
 type AutoStatsSettings struct {
-	// sql.stats.automatic_collection.enabled
+	// Enabled is table setting sql_stats_automatic_collection_enabled.
 	Enabled *bool `protobuf:"varint,1,opt,name=enabled" json:"enabled,omitempty"`
-	// sql.stats.automatic_collection.min_stale_rows
+	// MinStaleRows is table setting sql_stats_automatic_collection_min_stale_rows.
 	MinStaleRows *int64 `protobuf:"varint,2,opt,name=min_stale_rows,json=minStaleRows" json:"min_stale_rows,omitempty"`
-	// sql.stats.automatic_collection.fraction_stale_rows
+	// FractionStaleRows is table setting sql_stats_automatic_collection_fraction_stale_rows.
 	FractionStaleRows *float64 `protobuf:"fixed64,3,opt,name=fraction_stale_rows,json=fractionStaleRows" json:"fraction_stale_rows,omitempty"`
 }
 
