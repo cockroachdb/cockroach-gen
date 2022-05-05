@@ -702,7 +702,7 @@ type BackupDetails struct {
 	URI         string                    `protobuf:"bytes,3,opt,name=uri,proto3" json:"uri,omitempty"`
 	Destination BackupDetails_Destination `protobuf:"bytes,11,opt,name=destination,proto3" json:"destination"`
 	// URIsByLocalityKV is a map of locality KVs to store URIs, used for
-	// partitioned backups.
+	// partitioned backups. The map does not include the default locality.
 	URIsByLocalityKV         map[string]string        `protobuf:"bytes,5,rep,name=uris_by_locality_kv,json=urisByLocalityKv,proto3" json:"uris_by_locality_kv,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	DeprecatedBackupManifest []byte                   `protobuf:"bytes,4,opt,name=deprecated_backup_manifest,json=deprecatedBackupManifest,proto3" json:"deprecated_backup_manifest,omitempty"`
 	EncryptionOptions        *BackupEncryptionOptions `protobuf:"bytes,6,opt,name=encryption_options,json=encryptionOptions,proto3" json:"encryption_options,omitempty"`

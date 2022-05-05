@@ -165,8 +165,9 @@ func (m *BackupManifest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_BackupManifest proto.InternalMessageInfo
 
-// BackupManifest_File represents a file that contains the diff for a key
-// range between two timestamps.
+// BackupManifest_File represents a diff for a key range between two
+// timestamps. Note that many BackupManifest_File spans can get written to a
+// single SST.
 type BackupManifest_File struct {
 	Span        roachpb.Span     `protobuf:"bytes,1,opt,name=span,proto3" json:"span"`
 	Path        string           `protobuf:"bytes,2,opt,name=path,proto3" json:"path,omitempty"`
