@@ -112,7 +112,7 @@ type MVCCMetadata_SequencedIntent struct {
 	// the IntentHistory.
 	Sequence TxnSeq `protobuf:"varint,1,opt,name=sequence,casttype=TxnSeq" json:"sequence"`
 	// Value is the value written to the key as part of the transaction at
-	// the above Sequence.
+	// the above Sequence. Value uses the storage.MVCCValue encoding.
 	Value []byte `protobuf:"bytes,2,opt,name=value" json:"value,omitempty"`
 }
 
