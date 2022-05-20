@@ -472,6 +472,7 @@ var KeywordsCategories = map[string]string{
 	"timetz":                         "C",
 	"to":                             "R",
 	"trace":                          "U",
+	"tracing":                        "U",
 	"trailing":                       "R",
 	"transaction":                    "U",
 	"transactions":                   "U",
@@ -995,6 +996,7 @@ var KeywordNames = []string{
 	"timetz",
 	"to",
 	"trace",
+	"tracing",
 	"trailing",
 	"transaction",
 	"transactions",
@@ -1992,6 +1994,8 @@ func GetKeywordID(k string) int32 {
 		return TO
 	case "trace":
 		return TRACE
+	case "tracing":
+		return TRACING
 	case "trailing":
 		return TRAILING
 	case "transaction":
