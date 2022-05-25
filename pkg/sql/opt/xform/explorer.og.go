@@ -100,6 +100,38 @@ func (_e *explorer) exploreMemoCycleTestRel(
 		}
 	}
 
+	// [MemoCycleTestRelRuleFilter]
+	{
+		if _rootOrd >= _rootState.start {
+			input := _root.Input
+			filters := _root.Filters
+			if _e.o.matchedRule == nil || _e.o.matchedRule(opt.MemoCycleTestRelRuleFilter) {
+				_expr := &memo.SelectExpr{
+					Input: input,
+					Filters: memo.FiltersExpr{
+						_e.f.ConstructFiltersItem(
+							_e.f.ConstructExists(
+								_e.f.ConstructMemoCycleTestRel(
+									input,
+									filters,
+								),
+								_e.funcs.EmptySubqueryPrivate(),
+							),
+						),
+					},
+				}
+				_interned := _e.mem.AddSelectToGroup(_expr, _root)
+				if _e.o.appliedRule != nil {
+					if _interned != _expr {
+						_e.o.appliedRule(opt.MemoCycleTestRelRuleFilter, _root, nil)
+					} else {
+						_e.o.appliedRule(opt.MemoCycleTestRelRuleFilter, _root, _interned)
+					}
+				}
+			}
+		}
+	}
+
 	return _fullyExplored
 }
 

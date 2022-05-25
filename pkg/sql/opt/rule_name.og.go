@@ -284,6 +284,7 @@ const (
 	// Explore Rule Names
 	// ------------------------------------------------------------
 	MemoCycleTestRelRule
+	MemoCycleTestRelRuleFilter
 	ReplaceScalarMinMaxWithScalarSubqueries
 	ReplaceFilteredScalarMinMaxWithSubqueries
 	ReplaceScalarMinMaxWithLimit
