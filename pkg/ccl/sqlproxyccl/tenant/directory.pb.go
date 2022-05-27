@@ -38,9 +38,9 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 type PodState int32
 
 const (
-	// UNKNOWN indicates that the pod values being reported are from a potentially
-	// out of date source. UNKNOWN may be used to notify updates to pod values
-	// when the pod's state may be out of date by the time the update is processed.
+	// UNKNOWN indicates that the pod's state is not known. This is used as the
+	// default value for PodState. All pods returned by the tenant directory
+	// should have a proper state.
 	UNKNOWN PodState = 0
 	// RUNNING indicates the pod may have active SQL connections and is ready to
 	// accept new SQL connections.
@@ -51,8 +51,8 @@ const (
 	// DRAINING indicates that the pod may still have active SQL connections to
 	// it, but is in the process of shedding those connections so that it can be
 	// terminated. No new connections should be routed to the pod. In addition,
-	// the proxy will begin terminating existing, less-active connections to the
-	// pod.
+	// the proxy will begin migrating existing connections to other RUNNING pods
+	// if they exist.
 	DRAINING PodState = 2
 	// DELETING indicates that the pod is being terminated. This state is only
 	// used by WatchPods.
@@ -93,6 +93,8 @@ type Pod struct {
 	State PodState `protobuf:"varint,3,opt,name=state,proto3,enum=cockroach.ccl.sqlproxyccl.tenant.PodState" json:"state,omitempty"`
 	// Load is a number in the range [0, 1] indicating the current amount of load
 	// experienced by this tenant pod.
+	//
+	// TODO(jaylim-crl): Remove the Load field since it is now unused.
 	Load float32 `protobuf:"fixed32,4,opt,name=Load,proto3" json:"Load,omitempty"`
 	// StateTimestamp represents the timestamp that the state was last updated.
 	StateTimestamp time.Time `protobuf:"bytes,5,opt,name=stateTimestamp,proto3,stdtime" json:"stateTimestamp"`
