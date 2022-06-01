@@ -445,8 +445,6 @@ const (
 	// Index: A descriptor in this state is invisible to an INSERT,
 	// UPDATE, and DELETE.
 	//
-	// TODO(ssd): This is currently unused and is being added to
-	// facilitate the new temporary-index-based backfilling process.
 	DescriptorMutation_BACKFILLING DescriptorMutation_State = 3
 	// Operations can use this invisible descriptor to implicitly
 	// write and delete entries. This is used by the MVCC-compatible
