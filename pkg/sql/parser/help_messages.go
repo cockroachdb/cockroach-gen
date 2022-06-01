@@ -559,7 +559,7 @@ CREATE STATISTICS <statisticname>
 CREATE CHANGEFEED
 FOR <targets> [INTO sink] [WITH <options>]
 
-Sink: Data caputre stream stream destination.  Enterprise only.
+sink: data capture stream destination (Enterprise only)
 `,
 	},
 	//line sql.y: 4037
