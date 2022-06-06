@@ -700,8 +700,8 @@ func (u *sqlSymUnion) abbreviatedGrant() tree.AbbreviatedGrant {
 func (u *sqlSymUnion) abbreviatedRevoke() tree.AbbreviatedRevoke {
 	return u.val.(tree.AbbreviatedRevoke)
 }
-func (u *sqlSymUnion) alterDefaultPrivilegesTargetObject() tree.AlterDefaultPrivilegesTargetObject {
-	return u.val.(tree.AlterDefaultPrivilegesTargetObject)
+func (u *sqlSymUnion) targetObjectType() privilege.TargetObjectType {
+	return u.val.(privilege.TargetObjectType)
 }
 func (u *sqlSymUnion) setVar() *tree.SetVar {
 	return u.val.(*tree.SetVar)
@@ -32595,7 +32595,7 @@ sqldefault:
 		{
 			sqlVAL.union.val = tree.AbbreviatedGrant{
 				Privileges:      sqlDollar[2].union.privilegeList(),
-				Target:          sqlDollar[4].union.alterDefaultPrivilegesTargetObject(),
+				Target:          sqlDollar[4].union.targetObjectType(),
 				Grantees:        sqlDollar[6].union.roleSpecList(),
 				WithGrantOption: sqlDollar[7].union.bool(),
 			}
@@ -32618,7 +32618,7 @@ sqldefault:
 		{
 			sqlVAL.union.val = tree.AbbreviatedRevoke{
 				Privileges: sqlDollar[2].union.privilegeList(),
-				Target:     sqlDollar[4].union.alterDefaultPrivilegesTargetObject(),
+				Target:     sqlDollar[4].union.targetObjectType(),
 				Grantees:   sqlDollar[6].union.roleSpecList(),
 			}
 		}
@@ -32628,7 +32628,7 @@ sqldefault:
 		{
 			sqlVAL.union.val = tree.AbbreviatedRevoke{
 				Privileges:     sqlDollar[5].union.privilegeList(),
-				Target:         sqlDollar[7].union.alterDefaultPrivilegesTargetObject(),
+				Target:         sqlDollar[7].union.targetObjectType(),
 				Grantees:       sqlDollar[9].union.roleSpecList(),
 				GrantOptionFor: true,
 			}
@@ -32637,25 +32637,25 @@ sqldefault:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
 //line sql-gen.y:9168
 		{
-			sqlVAL.union.val = tree.Tables
+			sqlVAL.union.val = privilege.Tables
 		}
 	case 1532:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
 //line sql-gen.y:9172
 		{
-			sqlVAL.union.val = tree.Sequences
+			sqlVAL.union.val = privilege.Sequences
 		}
 	case 1533:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
 //line sql-gen.y:9176
 		{
-			sqlVAL.union.val = tree.Types
+			sqlVAL.union.val = privilege.Types
 		}
 	case 1534:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
 //line sql-gen.y:9180
 		{
-			sqlVAL.union.val = tree.Schemas
+			sqlVAL.union.val = privilege.Schemas
 		}
 	case 1535:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
@@ -32667,7 +32667,7 @@ sqldefault:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
 //line sql-gen.y:9188
 		{
-			return unimplemented(sqllex, "ALTER DEFAULT PRIVILEGES ... ON FUNCTIONS ...")
+			return unimplemented(sqllex, "ALTER DEFAULT PRIVILEGES ... ON ROUTINES ...")
 		}
 	case 1537:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
