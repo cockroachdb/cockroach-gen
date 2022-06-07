@@ -7538,7 +7538,11 @@ func (m *RangeLookupResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_RangeLookupResponse proto.InternalMessageInfo
 
 // RangeFeedRequest is a request that expresses the intention to establish a
-// RangeFeed stream over the provided span, starting at the specified timestamp.
+// RangeFeed stream over the provided span, starting at the specified timestamp
+// (exclusive).
+//
+// NB: The start timestamp is exclusive, i.e. the first possible event emitted
+// will be at Header.Timestamp.Next(). This includes catchup scans.
 type RangeFeedRequest struct {
 	Header `protobuf:"bytes,1,opt,name=header,proto3,embedded=header" json:"header"`
 	Span   Span `protobuf:"bytes,2,opt,name=span,proto3" json:"span"`
