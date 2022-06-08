@@ -426,7 +426,7 @@ func (m *RangeAppliedState) XXX_DiscardUnknown() {
 var xxx_messageInfo_RangeAppliedState proto.InternalMessageInfo
 
 // MVCCWriteValueOp corresponds to a value being written outside of a
-// transaction.
+// transaction. Inline values (without timestamp) are not logged.
 type MVCCWriteValueOp struct {
 	Key       []byte        `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
 	Timestamp hlc.Timestamp `protobuf:"bytes,2,opt,name=timestamp,proto3" json:"timestamp"`

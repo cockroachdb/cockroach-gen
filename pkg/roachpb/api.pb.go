@@ -7541,6 +7541,10 @@ var xxx_messageInfo_RangeLookupResponse proto.InternalMessageInfo
 // RangeFeed stream over the provided span, starting at the specified timestamp
 // (exclusive).
 //
+// Rangefeeds do not support inline (unversioned) values, and may omit them or
+// error on them. Similarly, rangefeeds will error if MVCC history is mutated
+// via e.g. ClearRange. Do not use rangefeeds across such key spans.
+//
 // NB: The start timestamp is exclusive, i.e. the first possible event emitted
 // will be at Header.Timestamp.Next(). This includes catchup scans.
 type RangeFeedRequest struct {
