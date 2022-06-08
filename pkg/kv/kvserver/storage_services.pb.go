@@ -73,6 +73,16 @@ const _ = grpc.SupportPackageIsVersion4
 type MultiRaftClient interface {
 	RaftMessageBatch(ctx context.Context, opts ...grpc.CallOption) (MultiRaft_RaftMessageBatchClient, error)
 	RaftSnapshot(ctx context.Context, opts ...grpc.CallOption) (MultiRaft_RaftSnapshotClient, error)
+	// DelegateRaftSnapshot asks the server to send a range snapshot to a target
+	// (so the client delegates the sending of the snapshot to the server). The
+	// server responds in two phases.
+	//
+	// TODO(nvanbenschoten): This RPC is bi-directional streaming (as opposed to
+	// only server-streaming) because of future aspirations; at the moment the
+	// request is unary. In the future, we wanted to pause all log truncation,
+	// then handshake with the delegated sender, then weaken log truncation
+	// protection to just below the index that the sender was sending the
+	// snapshot at.
 	DelegateRaftSnapshot(ctx context.Context, opts ...grpc.CallOption) (MultiRaft_DelegateRaftSnapshotClient, error)
 }
 
@@ -181,6 +191,16 @@ func (x *multiRaftDelegateRaftSnapshotClient) Recv() (*kvserverpb.DelegateSnapsh
 type MultiRaftServer interface {
 	RaftMessageBatch(MultiRaft_RaftMessageBatchServer) error
 	RaftSnapshot(MultiRaft_RaftSnapshotServer) error
+	// DelegateRaftSnapshot asks the server to send a range snapshot to a target
+	// (so the client delegates the sending of the snapshot to the server). The
+	// server responds in two phases.
+	//
+	// TODO(nvanbenschoten): This RPC is bi-directional streaming (as opposed to
+	// only server-streaming) because of future aspirations; at the moment the
+	// request is unary. In the future, we wanted to pause all log truncation,
+	// then handshake with the delegated sender, then weaken log truncation
+	// protection to just below the index that the sender was sending the
+	// snapshot at.
 	DelegateRaftSnapshot(MultiRaft_DelegateRaftSnapshotServer) error
 }
 
