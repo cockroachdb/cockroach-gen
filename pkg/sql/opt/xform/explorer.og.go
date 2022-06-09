@@ -2564,7 +2564,7 @@ func (_e *explorer) exploreLookupJoin(
 							Input: _e.f.ConstructLookupJoin(
 								input,
 								on,
-								_e.funcs.CreateLocalityOptimizedLookupJoinPrivate(localExpr, _e.funcs.EmptyFiltersExpr(), private),
+								_e.funcs.CreateLocalityOptimizedLookupJoinPrivateIncludingCols(localExpr, _e.funcs.EmptyFiltersExpr(), private, _e.funcs.OutputCols(input)),
 							),
 							On:                on,
 							LookupJoinPrivate: *_e.funcs.CreateLocalityOptimizedLookupJoinPrivate(remoteExpr, _e.funcs.EmptyFiltersExpr(), private),
