@@ -1342,8 +1342,13 @@ type RevertRangeRequest struct {
 	// any MVCC key with a strictly higher timestamp. TargetTime must be higher
 	// than the GC Threshold for the replica - so that it is assured that the keys
 	// for that time are still there — or the request will fail.
-	TargetTime                          hlc.Timestamp `protobuf:"bytes,2,opt,name=target_time,json=targetTime,proto3" json:"target_time"`
-	EnableTimeBoundIteratorOptimization bool          `protobuf:"varint,3,opt,name=enable_time_bound_iterator_optimization,json=enableTimeBoundIteratorOptimization,proto3" json:"enable_time_bound_iterator_optimization,omitempty"`
+	TargetTime hlc.Timestamp `protobuf:"bytes,2,opt,name=target_time,json=targetTime,proto3" json:"target_time"`
+	// This parameter has no effect on 22.2, as TBI is always enabled. For
+	// compatibility with 22.1 nodes, callers must continue to set this as
+	// appropriate until 22.2.
+	//
+	// TODO(erikgrinaker): Remove this in 22.2.
+	EnableTimeBoundIteratorOptimization bool `protobuf:"varint,3,opt,name=enable_time_bound_iterator_optimization,json=enableTimeBoundIteratorOptimization,proto3" json:"enable_time_bound_iterator_optimization,omitempty"`
 	// IgnoreGcThreshold can be set by a caller to ignore the target-time when
 	// checking that the earliest time at which the command operates is above the
 	// GC threshold. This is safe to set only in very specific situations, such as
@@ -4192,18 +4197,11 @@ type ExportRequest struct {
 	SplitMidKey bool `protobuf:"varint,13,opt,name=split_mid_key,json=splitMidKey,proto3" json:"split_mid_key,omitempty"`
 	// Return the exported SST data in the response.
 	ReturnSST bool `protobuf:"varint,5,opt,name=return_sst,json=returnSst,proto3" json:"return_sst,omitempty"`
-	// EnableTimeBoundIteratorOptimization, if true, enables a performance
-	// optimization that allows us to entirely skip over sstables in RocksDB that
-	// don't have data relevant to the time bounds in this request.
+	// This parameter has no effect on 22.2, as TBI is always enabled. For
+	// compatibility with 22.1 nodes, callers must continue to set this as
+	// appropriate until 22.2.
 	//
-	// This can have a dramatic impact on performance, but we've seen a number of
-	// extremely subtle and hard to detect correctness issues with this (see
-	// #28358 #34819). As a result, we've decided to skip the optimization
-	// everywhere that it isn't absolutely necessary for the feature to work
-	// (leaving one place: poller-based changefeeds, which are being phased out
-	// anyway). This will both give increased confidence in correctness as well as
-	// eliminate any need to investigate time-bound iterators when/if someone hits
-	// a correctness bug.
+	// TODO(erikgrinaker): Remove this in 22.2.
 	EnableTimeBoundIteratorOptimization bool `protobuf:"varint,7,opt,name=enable_time_bound_iterator_optimization,json=enableTimeBoundIteratorOptimization,proto3" json:"enable_time_bound_iterator_optimization,omitempty"`
 	// StorageByLocalityKV is a map of locality KVs to storage configurations. If
 	// set, files will be written to the store that matches the most specific
