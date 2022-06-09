@@ -158,6 +158,7 @@ var KeywordsCategories = map[string]string{
 	"force":                          "U",
 	"force_index":                    "U",
 	"foreign":                        "R",
+	"freeze":                         "U",
 	"from":                           "R",
 	"full":                           "T",
 	"function":                       "U",
@@ -182,6 +183,7 @@ var KeywordsCategories = map[string]string{
 	"groups":                         "U",
 	"hash":                           "U",
 	"having":                         "R",
+	"header":                         "U",
 	"high":                           "U",
 	"histogram":                      "U",
 	"hour":                           "U",
@@ -358,6 +360,7 @@ var KeywordsCategories = map[string]string{
 	"publication":                    "U",
 	"queries":                        "U",
 	"query":                          "U",
+	"quote":                          "U",
 	"range":                          "U",
 	"ranges":                         "U",
 	"read":                           "U",
@@ -682,6 +685,7 @@ var KeywordNames = []string{
 	"force",
 	"force_index",
 	"foreign",
+	"freeze",
 	"from",
 	"full",
 	"function",
@@ -706,6 +710,7 @@ var KeywordNames = []string{
 	"groups",
 	"hash",
 	"having",
+	"header",
 	"high",
 	"histogram",
 	"hour",
@@ -882,6 +887,7 @@ var KeywordNames = []string{
 	"publication",
 	"queries",
 	"query",
+	"quote",
 	"range",
 	"ranges",
 	"read",
@@ -1366,6 +1372,8 @@ func GetKeywordID(k string) int32 {
 		return FORCE_INDEX
 	case "foreign":
 		return FOREIGN
+	case "freeze":
+		return FREEZE
 	case "from":
 		return FROM
 	case "full":
@@ -1414,6 +1422,8 @@ func GetKeywordID(k string) int32 {
 		return HASH
 	case "having":
 		return HAVING
+	case "header":
+		return HEADER
 	case "high":
 		return HIGH
 	case "histogram":
@@ -1766,6 +1776,8 @@ func GetKeywordID(k string) int32 {
 		return QUERIES
 	case "query":
 		return QUERY
+	case "quote":
+		return QUOTE
 	case "range":
 		return RANGE
 	case "ranges":
