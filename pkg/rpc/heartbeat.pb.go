@@ -128,7 +128,8 @@ var xxx_messageInfo_PingRequest proto.InternalMessageInfo
 // A PingResponse contains the echoed ping request string.
 type PingResponse struct {
 	// An echo of value sent with PingRequest.
-	Pong          string          `protobuf:"bytes,1,opt,name=pong" json:"pong"`
+	Pong string `protobuf:"bytes,1,opt,name=pong" json:"pong"`
+	// A clock reading from the server, in nanos since epoch.
 	ServerTime    int64           `protobuf:"varint,2,opt,name=server_time,json=serverTime" json:"server_time"`
 	ServerVersion roachpb.Version `protobuf:"bytes,3,opt,name=server_version,json=serverVersion" json:"server_version"`
 	// Cluster name to prevent joining a new node to the wrong cluster.
