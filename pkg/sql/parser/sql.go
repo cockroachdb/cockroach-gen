@@ -25048,10 +25048,10 @@ sqldefault:
 //line sql-gen.y:3166
 		{
 			sqlVAL.union.val = &tree.Restore{
-				SystemUsers: true,
-				From:        sqlDollar[5].union.listOfStringOrPlaceholderOptList(),
-				AsOf:        sqlDollar[6].union.asOfClause(),
-				Options:     *(sqlDollar[7].union.restoreOptions()),
+				DescriptorCoverage: tree.SystemUsers,
+				From:               sqlDollar[5].union.listOfStringOrPlaceholderOptList(),
+				AsOf:               sqlDollar[6].union.asOfClause(),
+				Options:            *(sqlDollar[7].union.restoreOptions()),
 			}
 		}
 	case 299:
@@ -25059,11 +25059,11 @@ sqldefault:
 //line sql-gen.y:3175
 		{
 			sqlVAL.union.val = &tree.Restore{
-				SystemUsers: true,
-				Subdir:      sqlDollar[5].union.expr(),
-				From:        sqlDollar[7].union.listOfStringOrPlaceholderOptList(),
-				AsOf:        sqlDollar[8].union.asOfClause(),
-				Options:     *(sqlDollar[9].union.restoreOptions()),
+				DescriptorCoverage: tree.SystemUsers,
+				Subdir:             sqlDollar[5].union.expr(),
+				From:               sqlDollar[7].union.listOfStringOrPlaceholderOptList(),
+				AsOf:               sqlDollar[8].union.asOfClause(),
+				Options:            *(sqlDollar[9].union.restoreOptions()),
 			}
 		}
 	case 300:

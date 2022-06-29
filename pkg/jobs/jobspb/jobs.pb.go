@@ -929,8 +929,10 @@ type RestoreDetails struct {
 	// being restored.
 	DatabaseModifiers map[github_com_cockroachdb_cockroach_pkg_sql_catalog_descpb.ID]*RestoreDetails_DatabaseModifier `protobuf:"bytes,19,rep,name=database_modifiers,json=databaseModifiers,proto3,castkey=github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb.ID" json:"database_modifiers,omitempty" protobuf_key:"varint,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	// DebugPauseOn describes the events that the job should pause itself on for debugging purposes.
-	DebugPauseOn       string `protobuf:"bytes,20,opt,name=debug_pause_on,json=debugPauseOn,proto3" json:"debug_pause_on,omitempty"`
-	RestoreSystemUsers bool   `protobuf:"varint,22,opt,name=restore_system_users,json=restoreSystemUsers,proto3" json:"restore_system_users,omitempty"`
+	DebugPauseOn string `protobuf:"bytes,20,opt,name=debug_pause_on,json=debugPauseOn,proto3" json:"debug_pause_on,omitempty"`
+	// RestoreSystemUsers is set to true if user runs RESTORE SYSTEM USERS.
+	// TODO(msbutler): delete in 23.1
+	RestoreSystemUsers bool `protobuf:"varint,22,opt,name=restore_system_users,json=restoreSystemUsers,proto3" json:"restore_system_users,omitempty"`
 	// PreRewrittenTenantID is the ID of tenants[0] in the backup, aka its old ID;
 	// it is only valid to set this if len(tenants) == 1.
 	PreRewriteTenantId *roachpb.TenantID `protobuf:"bytes,23,opt,name=pre_rewrite_tenant_id,json=preRewriteTenantId,proto3" json:"pre_rewrite_tenant_id,omitempty"`
