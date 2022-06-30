@@ -33719,7 +33719,7 @@ sqldefault:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
 //line sql-gen.y:10126
 		{
-			sqlVAL.union.val = tree.LockWaitSkip
+			sqlVAL.union.val = tree.LockWaitSkipLocked
 		}
 	case 1711:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
