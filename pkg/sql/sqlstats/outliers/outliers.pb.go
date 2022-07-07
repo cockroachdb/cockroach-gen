@@ -7,6 +7,7 @@ import (
 	encoding_binary "encoding/binary"
 	fmt "fmt"
 	github_com_cockroachdb_cockroach_pkg_roachpb "github.com/cockroachdb/cockroach/pkg/roachpb"
+	github_com_cockroachdb_cockroach_pkg_sql_clusterunique "github.com/cockroachdb/cockroach/pkg/sql/clusterunique"
 	github_com_cockroachdb_cockroach_pkg_util_uuid "github.com/cockroachdb/cockroach/pkg/util/uuid"
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
@@ -26,17 +27,118 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+type Session struct {
+	ID github_com_cockroachdb_cockroach_pkg_sql_clusterunique.ID `protobuf:"bytes,1,opt,name=id,proto3,customtype=github.com/cockroachdb/cockroach/pkg/sql/clusterunique.ID" json:"id"`
+}
+
+func (m *Session) Reset()         { *m = Session{} }
+func (m *Session) String() string { return proto.CompactTextString(m) }
+func (*Session) ProtoMessage()    {}
+func (*Session) Descriptor() ([]byte, []int) {
+	return fileDescriptor_30c2b4c6eab9d9d1, []int{0}
+}
+func (m *Session) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *Session) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	b = b[:cap(b)]
+	n, err := m.MarshalToSizedBuffer(b)
+	if err != nil {
+		return nil, err
+	}
+	return b[:n], nil
+}
+func (m *Session) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Session.Merge(m, src)
+}
+func (m *Session) XXX_Size() int {
+	return m.Size()
+}
+func (m *Session) XXX_DiscardUnknown() {
+	xxx_messageInfo_Session.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Session proto.InternalMessageInfo
+
+type Transaction struct {
+	ID github_com_cockroachdb_cockroach_pkg_util_uuid.UUID `protobuf:"bytes,1,opt,name=id,proto3,customtype=github.com/cockroachdb/cockroach/pkg/util/uuid.UUID" json:"id"`
+}
+
+func (m *Transaction) Reset()         { *m = Transaction{} }
+func (m *Transaction) String() string { return proto.CompactTextString(m) }
+func (*Transaction) ProtoMessage()    {}
+func (*Transaction) Descriptor() ([]byte, []int) {
+	return fileDescriptor_30c2b4c6eab9d9d1, []int{1}
+}
+func (m *Transaction) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *Transaction) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	b = b[:cap(b)]
+	n, err := m.MarshalToSizedBuffer(b)
+	if err != nil {
+		return nil, err
+	}
+	return b[:n], nil
+}
+func (m *Transaction) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Transaction.Merge(m, src)
+}
+func (m *Transaction) XXX_Size() int {
+	return m.Size()
+}
+func (m *Transaction) XXX_DiscardUnknown() {
+	xxx_messageInfo_Transaction.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Transaction proto.InternalMessageInfo
+
+type Statement struct {
+	ID               github_com_cockroachdb_cockroach_pkg_sql_clusterunique.ID      `protobuf:"bytes,1,opt,name=id,proto3,customtype=github.com/cockroachdb/cockroach/pkg/sql/clusterunique.ID" json:"id"`
+	FingerprintID    github_com_cockroachdb_cockroach_pkg_roachpb.StmtFingerprintID `protobuf:"varint,2,opt,name=fingerprint_id,json=fingerprintId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/roachpb.StmtFingerprintID" json:"fingerprint_id,omitempty"`
+	LatencyInSeconds float64                                                        `protobuf:"fixed64,3,opt,name=latency_in_seconds,json=latencyInSeconds,proto3" json:"latency_in_seconds,omitempty"`
+}
+
+func (m *Statement) Reset()         { *m = Statement{} }
+func (m *Statement) String() string { return proto.CompactTextString(m) }
+func (*Statement) ProtoMessage()    {}
+func (*Statement) Descriptor() ([]byte, []int) {
+	return fileDescriptor_30c2b4c6eab9d9d1, []int{2}
+}
+func (m *Statement) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *Statement) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	b = b[:cap(b)]
+	n, err := m.MarshalToSizedBuffer(b)
+	if err != nil {
+		return nil, err
+	}
+	return b[:n], nil
+}
+func (m *Statement) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Statement.Merge(m, src)
+}
+func (m *Statement) XXX_Size() int {
+	return m.Size()
+}
+func (m *Statement) XXX_DiscardUnknown() {
+	xxx_messageInfo_Statement.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Statement proto.InternalMessageInfo
+
 type Outlier struct {
-	Session     *Outlier_Session     `protobuf:"bytes,1,opt,name=session,proto3" json:"session,omitempty"`
-	Transaction *Outlier_Transaction `protobuf:"bytes,2,opt,name=transaction,proto3" json:"transaction,omitempty"`
-	Statement   *Outlier_Statement   `protobuf:"bytes,3,opt,name=statement,proto3" json:"statement,omitempty"`
+	Session     *Session     `protobuf:"bytes,1,opt,name=session,proto3" json:"session,omitempty"`
+	Transaction *Transaction `protobuf:"bytes,2,opt,name=transaction,proto3" json:"transaction,omitempty"`
+	Statement   *Statement   `protobuf:"bytes,3,opt,name=statement,proto3" json:"statement,omitempty"`
 }
 
 func (m *Outlier) Reset()         { *m = Outlier{} }
 func (m *Outlier) String() string { return proto.CompactTextString(m) }
 func (*Outlier) ProtoMessage()    {}
 func (*Outlier) Descriptor() ([]byte, []int) {
-	return fileDescriptor_30c2b4c6eab9d9d1, []int{0}
+	return fileDescriptor_30c2b4c6eab9d9d1, []int{3}
 }
 func (m *Outlier) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -61,112 +163,11 @@ func (m *Outlier) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Outlier proto.InternalMessageInfo
 
-type Outlier_Session struct {
-	ID []byte `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-}
-
-func (m *Outlier_Session) Reset()         { *m = Outlier_Session{} }
-func (m *Outlier_Session) String() string { return proto.CompactTextString(m) }
-func (*Outlier_Session) ProtoMessage()    {}
-func (*Outlier_Session) Descriptor() ([]byte, []int) {
-	return fileDescriptor_30c2b4c6eab9d9d1, []int{0, 0}
-}
-func (m *Outlier_Session) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *Outlier_Session) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	b = b[:cap(b)]
-	n, err := m.MarshalToSizedBuffer(b)
-	if err != nil {
-		return nil, err
-	}
-	return b[:n], nil
-}
-func (m *Outlier_Session) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Outlier_Session.Merge(m, src)
-}
-func (m *Outlier_Session) XXX_Size() int {
-	return m.Size()
-}
-func (m *Outlier_Session) XXX_DiscardUnknown() {
-	xxx_messageInfo_Outlier_Session.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Outlier_Session proto.InternalMessageInfo
-
-type Outlier_Transaction struct {
-	ID *github_com_cockroachdb_cockroach_pkg_util_uuid.UUID `protobuf:"bytes,1,opt,name=id,proto3,customtype=github.com/cockroachdb/cockroach/pkg/util/uuid.UUID" json:"id,omitempty"`
-}
-
-func (m *Outlier_Transaction) Reset()         { *m = Outlier_Transaction{} }
-func (m *Outlier_Transaction) String() string { return proto.CompactTextString(m) }
-func (*Outlier_Transaction) ProtoMessage()    {}
-func (*Outlier_Transaction) Descriptor() ([]byte, []int) {
-	return fileDescriptor_30c2b4c6eab9d9d1, []int{0, 1}
-}
-func (m *Outlier_Transaction) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *Outlier_Transaction) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	b = b[:cap(b)]
-	n, err := m.MarshalToSizedBuffer(b)
-	if err != nil {
-		return nil, err
-	}
-	return b[:n], nil
-}
-func (m *Outlier_Transaction) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Outlier_Transaction.Merge(m, src)
-}
-func (m *Outlier_Transaction) XXX_Size() int {
-	return m.Size()
-}
-func (m *Outlier_Transaction) XXX_DiscardUnknown() {
-	xxx_messageInfo_Outlier_Transaction.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Outlier_Transaction proto.InternalMessageInfo
-
-type Outlier_Statement struct {
-	ID               []byte                                                         `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	FingerprintID    github_com_cockroachdb_cockroach_pkg_roachpb.StmtFingerprintID `protobuf:"varint,2,opt,name=fingerprint_id,json=fingerprintId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/roachpb.StmtFingerprintID" json:"fingerprint_id,omitempty"`
-	LatencyInSeconds float64                                                        `protobuf:"fixed64,3,opt,name=latency_in_seconds,json=latencyInSeconds,proto3" json:"latency_in_seconds,omitempty"`
-}
-
-func (m *Outlier_Statement) Reset()         { *m = Outlier_Statement{} }
-func (m *Outlier_Statement) String() string { return proto.CompactTextString(m) }
-func (*Outlier_Statement) ProtoMessage()    {}
-func (*Outlier_Statement) Descriptor() ([]byte, []int) {
-	return fileDescriptor_30c2b4c6eab9d9d1, []int{0, 2}
-}
-func (m *Outlier_Statement) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *Outlier_Statement) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	b = b[:cap(b)]
-	n, err := m.MarshalToSizedBuffer(b)
-	if err != nil {
-		return nil, err
-	}
-	return b[:n], nil
-}
-func (m *Outlier_Statement) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Outlier_Statement.Merge(m, src)
-}
-func (m *Outlier_Statement) XXX_Size() int {
-	return m.Size()
-}
-func (m *Outlier_Statement) XXX_DiscardUnknown() {
-	xxx_messageInfo_Outlier_Statement.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Outlier_Statement proto.InternalMessageInfo
-
 func init() {
+	proto.RegisterType((*Session)(nil), "cockroach.sql.outliers.Session")
+	proto.RegisterType((*Transaction)(nil), "cockroach.sql.outliers.Transaction")
+	proto.RegisterType((*Statement)(nil), "cockroach.sql.outliers.Statement")
 	proto.RegisterType((*Outlier)(nil), "cockroach.sql.outliers.Outlier")
-	proto.RegisterType((*Outlier_Session)(nil), "cockroach.sql.outliers.Outlier.Session")
-	proto.RegisterType((*Outlier_Transaction)(nil), "cockroach.sql.outliers.Outlier.Transaction")
-	proto.RegisterType((*Outlier_Statement)(nil), "cockroach.sql.outliers.Outlier.Statement")
 }
 
 func init() {
@@ -174,32 +175,144 @@ func init() {
 }
 
 var fileDescriptor_30c2b4c6eab9d9d1 = []byte{
-	// 397 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x92, 0xcf, 0xaa, 0xd3, 0x40,
-	0x18, 0xc5, 0x33, 0xb1, 0xb4, 0x76, 0x6a, 0x45, 0x06, 0x29, 0xa5, 0x8b, 0x89, 0x8a, 0xe0, 0x5f,
-	0x26, 0x60, 0xd7, 0x0a, 0x96, 0xa2, 0x64, 0x51, 0x84, 0xc4, 0x6e, 0x44, 0x28, 0xf9, 0x67, 0x3a,
-	0x34, 0x9d, 0x49, 0x33, 0x93, 0x85, 0x3e, 0x85, 0x2f, 0xe3, 0x3b, 0x74, 0x23, 0x74, 0x59, 0x5c,
-	0x04, 0x4d, 0xdf, 0xc2, 0x95, 0x74, 0xd2, 0x34, 0x11, 0xee, 0xa5, 0x77, 0x77, 0xc8, 0x77, 0xce,
-	0xc9, 0xef, 0xfb, 0x12, 0xf8, 0x58, 0x6c, 0x62, 0x53, 0x6c, 0x62, 0x21, 0x5d, 0x29, 0x4c, 0x9e,
-	0xc9, 0x98, 0x86, 0x69, 0x2d, 0x48, 0x92, 0x72, 0xc9, 0xd1, 0xc0, 0xe7, 0xfe, 0x2a, 0xe5, 0xae,
-	0xbf, 0x24, 0x62, 0x13, 0x93, 0x6a, 0x3a, 0xba, 0x1f, 0xf1, 0x88, 0x2b, 0x8b, 0x79, 0x54, 0xa5,
-	0xfb, 0xd1, 0x8f, 0x16, 0xec, 0x7c, 0x28, 0x2d, 0xe8, 0x2d, 0xec, 0x88, 0x50, 0x08, 0xca, 0xd9,
-	0x10, 0x3c, 0x00, 0x4f, 0x7b, 0xaf, 0x9e, 0x90, 0xab, 0xbb, 0xc8, 0x29, 0x41, 0x9c, 0xd2, 0x6e,
-	0x57, 0x39, 0x34, 0x83, 0x3d, 0x99, 0xba, 0x4c, 0xb8, 0xbe, 0x3c, 0xd6, 0xe8, 0xaa, 0xe6, 0xc5,
-	0xa5, 0x9a, 0x8f, 0x75, 0xc4, 0x6e, 0xe6, 0xd1, 0x7b, 0xd8, 0x3d, 0x2e, 0x1b, 0xae, 0x43, 0x26,
-	0x87, 0xb7, 0x54, 0xd9, 0xb3, 0x8b, 0x4c, 0x55, 0xc0, 0xae, 0xb3, 0xa3, 0x87, 0xb0, 0x73, 0x62,
-	0x45, 0x03, 0xa8, 0xd3, 0x40, 0x2d, 0x78, 0x67, 0xd2, 0x2e, 0x72, 0x43, 0xb7, 0xa6, 0xb6, 0x4e,
-	0x83, 0xd1, 0x67, 0xd8, 0x6b, 0x70, 0xa0, 0x59, 0xc3, 0xf6, 0xfa, 0x57, 0x6e, 0x8c, 0x23, 0x2a,
-	0x97, 0x99, 0x47, 0x7c, 0xbe, 0x36, 0xcf, 0x04, 0x81, 0x57, 0x6b, 0x33, 0x59, 0x45, 0x66, 0x26,
-	0x69, 0x6c, 0x66, 0x19, 0x0d, 0xc8, 0x7c, 0x6e, 0x4d, 0x1b, 0xed, 0x3f, 0x01, 0xec, 0x9e, 0xc9,
-	0xae, 0x63, 0x40, 0xdf, 0xe0, 0xdd, 0x2f, 0x94, 0x45, 0x61, 0x9a, 0xa4, 0x94, 0xc9, 0x05, 0x0d,
-	0xd4, 0x05, 0x5b, 0x13, 0xa7, 0xc8, 0x8d, 0xfe, 0xbb, 0x7a, 0x62, 0x4d, 0xff, 0xe6, 0xc6, 0x9b,
-	0x1b, 0x11, 0x29, 0x95, 0x78, 0xc4, 0x91, 0x6b, 0xf9, 0x5f, 0x83, 0xdd, 0x6f, 0xbc, 0xca, 0x0a,
-	0xd0, 0x4b, 0x88, 0x62, 0x57, 0x86, 0xcc, 0xff, 0xba, 0xa0, 0x6c, 0x21, 0x42, 0x9f, 0xb3, 0x40,
-	0xa8, 0xa3, 0x03, 0xfb, 0xde, 0x69, 0x62, 0x31, 0xa7, 0x7c, 0x3e, 0x79, 0xbe, 0xfd, 0x83, 0xb5,
-	0x6d, 0x81, 0xc1, 0xae, 0xc0, 0x60, 0x5f, 0x60, 0xf0, 0xbb, 0xc0, 0xe0, 0xfb, 0x01, 0x6b, 0xbb,
-	0x03, 0xd6, 0xf6, 0x07, 0xac, 0x7d, 0xba, 0x5d, 0x7d, 0x19, 0xaf, 0xad, 0x7e, 0xb5, 0xf1, 0xbf,
-	0x00, 0x00, 0x00, 0xff, 0xff, 0x81, 0x5c, 0x05, 0xa0, 0xc0, 0x02, 0x00, 0x00,
+	// 426 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x92, 0x41, 0x8b, 0xd3, 0x40,
+	0x14, 0xc7, 0x33, 0x51, 0xac, 0x3b, 0x71, 0x45, 0x82, 0x48, 0xf1, 0x30, 0xa9, 0xd5, 0x43, 0x11,
+	0x99, 0x40, 0xf7, 0xb4, 0x17, 0xc5, 0x52, 0x95, 0x9c, 0xc4, 0xc4, 0x45, 0xf0, 0x52, 0x93, 0xc9,
+	0x98, 0x1d, 0x36, 0x9d, 0x69, 0x33, 0x6f, 0x0e, 0xfa, 0x21, 0xc4, 0x8f, 0xd5, 0x83, 0x87, 0x3d,
+	0x2e, 0x1e, 0x82, 0xa6, 0xdf, 0xc2, 0x93, 0x34, 0x6d, 0x4c, 0x16, 0x5c, 0xe8, 0x65, 0x6f, 0x7f,
+	0xf2, 0xfe, 0xef, 0xfd, 0xde, 0xe4, 0xff, 0xf0, 0x13, 0xbd, 0xcc, 0x7d, 0xbd, 0xcc, 0x35, 0xc4,
+	0xa0, 0x7d, 0x65, 0x20, 0x17, 0xbc, 0x68, 0x05, 0x5d, 0x14, 0x0a, 0x94, 0xfb, 0x80, 0x29, 0x76,
+	0x56, 0xa8, 0x98, 0x9d, 0x52, 0xbd, 0xcc, 0x69, 0x53, 0x7d, 0x78, 0x3f, 0x53, 0x99, 0xaa, 0x2d,
+	0xfe, 0x46, 0x6d, 0xdd, 0xc3, 0x04, 0xf7, 0x22, 0xae, 0xb5, 0x50, 0xd2, 0xfd, 0x80, 0x6d, 0x91,
+	0xf6, 0xd1, 0x00, 0x8d, 0xee, 0x4c, 0xde, 0xac, 0x4a, 0xcf, 0xfa, 0x59, 0x7a, 0xc7, 0x99, 0x80,
+	0x53, 0x93, 0x50, 0xa6, 0xe6, 0xfe, 0xbf, 0xb9, 0x69, 0xd2, 0x6a, 0x7f, 0x71, 0x96, 0x6d, 0x76,
+	0xf2, 0x59, 0x6e, 0x34, 0xf0, 0xc2, 0x48, 0xb1, 0x34, 0x9c, 0x06, 0xd3, 0xaa, 0xf4, 0xec, 0x60,
+	0x1a, 0xda, 0x22, 0x1d, 0x7e, 0xc2, 0xce, 0xfb, 0x22, 0x96, 0x3a, 0x66, 0xb0, 0xe1, 0xbc, 0xeb,
+	0x70, 0x5e, 0xee, 0x38, 0x47, 0x7b, 0x71, 0x0c, 0x88, 0xdc, 0x37, 0x46, 0xa4, 0xf4, 0xe4, 0xe4,
+	0x12, 0xe1, 0x9b, 0x8d, 0x0f, 0x22, 0x88, 0x81, 0xcf, 0xb9, 0x84, 0x6b, 0x7b, 0x88, 0xfb, 0x15,
+	0xdf, 0xfd, 0x2c, 0x64, 0xc6, 0x8b, 0x45, 0x21, 0x24, 0xcc, 0x44, 0xda, 0xb7, 0x07, 0x68, 0x74,
+	0x73, 0x12, 0x55, 0xa5, 0x77, 0xf8, 0xba, 0xad, 0x04, 0xd3, 0x3f, 0xa5, 0xf7, 0x7c, 0x2f, 0x62,
+	0xad, 0x16, 0x09, 0x8d, 0x60, 0x0e, 0x97, 0x26, 0x84, 0x87, 0x1d, 0x54, 0x90, 0xba, 0xcf, 0xb0,
+	0x9b, 0xc7, 0xc0, 0x25, 0xfb, 0x32, 0x13, 0x72, 0xa6, 0x39, 0x53, 0x32, 0xd5, 0xfd, 0x1b, 0x03,
+	0x34, 0x42, 0xe1, 0xbd, 0x5d, 0x25, 0x90, 0xd1, 0xf6, 0xfb, 0xf0, 0x07, 0xc2, 0xbd, 0xb7, 0xdb,
+	0xe4, 0xdd, 0x63, 0xdc, 0xd3, 0xdb, 0x88, 0xeb, 0x7f, 0xe2, 0x8c, 0x3d, 0xfa, 0xff, 0x13, 0xa1,
+	0xbb, 0x4b, 0x08, 0x1b, 0xbf, 0xfb, 0x0a, 0x3b, 0xd0, 0x26, 0x57, 0xbf, 0xd6, 0x19, 0x3f, 0xbe,
+	0xaa, 0xbd, 0x13, 0x72, 0xd8, 0xed, 0x73, 0x5f, 0xe0, 0x03, 0xdd, 0xa4, 0x53, 0xaf, 0xec, 0x8c,
+	0x1f, 0x5d, 0xb9, 0x43, 0x63, 0x0c, 0xdb, 0x9e, 0xc9, 0xd3, 0xd5, 0x6f, 0x62, 0xad, 0x2a, 0x82,
+	0xce, 0x2b, 0x82, 0x2e, 0x2a, 0x82, 0x7e, 0x55, 0x04, 0x7d, 0x5f, 0x13, 0xeb, 0x7c, 0x4d, 0xac,
+	0x8b, 0x35, 0xb1, 0x3e, 0xde, 0x6e, 0x06, 0x24, 0xb7, 0xea, 0xc3, 0x3e, 0xfa, 0x1b, 0x00, 0x00,
+	0xff, 0xff, 0x66, 0x88, 0x4a, 0x68, 0x2e, 0x03, 0x00, 0x00,
+}
+
+func (m *Session) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *Session) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Session) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	{
+		size := m.ID.Size()
+		i -= size
+		if _, err := m.ID.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintOutliers(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
+}
+
+func (m *Transaction) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *Transaction) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Transaction) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	{
+		size := m.ID.Size()
+		i -= size
+		if _, err := m.ID.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintOutliers(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
+}
+
+func (m *Statement) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *Statement) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Statement) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.LatencyInSeconds != 0 {
+		i -= 8
+		encoding_binary.LittleEndian.PutUint64(dAtA[i:], uint64(math.Float64bits(float64(m.LatencyInSeconds))))
+		i--
+		dAtA[i] = 0x19
+	}
+	if m.FingerprintID != 0 {
+		i = encodeVarintOutliers(dAtA, i, uint64(m.FingerprintID))
+		i--
+		dAtA[i] = 0x10
+	}
+	{
+		size := m.ID.Size()
+		i -= size
+		if _, err := m.ID.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintOutliers(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *Outlier) Marshal() (dAtA []byte, err error) {
@@ -261,112 +374,6 @@ func (m *Outlier) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *Outlier_Session) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *Outlier_Session) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *Outlier_Session) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.ID) > 0 {
-		i -= len(m.ID)
-		copy(dAtA[i:], m.ID)
-		i = encodeVarintOutliers(dAtA, i, uint64(len(m.ID)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *Outlier_Transaction) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *Outlier_Transaction) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *Outlier_Transaction) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.ID != nil {
-		{
-			size := m.ID.Size()
-			i -= size
-			if _, err := m.ID.MarshalTo(dAtA[i:]); err != nil {
-				return 0, err
-			}
-			i = encodeVarintOutliers(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *Outlier_Statement) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *Outlier_Statement) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *Outlier_Statement) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.LatencyInSeconds != 0 {
-		i -= 8
-		encoding_binary.LittleEndian.PutUint64(dAtA[i:], uint64(math.Float64bits(float64(m.LatencyInSeconds))))
-		i--
-		dAtA[i] = 0x19
-	}
-	if m.FingerprintID != 0 {
-		i = encodeVarintOutliers(dAtA, i, uint64(m.FingerprintID))
-		i--
-		dAtA[i] = 0x10
-	}
-	if len(m.ID) > 0 {
-		i -= len(m.ID)
-		copy(dAtA[i:], m.ID)
-		i = encodeVarintOutliers(dAtA, i, uint64(len(m.ID)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
 func encodeVarintOutliers(dAtA []byte, offset int, v uint64) int {
 	offset -= sovOutliers(v)
 	base := offset
@@ -378,6 +385,45 @@ func encodeVarintOutliers(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
+func (m *Session) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = m.ID.Size()
+	n += 1 + l + sovOutliers(uint64(l))
+	return n
+}
+
+func (m *Transaction) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = m.ID.Size()
+	n += 1 + l + sovOutliers(uint64(l))
+	return n
+}
+
+func (m *Statement) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = m.ID.Size()
+	n += 1 + l + sovOutliers(uint64(l))
+	if m.FingerprintID != 0 {
+		n += 1 + sovOutliers(uint64(m.FingerprintID))
+	}
+	if m.LatencyInSeconds != 0 {
+		n += 9
+	}
+	return n
+}
+
 func (m *Outlier) Size() (n int) {
 	if m == nil {
 		return 0
@@ -399,56 +445,290 @@ func (m *Outlier) Size() (n int) {
 	return n
 }
 
-func (m *Outlier_Session) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.ID)
-	if l > 0 {
-		n += 1 + l + sovOutliers(uint64(l))
-	}
-	return n
-}
-
-func (m *Outlier_Transaction) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.ID != nil {
-		l = m.ID.Size()
-		n += 1 + l + sovOutliers(uint64(l))
-	}
-	return n
-}
-
-func (m *Outlier_Statement) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.ID)
-	if l > 0 {
-		n += 1 + l + sovOutliers(uint64(l))
-	}
-	if m.FingerprintID != 0 {
-		n += 1 + sovOutliers(uint64(m.FingerprintID))
-	}
-	if m.LatencyInSeconds != 0 {
-		n += 9
-	}
-	return n
-}
-
 func sovOutliers(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozOutliers(x uint64) (n int) {
 	return sovOutliers(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+}
+func (m *Session) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowOutliers
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: Session: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: Session: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ID", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowOutliers
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthOutliers
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex < 0 {
+				return ErrInvalidLengthOutliers
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.ID.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipOutliers(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthOutliers
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *Transaction) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowOutliers
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: Transaction: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: Transaction: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ID", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowOutliers
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthOutliers
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex < 0 {
+				return ErrInvalidLengthOutliers
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.ID.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipOutliers(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthOutliers
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *Statement) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowOutliers
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: Statement: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: Statement: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ID", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowOutliers
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthOutliers
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex < 0 {
+				return ErrInvalidLengthOutliers
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.ID.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field FingerprintID", wireType)
+			}
+			m.FingerprintID = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowOutliers
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.FingerprintID |= github_com_cockroachdb_cockroach_pkg_roachpb.StmtFingerprintID(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 3:
+			if wireType != 1 {
+				return fmt.Errorf("proto: wrong wireType = %d for field LatencyInSeconds", wireType)
+			}
+			var v uint64
+			if (iNdEx + 8) > l {
+				return io.ErrUnexpectedEOF
+			}
+			v = uint64(encoding_binary.LittleEndian.Uint64(dAtA[iNdEx:]))
+			iNdEx += 8
+			m.LatencyInSeconds = float64(math.Float64frombits(v))
+		default:
+			iNdEx = preIndex
+			skippy, err := skipOutliers(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthOutliers
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
 }
 func (m *Outlier) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
@@ -509,7 +789,7 @@ func (m *Outlier) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Session == nil {
-				m.Session = &Outlier_Session{}
+				m.Session = &Session{}
 			}
 			if err := m.Session.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -545,7 +825,7 @@ func (m *Outlier) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Transaction == nil {
-				m.Transaction = &Outlier_Transaction{}
+				m.Transaction = &Transaction{}
 			}
 			if err := m.Transaction.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -581,295 +861,12 @@ func (m *Outlier) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Statement == nil {
-				m.Statement = &Outlier_Statement{}
+				m.Statement = &Statement{}
 			}
 			if err := m.Statement.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipOutliers(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthOutliers
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *Outlier_Session) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowOutliers
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: Session: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: Session: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ID", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowOutliers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthOutliers
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex < 0 {
-				return ErrInvalidLengthOutliers
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.ID = append(m.ID[:0], dAtA[iNdEx:postIndex]...)
-			if m.ID == nil {
-				m.ID = []byte{}
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipOutliers(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthOutliers
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *Outlier_Transaction) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowOutliers
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: Transaction: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: Transaction: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ID", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowOutliers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthOutliers
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex < 0 {
-				return ErrInvalidLengthOutliers
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			var v github_com_cockroachdb_cockroach_pkg_util_uuid.UUID
-			m.ID = &v
-			if err := m.ID.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipOutliers(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthOutliers
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *Outlier_Statement) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowOutliers
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: Statement: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: Statement: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ID", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowOutliers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthOutliers
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex < 0 {
-				return ErrInvalidLengthOutliers
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.ID = append(m.ID[:0], dAtA[iNdEx:postIndex]...)
-			if m.ID == nil {
-				m.ID = []byte{}
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field FingerprintID", wireType)
-			}
-			m.FingerprintID = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowOutliers
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.FingerprintID |= github_com_cockroachdb_cockroach_pkg_roachpb.StmtFingerprintID(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 3:
-			if wireType != 1 {
-				return fmt.Errorf("proto: wrong wireType = %d for field LatencyInSeconds", wireType)
-			}
-			var v uint64
-			if (iNdEx + 8) > l {
-				return io.ErrUnexpectedEOF
-			}
-			v = uint64(encoding_binary.LittleEndian.Uint64(dAtA[iNdEx:]))
-			iNdEx += 8
-			m.LatencyInSeconds = float64(math.Float64frombits(v))
 		default:
 			iNdEx = preIndex
 			skippy, err := skipOutliers(dAtA[iNdEx:])
