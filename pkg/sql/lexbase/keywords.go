@@ -25,6 +25,7 @@ var KeywordsCategories = map[string]string{
 	"asensitive":                   "U",
 	"asymmetric":                   "R",
 	"at":                           "U",
+	"atomic":                       "U",
 	"attribute":                    "U",
 	"authorization":                "T",
 	"automatic":                    "U",
@@ -45,6 +46,7 @@ var KeywordsCategories = map[string]string{
 	"bundle":                       "U",
 	"by":                           "U",
 	"cache":                        "U",
+	"called":                       "U",
 	"cancel":                       "U",
 	"cancelquery":                  "U",
 	"cascade":                      "U",
@@ -82,6 +84,7 @@ var KeywordsCategories = map[string]string{
 	"conversion":                   "U",
 	"convert":                      "U",
 	"copy":                         "U",
+	"cost":                         "U",
 	"covering":                     "U",
 	"create":                       "R",
 	"createdb":                     "U",
@@ -113,6 +116,7 @@ var KeywordsCategories = map[string]string{
 	"defaults":                     "U",
 	"deferrable":                   "R",
 	"deferred":                     "U",
+	"definer":                      "U",
 	"delete":                       "U",
 	"delimiter":                    "U",
 	"desc":                         "R",
@@ -147,6 +151,7 @@ var KeywordsCategories = map[string]string{
 	"explain":                      "U",
 	"export":                       "U",
 	"extension":                    "U",
+	"external":                     "U",
 	"extract":                      "C",
 	"extract_duration":             "C",
 	"failure":                      "U",
@@ -201,6 +206,7 @@ var KeywordsCategories = map[string]string{
 	"ignore_foreign_keys":          "U",
 	"ilike":                        "T",
 	"immediate":                    "U",
+	"immutable":                    "U",
 	"import":                       "U",
 	"in":                           "R",
 	"include":                      "U",
@@ -214,6 +220,8 @@ var KeywordsCategories = map[string]string{
 	"initially":                    "R",
 	"inject":                       "U",
 	"inner":                        "T",
+	"inout":                        "C",
+	"input":                        "U",
 	"insensitive":                  "U",
 	"insert":                       "U",
 	"int":                          "C",
@@ -223,6 +231,7 @@ var KeywordsCategories = map[string]string{
 	"into":                         "R",
 	"into_db":                      "U",
 	"inverted":                     "U",
+	"invoker":                      "U",
 	"is":                           "T",
 	"iserror":                      "C",
 	"isnull":                       "T",
@@ -242,6 +251,7 @@ var KeywordsCategories = map[string]string{
 	"lc_collate":                   "U",
 	"lc_ctype":                     "U",
 	"leading":                      "R",
+	"leakproof":                    "U",
 	"lease":                        "U",
 	"least":                        "C",
 	"left":                         "T",
@@ -340,6 +350,7 @@ var KeywordsCategories = map[string]string{
 	"overlay":                      "C",
 	"owned":                        "U",
 	"owner":                        "U",
+	"parallel":                     "U",
 	"parent":                       "U",
 	"partial":                      "U",
 	"partition":                    "U",
@@ -403,7 +414,9 @@ var KeywordsCategories = map[string]string{
 	"restricted":                   "U",
 	"resume":                       "U",
 	"retry":                        "U",
+	"return":                       "U",
 	"returning":                    "R",
+	"returns":                      "U",
 	"revision_history":             "U",
 	"revoke":                       "U",
 	"right":                        "T",
@@ -427,6 +440,7 @@ var KeywordsCategories = map[string]string{
 	"scrub":                        "U",
 	"search":                       "U",
 	"second":                       "U",
+	"security":                     "U",
 	"select":                       "R",
 	"sequence":                     "U",
 	"sequences":                    "U",
@@ -436,6 +450,7 @@ var KeywordsCategories = map[string]string{
 	"sessions":                     "U",
 	"session_user":                 "R",
 	"set":                          "U",
+	"setof":                        "C",
 	"sets":                         "U",
 	"setting":                      "U",
 	"settings":                     "U",
@@ -455,6 +470,7 @@ var KeywordsCategories = map[string]string{
 	"split":                        "U",
 	"sql":                          "U",
 	"sqllogin":                     "U",
+	"stable":                       "U",
 	"start":                        "U",
 	"state":                        "U",
 	"statements":                   "U",
@@ -471,6 +487,7 @@ var KeywordsCategories = map[string]string{
 	"subscription":                 "U",
 	"substring":                    "C",
 	"super":                        "U",
+	"support":                      "U",
 	"survival":                     "U",
 	"survive":                      "U",
 	"symmetric":                    "R",
@@ -499,6 +516,7 @@ var KeywordsCategories = map[string]string{
 	"transaction":                  "U",
 	"transactions":                 "U",
 	"transfer":                     "U",
+	"transform":                    "U",
 	"treat":                        "C",
 	"trigger":                      "U",
 	"trim":                         "C",
@@ -536,6 +554,7 @@ var KeywordsCategories = map[string]string{
 	"viewclustersetting":           "U",
 	"virtual":                      "C",
 	"visible":                      "U",
+	"volatile":                     "U",
 	"voters":                       "U",
 	"when":                         "R",
 	"where":                        "R",
@@ -574,6 +593,7 @@ var KeywordNames = []string{
 	"asensitive",
 	"asymmetric",
 	"at",
+	"atomic",
 	"attribute",
 	"authorization",
 	"automatic",
@@ -594,6 +614,7 @@ var KeywordNames = []string{
 	"bundle",
 	"by",
 	"cache",
+	"called",
 	"cancel",
 	"cancelquery",
 	"cascade",
@@ -631,6 +652,7 @@ var KeywordNames = []string{
 	"conversion",
 	"convert",
 	"copy",
+	"cost",
 	"covering",
 	"create",
 	"createdb",
@@ -662,6 +684,7 @@ var KeywordNames = []string{
 	"defaults",
 	"deferrable",
 	"deferred",
+	"definer",
 	"delete",
 	"delimiter",
 	"desc",
@@ -696,6 +719,7 @@ var KeywordNames = []string{
 	"explain",
 	"export",
 	"extension",
+	"external",
 	"extract",
 	"extract_duration",
 	"failure",
@@ -750,6 +774,7 @@ var KeywordNames = []string{
 	"ignore_foreign_keys",
 	"ilike",
 	"immediate",
+	"immutable",
 	"import",
 	"in",
 	"include",
@@ -763,6 +788,8 @@ var KeywordNames = []string{
 	"initially",
 	"inject",
 	"inner",
+	"inout",
+	"input",
 	"insensitive",
 	"insert",
 	"int",
@@ -772,6 +799,7 @@ var KeywordNames = []string{
 	"into",
 	"into_db",
 	"inverted",
+	"invoker",
 	"is",
 	"iserror",
 	"isnull",
@@ -791,6 +819,7 @@ var KeywordNames = []string{
 	"lc_collate",
 	"lc_ctype",
 	"leading",
+	"leakproof",
 	"lease",
 	"least",
 	"left",
@@ -889,6 +918,7 @@ var KeywordNames = []string{
 	"overlay",
 	"owned",
 	"owner",
+	"parallel",
 	"parent",
 	"partial",
 	"partition",
@@ -952,7 +982,9 @@ var KeywordNames = []string{
 	"restricted",
 	"resume",
 	"retry",
+	"return",
 	"returning",
+	"returns",
 	"revision_history",
 	"revoke",
 	"right",
@@ -976,6 +1008,7 @@ var KeywordNames = []string{
 	"scrub",
 	"search",
 	"second",
+	"security",
 	"select",
 	"sequence",
 	"sequences",
@@ -985,6 +1018,7 @@ var KeywordNames = []string{
 	"sessions",
 	"session_user",
 	"set",
+	"setof",
 	"sets",
 	"setting",
 	"settings",
@@ -1004,6 +1038,7 @@ var KeywordNames = []string{
 	"split",
 	"sql",
 	"sqllogin",
+	"stable",
 	"start",
 	"state",
 	"statements",
@@ -1020,6 +1055,7 @@ var KeywordNames = []string{
 	"subscription",
 	"substring",
 	"super",
+	"support",
 	"survival",
 	"survive",
 	"symmetric",
@@ -1048,6 +1084,7 @@ var KeywordNames = []string{
 	"transaction",
 	"transactions",
 	"transfer",
+	"transform",
 	"treat",
 	"trigger",
 	"trim",
@@ -1085,6 +1122,7 @@ var KeywordNames = []string{
 	"viewclustersetting",
 	"virtual",
 	"visible",
+	"volatile",
 	"voters",
 	"when",
 	"where",
@@ -1150,6 +1188,8 @@ func GetKeywordID(k string) int32 {
 		return ASYMMETRIC
 	case "at":
 		return AT
+	case "atomic":
+		return ATOMIC
 	case "attribute":
 		return ATTRIBUTE
 	case "authorization":
@@ -1190,6 +1230,8 @@ func GetKeywordID(k string) int32 {
 		return BY
 	case "cache":
 		return CACHE
+	case "called":
+		return CALLED
 	case "cancel":
 		return CANCEL
 	case "cancelquery":
@@ -1264,6 +1306,8 @@ func GetKeywordID(k string) int32 {
 		return CONVERT
 	case "copy":
 		return COPY
+	case "cost":
+		return COST
 	case "covering":
 		return COVERING
 	case "create":
@@ -1326,6 +1370,8 @@ func GetKeywordID(k string) int32 {
 		return DEFERRABLE
 	case "deferred":
 		return DEFERRED
+	case "definer":
+		return DEFINER
 	case "delete":
 		return DELETE
 	case "delimiter":
@@ -1394,6 +1440,8 @@ func GetKeywordID(k string) int32 {
 		return EXPORT
 	case "extension":
 		return EXTENSION
+	case "external":
+		return EXTERNAL
 	case "extract":
 		return EXTRACT
 	case "extract_duration":
@@ -1502,6 +1550,8 @@ func GetKeywordID(k string) int32 {
 		return ILIKE
 	case "immediate":
 		return IMMEDIATE
+	case "immutable":
+		return IMMUTABLE
 	case "import":
 		return IMPORT
 	case "in":
@@ -1528,6 +1578,10 @@ func GetKeywordID(k string) int32 {
 		return INJECT
 	case "inner":
 		return INNER
+	case "inout":
+		return INOUT
+	case "input":
+		return INPUT
 	case "insensitive":
 		return INSENSITIVE
 	case "insert":
@@ -1546,6 +1600,8 @@ func GetKeywordID(k string) int32 {
 		return INTO_DB
 	case "inverted":
 		return INVERTED
+	case "invoker":
+		return INVOKER
 	case "is":
 		return IS
 	case "iserror":
@@ -1584,6 +1640,8 @@ func GetKeywordID(k string) int32 {
 		return LC_CTYPE
 	case "leading":
 		return LEADING
+	case "leakproof":
+		return LEAKPROOF
 	case "lease":
 		return LEASE
 	case "least":
@@ -1780,6 +1838,8 @@ func GetKeywordID(k string) int32 {
 		return OWNED
 	case "owner":
 		return OWNER
+	case "parallel":
+		return PARALLEL
 	case "parent":
 		return PARENT
 	case "partial":
@@ -1906,8 +1966,12 @@ func GetKeywordID(k string) int32 {
 		return RESUME
 	case "retry":
 		return RETRY
+	case "return":
+		return RETURN
 	case "returning":
 		return RETURNING
+	case "returns":
+		return RETURNS
 	case "revision_history":
 		return REVISION_HISTORY
 	case "revoke":
@@ -1954,6 +2018,8 @@ func GetKeywordID(k string) int32 {
 		return SEARCH
 	case "second":
 		return SECOND
+	case "security":
+		return SECURITY
 	case "select":
 		return SELECT
 	case "sequence":
@@ -1972,6 +2038,8 @@ func GetKeywordID(k string) int32 {
 		return SESSION_USER
 	case "set":
 		return SET
+	case "setof":
+		return SETOF
 	case "sets":
 		return SETS
 	case "setting":
@@ -2010,6 +2078,8 @@ func GetKeywordID(k string) int32 {
 		return SQL
 	case "sqllogin":
 		return SQLLOGIN
+	case "stable":
+		return STABLE
 	case "start":
 		return START
 	case "state":
@@ -2042,6 +2112,8 @@ func GetKeywordID(k string) int32 {
 		return SUBSTRING
 	case "super":
 		return SUPER
+	case "support":
+		return SUPPORT
 	case "survival":
 		return SURVIVAL
 	case "survive":
@@ -2098,6 +2170,8 @@ func GetKeywordID(k string) int32 {
 		return TRANSACTIONS
 	case "transfer":
 		return TRANSFER
+	case "transform":
+		return TRANSFORM
 	case "treat":
 		return TREAT
 	case "trigger":
@@ -2172,6 +2246,8 @@ func GetKeywordID(k string) int32 {
 		return VIRTUAL
 	case "visible":
 		return VISIBLE
+	case "volatile":
+		return VOLATILE
 	case "voters":
 		return VOTERS
 	case "when":
