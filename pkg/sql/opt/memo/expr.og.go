@@ -17115,6 +17115,10 @@ type CreateViewPrivate struct {
 
 	// TypeDeps contains the type dependencies of the view.
 	TypeDeps opt.ViewTypeDeps
+
+	// WithData indicates if the materialized view is populated
+	// with data upon creation.
+	WithData bool
 }
 
 // ExplainExpr returns information about the execution plan of the "input"
@@ -29827,6 +29831,7 @@ func (in *interner) InternCreateView(val *CreateViewExpr) *CreateViewExpr {
 	in.hasher.HashPresentation(val.Columns)
 	in.hasher.HashViewDeps(val.Deps)
 	in.hasher.HashViewTypeDeps(val.TypeDeps)
+	in.hasher.HashBool(val.WithData)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
@@ -29840,7 +29845,8 @@ func (in *interner) InternCreateView(val *CreateViewExpr) *CreateViewExpr {
 				in.hasher.IsStringEqual(val.ViewQuery, existing.ViewQuery) &&
 				in.hasher.IsPresentationEqual(val.Columns, existing.Columns) &&
 				in.hasher.IsViewDepsEqual(val.Deps, existing.Deps) &&
-				in.hasher.IsViewTypeDepsEqual(val.TypeDeps, existing.TypeDeps) {
+				in.hasher.IsViewTypeDepsEqual(val.TypeDeps, existing.TypeDeps) &&
+				in.hasher.IsBoolEqual(val.WithData, existing.WithData) {
 				return existing
 			}
 		}

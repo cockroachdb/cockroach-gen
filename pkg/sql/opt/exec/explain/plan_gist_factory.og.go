@@ -822,6 +822,7 @@ func (f *PlanGistFactory) ConstructCreateView(
 	columns colinfo.ResultColumns,
 	deps opt.ViewDeps,
 	typeDeps opt.ViewTypeDeps,
+	withData bool,
 ) (exec.Node, error) {
 	f.encodeOperator(createViewOp)
 	f.encodeID(schema.ID())
@@ -837,6 +838,7 @@ func (f *PlanGistFactory) ConstructCreateView(
 		columns,
 		deps,
 		typeDeps,
+		withData,
 	)
 	return node, err
 }

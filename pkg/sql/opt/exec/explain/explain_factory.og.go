@@ -1374,6 +1374,7 @@ func (f *Factory) ConstructCreateView(
 	columns colinfo.ResultColumns,
 	deps opt.ViewDeps,
 	typeDeps opt.ViewTypeDeps,
+	withData bool,
 ) (exec.Node, error) {
 	args := &createViewArgs{
 		Schema:       schema,
@@ -1386,6 +1387,7 @@ func (f *Factory) ConstructCreateView(
 		Columns:      columns,
 		deps:         deps,
 		typeDeps:     typeDeps,
+		withData:     withData,
 	}
 	_n, err := newNode(createViewOp, args, nil /* ordering */)
 	if err != nil {
@@ -1403,6 +1405,7 @@ func (f *Factory) ConstructCreateView(
 		columns,
 		deps,
 		typeDeps,
+		withData,
 	)
 	if err != nil {
 		return nil, err
@@ -2264,6 +2267,7 @@ type createViewArgs struct {
 	Columns      colinfo.ResultColumns
 	deps         opt.ViewDeps
 	typeDeps     opt.ViewTypeDeps
+	withData     bool
 }
 
 type sequenceSelectArgs struct {
