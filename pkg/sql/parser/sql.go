@@ -27074,13 +27074,13 @@ sqldefault:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
 //line sql-gen.y:4027
 		{
-			sqlVAL.union.val = tree.FunctionLeakProof(true)
+			sqlVAL.union.val = tree.FunctionLeakproof(true)
 		}
 	case 477:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
 //line sql-gen.y:4031
 		{
-			sqlVAL.union.val = tree.FunctionLeakProof(false)
+			sqlVAL.union.val = tree.FunctionLeakproof(false)
 		}
 	case 478:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
