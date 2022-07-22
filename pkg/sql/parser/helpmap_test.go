@@ -49,6 +49,7 @@ var expectedHelpStrings = []string{
 	"DELETE",
 	"DISCARD",
 	"DROP DATABASE",
+	"DROP EXTERNAL CONNECTION",
 	"DROP INDEX",
 	"DROP OWNED BY",
 	"DROP ROLE",
