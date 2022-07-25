@@ -16700,6 +16700,66 @@ func (e *NthValueExpr) DataType() *types.T {
 	return e.Typ
 }
 
+// UserDefinedFunctionExpr invokes a user-defined function. The
+// UserDefinedFunctionPrivate field contains the name of the function and a
+// pointer to its type.
+type UserDefinedFunctionExpr struct {
+	Body RelExpr
+	UserDefinedFunctionPrivate
+
+	rank opt.ScalarRank
+}
+
+var _ opt.ScalarExpr = &UserDefinedFunctionExpr{}
+
+func (e *UserDefinedFunctionExpr) Rank() opt.ScalarRank {
+	return e.rank
+}
+
+func (e *UserDefinedFunctionExpr) Op() opt.Operator {
+	return opt.UserDefinedFunctionOp
+}
+
+func (e *UserDefinedFunctionExpr) ChildCount() int {
+	return 1
+}
+
+func (e *UserDefinedFunctionExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Body
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *UserDefinedFunctionExpr) Private() interface{} {
+	return &e.UserDefinedFunctionPrivate
+}
+
+func (e *UserDefinedFunctionExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *UserDefinedFunctionExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Body = child.(RelExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *UserDefinedFunctionExpr) DataType() *types.T {
+	return e.Typ
+}
+
+type UserDefinedFunctionPrivate struct {
+	Name string
+	Typ  *types.T
+}
+
 // KVOptionsExpr is a set of KVOptionItems that specify arbitrary keys and values
 // that are used as modifiers for various statements (see tree.KVOptions). The
 // key is a constant string but the value can be a scalar expression.
@@ -23349,6 +23409,27 @@ func (m *Memo) MemoizeNthValue(
 	return interned
 }
 
+func (m *Memo) MemoizeUserDefinedFunction(
+	body RelExpr,
+	userDefinedFunctionPrivate *UserDefinedFunctionPrivate,
+) *UserDefinedFunctionExpr {
+	const size = int64(unsafe.Sizeof(UserDefinedFunctionExpr{}))
+	e := &UserDefinedFunctionExpr{
+		Body:                       body,
+		UserDefinedFunctionPrivate: *userDefinedFunctionPrivate,
+		rank:                       m.NextRank(),
+	}
+	interned := m.interner.InternUserDefinedFunction(e)
+	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
+		m.memEstimate += size
+		m.CheckExpr(e)
+	}
+	return interned
+}
+
 func (m *Memo) MemoizeCreateTable(
 	input RelExpr,
 	createTablePrivate *CreateTablePrivate,
@@ -25181,6 +25262,8 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternLastValue(t)
 	case *NthValueExpr:
 		return in.InternNthValue(t)
+	case *UserDefinedFunctionExpr:
+		return in.InternUserDefinedFunction(t)
 	case *KVOptionsExpr:
 		return in.InternKVOptions(t)
 	case *KVOptionsItem:
@@ -29729,6 +29812,28 @@ func (in *interner) InternNthValue(val *NthValueExpr) *NthValueExpr {
 		if existing, ok := in.cache.Item().(*NthValueExpr); ok {
 			if in.hasher.IsScalarExprEqual(val.Value, existing.Value) &&
 				in.hasher.IsScalarExprEqual(val.Nth, existing.Nth) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternUserDefinedFunction(val *UserDefinedFunctionExpr) *UserDefinedFunctionExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.UserDefinedFunctionOp)
+	in.hasher.HashRelExpr(val.Body)
+	in.hasher.HashString(val.Name)
+	in.hasher.HashType(val.Typ)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*UserDefinedFunctionExpr); ok {
+			if in.hasher.IsRelExprEqual(val.Body, existing.Body) &&
+				in.hasher.IsStringEqual(val.Name, existing.Name) &&
+				in.hasher.IsTypeEqual(val.Typ, existing.Typ) {
 				return existing
 			}
 		}

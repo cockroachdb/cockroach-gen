@@ -2061,7 +2061,7 @@ const sqlInitialStackSize = 16
 //line sql-gen.y:15156
 
 //line yacctab:1
-var sqlExca = [...]int{
+var sqlExca = [...]int16{
 	-1, 0,
 	1, 5,
 	-2, 1823,
@@ -6159,7 +6159,7 @@ const sqlPrivate = 57344
 
 const sqlLast = 155689
 
-var sqlAct = [...]int{
+var sqlAct = [...]int16{
 	301, 5181, 5489, 5180, 1470, 5407, 5345, 5071, 3274, 3395,
 	5329, 5063, 1206, 197, 5313, 3664, 4885, 5278, 5265, 1010,
 	10, 4, 5252, 1009, 6, 3244, 5134, 5421, 5235, 5195,
@@ -21731,7 +21731,7 @@ var sqlAct = [...]int{
 	0, 0, 0, 0, 0, 0, 0, 0, 1126,
 }
 
-var sqlPact = [...]int{
+var sqlPact = [...]int32{
 	6619, -1000, -1000, -1000, -1000, -1000, -1000, 192, -1000, -1000,
 	191, 187, 184, 182, 179, 176, 174, 173, 171, 169,
 	165, -1000, -1000, 164, 163, 156, 155, -1000, 154, 153,
@@ -22285,7 +22285,7 @@ var sqlPact = [...]int{
 	2314, -1000,
 }
 
-var sqlPgo = [...]int{
+var sqlPgo = [...]int16{
 	0, 4949, 4948, 21, 4947, 4946, 4945, 4944, 4943, 4940,
 	4936, 4933, 4932, 4929, 4928, 4927, 161, 4926, 4925, 4924,
 	4920, 4919, 4918, 4917, 4916, 4915, 4912, 4911, 4908, 4907,
@@ -22359,7 +22359,7 @@ var sqlPgo = [...]int{
 	16, 4229, 4228, 231, 3566, 4226, 4224, 25, 4222, 215,
 }
 
-var sqlR1 = [...]int{
+var sqlR1 = [...]int16{
 	0, 1, 2, 2, 2, 2, 3, 3, 3, 3,
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
@@ -22680,7 +22680,7 @@ var sqlR1 = [...]int{
 	579, 580, 580,
 }
 
-var sqlR2 = [...]int{
+var sqlR2 = [...]int8{
 	0, 1, 1, 1, 1, 0, 1, 1, 2, 1,
 	1, 1, 2, 1, 2, 1, 2, 1, 2, 1,
 	2, 1, 2, 1, 2, 1, 2, 1, 2, 1,
@@ -23001,7 +23001,7 @@ var sqlR2 = [...]int{
 	1, 1, 1,
 }
 
-var sqlChk = [...]int{
+var sqlChk = [...]int16{
 	-1000, -1, -2, 655, -3, -207, -114, -111, -77, -75,
 	-118, -119, -99, -120, -113, -142, -147, -128, -129, -130,
 	-143, -149, -206, -214, -215, -216, -217, -226, -208, -209,
@@ -23555,7 +23555,7 @@ var sqlChk = [...]int{
 	653, -370,
 }
 
-var sqlDef = [...]int{
+var sqlDef = [...]int16{
 	-2, -2, 1, 2, 3, 4, 6, 7, 9, 10,
 	11, 13, 15, 17, 19, 21, 23, 25, 27, 29,
 	31, 33, 34, 35, 37, 39, 41, 43, 1664, 1666,
@@ -24109,7 +24109,7 @@ var sqlDef = [...]int{
 	1325, 1342,
 }
 
-var sqlTok1 = [...]int{
+var sqlTok1 = [...]int16{
 	1, 3, 3, 3, 3, 3, 3, 3, 3, 3,
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
@@ -24125,7 +24125,7 @@ var sqlTok1 = [...]int{
 	3, 3, 3, 659, 639, 660, 635,
 }
 
-var sqlTok2 = [...]int{
+var sqlTok2 = [...]int16{
 	2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
 	12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
 	22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
@@ -24154,7 +24154,7 @@ var sqlTok2 = [...]int{
 	252, 253, 254, 255, 256, 257,
 }
 
-var sqlTok3 = [...]int{
+var sqlTok3 = [...]uint16{
 	57600, 258, 57601, 259, 57602, 260, 57603, 261, 57604, 262,
 	57605, 263, 57606, 264, 57607, 265, 57608, 266, 57609, 267,
 	57610, 268, 57611, 269, 57612, 270, 57613, 271, 57614, 272,
@@ -24311,9 +24311,9 @@ func sqlErrorMessage(state, lookAhead int) string {
 	expected := make([]int, 0, 4)
 
 	// Look for shiftable tokens.
-	base := sqlPact[state]
+	base := int(sqlPact[state])
 	for tok := TOKSTART; tok-1 < len(sqlToknames); tok++ {
-		if n := base + tok; n >= 0 && n < sqlLast && sqlChk[sqlAct[n]] == tok {
+		if n := base + tok; n >= 0 && n < sqlLast && int(sqlChk[int(sqlAct[n])]) == tok {
 			if len(expected) == cap(expected) {
 				return res
 			}
@@ -24323,13 +24323,13 @@ func sqlErrorMessage(state, lookAhead int) string {
 
 	if sqlDef[state] == -2 {
 		i := 0
-		for sqlExca[i] != -1 || sqlExca[i+1] != state {
+		for sqlExca[i] != -1 || int(sqlExca[i+1]) != state {
 			i += 2
 		}
 
 		// Look for tokens that we accept or reduce.
 		for i += 2; sqlExca[i] >= 0; i += 2 {
-			tok := sqlExca[i]
+			tok := int(sqlExca[i])
 			if tok < TOKSTART || sqlExca[i+1] == 0 {
 				continue
 			}
@@ -24360,30 +24360,30 @@ func sqllex1(lex sqlLexer, lval *sqlSymType) (char, token int) {
 	token = 0
 	char = lex.Lex(lval)
 	if char <= 0 {
-		token = sqlTok1[0]
+		token = int(sqlTok1[0])
 		goto out
 	}
 	if char < len(sqlTok1) {
-		token = sqlTok1[char]
+		token = int(sqlTok1[char])
 		goto out
 	}
 	if char >= sqlPrivate {
 		if char < sqlPrivate+len(sqlTok2) {
-			token = sqlTok2[char-sqlPrivate]
+			token = int(sqlTok2[char-sqlPrivate])
 			goto out
 		}
 	}
 	for i := 0; i < len(sqlTok3); i += 2 {
-		token = sqlTok3[i+0]
+		token = int(sqlTok3[i+0])
 		if token == char {
-			token = sqlTok3[i+1]
+			token = int(sqlTok3[i+1])
 			goto out
 		}
 	}
 
 out:
 	if token == 0 {
-		token = sqlTok2[1] /* unknown char */
+		token = int(sqlTok2[1]) /* unknown char */
 	}
 	if sqlDebug >= 3 {
 		__yyfmt__.Printf("lex %s(%d)\n", sqlTokname(token), uint(char))
@@ -24438,7 +24438,7 @@ sqlstack:
 	sqlS[sqlp].yys = sqlstate
 
 sqlnewstate:
-	sqln = sqlPact[sqlstate]
+	sqln = int(sqlPact[sqlstate])
 	if sqln <= sqlFlag {
 		goto sqldefault /* simple state */
 	}
@@ -24449,8 +24449,8 @@ sqlnewstate:
 	if sqln < 0 || sqln >= sqlLast {
 		goto sqldefault
 	}
-	sqln = sqlAct[sqln]
-	if sqlChk[sqln] == sqltoken { /* valid shift */
+	sqln = int(sqlAct[sqln])
+	if int(sqlChk[sqln]) == sqltoken { /* valid shift */
 		sqlrcvr.char = -1
 		sqltoken = -1
 		sqlVAL = sqlrcvr.lval
@@ -24463,7 +24463,7 @@ sqlnewstate:
 
 sqldefault:
 	/* default state action */
-	sqln = sqlDef[sqlstate]
+	sqln = int(sqlDef[sqlstate])
 	if sqln == -2 {
 		if sqlrcvr.char < 0 {
 			sqlrcvr.char, sqltoken = sqllex1(sqllex, &sqlrcvr.lval)
@@ -24472,18 +24472,18 @@ sqldefault:
 		/* look through exception table */
 		xi := 0
 		for {
-			if sqlExca[xi+0] == -1 && sqlExca[xi+1] == sqlstate {
+			if sqlExca[xi+0] == -1 && int(sqlExca[xi+1]) == sqlstate {
 				break
 			}
 			xi += 2
 		}
 		for xi += 2; ; xi += 2 {
-			sqln = sqlExca[xi+0]
+			sqln = int(sqlExca[xi+0])
 			if sqln < 0 || sqln == sqltoken {
 				break
 			}
 		}
-		sqln = sqlExca[xi+1]
+		sqln = int(sqlExca[xi+1])
 		if sqln < 0 {
 			goto ret0
 		}
@@ -24505,10 +24505,10 @@ sqldefault:
 
 			/* find a state where "error" is a legal shift action */
 			for sqlp >= 0 {
-				sqln = sqlPact[sqlS[sqlp].yys] + sqlErrCode
+				sqln = int(sqlPact[sqlS[sqlp].yys]) + sqlErrCode
 				if sqln >= 0 && sqln < sqlLast {
-					sqlstate = sqlAct[sqln] /* simulate a shift of "error" */
-					if sqlChk[sqlstate] == sqlErrCode {
+					sqlstate = int(sqlAct[sqln]) /* simulate a shift of "error" */
+					if int(sqlChk[sqlstate]) == sqlErrCode {
 						goto sqlstack
 					}
 				}
@@ -24544,7 +24544,7 @@ sqldefault:
 	sqlpt := sqlp
 	_ = sqlpt // guard against "declared and not used"
 
-	sqlp -= sqlR2[sqln]
+	sqlp -= int(sqlR2[sqln])
 	// sqlp is now the index of $0. Perform the default action. Iff the
 	// reduced production is ε, $1 is possibly out of range.
 	if sqlp+1 >= len(sqlS) {
@@ -24555,16 +24555,16 @@ sqldefault:
 	sqlVAL = sqlS[sqlp+1]
 
 	/* consult goto table to find next state */
-	sqln = sqlR1[sqln]
-	sqlg := sqlPgo[sqln]
+	sqln = int(sqlR1[sqln])
+	sqlg := int(sqlPgo[sqln])
 	sqlj := sqlg + sqlS[sqlp].yys + 1
 
 	if sqlj >= sqlLast {
-		sqlstate = sqlAct[sqlg]
+		sqlstate = int(sqlAct[sqlg])
 	} else {
-		sqlstate = sqlAct[sqlj]
-		if sqlChk[sqlstate] != -sqln {
-			sqlstate = sqlAct[sqlg]
+		sqlstate = int(sqlAct[sqlj])
+		if int(sqlChk[sqlstate]) != -sqln {
+			sqlstate = int(sqlAct[sqlg])
 		}
 	}
 	// dummy call; replaced with literal code

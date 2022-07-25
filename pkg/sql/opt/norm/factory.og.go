@@ -21294,6 +21294,29 @@ SKIP_RULES:
 	return expr
 }
 
+// ConstructUserDefinedFunction constructs an expression for the UserDefinedFunction operator.
+// UserDefinedFunction invokes a user-defined function. The
+// UserDefinedFunctionPrivate field contains the name of the function and a
+// pointer to its type.
+func (_f *Factory) ConstructUserDefinedFunction(
+	body memo.RelExpr,
+	userDefinedFunctionPrivate *memo.UserDefinedFunctionPrivate,
+) opt.ScalarExpr {
+	_f.constructorStackDepth++
+	if _f.constructorStackDepth > maxConstructorStackDepth {
+		// If the constructor call stack depth exceeds the limit, call
+		// onMaxConstructorStackDepthExceeded and skip all rules.
+		_f.onMaxConstructorStackDepthExceeded()
+		goto SKIP_RULES
+	}
+
+SKIP_RULES:
+	e := _f.mem.MemoizeUserDefinedFunction(body, userDefinedFunctionPrivate)
+	expr := _f.onConstructScalar(e)
+	_f.constructorStackDepth--
+	return expr
+}
+
 // ConstructKVOptionsItem constructs an expression for the KVOptionsItem operator.
 // KVOptionsItem is the key and value of an option (see tree.KVOption). For keys
 // that don't have values, the value is Null.
@@ -23209,6 +23232,13 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		}
 		return t
 
+	case *memo.UserDefinedFunctionExpr:
+		body := replace(t.Body).(memo.RelExpr)
+		if body != t.Body {
+			return f.ConstructUserDefinedFunction(body, &t.UserDefinedFunctionPrivate)
+		}
+		return t
+
 	case *memo.KVOptionsExpr:
 		if after, changed := f.replaceKVOptionsExpr(*t, replace); changed {
 			return &after
@@ -24667,6 +24697,12 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 			f.invokeReplace(t.Nth, replace).(opt.ScalarExpr),
 		)
 
+	case *memo.UserDefinedFunctionExpr:
+		return f.ConstructUserDefinedFunction(
+			f.invokeReplace(t.Body, replace).(memo.RelExpr),
+			&t.UserDefinedFunctionPrivate,
+		)
+
 	case *memo.CreateTableExpr:
 		return f.ConstructCreateTable(
 			f.invokeReplace(t.Input, replace).(memo.RelExpr),
@@ -25856,6 +25892,11 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 		return f.ConstructNthValue(
 			args[0].(opt.ScalarExpr),
 			args[1].(opt.ScalarExpr),
+		)
+	case opt.UserDefinedFunctionOp:
+		return f.ConstructUserDefinedFunction(
+			args[0].(memo.RelExpr),
+			args[1].(*memo.UserDefinedFunctionPrivate),
 		)
 	case opt.CreateTableOp:
 		return f.ConstructCreateTable(
