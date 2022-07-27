@@ -21294,13 +21294,11 @@ SKIP_RULES:
 	return expr
 }
 
-// ConstructUserDefinedFunction constructs an expression for the UserDefinedFunction operator.
-// UserDefinedFunction invokes a user-defined function. The
-// UserDefinedFunctionPrivate field contains the name of the function and a
-// pointer to its type.
-func (_f *Factory) ConstructUserDefinedFunction(
-	body memo.RelExpr,
-	userDefinedFunctionPrivate *memo.UserDefinedFunctionPrivate,
+// ConstructUDF constructs an expression for the UDF operator.
+// UDF invokes a user-defined function. The UDFPrivate field contains the name of
+// the function, the statements in the function body, and a pointer to its type.
+func (_f *Factory) ConstructUDF(
+	uDFPrivate *memo.UDFPrivate,
 ) opt.ScalarExpr {
 	_f.constructorStackDepth++
 	if _f.constructorStackDepth > maxConstructorStackDepth {
@@ -21311,7 +21309,7 @@ func (_f *Factory) ConstructUserDefinedFunction(
 	}
 
 SKIP_RULES:
-	e := _f.mem.MemoizeUserDefinedFunction(body, userDefinedFunctionPrivate)
+	e := _f.mem.MemoizeUDF(uDFPrivate)
 	expr := _f.onConstructScalar(e)
 	_f.constructorStackDepth--
 	return expr
@@ -23232,11 +23230,7 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		}
 		return t
 
-	case *memo.UserDefinedFunctionExpr:
-		body := replace(t.Body).(memo.RelExpr)
-		if body != t.Body {
-			return f.ConstructUserDefinedFunction(body, &t.UserDefinedFunctionPrivate)
-		}
+	case *memo.UDFExpr:
 		return t
 
 	case *memo.KVOptionsExpr:
@@ -24697,11 +24691,8 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 			f.invokeReplace(t.Nth, replace).(opt.ScalarExpr),
 		)
 
-	case *memo.UserDefinedFunctionExpr:
-		return f.ConstructUserDefinedFunction(
-			f.invokeReplace(t.Body, replace).(memo.RelExpr),
-			&t.UserDefinedFunctionPrivate,
-		)
+	case *memo.UDFExpr:
+		return t
 
 	case *memo.CreateTableExpr:
 		return f.ConstructCreateTable(
@@ -25893,10 +25884,9 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 			args[0].(opt.ScalarExpr),
 			args[1].(opt.ScalarExpr),
 		)
-	case opt.UserDefinedFunctionOp:
-		return f.ConstructUserDefinedFunction(
-			args[0].(memo.RelExpr),
-			args[1].(*memo.UserDefinedFunctionPrivate),
+	case opt.UDFOp:
+		return f.ConstructUDF(
+			args[0].(*memo.UDFPrivate),
 		)
 	case opt.CreateTableOp:
 		return f.ConstructCreateTable(

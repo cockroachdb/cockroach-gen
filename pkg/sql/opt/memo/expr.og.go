@@ -16700,63 +16700,53 @@ func (e *NthValueExpr) DataType() *types.T {
 	return e.Typ
 }
 
-// UserDefinedFunctionExpr invokes a user-defined function. The
-// UserDefinedFunctionPrivate field contains the name of the function and a
-// pointer to its type.
-type UserDefinedFunctionExpr struct {
-	Body RelExpr
-	UserDefinedFunctionPrivate
+// UDFExpr invokes a user-defined function. The UDFPrivate field contains the name of
+// the function, the statements in the function body, and a pointer to its type.
+type UDFExpr struct {
+	UDFPrivate
 
 	rank opt.ScalarRank
 }
 
-var _ opt.ScalarExpr = &UserDefinedFunctionExpr{}
+var _ opt.ScalarExpr = &UDFExpr{}
 
-func (e *UserDefinedFunctionExpr) Rank() opt.ScalarRank {
+func (e *UDFExpr) Rank() opt.ScalarRank {
 	return e.rank
 }
 
-func (e *UserDefinedFunctionExpr) Op() opt.Operator {
-	return opt.UserDefinedFunctionOp
+func (e *UDFExpr) Op() opt.Operator {
+	return opt.UDFOp
 }
 
-func (e *UserDefinedFunctionExpr) ChildCount() int {
-	return 1
+func (e *UDFExpr) ChildCount() int {
+	return 0
 }
 
-func (e *UserDefinedFunctionExpr) Child(nth int) opt.Expr {
-	switch nth {
-	case 0:
-		return e.Body
-	}
+func (e *UDFExpr) Child(nth int) opt.Expr {
 	panic(errors.AssertionFailedf("child index out of range"))
 }
 
-func (e *UserDefinedFunctionExpr) Private() interface{} {
-	return &e.UserDefinedFunctionPrivate
+func (e *UDFExpr) Private() interface{} {
+	return &e.UDFPrivate
 }
 
-func (e *UserDefinedFunctionExpr) String() string {
+func (e *UDFExpr) String() string {
 	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
 	f.FormatExpr(e)
 	return f.Buffer.String()
 }
 
-func (e *UserDefinedFunctionExpr) SetChild(nth int, child opt.Expr) {
-	switch nth {
-	case 0:
-		e.Body = child.(RelExpr)
-		return
-	}
+func (e *UDFExpr) SetChild(nth int, child opt.Expr) {
 	panic(errors.AssertionFailedf("child index out of range"))
 }
 
-func (e *UserDefinedFunctionExpr) DataType() *types.T {
+func (e *UDFExpr) DataType() *types.T {
 	return e.Typ
 }
 
-type UserDefinedFunctionPrivate struct {
+type UDFPrivate struct {
 	Name string
+	Body RelListExpr
 	Typ  *types.T
 }
 
@@ -23409,17 +23399,15 @@ func (m *Memo) MemoizeNthValue(
 	return interned
 }
 
-func (m *Memo) MemoizeUserDefinedFunction(
-	body RelExpr,
-	userDefinedFunctionPrivate *UserDefinedFunctionPrivate,
-) *UserDefinedFunctionExpr {
-	const size = int64(unsafe.Sizeof(UserDefinedFunctionExpr{}))
-	e := &UserDefinedFunctionExpr{
-		Body:                       body,
-		UserDefinedFunctionPrivate: *userDefinedFunctionPrivate,
-		rank:                       m.NextRank(),
+func (m *Memo) MemoizeUDF(
+	uDFPrivate *UDFPrivate,
+) *UDFExpr {
+	const size = int64(unsafe.Sizeof(UDFExpr{}))
+	e := &UDFExpr{
+		UDFPrivate: *uDFPrivate,
+		rank:       m.NextRank(),
 	}
-	interned := m.interner.InternUserDefinedFunction(e)
+	interned := m.interner.InternUDF(e)
 	if interned == e {
 		if m.newGroupFn != nil {
 			m.newGroupFn(e)
@@ -25262,8 +25250,8 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternLastValue(t)
 	case *NthValueExpr:
 		return in.InternNthValue(t)
-	case *UserDefinedFunctionExpr:
-		return in.InternUserDefinedFunction(t)
+	case *UDFExpr:
+		return in.InternUDF(t)
 	case *KVOptionsExpr:
 		return in.InternKVOptions(t)
 	case *KVOptionsItem:
@@ -29821,18 +29809,18 @@ func (in *interner) InternNthValue(val *NthValueExpr) *NthValueExpr {
 	return val
 }
 
-func (in *interner) InternUserDefinedFunction(val *UserDefinedFunctionExpr) *UserDefinedFunctionExpr {
+func (in *interner) InternUDF(val *UDFExpr) *UDFExpr {
 	in.hasher.Init()
-	in.hasher.HashOperator(opt.UserDefinedFunctionOp)
-	in.hasher.HashRelExpr(val.Body)
+	in.hasher.HashOperator(opt.UDFOp)
 	in.hasher.HashString(val.Name)
+	in.hasher.HashRelListExpr(val.Body)
 	in.hasher.HashType(val.Typ)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
-		if existing, ok := in.cache.Item().(*UserDefinedFunctionExpr); ok {
-			if in.hasher.IsRelExprEqual(val.Body, existing.Body) &&
-				in.hasher.IsStringEqual(val.Name, existing.Name) &&
+		if existing, ok := in.cache.Item().(*UDFExpr); ok {
+			if in.hasher.IsStringEqual(val.Name, existing.Name) &&
+				in.hasher.IsRelListExprEqual(val.Body, existing.Body) &&
 				in.hasher.IsTypeEqual(val.Typ, existing.Typ) {
 				return existing
 			}
