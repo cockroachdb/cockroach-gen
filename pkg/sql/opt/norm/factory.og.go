@@ -21366,6 +21366,25 @@ SKIP_RULES:
 	return expr
 }
 
+// ConstructCreateFunction constructs an expression for the CreateFunction operator.
+func (_f *Factory) ConstructCreateFunction(
+	createFunctionPrivate *memo.CreateFunctionPrivate,
+) memo.RelExpr {
+	_f.constructorStackDepth++
+	if _f.constructorStackDepth > maxConstructorStackDepth {
+		// If the constructor call stack depth exceeds the limit, call
+		// onMaxConstructorStackDepthExceeded and skip all rules.
+		_f.onMaxConstructorStackDepthExceeded()
+		goto SKIP_RULES
+	}
+
+SKIP_RULES:
+	e := _f.mem.MemoizeCreateFunction(createFunctionPrivate)
+	expr := _f.onConstructRelational(e)
+	_f.constructorStackDepth--
+	return expr
+}
+
 // ConstructExplain constructs an expression for the Explain operator.
 // Explain returns information about the execution plan of the "input"
 // expression.
@@ -23255,6 +23274,9 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 	case *memo.CreateViewExpr:
 		return t
 
+	case *memo.CreateFunctionExpr:
+		return t
+
 	case *memo.ExplainExpr:
 		input := replace(t.Input).(memo.RelExpr)
 		if input != t.Input {
@@ -24703,6 +24725,9 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 	case *memo.CreateViewExpr:
 		return f.mem.MemoizeCreateView(&t.CreateViewPrivate)
 
+	case *memo.CreateFunctionExpr:
+		return f.mem.MemoizeCreateFunction(&t.CreateFunctionPrivate)
+
 	case *memo.ExplainExpr:
 		return f.ConstructExplain(
 			f.invokeReplace(t.Input, replace).(memo.RelExpr),
@@ -25896,6 +25921,10 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 	case opt.CreateViewOp:
 		return f.ConstructCreateView(
 			args[0].(*memo.CreateViewPrivate),
+		)
+	case opt.CreateFunctionOp:
+		return f.ConstructCreateFunction(
+			args[0].(*memo.CreateFunctionPrivate),
 		)
 	case opt.ExplainOp:
 		return f.ConstructExplain(

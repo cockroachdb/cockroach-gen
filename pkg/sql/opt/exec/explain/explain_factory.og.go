@@ -1372,8 +1372,8 @@ func (f *Factory) ConstructCreateView(
 	materialized bool,
 	viewQuery string,
 	columns colinfo.ResultColumns,
-	deps opt.ViewDeps,
-	typeDeps opt.ViewTypeDeps,
+	deps opt.SchemaDeps,
+	typeDeps opt.SchemaTypeDeps,
 	withData bool,
 ) (exec.Node, error) {
 	args := &createViewArgs{
@@ -1882,6 +1882,51 @@ func (f *Factory) ConstructAlterRangeRelocate(
 	return _n, nil
 }
 
+func (f *Factory) ConstructCreateFunction(
+	schema cat.Schema,
+	funcName *tree.FunctionName,
+	replace bool,
+	funcArgs tree.FuncArgs,
+	returnType tree.FuncReturnType,
+	options tree.FunctionOptions,
+	body tree.FunctionBodyStr,
+	deps opt.SchemaDeps,
+	typeDeps opt.SchemaTypeDeps,
+) (exec.Node, error) {
+	args := &createFunctionArgs{
+		Schema:     schema,
+		FuncName:   funcName,
+		Replace:    replace,
+		FuncArgs:   funcArgs,
+		ReturnType: returnType,
+		Options:    options,
+		Body:       body,
+		Deps:       deps,
+		TypeDeps:   typeDeps,
+	}
+	_n, err := newNode(createFunctionOp, args, nil /* ordering */)
+	if err != nil {
+		return nil, err
+	}
+	// Build the "real" node.
+	wrapped, err := f.wrappedFactory.ConstructCreateFunction(
+		schema,
+		funcName,
+		replace,
+		funcArgs,
+		returnType,
+		options,
+		body,
+		deps,
+		typeDeps,
+	)
+	if err != nil {
+		return nil, err
+	}
+	_n.wrappedNode = wrapped
+	return _n, nil
+}
+
 type execOperator int
 
 const (
@@ -1943,6 +1988,7 @@ const (
 	createStatisticsOp
 	exportOp
 	alterRangeRelocateOp
+	createFunctionOp
 	numOperators
 )
 
@@ -2265,8 +2311,8 @@ type createViewArgs struct {
 	Materialized bool
 	ViewQuery    string
 	Columns      colinfo.ResultColumns
-	deps         opt.ViewDeps
-	typeDeps     opt.ViewTypeDeps
+	deps         opt.SchemaDeps
+	typeDeps     opt.SchemaTypeDeps
 	withData     bool
 }
 
@@ -2365,4 +2411,16 @@ type alterRangeRelocateArgs struct {
 	subjectReplicas tree.RelocateSubject
 	toStoreID       tree.TypedExpr
 	fromStoreID     tree.TypedExpr
+}
+
+type createFunctionArgs struct {
+	Schema     cat.Schema
+	FuncName   *tree.FunctionName
+	Replace    bool
+	FuncArgs   tree.FuncArgs
+	ReturnType tree.FuncReturnType
+	Options    tree.FunctionOptions
+	Body       tree.FunctionBodyStr
+	Deps       opt.SchemaDeps
+	TypeDeps   opt.SchemaTypeDeps
 }

@@ -17161,14 +17161,156 @@ type CreateViewPrivate struct {
 	Columns physical.Presentation
 
 	// Deps contains the data source dependencies of the view.
-	Deps opt.ViewDeps
+	Deps opt.SchemaDeps
 
 	// TypeDeps contains the type dependencies of the view.
-	TypeDeps opt.ViewTypeDeps
+	TypeDeps opt.SchemaTypeDeps
 
 	// WithData indicates if the materialized view is populated
 	// with data upon creation.
 	WithData bool
+}
+
+type CreateFunctionExpr struct {
+	CreateFunctionPrivate
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &CreateFunctionExpr{}
+
+func (e *CreateFunctionExpr) Op() opt.Operator {
+	return opt.CreateFunctionOp
+}
+
+func (e *CreateFunctionExpr) ChildCount() int {
+	return 0
+}
+
+func (e *CreateFunctionExpr) Child(nth int) opt.Expr {
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *CreateFunctionExpr) Private() interface{} {
+	return &e.CreateFunctionPrivate
+}
+
+func (e *CreateFunctionExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *CreateFunctionExpr) SetChild(nth int, child opt.Expr) {
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *CreateFunctionExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *CreateFunctionExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *CreateFunctionExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *CreateFunctionExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *CreateFunctionExpr) RequiredPhysical() *physical.Required {
+	return e.grp.bestProps().required
+}
+
+func (e *CreateFunctionExpr) ProvidedPhysical() *physical.Provided {
+	return e.grp.bestProps().provided
+}
+
+func (e *CreateFunctionExpr) Cost() Cost {
+	return e.grp.bestProps().cost
+}
+
+func (e *CreateFunctionExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *CreateFunctionExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
+}
+
+func (e *CreateFunctionExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(errors.AssertionFailedf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *CreateFunctionExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(errors.AssertionFailedf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type createFunctionGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	first CreateFunctionExpr
+	best  bestProps
+}
+
+var _ exprGroup = &createFunctionGroup{}
+
+func (g *createFunctionGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *createFunctionGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *createFunctionGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *createFunctionGroup) bestProps() *bestProps {
+	return &g.best
+}
+
+type CreateFunctionPrivate struct {
+	// Schema is the ID of the catalog schema into which the new function goes.
+	Schema opt.SchemaID
+
+	// FunctionName is the name of the new function.
+	FunctionName *tree.FunctionName
+
+	// Replace indicates whether the existing function, if found, should be
+	// replaced with the new definition or not.
+	Replace bool
+
+	// Args is a slice of Arguments of the new function.
+	Args tree.FuncArgs
+
+	// ReturnType is the return type of the new function.
+	ReturnType tree.FuncReturnType
+
+	// TODO (Chengxiong): break Options into individual option fields.
+	// Options is a slice of attribute values of the new function.
+	Options tree.FunctionOptions
+
+	// Body holds all statements of the new function.
+	Body tree.FunctionBodyStr
+
+	// Deps contains the data source dependencies of the view.
+	Deps opt.SchemaDeps
+
+	// TypeDeps contains the type dependencies of the view.
+	TypeDeps opt.SchemaTypeDeps
 }
 
 // ExplainExpr returns information about the execution plan of the "input"
@@ -23464,6 +23606,28 @@ func (m *Memo) MemoizeCreateView(
 	return interned.FirstExpr()
 }
 
+func (m *Memo) MemoizeCreateFunction(
+	createFunctionPrivate *CreateFunctionPrivate,
+) RelExpr {
+	const size = int64(unsafe.Sizeof(createFunctionGroup{}))
+	grp := &createFunctionGroup{mem: m, first: CreateFunctionExpr{
+		CreateFunctionPrivate: *createFunctionPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternCreateFunction(e)
+	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
+		m.logPropsBuilder.buildCreateFunctionProps(e, &grp.rel)
+		grp.rel.Populated = true
+		m.memEstimate += size
+		m.CheckExpr(e)
+	}
+	return interned.FirstExpr()
+}
+
 func (m *Memo) MemoizeExplain(
 	input RelExpr,
 	explainPrivate *ExplainPrivate,
@@ -24612,6 +24776,20 @@ func (m *Memo) AddCreateViewToGroup(e *CreateViewExpr, grp RelExpr) *CreateViewE
 	return interned
 }
 
+func (m *Memo) AddCreateFunctionToGroup(e *CreateFunctionExpr, grp RelExpr) *CreateFunctionExpr {
+	const size = int64(unsafe.Sizeof(CreateFunctionExpr{}))
+	interned := m.interner.InternCreateFunction(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.CheckExpr(e)
+	} else if interned.group() != grp.group() {
+		// This is a group collision, do nothing.
+		return nil
+	}
+	return interned
+}
+
 func (m *Memo) AddExplainToGroup(e *ExplainExpr, grp RelExpr) *ExplainExpr {
 	const size = int64(unsafe.Sizeof(ExplainExpr{}))
 	interned := m.interner.InternExplain(e)
@@ -25262,6 +25440,8 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternCreateTable(t)
 	case *CreateViewExpr:
 		return in.InternCreateView(t)
+	case *CreateFunctionExpr:
+		return in.InternCreateFunction(t)
 	case *ExplainExpr:
 		return in.InternExplain(t)
 	case *ShowTraceForSessionExpr:
@@ -29922,8 +30102,8 @@ func (in *interner) InternCreateView(val *CreateViewExpr) *CreateViewExpr {
 	in.hasher.HashBool(val.Materialized)
 	in.hasher.HashString(val.ViewQuery)
 	in.hasher.HashPresentation(val.Columns)
-	in.hasher.HashViewDeps(val.Deps)
-	in.hasher.HashViewTypeDeps(val.TypeDeps)
+	in.hasher.HashSchemaDeps(val.Deps)
+	in.hasher.HashSchemaTypeDeps(val.TypeDeps)
 	in.hasher.HashBool(val.WithData)
 
 	in.cache.Start(in.hasher.hash)
@@ -29937,9 +30117,43 @@ func (in *interner) InternCreateView(val *CreateViewExpr) *CreateViewExpr {
 				in.hasher.IsBoolEqual(val.Materialized, existing.Materialized) &&
 				in.hasher.IsStringEqual(val.ViewQuery, existing.ViewQuery) &&
 				in.hasher.IsPresentationEqual(val.Columns, existing.Columns) &&
-				in.hasher.IsViewDepsEqual(val.Deps, existing.Deps) &&
-				in.hasher.IsViewTypeDepsEqual(val.TypeDeps, existing.TypeDeps) &&
+				in.hasher.IsSchemaDepsEqual(val.Deps, existing.Deps) &&
+				in.hasher.IsSchemaTypeDepsEqual(val.TypeDeps, existing.TypeDeps) &&
 				in.hasher.IsBoolEqual(val.WithData, existing.WithData) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternCreateFunction(val *CreateFunctionExpr) *CreateFunctionExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.CreateFunctionOp)
+	in.hasher.HashSchemaID(val.Schema)
+	in.hasher.HashPointer(unsafe.Pointer(val.FunctionName))
+	in.hasher.HashBool(val.Replace)
+	in.hasher.HashFuncArgs(val.Args)
+	in.hasher.HashFuncReturnType(val.ReturnType)
+	in.hasher.HashFunctionOptions(val.Options)
+	in.hasher.HashFunctionBodyStr(val.Body)
+	in.hasher.HashSchemaDeps(val.Deps)
+	in.hasher.HashSchemaTypeDeps(val.TypeDeps)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*CreateFunctionExpr); ok {
+			if in.hasher.IsSchemaIDEqual(val.Schema, existing.Schema) &&
+				in.hasher.IsPointerEqual(unsafe.Pointer(val.FunctionName), unsafe.Pointer(existing.FunctionName)) &&
+				in.hasher.IsBoolEqual(val.Replace, existing.Replace) &&
+				in.hasher.IsFuncArgsEqual(val.Args, existing.Args) &&
+				in.hasher.IsFuncReturnTypeEqual(val.ReturnType, existing.ReturnType) &&
+				in.hasher.IsFunctionOptionsEqual(val.Options, existing.Options) &&
+				in.hasher.IsFunctionBodyStrEqual(val.Body, existing.Body) &&
+				in.hasher.IsSchemaDepsEqual(val.Deps, existing.Deps) &&
+				in.hasher.IsSchemaTypeDepsEqual(val.TypeDeps, existing.TypeDeps) {
 				return existing
 			}
 		}
@@ -30437,6 +30651,8 @@ func (b *logicalPropsBuilder) buildProps(e RelExpr, rel *props.Relational) {
 		b.buildCreateTableProps(t, rel)
 	case *CreateViewExpr:
 		b.buildCreateViewProps(t, rel)
+	case *CreateFunctionExpr:
+		b.buildCreateFunctionProps(t, rel)
 	case *ExplainExpr:
 		b.buildExplainProps(t, rel)
 	case *ShowTraceForSessionExpr:

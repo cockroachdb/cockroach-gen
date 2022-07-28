@@ -34322,7 +34322,7 @@ sqldefault:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
 //line sql-gen.y:9624
 		{
-			return unimplemented(sqllex, "ALTER DEFAULT PRIVILEGES ... ON FUNCTIONS ...")
+			sqlVAL.union.val = privilege.Functions
 		}
 	case 1619:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]

@@ -725,8 +725,8 @@ type Factory interface {
 		materialized bool,
 		viewQuery string,
 		columns colinfo.ResultColumns,
-		deps opt.ViewDeps,
-		typeDeps opt.ViewTypeDeps,
+		deps opt.SchemaDeps,
+		typeDeps opt.SchemaTypeDeps,
 		withData bool,
 	) (Node, error)
 
@@ -895,6 +895,21 @@ type Factory interface {
 		subjectReplicas tree.RelocateSubject,
 		toStoreID tree.TypedExpr,
 		fromStoreID tree.TypedExpr,
+	) (Node, error)
+
+	// ConstructCreateFunction creates a node for a CreateFunction operation.
+	//
+	// CreateFunction implements CREATE FUNCTION.
+	ConstructCreateFunction(
+		schema cat.Schema,
+		funcName *tree.FunctionName,
+		replace bool,
+		funcArgs tree.FuncArgs,
+		returnType tree.FuncReturnType,
+		options tree.FunctionOptions,
+		body tree.FunctionBodyStr,
+		deps opt.SchemaDeps,
+		typeDeps opt.SchemaTypeDeps,
 	) (Node, error)
 }
 
@@ -1308,8 +1323,8 @@ func (StubFactory) ConstructCreateView(
 	materialized bool,
 	viewQuery string,
 	columns colinfo.ResultColumns,
-	deps opt.ViewDeps,
-	typeDeps opt.ViewTypeDeps,
+	deps opt.SchemaDeps,
+	typeDeps opt.SchemaTypeDeps,
 	withData bool,
 ) (Node, error) {
 	return struct{}{}, nil
@@ -1444,6 +1459,20 @@ func (StubFactory) ConstructAlterRangeRelocate(
 	subjectReplicas tree.RelocateSubject,
 	toStoreID tree.TypedExpr,
 	fromStoreID tree.TypedExpr,
+) (Node, error) {
+	return struct{}{}, nil
+}
+
+func (StubFactory) ConstructCreateFunction(
+	schema cat.Schema,
+	funcName *tree.FunctionName,
+	replace bool,
+	funcArgs tree.FuncArgs,
+	returnType tree.FuncReturnType,
+	options tree.FunctionOptions,
+	body tree.FunctionBodyStr,
+	deps opt.SchemaDeps,
+	typeDeps opt.SchemaTypeDeps,
 ) (Node, error) {
 	return struct{}{}, nil
 }

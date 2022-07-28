@@ -820,8 +820,8 @@ func (f *PlanGistFactory) ConstructCreateView(
 	materialized bool,
 	viewQuery string,
 	columns colinfo.ResultColumns,
-	deps opt.ViewDeps,
-	typeDeps opt.ViewTypeDeps,
+	deps opt.SchemaDeps,
+	typeDeps opt.SchemaTypeDeps,
 	withData bool,
 ) (exec.Node, error) {
 	f.encodeOperator(createViewOp)
@@ -1078,6 +1078,33 @@ func (f *PlanGistFactory) ConstructAlterRangeRelocate(
 		subjectReplicas,
 		toStoreID,
 		fromStoreID,
+	)
+	return node, err
+}
+
+func (f *PlanGistFactory) ConstructCreateFunction(
+	schema cat.Schema,
+	funcName *tree.FunctionName,
+	replace bool,
+	funcArgs tree.FuncArgs,
+	returnType tree.FuncReturnType,
+	options tree.FunctionOptions,
+	body tree.FunctionBodyStr,
+	deps opt.SchemaDeps,
+	typeDeps opt.SchemaTypeDeps,
+) (exec.Node, error) {
+	f.encodeOperator(createFunctionOp)
+	f.encodeID(schema.ID())
+	node, err := f.wrappedFactory.ConstructCreateFunction(
+		schema,
+		funcName,
+		replace,
+		funcArgs,
+		returnType,
+		options,
+		body,
+		deps,
+		typeDeps,
 	)
 	return node, err
 }
@@ -1378,6 +1405,10 @@ func (f *PlanGistFactory) decodeOperatorBody(op execOperator) (*Node, error) {
 		var args alterRangeRelocateArgs
 		args.input = f.popChild()
 		_n, err = newNode(op, &args, reqOrdering, args.input)
+	case createFunctionOp:
+		var args createFunctionArgs
+		args.Schema = f.decodeSchema()
+		_n, err = newNode(op, &args, reqOrdering)
 	default:
 		return nil, errors.Newf("invalid op: %d", op)
 	}
