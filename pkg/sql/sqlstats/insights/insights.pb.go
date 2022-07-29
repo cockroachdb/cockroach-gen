@@ -11,15 +11,19 @@ import (
 	github_com_cockroachdb_cockroach_pkg_util_uuid "github.com/cockroachdb/cockroach/pkg/util/uuid"
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
+	_ "github.com/gogo/protobuf/types"
+	github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
 	io "io"
 	math "math"
 	math_bits "math/bits"
+	time "time"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
+var _ = time.Kitchen
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the proto package it is being compiled against.
@@ -61,7 +65,9 @@ func (m *Session) XXX_DiscardUnknown() {
 var xxx_messageInfo_Session proto.InternalMessageInfo
 
 type Transaction struct {
-	ID github_com_cockroachdb_cockroach_pkg_util_uuid.UUID `protobuf:"bytes,1,opt,name=id,proto3,customtype=github.com/cockroachdb/cockroach/pkg/util/uuid.UUID" json:"id"`
+	ID            github_com_cockroachdb_cockroach_pkg_util_uuid.UUID                   `protobuf:"bytes,1,opt,name=id,proto3,customtype=github.com/cockroachdb/cockroach/pkg/util/uuid.UUID" json:"id"`
+	FingerprintID github_com_cockroachdb_cockroach_pkg_roachpb.TransactionFingerprintID `protobuf:"varint,2,opt,name=fingerprint_id,json=fingerprintId,proto3,customtype=github.com/cockroachdb/cockroach/pkg/roachpb.TransactionFingerprintID" json:"fingerprint_id"`
+	UserPriority  float64                                                               `protobuf:"fixed64,3,opt,name=user_priority,json=userPriority,proto3" json:"user_priority,omitempty"`
 }
 
 func (m *Transaction) Reset()         { *m = Transaction{} }
@@ -97,6 +103,18 @@ type Statement struct {
 	ID               github_com_cockroachdb_cockroach_pkg_sql_clusterunique.ID      `protobuf:"bytes,1,opt,name=id,proto3,customtype=github.com/cockroachdb/cockroach/pkg/sql/clusterunique.ID" json:"id"`
 	FingerprintID    github_com_cockroachdb_cockroach_pkg_roachpb.StmtFingerprintID `protobuf:"varint,2,opt,name=fingerprint_id,json=fingerprintId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/roachpb.StmtFingerprintID" json:"fingerprint_id,omitempty"`
 	LatencyInSeconds float64                                                        `protobuf:"fixed64,3,opt,name=latency_in_seconds,json=latencyInSeconds,proto3" json:"latency_in_seconds,omitempty"`
+	Query            string                                                         `protobuf:"bytes,4,opt,name=query,proto3" json:"query,omitempty"`
+	Status           string                                                         `protobuf:"bytes,5,opt,name=status,proto3" json:"status,omitempty"`
+	StartTime        time.Time                                                      `protobuf:"bytes,6,opt,name=start_time,json=startTime,proto3,stdtime" json:"start_time"`
+	EndTime          time.Time                                                      `protobuf:"bytes,7,opt,name=end_time,json=endTime,proto3,stdtime" json:"end_time"`
+	FullScan         bool                                                           `protobuf:"varint,8,opt,name=full_scan,json=fullScan,proto3" json:"full_scan,omitempty"`
+	User             string                                                         `protobuf:"bytes,9,opt,name=user,proto3" json:"user,omitempty"`
+	ApplicationName  string                                                         `protobuf:"bytes,10,opt,name=application_name,json=applicationName,proto3" json:"application_name,omitempty"`
+	Database         string                                                         `protobuf:"bytes,11,opt,name=database,proto3" json:"database,omitempty"`
+	PlanGist         string                                                         `protobuf:"bytes,12,opt,name=plan_gist,json=planGist,proto3" json:"plan_gist,omitempty"`
+	RowsRead         int64                                                          `protobuf:"varint,13,opt,name=rows_read,json=rowsRead,proto3" json:"rows_read,omitempty"`
+	RowsWritten      int64                                                          `protobuf:"varint,14,opt,name=rows_written,json=rowsWritten,proto3" json:"rows_written,omitempty"`
+	Retries          int64                                                          `protobuf:"varint,15,opt,name=retries,proto3" json:"retries,omitempty"`
 }
 
 func (m *Statement) Reset()         { *m = Statement{} }
@@ -175,34 +193,52 @@ func init() {
 }
 
 var fileDescriptor_1905fa99396732c4 = []byte{
-	// 424 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x92, 0x41, 0x8b, 0xd3, 0x40,
-	0x14, 0xc7, 0x33, 0x51, 0xac, 0x3b, 0x71, 0x45, 0x06, 0x91, 0xe2, 0x61, 0x52, 0xab, 0x87, 0x22,
-	0x32, 0x81, 0xee, 0x69, 0x2f, 0x8a, 0xa5, 0x2a, 0x39, 0x9a, 0xb8, 0x08, 0x5e, 0x6a, 0x32, 0x19,
-	0xd3, 0x61, 0xd3, 0x99, 0x24, 0x33, 0x39, 0xe8, 0x87, 0x10, 0x3f, 0x56, 0x0f, 0x1e, 0xf6, 0xb8,
-	0x78, 0x08, 0x9a, 0x7e, 0x0b, 0x4f, 0xd2, 0xa4, 0x31, 0x29, 0x58, 0xe8, 0xc5, 0xdb, 0x9f, 0xbc,
-	0xff, 0x7b, 0xbf, 0x37, 0xf9, 0x3f, 0xf8, 0x44, 0x65, 0x89, 0xa3, 0xb2, 0x44, 0xe9, 0x40, 0x2b,
-	0x87, 0x0b, 0xc5, 0xe3, 0x65, 0x4f, 0x90, 0x34, 0x97, 0x5a, 0xa2, 0x07, 0x54, 0xd2, 0xcb, 0x5c,
-	0x06, 0x74, 0x49, 0x54, 0x96, 0x90, 0xb6, 0xfa, 0xf0, 0x7e, 0x2c, 0x63, 0x59, 0x5b, 0x9c, 0xad,
-	0x6a, 0xdc, 0xe3, 0x10, 0x0e, 0x7c, 0xa6, 0x14, 0x97, 0x02, 0xbd, 0x87, 0x26, 0x8f, 0x86, 0x60,
-	0x04, 0x26, 0x77, 0x66, 0x6f, 0xd6, 0xa5, 0x6d, 0xfc, 0x28, 0xed, 0xf3, 0x98, 0xeb, 0x65, 0x11,
-	0x12, 0x2a, 0x57, 0xce, 0xdf, 0xb9, 0x51, 0xd8, 0x69, 0x27, 0xbd, 0x8c, 0xb7, 0x3b, 0x39, 0x34,
-	0x29, 0x94, 0x66, 0x79, 0x21, 0x78, 0x56, 0x30, 0xe2, 0xce, 0xab, 0xd2, 0x36, 0xdd, 0xb9, 0x67,
-	0xf2, 0x68, 0xfc, 0x11, 0x5a, 0xef, 0xf2, 0x40, 0xa8, 0x80, 0xea, 0x2d, 0xe7, 0x6d, 0x8f, 0xf3,
-	0x72, 0xc7, 0x39, 0x3b, 0x8a, 0x53, 0x68, 0x9e, 0x38, 0x45, 0xc1, 0x23, 0x72, 0x71, 0xb1, 0x47,
-	0xf8, 0x6a, 0xc2, 0x13, 0x5f, 0x07, 0x9a, 0xad, 0x98, 0xd0, 0xff, 0xed, 0x21, 0xe8, 0x0b, 0xbc,
-	0xfb, 0x89, 0x8b, 0x98, 0xe5, 0x69, 0xce, 0x85, 0x5e, 0xf0, 0x68, 0x68, 0x8e, 0xc0, 0xe4, 0xe6,
-	0xcc, 0xaf, 0x4a, 0xfb, 0xf4, 0x75, 0x57, 0x71, 0xe7, 0xbf, 0x4b, 0xfb, 0xf9, 0x51, 0xc4, 0x5a,
-	0xa5, 0x21, 0xf1, 0xf5, 0x4a, 0xef, 0x4d, 0xf0, 0x4e, 0x7b, 0x28, 0x37, 0x42, 0xcf, 0x20, 0x4a,
-	0x02, 0xcd, 0x04, 0xfd, 0xbc, 0xe0, 0x62, 0xa1, 0x18, 0x95, 0x22, 0x52, 0xc3, 0x1b, 0x23, 0x30,
-	0x01, 0xde, 0xbd, 0x5d, 0xc5, 0x15, 0x7e, 0xf3, 0x7d, 0xfc, 0x1d, 0xc0, 0x81, 0xdb, 0x24, 0x8f,
-	0xce, 0xe1, 0x40, 0x35, 0x11, 0xd7, 0xff, 0xc4, 0x9a, 0xda, 0xe4, 0xdf, 0x27, 0x42, 0x76, 0x97,
-	0xe0, 0xb5, 0x7e, 0xf4, 0x0a, 0x5a, 0xba, 0x4b, 0xae, 0x7e, 0xad, 0x35, 0x7d, 0x7c, 0xa8, 0xbd,
-	0x17, 0xb2, 0xd7, 0xef, 0x43, 0x2f, 0xe0, 0x89, 0x6a, 0xd3, 0xa9, 0x57, 0xb6, 0xa6, 0x8f, 0x0e,
-	0xee, 0xd0, 0x1a, 0xbd, 0xae, 0x67, 0xf6, 0x74, 0xfd, 0x0b, 0x1b, 0xeb, 0x0a, 0x83, 0xab, 0x0a,
-	0x83, 0xeb, 0x0a, 0x83, 0x9f, 0x15, 0x06, 0xdf, 0x36, 0xd8, 0xb8, 0xda, 0x60, 0xe3, 0x7a, 0x83,
-	0x8d, 0x0f, 0xb7, 0xdb, 0x01, 0xe1, 0xad, 0xfa, 0xb0, 0xcf, 0xfe, 0x04, 0x00, 0x00, 0xff, 0xff,
-	0xc2, 0x05, 0x69, 0xab, 0x2e, 0x03, 0x00, 0x00,
+	// 710 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x54, 0xcf, 0x4f, 0xdb, 0x48,
+	0x14, 0xce, 0x84, 0x1f, 0x71, 0xc6, 0x09, 0xa0, 0x11, 0x42, 0x56, 0x56, 0x72, 0x42, 0xd8, 0x43,
+	0x76, 0xb5, 0xb2, 0xa5, 0x70, 0xe2, 0xb2, 0x68, 0xb3, 0xb0, 0x28, 0x97, 0xd5, 0xae, 0x03, 0x42,
+	0xea, 0xa1, 0xd6, 0xc4, 0x1e, 0xcc, 0x08, 0x67, 0xec, 0xcc, 0x8c, 0x85, 0xe8, 0xbd, 0xc7, 0x4a,
+	0xfc, 0x2b, 0xfd, 0x2f, 0x38, 0xf4, 0xc0, 0x11, 0xf5, 0x90, 0xb6, 0xe1, 0xbf, 0xe8, 0xa9, 0x9a,
+	0x71, 0x42, 0x5c, 0xb5, 0x54, 0x70, 0xe8, 0xed, 0xbd, 0xef, 0x7b, 0xf3, 0xbe, 0xf1, 0xf3, 0x37,
+	0x0f, 0xfe, 0x2a, 0xc6, 0xb1, 0x2b, 0xc6, 0xb1, 0x90, 0x58, 0x0a, 0x97, 0x32, 0x41, 0xa3, 0xf3,
+	0x42, 0xe0, 0xa4, 0x3c, 0x91, 0x09, 0xda, 0x0a, 0x92, 0xe0, 0x82, 0x27, 0x38, 0x38, 0x77, 0xc4,
+	0x38, 0x76, 0xe6, 0x6c, 0x63, 0x33, 0x4a, 0xa2, 0x44, 0x97, 0xb8, 0x2a, 0xca, 0xab, 0x1b, 0xcd,
+	0x28, 0x49, 0xa2, 0x98, 0xb8, 0x3a, 0x1b, 0x66, 0x67, 0xae, 0xa4, 0x23, 0x22, 0x24, 0x1e, 0xa5,
+	0x79, 0x41, 0x7b, 0x08, 0x2b, 0x03, 0x22, 0x04, 0x4d, 0x18, 0x3a, 0x85, 0x65, 0x1a, 0x5a, 0xa0,
+	0x05, 0x3a, 0xb5, 0xde, 0xd1, 0xcd, 0xa4, 0x59, 0x7a, 0x3f, 0x69, 0xee, 0x45, 0x54, 0x9e, 0x67,
+	0x43, 0x27, 0x48, 0x46, 0xee, 0x83, 0x70, 0x38, 0x5c, 0xc4, 0x6e, 0x7a, 0x11, 0xa9, 0x4b, 0xbb,
+	0x41, 0x9c, 0x09, 0x49, 0x78, 0xc6, 0xe8, 0x38, 0x23, 0x4e, 0xff, 0x60, 0x3a, 0x69, 0x96, 0xfb,
+	0x07, 0x5e, 0x99, 0x86, 0xed, 0x37, 0x65, 0x68, 0x1e, 0x73, 0xcc, 0x04, 0x0e, 0xa4, 0x12, 0xfa,
+	0xbf, 0x20, 0xf4, 0xd7, 0x4c, 0x68, 0xf7, 0x49, 0x42, 0x99, 0xa4, 0xb1, 0x9b, 0x65, 0x34, 0x74,
+	0x4e, 0x4e, 0x8a, 0x12, 0xe8, 0x35, 0x80, 0x6b, 0x67, 0x94, 0x45, 0x84, 0xa7, 0x9c, 0x32, 0xe9,
+	0xd3, 0xd0, 0x2a, 0xb7, 0x40, 0x67, 0xb9, 0xf7, 0x72, 0xd6, 0xff, 0xf0, 0x49, 0xfd, 0x75, 0x94,
+	0x0e, 0x9d, 0xc2, 0x6d, 0xff, 0x59, 0x74, 0xd5, 0x8a, 0xf5, 0xaf, 0x00, 0xaf, 0x5e, 0x50, 0xed,
+	0x87, 0x68, 0x07, 0xd6, 0x33, 0x41, 0xb8, 0x9f, 0x72, 0x9a, 0x70, 0x2a, 0xaf, 0xac, 0xa5, 0x16,
+	0xe8, 0x00, 0xaf, 0xa6, 0xc0, 0xff, 0x66, 0x58, 0xfb, 0xed, 0x0a, 0xac, 0x0e, 0x24, 0x96, 0x64,
+	0x44, 0x98, 0xfc, 0x69, 0x63, 0x47, 0xaf, 0x1e, 0x19, 0xc9, 0xe0, 0x9b, 0xaf, 0xf8, 0x3c, 0x69,
+	0xfe, 0xf9, 0xac, 0xf9, 0x0c, 0xe4, 0x48, 0xfe, 0x70, 0x0e, 0x7f, 0x40, 0x14, 0x63, 0x49, 0x58,
+	0x70, 0xe5, 0x53, 0xe6, 0x0b, 0x12, 0x24, 0x2c, 0x14, 0xb3, 0x61, 0x6c, 0xcc, 0x98, 0x3e, 0x1b,
+	0xe4, 0x38, 0xda, 0x84, 0x2b, 0xe3, 0x8c, 0xf0, 0x2b, 0x6b, 0xb9, 0x05, 0x3a, 0x55, 0x2f, 0x4f,
+	0xd0, 0x16, 0x5c, 0x55, 0x4f, 0x21, 0x13, 0xd6, 0x8a, 0x86, 0x67, 0x19, 0xfa, 0x1b, 0x42, 0x21,
+	0x31, 0x97, 0xbe, 0xf2, 0xb2, 0xb5, 0xda, 0x02, 0x1d, 0xb3, 0xdb, 0x70, 0x72, 0xa3, 0x3b, 0x73,
+	0xa3, 0x3b, 0xc7, 0x73, 0xa3, 0xf7, 0x0c, 0x35, 0xd4, 0xeb, 0x0f, 0x4d, 0xe0, 0x55, 0xf5, 0x39,
+	0xc5, 0xa0, 0x7d, 0x68, 0x10, 0x16, 0xe6, 0x2d, 0x2a, 0xcf, 0x68, 0x51, 0x21, 0x2c, 0xd4, 0x0d,
+	0x7e, 0x81, 0xd5, 0xb3, 0x2c, 0x8e, 0x7d, 0x11, 0x60, 0x66, 0x19, 0x2d, 0xd0, 0x31, 0x3c, 0x43,
+	0x01, 0x83, 0x00, 0x33, 0x84, 0xe0, 0xb2, 0xfa, 0xe3, 0x56, 0x55, 0x5f, 0x5c, 0xc7, 0xe8, 0x37,
+	0xb8, 0x81, 0xd3, 0x34, 0xa6, 0x01, 0x56, 0xb6, 0xf2, 0x19, 0x1e, 0x11, 0x0b, 0x6a, 0x7e, 0xbd,
+	0x80, 0xff, 0x8b, 0x47, 0x04, 0x35, 0xa0, 0x11, 0x62, 0x89, 0x87, 0x58, 0x10, 0xcb, 0xd4, 0x25,
+	0x0f, 0xb9, 0xd2, 0x4d, 0x63, 0xcc, 0xfc, 0x88, 0x0a, 0x69, 0xd5, 0x72, 0x52, 0x01, 0x47, 0x54,
+	0x48, 0x45, 0xf2, 0xe4, 0x52, 0xf8, 0x9c, 0xe0, 0xd0, 0xaa, 0xb7, 0x40, 0x67, 0xc9, 0x33, 0x14,
+	0xe0, 0x11, 0x1c, 0xa2, 0x6d, 0x58, 0xd3, 0xe4, 0x25, 0xa7, 0x52, 0x12, 0x66, 0xad, 0x69, 0xde,
+	0x54, 0xd8, 0x69, 0x0e, 0x21, 0x0b, 0x56, 0x38, 0x91, 0x9c, 0x12, 0x61, 0xad, 0x6b, 0x76, 0x9e,
+	0xb6, 0xdf, 0x01, 0x58, 0xe9, 0xe7, 0xbb, 0x06, 0xed, 0xc1, 0x8a, 0xc8, 0x77, 0x86, 0xb6, 0xad,
+	0xd9, 0x6d, 0x3a, 0xdf, 0x5f, 0x4a, 0xce, 0x6c, 0xb5, 0x78, 0xf3, 0x7a, 0x74, 0x08, 0x4d, 0xb9,
+	0x78, 0x5b, 0xda, 0x90, 0x66, 0x77, 0xe7, 0xb1, 0xe3, 0x85, 0x67, 0xe8, 0x15, 0xcf, 0xa1, 0x7d,
+	0xa8, 0x7e, 0x65, 0xfe, 0x80, 0xb4, 0xab, 0xcc, 0xee, 0xf6, 0xa3, 0x77, 0x98, 0x17, 0x7a, 0x8b,
+	0x33, 0xbd, 0xdf, 0x6f, 0x3e, 0xd9, 0xa5, 0x9b, 0xa9, 0x0d, 0x6e, 0xa7, 0x36, 0xb8, 0x9b, 0xda,
+	0xe0, 0xe3, 0xd4, 0x06, 0xd7, 0xf7, 0x76, 0xe9, 0xf6, 0xde, 0x2e, 0xdd, 0xdd, 0xdb, 0xa5, 0x17,
+	0xc6, 0xbc, 0xc1, 0x70, 0x55, 0x1b, 0x62, 0xf7, 0x4b, 0x00, 0x00, 0x00, 0xff, 0xff, 0xd1, 0x47,
+	0x7a, 0xc1, 0xa0, 0x05, 0x00, 0x00,
 }
 
 func (m *Session) Marshal() (dAtA []byte, err error) {
@@ -258,6 +294,17 @@ func (m *Transaction) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	if m.UserPriority != 0 {
+		i -= 8
+		encoding_binary.LittleEndian.PutUint64(dAtA[i:], uint64(math.Float64bits(float64(m.UserPriority))))
+		i--
+		dAtA[i] = 0x19
+	}
+	if m.FingerprintID != 0 {
+		i = encodeVarintInsights(dAtA, i, uint64(m.FingerprintID))
+		i--
+		dAtA[i] = 0x10
+	}
 	{
 		size := m.ID.Size()
 		i -= size
@@ -291,6 +338,89 @@ func (m *Statement) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	if m.Retries != 0 {
+		i = encodeVarintInsights(dAtA, i, uint64(m.Retries))
+		i--
+		dAtA[i] = 0x78
+	}
+	if m.RowsWritten != 0 {
+		i = encodeVarintInsights(dAtA, i, uint64(m.RowsWritten))
+		i--
+		dAtA[i] = 0x70
+	}
+	if m.RowsRead != 0 {
+		i = encodeVarintInsights(dAtA, i, uint64(m.RowsRead))
+		i--
+		dAtA[i] = 0x68
+	}
+	if len(m.PlanGist) > 0 {
+		i -= len(m.PlanGist)
+		copy(dAtA[i:], m.PlanGist)
+		i = encodeVarintInsights(dAtA, i, uint64(len(m.PlanGist)))
+		i--
+		dAtA[i] = 0x62
+	}
+	if len(m.Database) > 0 {
+		i -= len(m.Database)
+		copy(dAtA[i:], m.Database)
+		i = encodeVarintInsights(dAtA, i, uint64(len(m.Database)))
+		i--
+		dAtA[i] = 0x5a
+	}
+	if len(m.ApplicationName) > 0 {
+		i -= len(m.ApplicationName)
+		copy(dAtA[i:], m.ApplicationName)
+		i = encodeVarintInsights(dAtA, i, uint64(len(m.ApplicationName)))
+		i--
+		dAtA[i] = 0x52
+	}
+	if len(m.User) > 0 {
+		i -= len(m.User)
+		copy(dAtA[i:], m.User)
+		i = encodeVarintInsights(dAtA, i, uint64(len(m.User)))
+		i--
+		dAtA[i] = 0x4a
+	}
+	if m.FullScan {
+		i--
+		if m.FullScan {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x40
+	}
+	n1, err1 := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.EndTime, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(m.EndTime):])
+	if err1 != nil {
+		return 0, err1
+	}
+	i -= n1
+	i = encodeVarintInsights(dAtA, i, uint64(n1))
+	i--
+	dAtA[i] = 0x3a
+	n2, err2 := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.StartTime, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(m.StartTime):])
+	if err2 != nil {
+		return 0, err2
+	}
+	i -= n2
+	i = encodeVarintInsights(dAtA, i, uint64(n2))
+	i--
+	dAtA[i] = 0x32
+	if len(m.Status) > 0 {
+		i -= len(m.Status)
+		copy(dAtA[i:], m.Status)
+		i = encodeVarintInsights(dAtA, i, uint64(len(m.Status)))
+		i--
+		dAtA[i] = 0x2a
+	}
+	if len(m.Query) > 0 {
+		i -= len(m.Query)
+		copy(dAtA[i:], m.Query)
+		i = encodeVarintInsights(dAtA, i, uint64(len(m.Query)))
+		i--
+		dAtA[i] = 0x22
+	}
 	if m.LatencyInSeconds != 0 {
 		i -= 8
 		encoding_binary.LittleEndian.PutUint64(dAtA[i:], uint64(math.Float64bits(float64(m.LatencyInSeconds))))
@@ -404,6 +534,12 @@ func (m *Transaction) Size() (n int) {
 	_ = l
 	l = m.ID.Size()
 	n += 1 + l + sovInsights(uint64(l))
+	if m.FingerprintID != 0 {
+		n += 1 + sovInsights(uint64(m.FingerprintID))
+	}
+	if m.UserPriority != 0 {
+		n += 9
+	}
 	return n
 }
 
@@ -420,6 +556,46 @@ func (m *Statement) Size() (n int) {
 	}
 	if m.LatencyInSeconds != 0 {
 		n += 9
+	}
+	l = len(m.Query)
+	if l > 0 {
+		n += 1 + l + sovInsights(uint64(l))
+	}
+	l = len(m.Status)
+	if l > 0 {
+		n += 1 + l + sovInsights(uint64(l))
+	}
+	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.StartTime)
+	n += 1 + l + sovInsights(uint64(l))
+	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.EndTime)
+	n += 1 + l + sovInsights(uint64(l))
+	if m.FullScan {
+		n += 2
+	}
+	l = len(m.User)
+	if l > 0 {
+		n += 1 + l + sovInsights(uint64(l))
+	}
+	l = len(m.ApplicationName)
+	if l > 0 {
+		n += 1 + l + sovInsights(uint64(l))
+	}
+	l = len(m.Database)
+	if l > 0 {
+		n += 1 + l + sovInsights(uint64(l))
+	}
+	l = len(m.PlanGist)
+	if l > 0 {
+		n += 1 + l + sovInsights(uint64(l))
+	}
+	if m.RowsRead != 0 {
+		n += 1 + sovInsights(uint64(m.RowsRead))
+	}
+	if m.RowsWritten != 0 {
+		n += 1 + sovInsights(uint64(m.RowsWritten))
+	}
+	if m.Retries != 0 {
+		n += 1 + sovInsights(uint64(m.Retries))
 	}
 	return n
 }
@@ -596,6 +772,36 @@ func (m *Transaction) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field FingerprintID", wireType)
+			}
+			m.FingerprintID = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowInsights
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.FingerprintID |= github_com_cockroachdb_cockroach_pkg_roachpb.TransactionFingerprintID(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 3:
+			if wireType != 1 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UserPriority", wireType)
+			}
+			var v uint64
+			if (iNdEx + 8) > l {
+				return io.ErrUnexpectedEOF
+			}
+			v = uint64(encoding_binary.LittleEndian.Uint64(dAtA[iNdEx:]))
+			iNdEx += 8
+			m.UserPriority = float64(math.Float64frombits(v))
 		default:
 			iNdEx = preIndex
 			skippy, err := skipInsights(dAtA[iNdEx:])
@@ -709,6 +915,341 @@ func (m *Statement) Unmarshal(dAtA []byte) error {
 			v = uint64(encoding_binary.LittleEndian.Uint64(dAtA[iNdEx:]))
 			iNdEx += 8
 			m.LatencyInSeconds = float64(math.Float64frombits(v))
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Query", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowInsights
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthInsights
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthInsights
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Query = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Status", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowInsights
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthInsights
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthInsights
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Status = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field StartTime", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowInsights
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthInsights
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthInsights
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.StartTime, dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field EndTime", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowInsights
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthInsights
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthInsights
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.EndTime, dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 8:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field FullScan", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowInsights
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.FullScan = bool(v != 0)
+		case 9:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field User", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowInsights
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthInsights
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthInsights
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.User = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 10:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ApplicationName", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowInsights
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthInsights
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthInsights
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ApplicationName = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 11:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Database", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowInsights
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthInsights
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthInsights
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Database = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 12:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PlanGist", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowInsights
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthInsights
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthInsights
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.PlanGist = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 13:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RowsRead", wireType)
+			}
+			m.RowsRead = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowInsights
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.RowsRead |= int64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 14:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RowsWritten", wireType)
+			}
+			m.RowsWritten = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowInsights
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.RowsWritten |= int64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 15:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Retries", wireType)
+			}
+			m.Retries = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowInsights
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Retries |= int64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipInsights(dAtA[iNdEx:])
