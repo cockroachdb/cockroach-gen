@@ -12618,9 +12618,10 @@ func (_f *Factory) ConstructNot(
 		if opt.IsComparisonOp(input) {
 			left := input.Child(0).(opt.ScalarExpr)
 			right := input.Child(1).(opt.ScalarExpr)
-			if !(input.Op() == opt.ContainsOp || input.Op() == opt.ContainedByOp || input.Op() == opt.JsonExistsOp || input.Op() == opt.JsonSomeExistsOp || input.Op() == opt.JsonAllExistsOp || input.Op() == opt.OverlapsOp) {
+			op := input.Op()
+			if _f.funcs.CanNegateComparison(op) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.NegateComparison) {
-					_expr := _f.funcs.NegateComparison(input.Op(), left, right).(opt.ScalarExpr)
+					_expr := _f.funcs.NegateComparison(op, left, right).(opt.ScalarExpr)
 					if _f.appliedRule != nil {
 						_f.appliedRule(opt.NegateComparison, nil, _expr)
 					}
