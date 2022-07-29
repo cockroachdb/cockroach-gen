@@ -440,6 +440,7 @@ var KeywordsCategories = map[string]string{
 	"scrub":                        "U",
 	"search":                       "U",
 	"second":                       "U",
+	"secondary":                    "U",
 	"security":                     "U",
 	"select":                       "R",
 	"sequence":                     "U",
@@ -1008,6 +1009,7 @@ var KeywordNames = []string{
 	"scrub",
 	"search",
 	"second",
+	"secondary",
 	"security",
 	"select",
 	"sequence",
@@ -2018,6 +2020,8 @@ func GetKeywordID(k string) int32 {
 		return SEARCH
 	case "second":
 		return SECOND
+	case "secondary":
+		return SECONDARY
 	case "security":
 		return SECURITY
 	case "select":
