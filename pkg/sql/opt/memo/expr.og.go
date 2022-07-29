@@ -13,6 +13,7 @@ import (
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/props"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/props/physical"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
+	"github.com/cockroachdb/cockroach/pkg/sql/sem/volatility"
 	"github.com/cockroachdb/cockroach/pkg/sql/types"
 	"github.com/cockroachdb/errors"
 )
@@ -16745,9 +16746,10 @@ func (e *UDFExpr) DataType() *types.T {
 }
 
 type UDFPrivate struct {
-	Name string
-	Body RelListExpr
-	Typ  *types.T
+	Name       string
+	Body       RelListExpr
+	Typ        *types.T
+	Volatility volatility.V
 }
 
 // KVOptionsExpr is a set of KVOptionItems that specify arbitrary keys and values
@@ -29995,13 +29997,15 @@ func (in *interner) InternUDF(val *UDFExpr) *UDFExpr {
 	in.hasher.HashString(val.Name)
 	in.hasher.HashRelListExpr(val.Body)
 	in.hasher.HashType(val.Typ)
+	in.hasher.HashVolatility(val.Volatility)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*UDFExpr); ok {
 			if in.hasher.IsStringEqual(val.Name, existing.Name) &&
 				in.hasher.IsRelListExprEqual(val.Body, existing.Body) &&
-				in.hasher.IsTypeEqual(val.Typ, existing.Typ) {
+				in.hasher.IsTypeEqual(val.Typ, existing.Typ) &&
+				in.hasher.IsVolatilityEqual(val.Volatility, existing.Volatility) {
 				return existing
 			}
 		}
