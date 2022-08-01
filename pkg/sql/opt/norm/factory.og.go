@@ -12367,9 +12367,9 @@ func (_f *Factory) ConstructAggregationsItem(
 // ConstructFiltersItem constructs an expression for the FiltersItem operator.
 // FiltersItem contains a filter condition that's evaluated to determine whether
 // Select or Join rows should be filtered. In addition, the FiltersItem caches a
-// set of scalar properties that are lazily calculated by traversing the
-// Condition scalar expression. This allows the properties for the entire
-// expression subtree to be calculated once and then repeatedly reused.
+// set of scalar properties that are calculated by traversing the Condition
+// scalar expression. This allows the properties for the entire expression
+// subtree to be calculated once and then repeatedly reused.
 func (_f *Factory) ConstructFiltersItem(
 	condition opt.ScalarExpr,
 ) memo.FiltersItem {
