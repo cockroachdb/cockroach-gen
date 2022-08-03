@@ -256,6 +256,7 @@ const (
 
 	CovarSampOp
 
+	// CreateFunction represents a CREATE FUNCTION statement.
 	CreateFunctionOp
 
 	CreateFunctionPrivateOp

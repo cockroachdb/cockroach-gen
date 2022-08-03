@@ -902,12 +902,7 @@ type Factory interface {
 	// CreateFunction implements CREATE FUNCTION.
 	ConstructCreateFunction(
 		schema cat.Schema,
-		funcName *tree.FunctionName,
-		replace bool,
-		funcArgs tree.FuncArgs,
-		returnType tree.FuncReturnType,
-		options tree.FunctionOptions,
-		body tree.FunctionBodyStr,
+		cf *tree.CreateFunction,
 		deps opt.SchemaDeps,
 		typeDeps opt.SchemaTypeDeps,
 	) (Node, error)
@@ -1465,12 +1460,7 @@ func (StubFactory) ConstructAlterRangeRelocate(
 
 func (StubFactory) ConstructCreateFunction(
 	schema cat.Schema,
-	funcName *tree.FunctionName,
-	replace bool,
-	funcArgs tree.FuncArgs,
-	returnType tree.FuncReturnType,
-	options tree.FunctionOptions,
-	body tree.FunctionBodyStr,
+	cf *tree.CreateFunction,
 	deps opt.SchemaDeps,
 	typeDeps opt.SchemaTypeDeps,
 ) (Node, error) {

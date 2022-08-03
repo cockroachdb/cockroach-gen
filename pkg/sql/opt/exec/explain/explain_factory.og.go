@@ -1884,25 +1884,15 @@ func (f *Factory) ConstructAlterRangeRelocate(
 
 func (f *Factory) ConstructCreateFunction(
 	schema cat.Schema,
-	funcName *tree.FunctionName,
-	replace bool,
-	funcArgs tree.FuncArgs,
-	returnType tree.FuncReturnType,
-	options tree.FunctionOptions,
-	body tree.FunctionBodyStr,
+	cf *tree.CreateFunction,
 	deps opt.SchemaDeps,
 	typeDeps opt.SchemaTypeDeps,
 ) (exec.Node, error) {
 	args := &createFunctionArgs{
-		Schema:     schema,
-		FuncName:   funcName,
-		Replace:    replace,
-		FuncArgs:   funcArgs,
-		ReturnType: returnType,
-		Options:    options,
-		Body:       body,
-		Deps:       deps,
-		TypeDeps:   typeDeps,
+		Schema:   schema,
+		Cf:       cf,
+		Deps:     deps,
+		TypeDeps: typeDeps,
 	}
 	_n, err := newNode(createFunctionOp, args, nil /* ordering */)
 	if err != nil {
@@ -1911,12 +1901,7 @@ func (f *Factory) ConstructCreateFunction(
 	// Build the "real" node.
 	wrapped, err := f.wrappedFactory.ConstructCreateFunction(
 		schema,
-		funcName,
-		replace,
-		funcArgs,
-		returnType,
-		options,
-		body,
+		cf,
 		deps,
 		typeDeps,
 	)
@@ -2414,13 +2399,8 @@ type alterRangeRelocateArgs struct {
 }
 
 type createFunctionArgs struct {
-	Schema     cat.Schema
-	FuncName   *tree.FunctionName
-	Replace    bool
-	FuncArgs   tree.FuncArgs
-	ReturnType tree.FuncReturnType
-	Options    tree.FunctionOptions
-	Body       tree.FunctionBodyStr
-	Deps       opt.SchemaDeps
-	TypeDeps   opt.SchemaTypeDeps
+	Schema   cat.Schema
+	Cf       *tree.CreateFunction
+	Deps     opt.SchemaDeps
+	TypeDeps opt.SchemaTypeDeps
 }

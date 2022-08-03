@@ -1084,12 +1084,7 @@ func (f *PlanGistFactory) ConstructAlterRangeRelocate(
 
 func (f *PlanGistFactory) ConstructCreateFunction(
 	schema cat.Schema,
-	funcName *tree.FunctionName,
-	replace bool,
-	funcArgs tree.FuncArgs,
-	returnType tree.FuncReturnType,
-	options tree.FunctionOptions,
-	body tree.FunctionBodyStr,
+	cf *tree.CreateFunction,
 	deps opt.SchemaDeps,
 	typeDeps opt.SchemaTypeDeps,
 ) (exec.Node, error) {
@@ -1097,12 +1092,7 @@ func (f *PlanGistFactory) ConstructCreateFunction(
 	f.encodeID(schema.ID())
 	node, err := f.wrappedFactory.ConstructCreateFunction(
 		schema,
-		funcName,
-		replace,
-		funcArgs,
-		returnType,
-		options,
-		body,
+		cf,
 		deps,
 		typeDeps,
 	)

@@ -21367,6 +21367,7 @@ SKIP_RULES:
 }
 
 // ConstructCreateFunction constructs an expression for the CreateFunction operator.
+// CreateFunction represents a CREATE FUNCTION statement.
 func (_f *Factory) ConstructCreateFunction(
 	createFunctionPrivate *memo.CreateFunctionPrivate,
 ) memo.RelExpr {

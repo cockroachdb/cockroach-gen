@@ -17173,6 +17173,7 @@ type CreateViewPrivate struct {
 	WithData bool
 }
 
+// CreateFunctionExpr represents a CREATE FUNCTION statement.
 type CreateFunctionExpr struct {
 	CreateFunctionPrivate
 
@@ -17288,25 +17289,8 @@ type CreateFunctionPrivate struct {
 	// Schema is the ID of the catalog schema into which the new function goes.
 	Schema opt.SchemaID
 
-	// FunctionName is the name of the new function.
-	FunctionName *tree.FunctionName
-
-	// Replace indicates whether the existing function, if found, should be
-	// replaced with the new definition or not.
-	Replace bool
-
-	// Args is a slice of Arguments of the new function.
-	Args tree.FuncArgs
-
-	// ReturnType is the return type of the new function.
-	ReturnType tree.FuncReturnType
-
-	// TODO (Chengxiong): break Options into individual option fields.
-	// Options is a slice of attribute values of the new function.
-	Options tree.FunctionOptions
-
-	// Body holds all statements of the new function.
-	Body tree.FunctionBodyStr
+	// Syntax is the CREATE FUNCTION AST node.
+	Syntax *tree.CreateFunction
 
 	// Deps contains the data source dependencies of the view.
 	Deps opt.SchemaDeps
@@ -30137,12 +30121,7 @@ func (in *interner) InternCreateFunction(val *CreateFunctionExpr) *CreateFunctio
 	in.hasher.Init()
 	in.hasher.HashOperator(opt.CreateFunctionOp)
 	in.hasher.HashSchemaID(val.Schema)
-	in.hasher.HashPointer(unsafe.Pointer(val.FunctionName))
-	in.hasher.HashBool(val.Replace)
-	in.hasher.HashFuncArgs(val.Args)
-	in.hasher.HashFuncReturnType(val.ReturnType)
-	in.hasher.HashFunctionOptions(val.Options)
-	in.hasher.HashFunctionBodyStr(val.Body)
+	in.hasher.HashPointer(unsafe.Pointer(val.Syntax))
 	in.hasher.HashSchemaDeps(val.Deps)
 	in.hasher.HashSchemaTypeDeps(val.TypeDeps)
 
@@ -30150,12 +30129,7 @@ func (in *interner) InternCreateFunction(val *CreateFunctionExpr) *CreateFunctio
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*CreateFunctionExpr); ok {
 			if in.hasher.IsSchemaIDEqual(val.Schema, existing.Schema) &&
-				in.hasher.IsPointerEqual(unsafe.Pointer(val.FunctionName), unsafe.Pointer(existing.FunctionName)) &&
-				in.hasher.IsBoolEqual(val.Replace, existing.Replace) &&
-				in.hasher.IsFuncArgsEqual(val.Args, existing.Args) &&
-				in.hasher.IsFuncReturnTypeEqual(val.ReturnType, existing.ReturnType) &&
-				in.hasher.IsFunctionOptionsEqual(val.Options, existing.Options) &&
-				in.hasher.IsFunctionBodyStrEqual(val.Body, existing.Body) &&
+				in.hasher.IsPointerEqual(unsafe.Pointer(val.Syntax), unsafe.Pointer(existing.Syntax)) &&
 				in.hasher.IsSchemaDepsEqual(val.Deps, existing.Deps) &&
 				in.hasher.IsSchemaTypeDepsEqual(val.TypeDeps, existing.TypeDeps) {
 				return existing
