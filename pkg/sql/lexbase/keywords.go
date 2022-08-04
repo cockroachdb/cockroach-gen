@@ -119,6 +119,7 @@ var KeywordsCategories = map[string]string{
 	"definer":                      "U",
 	"delete":                       "U",
 	"delimiter":                    "U",
+	"depends":                      "U",
 	"desc":                         "R",
 	"destination":                  "U",
 	"detached":                     "U",
@@ -688,6 +689,7 @@ var KeywordNames = []string{
 	"definer",
 	"delete",
 	"delimiter",
+	"depends",
 	"desc",
 	"destination",
 	"detached",
@@ -1378,6 +1380,8 @@ func GetKeywordID(k string) int32 {
 		return DELETE
 	case "delimiter":
 		return DELIMITER
+	case "depends":
+		return DEPENDS
 	case "desc":
 		return DESC
 	case "destination":
