@@ -16701,8 +16701,9 @@ func (e *NthValueExpr) DataType() *types.T {
 	return e.Typ
 }
 
-// UDFExpr invokes a user-defined function. The UDFPrivate field contains the name of
-// the function, the statements in the function body, and a pointer to its type.
+// UDFExpr invokes a user-defined function. The UDFPrivate field contains details
+// about the UDF including the name of the function, the statements in the
+// function body, and a pointer to its type.
 type UDFExpr struct {
 	UDFPrivate
 

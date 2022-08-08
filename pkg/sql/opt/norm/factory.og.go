@@ -21295,8 +21295,9 @@ SKIP_RULES:
 }
 
 // ConstructUDF constructs an expression for the UDF operator.
-// UDF invokes a user-defined function. The UDFPrivate field contains the name of
-// the function, the statements in the function body, and a pointer to its type.
+// UDF invokes a user-defined function. The UDFPrivate field contains details
+// about the UDF including the name of the function, the statements in the
+// function body, and a pointer to its type.
 func (_f *Factory) ConstructUDF(
 	uDFPrivate *memo.UDFPrivate,
 ) opt.ScalarExpr {
