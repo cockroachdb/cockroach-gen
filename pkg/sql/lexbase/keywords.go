@@ -554,7 +554,9 @@ var KeywordsCategories = map[string]string{
 	"view":                         "U",
 	"viewactivity":                 "U",
 	"viewactivityredacted":         "U",
+	"viewclustermetadata":          "U",
 	"viewclustersetting":           "U",
+	"viewdebug":                    "U",
 	"virtual":                      "C",
 	"visible":                      "U",
 	"volatile":                     "U",
@@ -1125,7 +1127,9 @@ var KeywordNames = []string{
 	"view",
 	"viewactivity",
 	"viewactivityredacted",
+	"viewclustermetadata",
 	"viewclustersetting",
+	"viewdebug",
 	"virtual",
 	"visible",
 	"volatile",
@@ -2252,8 +2256,12 @@ func GetKeywordID(k string) int32 {
 		return VIEWACTIVITY
 	case "viewactivityredacted":
 		return VIEWACTIVITYREDACTED
+	case "viewclustermetadata":
+		return VIEWCLUSTERMETADATA
 	case "viewclustersetting":
 		return VIEWCLUSTERSETTING
+	case "viewdebug":
+		return VIEWDEBUG
 	case "virtual":
 		return VIRTUAL
 	case "visible":
