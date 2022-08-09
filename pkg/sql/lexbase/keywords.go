@@ -437,6 +437,7 @@ var KeywordsCategories = map[string]string{
 	"schedules":                    "U",
 	"schema":                       "U",
 	"schemas":                      "U",
+	"schema_only":                  "U",
 	"scroll":                       "U",
 	"scrub":                        "U",
 	"search":                       "U",
@@ -1007,6 +1008,7 @@ var KeywordNames = []string{
 	"schedules",
 	"schema",
 	"schemas",
+	"schema_only",
 	"scroll",
 	"scrub",
 	"search",
@@ -2016,6 +2018,8 @@ func GetKeywordID(k string) int32 {
 		return SCHEMA
 	case "schemas":
 		return SCHEMAS
+	case "schema_only":
+		return SCHEMA_ONLY
 	case "scroll":
 		return SCROLL
 	case "scrub":
