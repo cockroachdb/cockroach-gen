@@ -3184,24 +3184,23 @@ func (_f *Factory) ConstructInnerJoin(
 		}
 	}
 
-	// [ExtractJoinEqualities]
+	// [ExtractJoinComparisons]
 	{
 		if !_f.funcs.HasOuterCols(left) {
 			if !_f.funcs.HasOuterCols(right) {
 				for i := range on {
 					item := &on[i]
-					_eq, _ := item.Condition.(*memo.EqExpr)
-					if _eq != nil {
-						a := _eq.Left
+					if item.Condition.Op() == opt.EqOp || item.Condition.Op() == opt.LtOp || item.Condition.Op() == opt.LeOp || item.Condition.Op() == opt.GtOp || item.Condition.Op() == opt.GeOp {
+						a := item.Condition.Child(0).(opt.ScalarExpr)
 						if !(opt.IsConstValueOp(a)) {
-							b := _eq.Right
+							b := item.Condition.Child(1).(opt.ScalarExpr)
 							if !(opt.IsConstValueOp(b)) {
-								if _f.funcs.CanExtractJoinEquality(a, b, _f.funcs.OutputCols(left), _f.funcs.OutputCols(right)) {
+								if _f.funcs.CanExtractJoinComparison(a, b, _f.funcs.OutputCols(left), _f.funcs.OutputCols(right)) {
 									private := joinPrivate
-									if _f.matchedRule == nil || _f.matchedRule(opt.ExtractJoinEqualities) {
-										_expr := _f.funcs.ExtractJoinEquality(opt.InnerJoinOp, left, right, on, item, private).(memo.RelExpr)
+									if _f.matchedRule == nil || _f.matchedRule(opt.ExtractJoinComparisons) {
+										_expr := _f.funcs.ExtractJoinComparison(opt.InnerJoinOp, left, right, on, item, private).(memo.RelExpr)
 										if _f.appliedRule != nil {
-											_f.appliedRule(opt.ExtractJoinEqualities, nil, _expr)
+											_f.appliedRule(opt.ExtractJoinComparisons, nil, _expr)
 										}
 										_f.constructorStackDepth--
 										return _expr
@@ -4071,24 +4070,23 @@ func (_f *Factory) ConstructLeftJoin(
 		}
 	}
 
-	// [ExtractJoinEqualities]
+	// [ExtractJoinComparisons]
 	{
 		if !_f.funcs.HasOuterCols(left) {
 			if !_f.funcs.HasOuterCols(right) {
 				for i := range on {
 					item := &on[i]
-					_eq, _ := item.Condition.(*memo.EqExpr)
-					if _eq != nil {
-						a := _eq.Left
+					if item.Condition.Op() == opt.EqOp || item.Condition.Op() == opt.LtOp || item.Condition.Op() == opt.LeOp || item.Condition.Op() == opt.GtOp || item.Condition.Op() == opt.GeOp {
+						a := item.Condition.Child(0).(opt.ScalarExpr)
 						if !(opt.IsConstValueOp(a)) {
-							b := _eq.Right
+							b := item.Condition.Child(1).(opt.ScalarExpr)
 							if !(opt.IsConstValueOp(b)) {
-								if _f.funcs.CanExtractJoinEquality(a, b, _f.funcs.OutputCols(left), _f.funcs.OutputCols(right)) {
+								if _f.funcs.CanExtractJoinComparison(a, b, _f.funcs.OutputCols(left), _f.funcs.OutputCols(right)) {
 									private := joinPrivate
-									if _f.matchedRule == nil || _f.matchedRule(opt.ExtractJoinEqualities) {
-										_expr := _f.funcs.ExtractJoinEquality(opt.LeftJoinOp, left, right, on, item, private).(memo.RelExpr)
+									if _f.matchedRule == nil || _f.matchedRule(opt.ExtractJoinComparisons) {
+										_expr := _f.funcs.ExtractJoinComparison(opt.LeftJoinOp, left, right, on, item, private).(memo.RelExpr)
 										if _f.appliedRule != nil {
-											_f.appliedRule(opt.ExtractJoinEqualities, nil, _expr)
+											_f.appliedRule(opt.ExtractJoinComparisons, nil, _expr)
 										}
 										_f.constructorStackDepth--
 										return _expr
@@ -4461,24 +4459,23 @@ func (_f *Factory) ConstructRightJoin(
 		}
 	}
 
-	// [ExtractJoinEqualities]
+	// [ExtractJoinComparisons]
 	{
 		if !_f.funcs.HasOuterCols(left) {
 			if !_f.funcs.HasOuterCols(right) {
 				for i := range on {
 					item := &on[i]
-					_eq, _ := item.Condition.(*memo.EqExpr)
-					if _eq != nil {
-						a := _eq.Left
+					if item.Condition.Op() == opt.EqOp || item.Condition.Op() == opt.LtOp || item.Condition.Op() == opt.LeOp || item.Condition.Op() == opt.GtOp || item.Condition.Op() == opt.GeOp {
+						a := item.Condition.Child(0).(opt.ScalarExpr)
 						if !(opt.IsConstValueOp(a)) {
-							b := _eq.Right
+							b := item.Condition.Child(1).(opt.ScalarExpr)
 							if !(opt.IsConstValueOp(b)) {
-								if _f.funcs.CanExtractJoinEquality(a, b, _f.funcs.OutputCols(left), _f.funcs.OutputCols(right)) {
+								if _f.funcs.CanExtractJoinComparison(a, b, _f.funcs.OutputCols(left), _f.funcs.OutputCols(right)) {
 									private := joinPrivate
-									if _f.matchedRule == nil || _f.matchedRule(opt.ExtractJoinEqualities) {
-										_expr := _f.funcs.ExtractJoinEquality(opt.RightJoinOp, left, right, on, item, private).(memo.RelExpr)
+									if _f.matchedRule == nil || _f.matchedRule(opt.ExtractJoinComparisons) {
+										_expr := _f.funcs.ExtractJoinComparison(opt.RightJoinOp, left, right, on, item, private).(memo.RelExpr)
 										if _f.appliedRule != nil {
-											_f.appliedRule(opt.ExtractJoinEqualities, nil, _expr)
+											_f.appliedRule(opt.ExtractJoinComparisons, nil, _expr)
 										}
 										_f.constructorStackDepth--
 										return _expr
@@ -4790,24 +4787,23 @@ func (_f *Factory) ConstructFullJoin(
 		}
 	}
 
-	// [ExtractJoinEqualities]
+	// [ExtractJoinComparisons]
 	{
 		if !_f.funcs.HasOuterCols(left) {
 			if !_f.funcs.HasOuterCols(right) {
 				for i := range on {
 					item := &on[i]
-					_eq, _ := item.Condition.(*memo.EqExpr)
-					if _eq != nil {
-						a := _eq.Left
+					if item.Condition.Op() == opt.EqOp || item.Condition.Op() == opt.LtOp || item.Condition.Op() == opt.LeOp || item.Condition.Op() == opt.GtOp || item.Condition.Op() == opt.GeOp {
+						a := item.Condition.Child(0).(opt.ScalarExpr)
 						if !(opt.IsConstValueOp(a)) {
-							b := _eq.Right
+							b := item.Condition.Child(1).(opt.ScalarExpr)
 							if !(opt.IsConstValueOp(b)) {
-								if _f.funcs.CanExtractJoinEquality(a, b, _f.funcs.OutputCols(left), _f.funcs.OutputCols(right)) {
+								if _f.funcs.CanExtractJoinComparison(a, b, _f.funcs.OutputCols(left), _f.funcs.OutputCols(right)) {
 									private := joinPrivate
-									if _f.matchedRule == nil || _f.matchedRule(opt.ExtractJoinEqualities) {
-										_expr := _f.funcs.ExtractJoinEquality(opt.FullJoinOp, left, right, on, item, private).(memo.RelExpr)
+									if _f.matchedRule == nil || _f.matchedRule(opt.ExtractJoinComparisons) {
+										_expr := _f.funcs.ExtractJoinComparison(opt.FullJoinOp, left, right, on, item, private).(memo.RelExpr)
 										if _f.appliedRule != nil {
-											_f.appliedRule(opt.ExtractJoinEqualities, nil, _expr)
+											_f.appliedRule(opt.ExtractJoinComparisons, nil, _expr)
 										}
 										_f.constructorStackDepth--
 										return _expr
@@ -5467,24 +5463,23 @@ func (_f *Factory) ConstructSemiJoin(
 		}
 	}
 
-	// [ExtractJoinEqualities]
+	// [ExtractJoinComparisons]
 	{
 		if !_f.funcs.HasOuterCols(left) {
 			if !_f.funcs.HasOuterCols(right) {
 				for i := range on {
 					item := &on[i]
-					_eq, _ := item.Condition.(*memo.EqExpr)
-					if _eq != nil {
-						a := _eq.Left
+					if item.Condition.Op() == opt.EqOp || item.Condition.Op() == opt.LtOp || item.Condition.Op() == opt.LeOp || item.Condition.Op() == opt.GtOp || item.Condition.Op() == opt.GeOp {
+						a := item.Condition.Child(0).(opt.ScalarExpr)
 						if !(opt.IsConstValueOp(a)) {
-							b := _eq.Right
+							b := item.Condition.Child(1).(opt.ScalarExpr)
 							if !(opt.IsConstValueOp(b)) {
-								if _f.funcs.CanExtractJoinEquality(a, b, _f.funcs.OutputCols(left), _f.funcs.OutputCols(right)) {
+								if _f.funcs.CanExtractJoinComparison(a, b, _f.funcs.OutputCols(left), _f.funcs.OutputCols(right)) {
 									private := joinPrivate
-									if _f.matchedRule == nil || _f.matchedRule(opt.ExtractJoinEqualities) {
-										_expr := _f.funcs.ExtractJoinEquality(opt.SemiJoinOp, left, right, on, item, private).(memo.RelExpr)
+									if _f.matchedRule == nil || _f.matchedRule(opt.ExtractJoinComparisons) {
+										_expr := _f.funcs.ExtractJoinComparison(opt.SemiJoinOp, left, right, on, item, private).(memo.RelExpr)
 										if _f.appliedRule != nil {
-											_f.appliedRule(opt.ExtractJoinEqualities, nil, _expr)
+											_f.appliedRule(opt.ExtractJoinComparisons, nil, _expr)
 										}
 										_f.constructorStackDepth--
 										return _expr
@@ -6041,24 +6036,23 @@ func (_f *Factory) ConstructAntiJoin(
 		}
 	}
 
-	// [ExtractJoinEqualities]
+	// [ExtractJoinComparisons]
 	{
 		if !_f.funcs.HasOuterCols(left) {
 			if !_f.funcs.HasOuterCols(right) {
 				for i := range on {
 					item := &on[i]
-					_eq, _ := item.Condition.(*memo.EqExpr)
-					if _eq != nil {
-						a := _eq.Left
+					if item.Condition.Op() == opt.EqOp || item.Condition.Op() == opt.LtOp || item.Condition.Op() == opt.LeOp || item.Condition.Op() == opt.GtOp || item.Condition.Op() == opt.GeOp {
+						a := item.Condition.Child(0).(opt.ScalarExpr)
 						if !(opt.IsConstValueOp(a)) {
-							b := _eq.Right
+							b := item.Condition.Child(1).(opt.ScalarExpr)
 							if !(opt.IsConstValueOp(b)) {
-								if _f.funcs.CanExtractJoinEquality(a, b, _f.funcs.OutputCols(left), _f.funcs.OutputCols(right)) {
+								if _f.funcs.CanExtractJoinComparison(a, b, _f.funcs.OutputCols(left), _f.funcs.OutputCols(right)) {
 									private := joinPrivate
-									if _f.matchedRule == nil || _f.matchedRule(opt.ExtractJoinEqualities) {
-										_expr := _f.funcs.ExtractJoinEquality(opt.AntiJoinOp, left, right, on, item, private).(memo.RelExpr)
+									if _f.matchedRule == nil || _f.matchedRule(opt.ExtractJoinComparisons) {
+										_expr := _f.funcs.ExtractJoinComparison(opt.AntiJoinOp, left, right, on, item, private).(memo.RelExpr)
 										if _f.appliedRule != nil {
-											_f.appliedRule(opt.ExtractJoinEqualities, nil, _expr)
+											_f.appliedRule(opt.ExtractJoinComparisons, nil, _expr)
 										}
 										_f.constructorStackDepth--
 										return _expr

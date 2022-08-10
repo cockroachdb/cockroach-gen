@@ -148,7 +148,7 @@ const (
 	HoistJoinProjectRight
 	HoistJoinProjectLeft
 	SimplifyJoinNotNullEquality
-	ExtractJoinEqualities
+	ExtractJoinComparisons
 	SortFiltersInJoin
 	LeftAssociateJoinsLeft
 	LeftAssociateJoinsRight
