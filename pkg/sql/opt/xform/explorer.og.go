@@ -3896,29 +3896,31 @@ func (_e *explorer) exploreLimit(
 				if _indexJoin != nil {
 					input := _indexJoin.Input
 					indexJoinPrivate := &_indexJoin.IndexJoinPrivate
-					limitExpr := _root.Limit
-					_const, _ := limitExpr.(*memo.ConstExpr)
-					if _const != nil {
-						limit := _const.Value
-						if _e.funcs.IsPositiveInt(limit) {
-							ordering := _root.Ordering
-							cols := _e.funcs.OutputCols(input)
-							if _e.funcs.OrderingCanProjectCols(ordering, cols) {
-								if _e.o.matchedRule == nil || _e.o.matchedRule(opt.PushLimitIntoIndexJoin) {
-									_expr := &memo.IndexJoinExpr{
-										Input: _e.f.ConstructLimit(
-											input,
-											_const,
-											_e.funcs.PruneOrdering(ordering, cols),
-										),
-										IndexJoinPrivate: *indexJoinPrivate,
-									}
-									_interned := _e.mem.AddIndexJoinToGroup(_expr, _root)
-									if _e.o.appliedRule != nil {
-										if _interned != _expr {
-											_e.o.appliedRule(opt.PushLimitIntoIndexJoin, _root, nil)
-										} else {
-											_e.o.appliedRule(opt.PushLimitIntoIndexJoin, _root, _interned)
+					if _e.funcs.IndexJoinPreservesRows(indexJoinPrivate) {
+						limitExpr := _root.Limit
+						_const, _ := limitExpr.(*memo.ConstExpr)
+						if _const != nil {
+							limit := _const.Value
+							if _e.funcs.IsPositiveInt(limit) {
+								ordering := _root.Ordering
+								cols := _e.funcs.OutputCols(input)
+								if _e.funcs.OrderingCanProjectCols(ordering, cols) {
+									if _e.o.matchedRule == nil || _e.o.matchedRule(opt.PushLimitIntoIndexJoin) {
+										_expr := &memo.IndexJoinExpr{
+											Input: _e.f.ConstructLimit(
+												input,
+												_const,
+												_e.funcs.PruneOrdering(ordering, cols),
+											),
+											IndexJoinPrivate: *indexJoinPrivate,
+										}
+										_interned := _e.mem.AddIndexJoinToGroup(_expr, _root)
+										if _e.o.appliedRule != nil {
+											if _interned != _expr {
+												_e.o.appliedRule(opt.PushLimitIntoIndexJoin, _root, nil)
+											} else {
+												_e.o.appliedRule(opt.PushLimitIntoIndexJoin, _root, _interned)
+											}
 										}
 									}
 								}

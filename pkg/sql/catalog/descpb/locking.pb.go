@@ -170,9 +170,6 @@ const (
 	// BLOCK represents the default - wait for the lock to become available.
 	ScanLockingWaitPolicy_BLOCK ScanLockingWaitPolicy = 0
 	// SKIP_LOCKED represents SKIP LOCKED - skip rows that can't be locked.
-	//
-	// NOTE: SKIP_LOCKED is not currently implemented and does not make it out of
-	// the SQL optimizer without throwing an error.
 	ScanLockingWaitPolicy_SKIP_LOCKED ScanLockingWaitPolicy = 1
 	// ERROR represents NOWAIT - raise an error if a row cannot be locked.
 	ScanLockingWaitPolicy_ERROR ScanLockingWaitPolicy = 2
