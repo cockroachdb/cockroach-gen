@@ -70,99 +70,22 @@ func (ExternalStorageProvider) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_cc9668e2484a7cfb, []int{0}
 }
 
-type LocalFileConfig struct {
-	Path   string                                              `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
-	NodeID github_com_cockroachdb_cockroach_pkg_roachpb.NodeID `protobuf:"varint,2,opt,name=node_id,json=nodeId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/roachpb.NodeID" json:"node_id,omitempty"`
-}
-
-func (m *LocalFileConfig) Reset()         { *m = LocalFileConfig{} }
-func (m *LocalFileConfig) String() string { return proto.CompactTextString(m) }
-func (*LocalFileConfig) ProtoMessage()    {}
-func (*LocalFileConfig) Descriptor() ([]byte, []int) {
-	return fileDescriptor_cc9668e2484a7cfb, []int{0}
-}
-func (m *LocalFileConfig) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *LocalFileConfig) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	b = b[:cap(b)]
-	n, err := m.MarshalToSizedBuffer(b)
-	if err != nil {
-		return nil, err
-	}
-	return b[:n], nil
-}
-func (m *LocalFileConfig) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_LocalFileConfig.Merge(m, src)
-}
-func (m *LocalFileConfig) XXX_Size() int {
-	return m.Size()
-}
-func (m *LocalFileConfig) XXX_DiscardUnknown() {
-	xxx_messageInfo_LocalFileConfig.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_LocalFileConfig proto.InternalMessageInfo
-
-// ExternalConnectionConfig is the ExternalStorage configuration for the
-// `external` provider.
-type ExternalConnectionConfig struct {
-	// Name identifies the External Connection object.
-	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// User interacting with the external storage. This is used to check access
-	// privileges of the external connection object.
-	User string `protobuf:"bytes,2,opt,name=user,proto3" json:"user,omitempty"`
-	// Path will be appended to the endpoint of the resource represented by the
-	// external connection object. It is used to access subdirectories/buckets of
-	// the external resource.
-	Path string `protobuf:"bytes,3,opt,name=path,proto3" json:"path,omitempty"`
-}
-
-func (m *ExternalConnectionConfig) Reset()         { *m = ExternalConnectionConfig{} }
-func (m *ExternalConnectionConfig) String() string { return proto.CompactTextString(m) }
-func (*ExternalConnectionConfig) ProtoMessage()    {}
-func (*ExternalConnectionConfig) Descriptor() ([]byte, []int) {
-	return fileDescriptor_cc9668e2484a7cfb, []int{1}
-}
-func (m *ExternalConnectionConfig) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *ExternalConnectionConfig) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	b = b[:cap(b)]
-	n, err := m.MarshalToSizedBuffer(b)
-	if err != nil {
-		return nil, err
-	}
-	return b[:n], nil
-}
-func (m *ExternalConnectionConfig) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ExternalConnectionConfig.Merge(m, src)
-}
-func (m *ExternalConnectionConfig) XXX_Size() int {
-	return m.Size()
-}
-func (m *ExternalConnectionConfig) XXX_DiscardUnknown() {
-	xxx_messageInfo_ExternalConnectionConfig.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_ExternalConnectionConfig proto.InternalMessageInfo
-
 type ExternalStorage struct {
-	Provider                 ExternalStorageProvider   `protobuf:"varint,1,opt,name=provider,proto3,enum=cockroach.cloud.cloudpb.ExternalStorageProvider" json:"provider,omitempty"`
-	LocalFileConfig          LocalFileConfig           `protobuf:"bytes,2,opt,name=local_file_config,json=localFileConfig,proto3" json:"local_file_config"`
-	HttpPath                 ExternalStorage_Http      `protobuf:"bytes,3,opt,name=HttpPath,proto3" json:"HttpPath"`
-	GoogleCloudConfig        *ExternalStorage_GCS      `protobuf:"bytes,4,opt,name=GoogleCloudConfig,proto3" json:"GoogleCloudConfig,omitempty"`
-	S3Config                 *ExternalStorage_S3       `protobuf:"bytes,5,opt,name=S3Config,proto3" json:"S3Config,omitempty"`
-	AzureConfig              *ExternalStorage_Azure    `protobuf:"bytes,6,opt,name=AzureConfig,proto3" json:"AzureConfig,omitempty"`
-	FileTableConfig          ExternalStorage_FileTable `protobuf:"bytes,8,opt,name=FileTableConfig,proto3" json:"FileTableConfig"`
-	ExternalConnectionConfig ExternalConnectionConfig  `protobuf:"bytes,9,opt,name=external_connection_config,json=externalConnectionConfig,proto3" json:"external_connection_config"`
+	Provider                 ExternalStorageProvider                  `protobuf:"varint,1,opt,name=provider,proto3,enum=cockroach.cloud.cloudpb.ExternalStorageProvider" json:"provider,omitempty"`
+	LocalFileConfig          ExternalStorage_LocalFileConfig          `protobuf:"bytes,2,opt,name=local_file_config,json=localFileConfig,proto3" json:"local_file_config"`
+	HttpPath                 ExternalStorage_Http                     `protobuf:"bytes,3,opt,name=HttpPath,proto3" json:"HttpPath"`
+	GoogleCloudConfig        *ExternalStorage_GCS                     `protobuf:"bytes,4,opt,name=GoogleCloudConfig,proto3" json:"GoogleCloudConfig,omitempty"`
+	S3Config                 *ExternalStorage_S3                      `protobuf:"bytes,5,opt,name=S3Config,proto3" json:"S3Config,omitempty"`
+	AzureConfig              *ExternalStorage_Azure                   `protobuf:"bytes,6,opt,name=AzureConfig,proto3" json:"AzureConfig,omitempty"`
+	FileTableConfig          ExternalStorage_FileTable                `protobuf:"bytes,8,opt,name=FileTableConfig,proto3" json:"FileTableConfig"`
+	ExternalConnectionConfig ExternalStorage_ExternalConnectionConfig `protobuf:"bytes,9,opt,name=external_connection_config,json=externalConnectionConfig,proto3" json:"external_connection_config"`
 }
 
 func (m *ExternalStorage) Reset()         { *m = ExternalStorage{} }
 func (m *ExternalStorage) String() string { return proto.CompactTextString(m) }
 func (*ExternalStorage) ProtoMessage()    {}
 func (*ExternalStorage) Descriptor() ([]byte, []int) {
-	return fileDescriptor_cc9668e2484a7cfb, []int{2}
+	return fileDescriptor_cc9668e2484a7cfb, []int{0}
 }
 func (m *ExternalStorage) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -187,6 +110,40 @@ func (m *ExternalStorage) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_ExternalStorage proto.InternalMessageInfo
 
+type ExternalStorage_LocalFileConfig struct {
+	Path   string                                              `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
+	NodeID github_com_cockroachdb_cockroach_pkg_roachpb.NodeID `protobuf:"varint,2,opt,name=node_id,json=nodeId,proto3,casttype=github.com/cockroachdb/cockroach/pkg/roachpb.NodeID" json:"node_id,omitempty"`
+}
+
+func (m *ExternalStorage_LocalFileConfig) Reset()         { *m = ExternalStorage_LocalFileConfig{} }
+func (m *ExternalStorage_LocalFileConfig) String() string { return proto.CompactTextString(m) }
+func (*ExternalStorage_LocalFileConfig) ProtoMessage()    {}
+func (*ExternalStorage_LocalFileConfig) Descriptor() ([]byte, []int) {
+	return fileDescriptor_cc9668e2484a7cfb, []int{0, 0}
+}
+func (m *ExternalStorage_LocalFileConfig) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ExternalStorage_LocalFileConfig) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	b = b[:cap(b)]
+	n, err := m.MarshalToSizedBuffer(b)
+	if err != nil {
+		return nil, err
+	}
+	return b[:n], nil
+}
+func (m *ExternalStorage_LocalFileConfig) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ExternalStorage_LocalFileConfig.Merge(m, src)
+}
+func (m *ExternalStorage_LocalFileConfig) XXX_Size() int {
+	return m.Size()
+}
+func (m *ExternalStorage_LocalFileConfig) XXX_DiscardUnknown() {
+	xxx_messageInfo_ExternalStorage_LocalFileConfig.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ExternalStorage_LocalFileConfig proto.InternalMessageInfo
+
 type ExternalStorage_Http struct {
 	BaseUri string `protobuf:"bytes,1,opt,name=baseUri,proto3" json:"baseUri,omitempty"`
 }
@@ -195,7 +152,7 @@ func (m *ExternalStorage_Http) Reset()         { *m = ExternalStorage_Http{} }
 func (m *ExternalStorage_Http) String() string { return proto.CompactTextString(m) }
 func (*ExternalStorage_Http) ProtoMessage()    {}
 func (*ExternalStorage_Http) Descriptor() ([]byte, []int) {
-	return fileDescriptor_cc9668e2484a7cfb, []int{2, 0}
+	return fileDescriptor_cc9668e2484a7cfb, []int{0, 1}
 }
 func (m *ExternalStorage_Http) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -245,7 +202,7 @@ func (m *ExternalStorage_S3) Reset()         { *m = ExternalStorage_S3{} }
 func (m *ExternalStorage_S3) String() string { return proto.CompactTextString(m) }
 func (*ExternalStorage_S3) ProtoMessage()    {}
 func (*ExternalStorage_S3) Descriptor() ([]byte, []int) {
-	return fileDescriptor_cc9668e2484a7cfb, []int{2, 1}
+	return fileDescriptor_cc9668e2484a7cfb, []int{0, 2}
 }
 func (m *ExternalStorage_S3) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -297,7 +254,7 @@ func (m *ExternalStorage_GCS) Reset()         { *m = ExternalStorage_GCS{} }
 func (m *ExternalStorage_GCS) String() string { return proto.CompactTextString(m) }
 func (*ExternalStorage_GCS) ProtoMessage()    {}
 func (*ExternalStorage_GCS) Descriptor() ([]byte, []int) {
-	return fileDescriptor_cc9668e2484a7cfb, []int{2, 2}
+	return fileDescriptor_cc9668e2484a7cfb, []int{0, 3}
 }
 func (m *ExternalStorage_GCS) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -334,7 +291,7 @@ func (m *ExternalStorage_Azure) Reset()         { *m = ExternalStorage_Azure{} }
 func (m *ExternalStorage_Azure) String() string { return proto.CompactTextString(m) }
 func (*ExternalStorage_Azure) ProtoMessage()    {}
 func (*ExternalStorage_Azure) Descriptor() ([]byte, []int) {
-	return fileDescriptor_cc9668e2484a7cfb, []int{2, 3}
+	return fileDescriptor_cc9668e2484a7cfb, []int{0, 4}
 }
 func (m *ExternalStorage_Azure) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -376,7 +333,7 @@ func (m *ExternalStorage_FileTable) Reset()         { *m = ExternalStorage_FileT
 func (m *ExternalStorage_FileTable) String() string { return proto.CompactTextString(m) }
 func (*ExternalStorage_FileTable) ProtoMessage()    {}
 func (*ExternalStorage_FileTable) Descriptor() ([]byte, []int) {
-	return fileDescriptor_cc9668e2484a7cfb, []int{2, 4}
+	return fileDescriptor_cc9668e2484a7cfb, []int{0, 5}
 }
 func (m *ExternalStorage_FileTable) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -401,16 +358,61 @@ func (m *ExternalStorage_FileTable) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_ExternalStorage_FileTable proto.InternalMessageInfo
 
+// ExternalConnectionConfig is the ExternalStorage configuration for the
+// `external` provider.
+type ExternalStorage_ExternalConnectionConfig struct {
+	// Name identifies the External Connection object.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// User interacting with the external storage. This is used to check access
+	// privileges of the external connection object.
+	User string `protobuf:"bytes,2,opt,name=user,proto3" json:"user,omitempty"`
+	// Path will be appended to the endpoint of the resource represented by the
+	// external connection object. It is used to access subdirectories/buckets of
+	// the external resource.
+	Path string `protobuf:"bytes,3,opt,name=path,proto3" json:"path,omitempty"`
+}
+
+func (m *ExternalStorage_ExternalConnectionConfig) Reset() {
+	*m = ExternalStorage_ExternalConnectionConfig{}
+}
+func (m *ExternalStorage_ExternalConnectionConfig) String() string { return proto.CompactTextString(m) }
+func (*ExternalStorage_ExternalConnectionConfig) ProtoMessage()    {}
+func (*ExternalStorage_ExternalConnectionConfig) Descriptor() ([]byte, []int) {
+	return fileDescriptor_cc9668e2484a7cfb, []int{0, 6}
+}
+func (m *ExternalStorage_ExternalConnectionConfig) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ExternalStorage_ExternalConnectionConfig) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	b = b[:cap(b)]
+	n, err := m.MarshalToSizedBuffer(b)
+	if err != nil {
+		return nil, err
+	}
+	return b[:n], nil
+}
+func (m *ExternalStorage_ExternalConnectionConfig) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ExternalStorage_ExternalConnectionConfig.Merge(m, src)
+}
+func (m *ExternalStorage_ExternalConnectionConfig) XXX_Size() int {
+	return m.Size()
+}
+func (m *ExternalStorage_ExternalConnectionConfig) XXX_DiscardUnknown() {
+	xxx_messageInfo_ExternalStorage_ExternalConnectionConfig.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ExternalStorage_ExternalConnectionConfig proto.InternalMessageInfo
+
 func init() {
 	proto.RegisterEnum("cockroach.cloud.cloudpb.ExternalStorageProvider", ExternalStorageProvider_name, ExternalStorageProvider_value)
-	proto.RegisterType((*LocalFileConfig)(nil), "cockroach.cloud.cloudpb.LocalFileConfig")
-	proto.RegisterType((*ExternalConnectionConfig)(nil), "cockroach.cloud.cloudpb.ExternalConnectionConfig")
 	proto.RegisterType((*ExternalStorage)(nil), "cockroach.cloud.cloudpb.ExternalStorage")
+	proto.RegisterType((*ExternalStorage_LocalFileConfig)(nil), "cockroach.cloud.cloudpb.ExternalStorage.LocalFileConfig")
 	proto.RegisterType((*ExternalStorage_Http)(nil), "cockroach.cloud.cloudpb.ExternalStorage.Http")
 	proto.RegisterType((*ExternalStorage_S3)(nil), "cockroach.cloud.cloudpb.ExternalStorage.S3")
 	proto.RegisterType((*ExternalStorage_GCS)(nil), "cockroach.cloud.cloudpb.ExternalStorage.GCS")
 	proto.RegisterType((*ExternalStorage_Azure)(nil), "cockroach.cloud.cloudpb.ExternalStorage.Azure")
 	proto.RegisterType((*ExternalStorage_FileTable)(nil), "cockroach.cloud.cloudpb.ExternalStorage.FileTable")
+	proto.RegisterType((*ExternalStorage_ExternalConnectionConfig)(nil), "cockroach.cloud.cloudpb.ExternalStorage.ExternalConnectionConfig")
 }
 
 func init() {
@@ -418,153 +420,74 @@ func init() {
 }
 
 var fileDescriptor_cc9668e2484a7cfb = []byte{
-	// 1062 bytes of a gzipped FileDescriptorProto
+	// 1063 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x56, 0x4f, 0x73, 0xdb, 0x44,
-	0x14, 0xb7, 0x62, 0xc7, 0x96, 0x9e, 0xe2, 0x5a, 0x2c, 0x85, 0x6a, 0x3c, 0x60, 0xbb, 0x81, 0x29,
-	0xe1, 0x9f, 0x5d, 0xe2, 0x4f, 0x10, 0xbb, 0x25, 0x84, 0xb6, 0x21, 0x23, 0xb7, 0x1c, 0x72, 0xd1,
-	0xc8, 0xd2, 0x8b, 0x23, 0x2c, 0xef, 0x8a, 0x95, 0x14, 0x5a, 0x6e, 0x5c, 0x38, 0x71, 0xe0, 0x3b,
-	0xf0, 0x45, 0x38, 0xe6, 0xd8, 0x63, 0x4f, 0x1e, 0x70, 0x86, 0x2f, 0xc1, 0x89, 0xd9, 0xd5, 0x4a,
-	0xf1, 0x98, 0xc9, 0x10, 0x2e, 0xc9, 0xee, 0x6f, 0xdf, 0xfb, 0xe9, 0xbd, 0xdf, 0x7b, 0xbb, 0xcf,
-	0xf0, 0xa1, 0x1f, 0xb1, 0x2c, 0x18, 0xc8, 0xbf, 0xf1, 0x74, 0x80, 0x2f, 0x53, 0xe4, 0xd4, 0x8b,
-	0xdc, 0x24, 0x65, 0xdc, 0x9b, 0x61, 0x3f, 0xe6, 0x2c, 0x65, 0xe4, 0x9e, 0xcf, 0xfc, 0x39, 0x67,
-	0x9e, 0x7f, 0xde, 0x97, 0x96, 0x7d, 0x65, 0xdf, 0xbe, 0x3b, 0x63, 0x33, 0x26, 0x6d, 0x06, 0x62,
-	0x95, 0x9b, 0xef, 0xfe, 0xa4, 0x41, 0xeb, 0x29, 0xf3, 0xbd, 0xe8, 0xcb, 0x30, 0xc2, 0x31, 0xa3,
-	0x67, 0xe1, 0x8c, 0x10, 0xa8, 0xc5, 0x5e, 0x7a, 0x6e, 0x6b, 0x3d, 0x6d, 0xcf, 0x70, 0xe4, 0x9a,
-	0x9c, 0x42, 0x83, 0xb2, 0x00, 0xdd, 0x30, 0xb0, 0xb7, 0x7a, 0xda, 0x5e, 0x73, 0x74, 0xb0, 0x5a,
-	0x76, 0xeb, 0xc7, 0x2c, 0xc0, 0xa3, 0x47, 0x7f, 0x2f, 0xbb, 0xc3, 0x59, 0x98, 0x9e, 0x67, 0xd3,
-	0xbe, 0xcf, 0x16, 0x83, 0x32, 0x80, 0x60, 0x7a, 0xbd, 0x1e, 0xc4, 0xf3, 0xd9, 0x40, 0xae, 0xe2,
-	0x69, 0x3f, 0x77, 0x73, 0xea, 0x82, 0xf1, 0x28, 0xd8, 0xfd, 0x16, 0xec, 0xc7, 0x2a, 0x99, 0x31,
-	0xa3, 0x14, 0xfd, 0x34, 0x64, 0xf4, 0x3a, 0x16, 0xea, 0x2d, 0xb0, 0x88, 0x45, 0xac, 0x05, 0x96,
-	0x25, 0xc8, 0x65, 0x20, 0x86, 0x23, 0xd7, 0x65, 0xcc, 0xd5, 0xeb, 0x98, 0x77, 0xff, 0x6a, 0x42,
-	0xab, 0x20, 0x9e, 0xe4, 0x22, 0x91, 0xa7, 0xa0, 0xc7, 0x9c, 0x5d, 0x84, 0x01, 0x72, 0xc9, 0x79,
-	0x67, 0xff, 0x61, 0xff, 0x06, 0xc5, 0xfa, 0x1b, 0xbe, 0x27, 0xca, 0xcf, 0x29, 0x19, 0xc8, 0x29,
-	0xbc, 0x15, 0x09, 0xf1, 0xdc, 0xb3, 0x30, 0x42, 0xd7, 0x97, 0x21, 0xcb, 0xb0, 0xcc, 0xfd, 0xbd,
-	0x1b, 0x69, 0x37, 0xe4, 0x1e, 0xd5, 0x2e, 0x97, 0xdd, 0x8a, 0xd3, 0x8a, 0x36, 0xaa, 0xf0, 0x0d,
-	0xe8, 0x5f, 0xa5, 0x69, 0x7c, 0x52, 0x64, 0x65, 0xee, 0x7f, 0x7e, 0xdb, 0x48, 0xfb, 0xc2, 0x51,
-	0xf1, 0x96, 0x24, 0x22, 0xd8, 0x43, 0xc6, 0x66, 0x11, 0x8e, 0x85, 0x57, 0xfe, 0x15, 0xbb, 0x26,
-	0x99, 0x3f, 0xbb, 0x35, 0xf3, 0xe1, 0x78, 0xe2, 0xfc, 0x9b, 0x86, 0x1c, 0x82, 0x3e, 0x19, 0x2a,
-	0xca, 0x6d, 0x49, 0xf9, 0xe9, 0xad, 0x29, 0x27, 0x43, 0xa7, 0x74, 0x26, 0x27, 0x60, 0x1e, 0xfc,
-	0x98, 0x71, 0x25, 0x82, 0x5d, 0x97, 0x5c, 0xfd, 0x5b, 0x73, 0x49, 0x5f, 0x67, 0x9d, 0x82, 0x4c,
-	0xa1, 0x25, 0x54, 0x7d, 0xee, 0x4d, 0x0b, 0x69, 0x6d, 0x5d, 0xb2, 0xee, 0xdf, 0x9a, 0xb5, 0xf4,
-	0x2f, 0x6a, 0xb5, 0x41, 0x48, 0x32, 0x68, 0x97, 0xd7, 0xd1, 0x2f, 0x5b, 0xb8, 0x68, 0x08, 0x43,
-	0x7e, 0xee, 0x8b, 0xff, 0xfc, 0xdc, 0x66, 0xf3, 0xab, 0xaf, 0xd9, 0x78, 0xc3, 0x79, 0xbb, 0x07,
-	0x35, 0x51, 0x5d, 0x62, 0x43, 0x63, 0xea, 0x25, 0xf8, 0x82, 0x87, 0xea, 0x9e, 0x14, 0xdb, 0xf6,
-	0xef, 0x55, 0xd8, 0x9a, 0x0c, 0xc9, 0xbb, 0x50, 0x9f, 0x66, 0xfe, 0x1c, 0x53, 0x75, 0xae, 0x76,
-	0x02, 0x8f, 0x39, 0x9e, 0x85, 0x2f, 0xd5, 0x5d, 0x52, 0x3b, 0xf2, 0x3e, 0x80, 0xe7, 0xfb, 0x98,
-	0x24, 0xee, 0x1c, 0x5f, 0xa9, 0x3b, 0x65, 0xe4, 0xc8, 0x13, 0x7c, 0x25, 0xdc, 0x12, 0xf4, 0x39,
-	0xa6, 0xb2, 0x7d, 0x0c, 0x47, 0xed, 0x84, 0x5b, 0x8a, 0x8b, 0xd8, 0x4d, 0xd9, 0x1c, 0xa9, 0xec,
-	0x03, 0xc3, 0x31, 0x04, 0xf2, 0x5c, 0x00, 0xa4, 0x0d, 0x3a, 0xd2, 0x20, 0x66, 0x21, 0x4d, 0x65,
-	0x61, 0x0d, 0xa7, 0xdc, 0x0b, 0x4a, 0x8e, 0xb3, 0x90, 0x51, 0xbb, 0x91, 0x53, 0xe6, 0x3b, 0x71,
-	0xaf, 0xbd, 0x2c, 0x3d, 0x97, 0x25, 0x33, 0x1c, 0xb9, 0x26, 0x0f, 0xa0, 0x95, 0x20, 0xbf, 0x40,
-	0xee, 0x22, 0xf5, 0xdd, 0x05, 0x0b, 0x50, 0x4a, 0x6c, 0x38, 0xcd, 0x1c, 0x7e, 0x4c, 0xfd, 0x67,
-	0x2c, 0x40, 0x32, 0x04, 0x05, 0xb8, 0xf3, 0x45, 0x22, 0x5e, 0x2e, 0x10, 0x56, 0xa3, 0xd6, 0x6a,
-	0xd9, 0x35, 0x27, 0xf2, 0xe0, 0xc9, 0xb3, 0xc9, 0xd1, 0x23, 0xc7, 0xcc, 0xad, 0x9e, 0x2c, 0x92,
-	0xa3, 0x80, 0x7c, 0x00, 0x4d, 0xf5, 0xa0, 0xba, 0x7e, 0xe4, 0x25, 0x89, 0x6d, 0x4a, 0xea, 0x1d,
-	0x05, 0x8e, 0x05, 0x46, 0x1e, 0x80, 0xce, 0x59, 0x84, 0xae, 0xc7, 0xa9, 0xbd, 0x23, 0x49, 0xcd,
-	0xd5, 0xb2, 0xdb, 0x70, 0x58, 0x84, 0x07, 0xce, 0xb1, 0xd3, 0x10, 0x87, 0x07, 0x9c, 0x92, 0x11,
-	0x90, 0x00, 0x23, 0x9c, 0x79, 0x29, 0xba, 0x85, 0x43, 0x62, 0x37, 0x7b, 0xd5, 0x3d, 0x63, 0x74,
-	0x77, 0xb5, 0xec, 0x5a, 0x8f, 0xd4, 0xa9, 0xf2, 0x4c, 0x1c, 0x2b, 0x58, 0x47, 0x38, 0x4d, 0xda,
-	0xbf, 0x6c, 0x41, 0xf5, 0x70, 0x3c, 0xf9, 0xdf, 0x35, 0x2c, 0x94, 0xab, 0xae, 0x29, 0xf7, 0x11,
-	0xb4, 0xa6, 0x61, 0x14, 0x85, 0x74, 0xe6, 0xc6, 0x9c, 0x7d, 0x87, 0x7e, 0x51, 0xc1, 0x3b, 0x0a,
-	0x3e, 0xc9, 0x51, 0xd2, 0x03, 0xd3, 0xe7, 0x18, 0x20, 0x4d, 0x43, 0x2f, 0x4a, 0x54, 0x29, 0xd7,
-	0x21, 0xd2, 0x05, 0xd3, 0x4b, 0x92, 0x6c, 0x91, 0x27, 0xa6, 0xea, 0x09, 0x39, 0x24, 0x62, 0x27,
-	0xfb, 0xf0, 0xce, 0x9a, 0x81, 0x5b, 0xe4, 0x95, 0xd8, 0xba, 0x48, 0xdf, 0x79, 0xfb, 0xda, 0xb4,
-	0x10, 0x21, 0x21, 0xf7, 0x61, 0x67, 0x8a, 0x1e, 0x47, 0xae, 0x5a, 0x28, 0xef, 0x05, 0x33, 0xc7,
-	0x64, 0x13, 0xb5, 0x7f, 0xd3, 0x60, 0x5b, 0x5e, 0x6f, 0xf2, 0x1e, 0x18, 0x3e, 0xa3, 0xa9, 0x17,
-	0x52, 0xf5, 0x96, 0x1b, 0xce, 0x35, 0x70, 0xa3, 0x2c, 0xf7, 0x61, 0xc7, 0xf3, 0x7d, 0x96, 0xd1,
-	0xd4, 0x95, 0x83, 0x25, 0x97, 0xc7, 0x54, 0xd8, 0xb1, 0x98, 0x2f, 0x22, 0x35, 0x65, 0x22, 0xda,
-	0xbf, 0xa6, 0x52, 0xcb, 0x21, 0xd1, 0xff, 0x3d, 0x30, 0x91, 0x5e, 0x84, 0x9c, 0xd1, 0x05, 0xd2,
-	0xb4, 0x50, 0x67, 0x0d, 0x6a, 0x23, 0x18, 0xe5, 0x1b, 0x51, 0xce, 0x2b, 0x6d, 0x6d, 0x5e, 0x3d,
-	0x84, 0xbb, 0xdf, 0x67, 0x5e, 0x14, 0x9e, 0x85, 0x18, 0xb8, 0xa9, 0x30, 0xcb, 0xc3, 0xc9, 0x83,
-	0x25, 0xe5, 0x99, 0x64, 0x38, 0x56, 0x53, 0x6f, 0x73, 0xc2, 0x7d, 0x5d, 0xd3, 0x1b, 0x96, 0xfe,
-	0xc9, 0xcf, 0x1a, 0xdc, 0xbb, 0x61, 0x56, 0x11, 0x13, 0x1a, 0x2f, 0xe8, 0x9c, 0xb2, 0x1f, 0xa8,
-	0x55, 0x21, 0x4d, 0x30, 0xc4, 0xc8, 0x95, 0x93, 0xc6, 0xd2, 0x88, 0x0e, 0xb5, 0xf3, 0x34, 0x8d,
-	0xad, 0x2d, 0x52, 0x87, 0xad, 0x64, 0x68, 0x55, 0xc5, 0xff, 0x59, 0x62, 0xd5, 0x88, 0x01, 0xdb,
-	0x9e, 0xd0, 0xd8, 0xda, 0x26, 0x3b, 0xa0, 0x8b, 0x80, 0xc5, 0x80, 0xb3, 0x1a, 0xc2, 0x85, 0x66,
-	0x51, 0x64, 0xe9, 0x02, 0x2f, 0xde, 0x25, 0xcb, 0xd8, 0xad, 0xe9, 0x75, 0xab, 0x3e, 0xfa, 0xf8,
-	0xf2, 0xcf, 0x4e, 0xe5, 0x72, 0xd5, 0xd1, 0x5e, 0xaf, 0x3a, 0xda, 0x9b, 0x55, 0x47, 0xfb, 0x63,
-	0xd5, 0xd1, 0x7e, 0xbd, 0xea, 0x54, 0x5e, 0x5f, 0x75, 0x2a, 0x6f, 0xae, 0x3a, 0x95, 0xd3, 0x86,
-	0x7a, 0xf3, 0xa6, 0x75, 0xf9, 0xf3, 0x63, 0xf8, 0x4f, 0x00, 0x00, 0x00, 0xff, 0xff, 0x15, 0xed,
-	0x4e, 0x01, 0xd5, 0x08, 0x00, 0x00,
-}
-
-func (m *LocalFileConfig) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *LocalFileConfig) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *LocalFileConfig) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.NodeID != 0 {
-		i = encodeVarintExternalStorage(dAtA, i, uint64(m.NodeID))
-		i--
-		dAtA[i] = 0x10
-	}
-	if len(m.Path) > 0 {
-		i -= len(m.Path)
-		copy(dAtA[i:], m.Path)
-		i = encodeVarintExternalStorage(dAtA, i, uint64(len(m.Path)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *ExternalConnectionConfig) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *ExternalConnectionConfig) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *ExternalConnectionConfig) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.Path) > 0 {
-		i -= len(m.Path)
-		copy(dAtA[i:], m.Path)
-		i = encodeVarintExternalStorage(dAtA, i, uint64(len(m.Path)))
-		i--
-		dAtA[i] = 0x1a
-	}
-	if len(m.User) > 0 {
-		i -= len(m.User)
-		copy(dAtA[i:], m.User)
-		i = encodeVarintExternalStorage(dAtA, i, uint64(len(m.User)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.Name) > 0 {
-		i -= len(m.Name)
-		copy(dAtA[i:], m.Name)
-		i = encodeVarintExternalStorage(dAtA, i, uint64(len(m.Name)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
+	0x14, 0xb7, 0x6c, 0xc7, 0x96, 0x9e, 0x92, 0x5a, 0x5d, 0x02, 0xd5, 0x78, 0xc0, 0x76, 0x0b, 0x53,
+	0xc2, 0x3f, 0xbb, 0x13, 0x5f, 0xb8, 0xc6, 0x4e, 0x09, 0x21, 0x6d, 0xc8, 0xc8, 0x2d, 0x87, 0x5c,
+	0x34, 0xb2, 0xf4, 0xe2, 0xa8, 0x96, 0x77, 0x85, 0xb4, 0x0e, 0x2d, 0x37, 0x0e, 0x70, 0xe2, 0xc0,
+	0x77, 0xe0, 0x8b, 0x70, 0xcc, 0xb1, 0xc7, 0x9e, 0x3c, 0xe0, 0x7c, 0x0b, 0x4e, 0xcc, 0xae, 0x56,
+	0x8a, 0x1b, 0xc8, 0x8c, 0xb9, 0xd8, 0xbb, 0xbf, 0x7d, 0xef, 0xf7, 0xde, 0xbe, 0xf7, 0xf3, 0x5b,
+	0xc3, 0x47, 0x7e, 0xc4, 0xe6, 0x41, 0x4f, 0x7e, 0xc6, 0xe3, 0x1e, 0xbe, 0xe4, 0x98, 0x50, 0x2f,
+	0x72, 0x53, 0xce, 0x12, 0x6f, 0x82, 0xdd, 0x38, 0x61, 0x9c, 0x91, 0x7b, 0x3e, 0xf3, 0xa7, 0x09,
+	0xf3, 0xfc, 0xf3, 0xae, 0xb4, 0xec, 0x2a, 0xfb, 0xe6, 0xf6, 0x84, 0x4d, 0x98, 0xb4, 0xe9, 0x89,
+	0x55, 0x66, 0xfe, 0x60, 0xd9, 0x80, 0xc6, 0x63, 0xc5, 0x34, 0xca, 0x88, 0xc8, 0x13, 0xd0, 0xe3,
+	0x84, 0x5d, 0x84, 0x01, 0x26, 0xb6, 0xd6, 0xd1, 0x76, 0xee, 0xec, 0x3e, 0xea, 0xde, 0xc2, 0xda,
+	0xbd, 0xe1, 0x7b, 0xa2, 0xfc, 0x9c, 0x82, 0x81, 0xbc, 0x80, 0xbb, 0x11, 0xf3, 0xbd, 0xc8, 0x3d,
+	0x0b, 0x23, 0x74, 0x7d, 0x46, 0xcf, 0xc2, 0x89, 0x5d, 0xee, 0x68, 0x3b, 0xe6, 0xee, 0x97, 0xeb,
+	0xd2, 0x76, 0x9f, 0x08, 0x86, 0xaf, 0xc2, 0x08, 0x87, 0xd2, 0x7f, 0x50, 0xbd, 0x5c, 0xb4, 0x4b,
+	0x4e, 0x23, 0x7a, 0x1b, 0x26, 0xdf, 0x82, 0xfe, 0x35, 0xe7, 0xf1, 0x89, 0xc7, 0xcf, 0xed, 0x8a,
+	0x0c, 0xf1, 0xc5, 0xda, 0x21, 0x84, 0xa3, 0xe2, 0x2d, 0x48, 0xc8, 0x29, 0xdc, 0x3d, 0x60, 0x6c,
+	0x12, 0xe1, 0x50, 0x78, 0x65, 0x51, 0xec, 0xaa, 0x64, 0xfe, 0x7c, 0x6d, 0xe6, 0x83, 0xe1, 0xc8,
+	0xf9, 0x37, 0x0d, 0x39, 0x00, 0x7d, 0xd4, 0x57, 0x94, 0x1b, 0x92, 0xf2, 0xb3, 0xb5, 0x29, 0x47,
+	0x7d, 0xa7, 0x70, 0x26, 0x27, 0x60, 0xee, 0xfd, 0x38, 0x4f, 0x54, 0x11, 0xec, 0x9a, 0xe4, 0xea,
+	0xae, 0xcd, 0x25, 0x7d, 0x9d, 0x55, 0x0a, 0x32, 0x86, 0x86, 0xa8, 0xea, 0x33, 0x6f, 0x9c, 0x97,
+	0xd6, 0xd6, 0x25, 0xeb, 0xee, 0xda, 0xac, 0x85, 0x7f, 0xde, 0xab, 0x1b, 0x84, 0xe4, 0x67, 0x0d,
+	0x9a, 0x85, 0x86, 0x7d, 0x46, 0x29, 0xfa, 0x3c, 0x64, 0x34, 0x57, 0x88, 0x21, 0xe3, 0xed, 0xad,
+	0x1d, 0x2f, 0xdf, 0x0f, 0x0b, 0xa6, 0xb7, 0xa4, 0x62, 0xe3, 0x2d, 0xe7, 0xcd, 0x9f, 0x34, 0x68,
+	0xdc, 0x90, 0x17, 0x21, 0x50, 0x8d, 0x85, 0x86, 0x84, 0xfa, 0x0d, 0x47, 0xae, 0xc9, 0x29, 0xd4,
+	0x29, 0x0b, 0xd0, 0x0d, 0x03, 0xa9, 0xde, 0xad, 0xc1, 0xde, 0x72, 0xd1, 0xae, 0x1d, 0xb3, 0x00,
+	0x0f, 0xf7, 0xff, 0x5e, 0xb4, 0xfb, 0x93, 0x90, 0x9f, 0xcf, 0xc7, 0x5d, 0x9f, 0xcd, 0x7a, 0x45,
+	0xce, 0xc1, 0xf8, 0x7a, 0xdd, 0x8b, 0xa7, 0x93, 0x9e, 0x5c, 0xc5, 0xe3, 0x6e, 0xe6, 0xe6, 0xd4,
+	0x04, 0xe3, 0x61, 0xd0, 0xec, 0x40, 0x55, 0x48, 0x8e, 0xd8, 0x50, 0x1f, 0x7b, 0x29, 0x3e, 0x4f,
+	0x42, 0x15, 0x3a, 0xdf, 0x36, 0xff, 0xa8, 0x40, 0x79, 0xd4, 0x27, 0xef, 0x41, 0x6d, 0x3c, 0xf7,
+	0xa7, 0xc8, 0xd5, 0xb9, 0xda, 0x09, 0x3c, 0x4e, 0xf0, 0x2c, 0x7c, 0x29, 0x73, 0x33, 0x1c, 0xb5,
+	0x23, 0x1f, 0x00, 0x78, 0xbe, 0x8f, 0x69, 0xea, 0x4e, 0xf1, 0x95, 0xfc, 0x49, 0x18, 0x8e, 0x91,
+	0x21, 0x47, 0xf8, 0x4a, 0xb8, 0xa5, 0xe8, 0x27, 0xc8, 0xa5, 0xa6, 0x0d, 0x47, 0xed, 0x84, 0x1b,
+	0xc7, 0x59, 0xec, 0x72, 0x36, 0x45, 0x2a, 0xc5, 0x69, 0x38, 0x86, 0x40, 0x9e, 0x09, 0x80, 0x34,
+	0x41, 0x47, 0x1a, 0xc4, 0x2c, 0xa4, 0x5c, 0xaa, 0xcd, 0x70, 0x8a, 0xbd, 0xa0, 0x4c, 0x70, 0x12,
+	0x32, 0x6a, 0xd7, 0x33, 0xca, 0x6c, 0x27, 0x4a, 0xea, 0xcd, 0xf9, 0xb9, 0xd4, 0x91, 0xe1, 0xc8,
+	0x35, 0x79, 0x08, 0x8d, 0x14, 0x93, 0x0b, 0x4c, 0x5c, 0xa4, 0xbe, 0x3b, 0x63, 0x01, 0xca, 0xb6,
+	0x1b, 0xce, 0x56, 0x06, 0x3f, 0xa6, 0xfe, 0x53, 0x16, 0x20, 0xe9, 0x83, 0x02, 0xdc, 0xe9, 0x2c,
+	0x15, 0x0d, 0x00, 0x61, 0x35, 0x68, 0x2c, 0x17, 0x6d, 0x73, 0x24, 0x0f, 0x8e, 0x9e, 0x8e, 0x0e,
+	0xf7, 0x1d, 0x33, 0xb3, 0x3a, 0x9a, 0xa5, 0x87, 0x01, 0xf9, 0x10, 0xb6, 0xd4, 0x64, 0x74, 0xfd,
+	0xc8, 0x4b, 0x53, 0xdb, 0x94, 0xd4, 0x9b, 0x0a, 0x1c, 0x0a, 0x8c, 0x3c, 0x04, 0x3d, 0x61, 0x11,
+	0xba, 0x5e, 0x42, 0xed, 0x4d, 0x49, 0x6a, 0x2e, 0x17, 0xed, 0xba, 0xc3, 0x22, 0xdc, 0x73, 0x8e,
+	0x9d, 0xba, 0x38, 0xdc, 0x4b, 0x28, 0x19, 0x00, 0x09, 0x30, 0xc2, 0x89, 0xc7, 0xd1, 0xcd, 0x1d,
+	0x52, 0x7b, 0xab, 0x53, 0xd9, 0x31, 0x06, 0xdb, 0xcb, 0x45, 0xdb, 0xda, 0x57, 0xa7, 0xca, 0x33,
+	0x75, 0xac, 0x60, 0x15, 0x49, 0x68, 0xda, 0xfc, 0xb5, 0x0c, 0x95, 0x83, 0xe1, 0xe8, 0x7f, 0xf7,
+	0x30, 0xaf, 0x5c, 0x65, 0xa5, 0x72, 0x1f, 0x43, 0x63, 0x1c, 0x46, 0x51, 0x48, 0x27, 0x6e, 0x9c,
+	0xb0, 0x17, 0xe8, 0xe7, 0x1d, 0xbc, 0xa3, 0xe0, 0x93, 0x0c, 0x25, 0x1d, 0x30, 0xfd, 0x04, 0x03,
+	0xa4, 0x3c, 0xf4, 0xa2, 0x54, 0xb5, 0x72, 0x15, 0x22, 0x6d, 0x30, 0xbd, 0x34, 0x9d, 0xcf, 0xb2,
+	0x8b, 0xa9, 0x7e, 0x42, 0x06, 0x89, 0xdc, 0xc9, 0x2e, 0xbc, 0xbb, 0x62, 0xe0, 0xe6, 0xf7, 0x4a,
+	0x6d, 0x5d, 0x5c, 0xdf, 0x79, 0xe7, 0xda, 0x34, 0x2f, 0x42, 0x4a, 0xee, 0xc3, 0xe6, 0x18, 0xbd,
+	0x04, 0x13, 0x25, 0xa1, 0x4c, 0x0b, 0x66, 0x86, 0x49, 0x11, 0x35, 0x7f, 0xd7, 0x60, 0x43, 0xce,
+	0x1c, 0xf2, 0x3e, 0x18, 0x3e, 0xa3, 0xdc, 0x0b, 0xa9, 0x7a, 0x70, 0x0c, 0xe7, 0x1a, 0xb8, 0xb5,
+	0x2c, 0xf7, 0x61, 0xd3, 0xf3, 0x7d, 0x36, 0xa7, 0xdc, 0xa5, 0xde, 0x0c, 0x55, 0x79, 0x4c, 0x85,
+	0x1d, 0x7b, 0x33, 0x94, 0x57, 0x53, 0x26, 0x42, 0xfe, 0x55, 0x75, 0xb5, 0x0c, 0x12, 0xfa, 0xef,
+	0x80, 0x89, 0xf4, 0x22, 0x4c, 0x18, 0x9d, 0x21, 0xe5, 0x79, 0x75, 0x56, 0xa0, 0x26, 0x82, 0x51,
+	0x0c, 0x2e, 0xd1, 0x89, 0x79, 0x5a, 0xe4, 0x28, 0xd7, 0xe4, 0x11, 0x6c, 0x7f, 0x3f, 0xf7, 0xa2,
+	0xf0, 0x2c, 0xc4, 0xc0, 0xe5, 0xc2, 0x2c, 0x4b, 0x27, 0x4b, 0x96, 0x14, 0x67, 0x92, 0x41, 0x66,
+	0x95, 0x0f, 0x97, 0xca, 0xf5, 0x70, 0x69, 0x7e, 0x07, 0xf6, 0x6d, 0x03, 0x4c, 0xd8, 0x4b, 0x46,
+	0x15, 0x95, 0x2a, 0x0e, 0x99, 0x49, 0x79, 0x25, 0x93, 0xff, 0xe0, 0xfd, 0xa6, 0xaa, 0xd7, 0x2d,
+	0xfd, 0xd3, 0x5f, 0x34, 0xb8, 0x77, 0xcb, 0x43, 0x4d, 0x4c, 0xa8, 0x3f, 0xa7, 0x53, 0xca, 0x7e,
+	0xa0, 0x56, 0x89, 0x6c, 0x81, 0x21, 0x26, 0x92, 0x7c, 0x56, 0x2d, 0x8d, 0xe8, 0x50, 0x3d, 0xe7,
+	0x3c, 0xb6, 0xca, 0xa4, 0x06, 0xe5, 0xb4, 0x6f, 0x55, 0xc4, 0xf7, 0x24, 0xb5, 0xaa, 0xc4, 0x80,
+	0x0d, 0x4f, 0xf4, 0xce, 0xda, 0x20, 0x9b, 0xa0, 0x8b, 0xf0, 0xe2, 0x75, 0xb7, 0xea, 0xc2, 0x85,
+	0xce, 0xa3, 0xc8, 0xd2, 0x05, 0x9e, 0xcf, 0x5c, 0xcb, 0x78, 0x50, 0xd5, 0x6b, 0x56, 0x6d, 0xf0,
+	0xc9, 0xe5, 0x5f, 0xad, 0xd2, 0xe5, 0xb2, 0xa5, 0xbd, 0x5e, 0xb6, 0xb4, 0x37, 0xcb, 0x96, 0xf6,
+	0xe7, 0xb2, 0xa5, 0xfd, 0x76, 0xd5, 0x2a, 0xbd, 0xbe, 0x6a, 0x95, 0xde, 0x5c, 0xb5, 0x4a, 0xa7,
+	0x75, 0x35, 0xdf, 0xc7, 0x35, 0xf9, 0xff, 0xa4, 0xff, 0x4f, 0x00, 0x00, 0x00, 0xff, 0xff, 0x5f,
+	0x14, 0x26, 0xba, 0xf6, 0x08, 0x00, 0x00,
 }
 
 func (m *ExternalStorage) Marshal() (dAtA []byte, err error) {
@@ -667,6 +590,41 @@ func (m *ExternalStorage) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i = encodeVarintExternalStorage(dAtA, i, uint64(m.Provider))
 		i--
 		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *ExternalStorage_LocalFileConfig) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ExternalStorage_LocalFileConfig) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ExternalStorage_LocalFileConfig) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.NodeID != 0 {
+		i = encodeVarintExternalStorage(dAtA, i, uint64(m.NodeID))
+		i--
+		dAtA[i] = 0x10
+	}
+	if len(m.Path) > 0 {
+		i -= len(m.Path)
+		copy(dAtA[i:], m.Path)
+		i = encodeVarintExternalStorage(dAtA, i, uint64(len(m.Path)))
+		i--
+		dAtA[i] = 0xa
 	}
 	return len(dAtA) - i, nil
 }
@@ -1000,6 +958,50 @@ func (m *ExternalStorage_FileTable) MarshalToSizedBuffer(dAtA []byte) (int, erro
 	return len(dAtA) - i, nil
 }
 
+func (m *ExternalStorage_ExternalConnectionConfig) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ExternalStorage_ExternalConnectionConfig) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ExternalStorage_ExternalConnectionConfig) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Path) > 0 {
+		i -= len(m.Path)
+		copy(dAtA[i:], m.Path)
+		i = encodeVarintExternalStorage(dAtA, i, uint64(len(m.Path)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.User) > 0 {
+		i -= len(m.User)
+		copy(dAtA[i:], m.User)
+		i = encodeVarintExternalStorage(dAtA, i, uint64(len(m.User)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Name) > 0 {
+		i -= len(m.Name)
+		copy(dAtA[i:], m.Name)
+		i = encodeVarintExternalStorage(dAtA, i, uint64(len(m.Name)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintExternalStorage(dAtA []byte, offset int, v uint64) int {
 	offset -= sovExternalStorage(v)
 	base := offset
@@ -1011,43 +1013,6 @@ func encodeVarintExternalStorage(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-func (m *LocalFileConfig) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.Path)
-	if l > 0 {
-		n += 1 + l + sovExternalStorage(uint64(l))
-	}
-	if m.NodeID != 0 {
-		n += 1 + sovExternalStorage(uint64(m.NodeID))
-	}
-	return n
-}
-
-func (m *ExternalConnectionConfig) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.Name)
-	if l > 0 {
-		n += 1 + l + sovExternalStorage(uint64(l))
-	}
-	l = len(m.User)
-	if l > 0 {
-		n += 1 + l + sovExternalStorage(uint64(l))
-	}
-	l = len(m.Path)
-	if l > 0 {
-		n += 1 + l + sovExternalStorage(uint64(l))
-	}
-	return n
-}
-
 func (m *ExternalStorage) Size() (n int) {
 	if m == nil {
 		return 0
@@ -1077,6 +1042,22 @@ func (m *ExternalStorage) Size() (n int) {
 	n += 1 + l + sovExternalStorage(uint64(l))
 	l = m.ExternalConnectionConfig.Size()
 	n += 1 + l + sovExternalStorage(uint64(l))
+	return n
+}
+
+func (m *ExternalStorage_LocalFileConfig) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Path)
+	if l > 0 {
+		n += 1 + l + sovExternalStorage(uint64(l))
+	}
+	if m.NodeID != 0 {
+		n += 1 + sovExternalStorage(uint64(m.NodeID))
+	}
 	return n
 }
 
@@ -1249,258 +1230,32 @@ func (m *ExternalStorage_FileTable) Size() (n int) {
 	return n
 }
 
+func (m *ExternalStorage_ExternalConnectionConfig) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Name)
+	if l > 0 {
+		n += 1 + l + sovExternalStorage(uint64(l))
+	}
+	l = len(m.User)
+	if l > 0 {
+		n += 1 + l + sovExternalStorage(uint64(l))
+	}
+	l = len(m.Path)
+	if l > 0 {
+		n += 1 + l + sovExternalStorage(uint64(l))
+	}
+	return n
+}
+
 func sovExternalStorage(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozExternalStorage(x uint64) (n int) {
 	return sovExternalStorage(uint64((x << 1) ^ uint64((int64(x) >> 63))))
-}
-func (m *LocalFileConfig) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowExternalStorage
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: LocalFileConfig: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: LocalFileConfig: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Path", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowExternalStorage
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthExternalStorage
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthExternalStorage
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Path = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field NodeID", wireType)
-			}
-			m.NodeID = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowExternalStorage
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.NodeID |= github_com_cockroachdb_cockroach_pkg_roachpb.NodeID(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		default:
-			iNdEx = preIndex
-			skippy, err := skipExternalStorage(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthExternalStorage
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *ExternalConnectionConfig) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowExternalStorage
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: ExternalConnectionConfig: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ExternalConnectionConfig: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowExternalStorage
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthExternalStorage
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthExternalStorage
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Name = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field User", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowExternalStorage
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthExternalStorage
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthExternalStorage
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.User = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Path", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowExternalStorage
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthExternalStorage
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthExternalStorage
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Path = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipExternalStorage(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthExternalStorage
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
 }
 func (m *ExternalStorage) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
@@ -1790,6 +1545,107 @@ func (m *ExternalStorage) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipExternalStorage(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthExternalStorage
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ExternalStorage_LocalFileConfig) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowExternalStorage
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: LocalFileConfig: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: LocalFileConfig: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Path", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowExternalStorage
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthExternalStorage
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthExternalStorage
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Path = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field NodeID", wireType)
+			}
+			m.NodeID = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowExternalStorage
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.NodeID |= github_com_cockroachdb_cockroach_pkg_roachpb.NodeID(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipExternalStorage(dAtA[iNdEx:])
@@ -2967,6 +2823,152 @@ func (m *ExternalStorage_FileTable) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			m.QualifiedTableName = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Path", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowExternalStorage
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthExternalStorage
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthExternalStorage
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Path = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipExternalStorage(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthExternalStorage
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ExternalStorage_ExternalConnectionConfig) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowExternalStorage
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ExternalConnectionConfig: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ExternalConnectionConfig: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowExternalStorage
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthExternalStorage
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthExternalStorage
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Name = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field User", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowExternalStorage
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthExternalStorage
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthExternalStorage
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.User = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
