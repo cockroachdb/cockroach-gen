@@ -245,6 +245,7 @@ var KeywordsCategories = map[string]string{
 	"keys":                         "U",
 	"kms":                          "U",
 	"kv":                           "U",
+	"label":                        "U",
 	"language":                     "U",
 	"last":                         "U",
 	"lateral":                      "R",
@@ -818,6 +819,7 @@ var KeywordNames = []string{
 	"keys",
 	"kms",
 	"kv",
+	"label",
 	"language",
 	"last",
 	"lateral",
@@ -1638,6 +1640,8 @@ func GetKeywordID(k string) int32 {
 		return KMS
 	case "kv":
 		return KV
+	case "label":
+		return LABEL
 	case "language":
 		return LANGUAGE
 	case "last":
