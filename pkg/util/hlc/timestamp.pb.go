@@ -47,7 +47,8 @@ type Timestamp struct {
 	//
 	// The flag serves as the dynamically typed version of a ClockTimestamp
 	// (but inverted). Only Timestamps with this flag set to false can be
-	// downcast to a ClockTimestamp successfully (see TryToClockTimestamp).
+	// downcast to a ClockTimestamp successfully (see
+	// DeprecatedTryToClockTimestamp).
 	//
 	// Synthetic timestamps with this flag set to true are central to
 	// non-blocking transactions, which write "into the future". Setting the
