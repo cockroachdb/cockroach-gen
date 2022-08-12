@@ -16705,6 +16705,8 @@ func (e *NthValueExpr) DataType() *types.T {
 // about the UDF including the name of the function, the statements in the
 // function body, and a pointer to its type.
 type UDFExpr struct {
+	// Input contains the scalar expressions given as input to the UDF.
+	Input ScalarListExpr
 	UDFPrivate
 
 	rank opt.ScalarRank
@@ -16721,10 +16723,14 @@ func (e *UDFExpr) Op() opt.Operator {
 }
 
 func (e *UDFExpr) ChildCount() int {
-	return 0
+	return 1
 }
 
 func (e *UDFExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return &e.Input
+	}
 	panic(errors.AssertionFailedf("child index out of range"))
 }
 
@@ -16739,6 +16745,11 @@ func (e *UDFExpr) String() string {
 }
 
 func (e *UDFExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = *child.(*ScalarListExpr)
+		return
+	}
 	panic(errors.AssertionFailedf("child index out of range"))
 }
 
@@ -16747,10 +16758,37 @@ func (e *UDFExpr) DataType() *types.T {
 }
 
 type UDFPrivate struct {
-	Name       string
-	Body       RelListExpr
-	Typ        *types.T
+	// Name is the name of the function.
+	Name string
+
+	// Body contains a relational expression for each statement in the function
+	// body.
+	Body RelListExpr
+
+	// ArgCols is a list of columns that are references to arguments of the
+	// function. The i-th column in the list corresponds to the i-th argument of
+	// the function. During execution of the UDF, these columns are replaced with
+	// the constant value inputs to the function.
+	ArgCols opt.ColList
+
+	// Typ is the return type of the function.
+	Typ *types.T
+
+	// Volatility is the user-provided volatility of the function given during
+	// CREATE FUNCTION.
+	//
+	// Volatility affects the visibility of mutations made by the statement
+	// calling the function. A volatile function will see these mutations. Also,
+	// statements within a volatile function's body will see changes made by
+	// previous statements in the function body. In contrast, a stable,
+	// immutable, or leakproof function will see a snapshot of the data as of the
+	// start of the statement calling the function.
 	Volatility volatility.V
+
+	// CalledOnNullInput is true if the function should be called when any of its
+	// inputs are NULL. If false, the function will not be evaluated in the
+	// presence of NULL inputs, and will instead evaluate directly to NULL.
+	CalledOnNullInput bool
 }
 
 // KVOptionsExpr is a set of KVOptionItems that specify arbitrary keys and values
@@ -23529,10 +23567,12 @@ func (m *Memo) MemoizeNthValue(
 }
 
 func (m *Memo) MemoizeUDF(
+	input ScalarListExpr,
 	uDFPrivate *UDFPrivate,
 ) *UDFExpr {
 	const size = int64(unsafe.Sizeof(UDFExpr{}))
 	e := &UDFExpr{
+		Input:      input,
 		UDFPrivate: *uDFPrivate,
 		rank:       m.NextRank(),
 	}
@@ -29979,18 +30019,24 @@ func (in *interner) InternNthValue(val *NthValueExpr) *NthValueExpr {
 func (in *interner) InternUDF(val *UDFExpr) *UDFExpr {
 	in.hasher.Init()
 	in.hasher.HashOperator(opt.UDFOp)
+	in.hasher.HashScalarListExpr(val.Input)
 	in.hasher.HashString(val.Name)
 	in.hasher.HashRelListExpr(val.Body)
+	in.hasher.HashColList(val.ArgCols)
 	in.hasher.HashType(val.Typ)
 	in.hasher.HashVolatility(val.Volatility)
+	in.hasher.HashBool(val.CalledOnNullInput)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*UDFExpr); ok {
-			if in.hasher.IsStringEqual(val.Name, existing.Name) &&
+			if in.hasher.IsScalarListExprEqual(val.Input, existing.Input) &&
+				in.hasher.IsStringEqual(val.Name, existing.Name) &&
 				in.hasher.IsRelListExprEqual(val.Body, existing.Body) &&
+				in.hasher.IsColListEqual(val.ArgCols, existing.ArgCols) &&
 				in.hasher.IsTypeEqual(val.Typ, existing.Typ) &&
-				in.hasher.IsVolatilityEqual(val.Volatility, existing.Volatility) {
+				in.hasher.IsVolatilityEqual(val.Volatility, existing.Volatility) &&
+				in.hasher.IsBoolEqual(val.CalledOnNullInput, existing.CalledOnNullInput) {
 				return existing
 			}
 		}

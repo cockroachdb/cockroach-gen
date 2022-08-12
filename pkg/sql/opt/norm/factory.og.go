@@ -21293,6 +21293,7 @@ SKIP_RULES:
 // about the UDF including the name of the function, the statements in the
 // function body, and a pointer to its type.
 func (_f *Factory) ConstructUDF(
+	input memo.ScalarListExpr,
 	uDFPrivate *memo.UDFPrivate,
 ) opt.ScalarExpr {
 	_f.constructorStackDepth++
@@ -21304,7 +21305,7 @@ func (_f *Factory) ConstructUDF(
 	}
 
 SKIP_RULES:
-	e := _f.mem.MemoizeUDF(uDFPrivate)
+	e := _f.mem.MemoizeUDF(input, uDFPrivate)
 	expr := _f.onConstructScalar(e)
 	_f.constructorStackDepth--
 	return expr
@@ -23246,6 +23247,10 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		return t
 
 	case *memo.UDFExpr:
+		input, inputChanged := f.replaceScalarListExpr(t.Input, replace)
+		if inputChanged {
+			return f.ConstructUDF(input, &t.UDFPrivate)
+		}
 		return t
 
 	case *memo.KVOptionsExpr:
@@ -24710,7 +24715,10 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 		)
 
 	case *memo.UDFExpr:
-		return t
+		return f.ConstructUDF(
+			f.copyAndReplaceDefaultScalarListExpr(t.Input, replace),
+			&t.UDFPrivate,
+		)
 
 	case *memo.CreateTableExpr:
 		return f.ConstructCreateTable(
@@ -25907,7 +25915,8 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 		)
 	case opt.UDFOp:
 		return f.ConstructUDF(
-			args[0].(*memo.UDFPrivate),
+			*args[0].(*memo.ScalarListExpr),
+			args[1].(*memo.UDFPrivate),
 		)
 	case opt.CreateTableOp:
 		return f.ConstructCreateTable(
