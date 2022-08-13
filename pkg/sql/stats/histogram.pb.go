@@ -26,12 +26,14 @@ var _ = math.Inf
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // HistogramData encodes the data for a histogram, which captures the
-// distribution of values on a specific column.
+// distribution of values on a specific column. A histogram on an empty table
+// is represented by a non-nil HistogramData with non-nil zero-length Buckets.
 type HistogramData struct {
 	// Value type for the column.
 	ColumnType *types.T `protobuf:"bytes,2,opt,name=column_type,json=columnType,proto3" json:"column_type,omitempty"`
 	// Histogram buckets. Note that NULL values are excluded from the
-	// histogram.
+	// histogram. For an empty table (or a table with all NULL values) Buckets
+	// will have zero length.
 	Buckets []HistogramData_Bucket `protobuf:"bytes,1,rep,name=buckets,proto3" json:"buckets"`
 	// Version of the logic used to construct this histogram. See histogram.go
 	// for more details.

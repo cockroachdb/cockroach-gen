@@ -4571,8 +4571,6 @@ type AddSSTableRequest struct {
 	// reader has already observed, changing the value at that timestamp and above
 	// it. Use with SSTTimestampToRequestTimestamp to guarantee serializability.
 	//
-	// MVCC range tombstones are not currently supported with DisallowConflicts.
-	//
 	// Added in 22.1, so check the MVCCAddSSTable version gate before using.
 	//
 	// TODO(erikgrinaker): It might be possible to avoid this parameter if we
@@ -4583,8 +4581,6 @@ type AddSSTableRequest struct {
 	// DisallowShadowing implies DisallowConflicts, and additionally rejects
 	// writing above keys that have an existing/visible value (but will write
 	// above tombstones).
-	//
-	// MVCC range tombstones are not currently supported with DisallowShadowing.
 	//
 	// TODO(erikgrinaker): Consider removing this in 22.1 if all callers have
 	// been migrated to DisallowShadowingBelow.
@@ -4605,9 +4601,6 @@ type AddSSTableRequest struct {
 	//
 	// If this parameter is used, the value of DisallowShadowing is ignored, so
 	// callers may pass both for forward and backwards compatibility.
-	//
-	// MVCC range tombstones are not currently supported with
-	// DisallowShadowingBelow.
 	//
 	// Added in 22.1, so check the MVCCAddSSTable version gate before using.
 	DisallowShadowingBelow hlc.Timestamp `protobuf:"bytes,8,opt,name=disallow_shadowing_below,json=disallowShadowingBelow,proto3" json:"disallow_shadowing_below"`

@@ -50,7 +50,14 @@ type TableStatisticProto struct {
 	DistinctCount uint64 `protobuf:"varint,7,opt,name=distinct_count,json=distinctCount,proto3" json:"distinct_count,omitempty"`
 	// The number of rows that have a NULL in all of the columns in ColumnIDs.
 	NullCount uint64 `protobuf:"varint,8,opt,name=null_count,json=nullCount,proto3" json:"null_count,omitempty"`
-	// Histogram (if available)
+	// Histogram (if available). A nil HistogramData is used for:
+	// - regular stats, GenerateHistogram=false (i.e. no histogram collected)
+	// - inverted stats, no inverted index  (i.e. no histogram collected)
+	// - inverted stats, yes inverted index, empty table
+	// - inverted stats, yes inverted index, all NULL values
+	// A non-nil HistogramData with len(Buckets) == 0 is used for:
+	// - regular stats, GenerateHistogram=true, empty table
+	// - regular stats, GenerateHistogram=true, all NULL values
 	HistogramData *HistogramData `protobuf:"bytes,9,opt,name=histogram_data,json=histogramData,proto3" json:"histogram_data,omitempty"`
 	// The average row size of the columns in ColumnIDs.
 	AvgSize uint64 `protobuf:"varint,10,opt,name=avg_size,json=avgSize,proto3" json:"avg_size,omitempty"`
