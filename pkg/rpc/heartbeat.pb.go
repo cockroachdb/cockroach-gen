@@ -85,6 +85,7 @@ type PingRequest struct {
 	// The address of the client.
 	OriginAddr string `protobuf:"bytes,3,opt,name=origin_addr,json=originAddr" json:"origin_addr"`
 	// The configured maximum clock offset (in nanoseconds) on the server.
+	// TODO(nvanbenschoten): remove this field in v23.1. It is no longer read.
 	OriginMaxOffsetNanos int64 `protobuf:"varint,4,opt,name=origin_max_offset_nanos,json=originMaxOffsetNanos" json:"origin_max_offset_nanos"`
 	// Cluster ID to prevent connections between nodes in different clusters.
 	ClusterID     *github_com_cockroachdb_cockroach_pkg_util_uuid.UUID `protobuf:"bytes,5,opt,name=origin_cluster_id,json=originClusterId,customtype=github.com/cockroachdb/cockroach/pkg/util/uuid.UUID" json:"origin_cluster_id,omitempty"`
