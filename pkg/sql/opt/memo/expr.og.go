@@ -1994,6 +1994,129 @@ type ValuesPrivate struct {
 	ID opt.UniqueID
 }
 
+// LiteralValuesExpr is a version of values where the exprs have already been type checked
+// and are real Datums that don't need evaluation.
+type LiteralValuesExpr struct {
+	Rows *opt.LiteralRows
+	Cols opt.ColList
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &LiteralValuesExpr{}
+
+func (e *LiteralValuesExpr) Op() opt.Operator {
+	return opt.LiteralValuesOp
+}
+
+func (e *LiteralValuesExpr) ChildCount() int {
+	return 1
+}
+
+func (e *LiteralValuesExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Rows
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *LiteralValuesExpr) Private() interface{} {
+	return &e.Cols
+}
+
+func (e *LiteralValuesExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, e.Memo(), nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *LiteralValuesExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Rows = child.(*opt.LiteralRows)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *LiteralValuesExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *LiteralValuesExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *LiteralValuesExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *LiteralValuesExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *LiteralValuesExpr) RequiredPhysical() *physical.Required {
+	return e.grp.bestProps().required
+}
+
+func (e *LiteralValuesExpr) ProvidedPhysical() *physical.Provided {
+	return e.grp.bestProps().provided
+}
+
+func (e *LiteralValuesExpr) Cost() Cost {
+	return e.grp.bestProps().cost
+}
+
+func (e *LiteralValuesExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *LiteralValuesExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
+}
+
+func (e *LiteralValuesExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(errors.AssertionFailedf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *LiteralValuesExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(errors.AssertionFailedf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type literalValuesGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	first LiteralValuesExpr
+	best  bestProps
+}
+
+var _ exprGroup = &literalValuesGroup{}
+
+func (g *literalValuesGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *literalValuesGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *literalValuesGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *literalValuesGroup) bestProps() *bestProps {
+	return &g.best
+}
+
 // SelectExpr filters rows from its input result set, based on the boolean filter
 // predicate expression. Rows which do not match the filter are discarded. While
 // the Filter operand can be any boolean expression, normalization rules will
@@ -19653,6 +19776,30 @@ func (m *Memo) MemoizeValues(
 	return interned.FirstExpr()
 }
 
+func (m *Memo) MemoizeLiteralValues(
+	rows *opt.LiteralRows,
+	cols opt.ColList,
+) RelExpr {
+	const size = int64(unsafe.Sizeof(literalValuesGroup{}))
+	grp := &literalValuesGroup{mem: m, first: LiteralValuesExpr{
+		Rows: rows,
+		Cols: cols,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternLiteralValues(e)
+	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
+		m.logPropsBuilder.buildLiteralValuesProps(e, &grp.rel)
+		grp.rel.Populated = true
+		m.memEstimate += size
+		m.CheckExpr(e)
+	}
+	return interned.FirstExpr()
+}
+
 func (m *Memo) MemoizeSelect(
 	input RelExpr,
 	filters FiltersExpr,
@@ -24179,6 +24326,20 @@ func (m *Memo) AddValuesToGroup(e *ValuesExpr, grp RelExpr) *ValuesExpr {
 	return interned
 }
 
+func (m *Memo) AddLiteralValuesToGroup(e *LiteralValuesExpr, grp RelExpr) *LiteralValuesExpr {
+	const size = int64(unsafe.Sizeof(LiteralValuesExpr{}))
+	interned := m.interner.InternLiteralValues(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.CheckExpr(e)
+	} else if interned.group() != grp.group() {
+		// This is a group collision, do nothing.
+		return nil
+	}
+	return interned
+}
+
 func (m *Memo) AddSelectToGroup(e *SelectExpr, grp RelExpr) *SelectExpr {
 	const size = int64(unsafe.Sizeof(SelectExpr{}))
 	interned := m.interner.InternSelect(e)
@@ -25071,6 +25232,8 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternSequenceSelect(t)
 	case *ValuesExpr:
 		return in.InternValues(t)
+	case *LiteralValuesExpr:
+		return in.InternLiteralValues(t)
 	case *SelectExpr:
 		return in.InternSelect(t)
 	case *ProjectExpr:
@@ -25947,6 +26110,26 @@ func (in *interner) InternValues(val *ValuesExpr) *ValuesExpr {
 			if in.hasher.IsScalarListExprEqual(val.Rows, existing.Rows) &&
 				in.hasher.IsColListEqual(val.Cols, existing.Cols) &&
 				in.hasher.IsUniqueIDEqual(val.ID, existing.ID) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternLiteralValues(val *LiteralValuesExpr) *LiteralValuesExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.LiteralValuesOp)
+	in.hasher.HashLiteralRows(val.Rows)
+	in.hasher.HashColList(val.Cols)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*LiteralValuesExpr); ok {
+			if in.hasher.IsLiteralRowsEqual(val.Rows, existing.Rows) &&
+				in.hasher.IsColListEqual(val.Cols, existing.Cols) {
 				return existing
 			}
 		}
@@ -30588,6 +30771,8 @@ func (b *logicalPropsBuilder) buildProps(e RelExpr, rel *props.Relational) {
 		b.buildSequenceSelectProps(t, rel)
 	case *ValuesExpr:
 		b.buildValuesProps(t, rel)
+	case *LiteralValuesExpr:
+		b.buildLiteralValuesProps(t, rel)
 	case *SelectExpr:
 		b.buildSelectProps(t, rel)
 	case *ProjectExpr:

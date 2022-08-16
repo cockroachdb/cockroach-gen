@@ -553,6 +553,28 @@ SKIP_RULES:
 	return expr
 }
 
+// ConstructLiteralValues constructs an expression for the LiteralValues operator.
+// LiteralValues is a version of values where the exprs have already been type checked
+// and are real Datums that don't need evaluation.
+func (_f *Factory) ConstructLiteralValues(
+	rows *opt.LiteralRows,
+	cols opt.ColList,
+) memo.RelExpr {
+	_f.constructorStackDepth++
+	if _f.constructorStackDepth > maxConstructorStackDepth {
+		// If the constructor call stack depth exceeds the limit, call
+		// onMaxConstructorStackDepthExceeded and skip all rules.
+		_f.onMaxConstructorStackDepthExceeded()
+		goto SKIP_RULES
+	}
+
+SKIP_RULES:
+	e := _f.mem.MemoizeLiteralValues(rows, cols)
+	expr := _f.onConstructRelational(e)
+	_f.constructorStackDepth--
+	return expr
+}
+
 // ConstructSelect constructs an expression for the Select operator.
 // Select filters rows from its input result set, based on the boolean filter
 // predicate expression. Rows which do not match the filter are discarded. While
@@ -21872,6 +21894,13 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		}
 		return t
 
+	case *memo.LiteralValuesExpr:
+		rows := replace(t.Rows).(*opt.LiteralRows)
+		if rows != t.Rows {
+			return f.ConstructLiteralValues(rows, t.Cols)
+		}
+		return t
+
 	case *memo.SelectExpr:
 		input := replace(t.Input).(memo.RelExpr)
 		filters, filtersChanged := f.replaceFiltersExpr(t.Filters, replace)
@@ -23648,6 +23677,12 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 			&t.ValuesPrivate,
 		)
 
+	case *memo.LiteralValuesExpr:
+		return f.ConstructLiteralValues(
+			f.invokeReplace(t.Rows, replace).(*opt.LiteralRows),
+			t.Cols,
+		)
+
 	case *memo.SelectExpr:
 		return f.ConstructSelect(
 			f.invokeReplace(t.Input, replace).(memo.RelExpr),
@@ -25023,6 +25058,11 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 		return f.ConstructValues(
 			*args[0].(*memo.ScalarListExpr),
 			args[1].(*memo.ValuesPrivate),
+		)
+	case opt.LiteralValuesOp:
+		return f.ConstructLiteralValues(
+			args[0].(*opt.LiteralRows),
+			*args[1].(*opt.ColList),
 		)
 	case opt.SelectOp:
 		return f.ConstructSelect(

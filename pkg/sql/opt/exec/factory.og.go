@@ -906,6 +906,15 @@ type Factory interface {
 		deps opt.SchemaDeps,
 		typeDeps opt.SchemaTypeDeps,
 	) (Node, error)
+
+	// ConstructLiteralValues creates a node for a LiteralValues operation.
+	//
+	// LiteralValues allows datums to be planned directly that are type checked
+	// and evaluated (i.e. literals).
+	ConstructLiteralValues(
+		rows tree.ExprContainer,
+		columns colinfo.ResultColumns,
+	) (Node, error)
 }
 
 // StubFactory is a do-nothing implementation of Factory, used for testing.
@@ -1463,6 +1472,13 @@ func (StubFactory) ConstructCreateFunction(
 	cf *tree.CreateFunction,
 	deps opt.SchemaDeps,
 	typeDeps opt.SchemaTypeDeps,
+) (Node, error) {
+	return struct{}{}, nil
+}
+
+func (StubFactory) ConstructLiteralValues(
+	rows tree.ExprContainer,
+	columns colinfo.ResultColumns,
 ) (Node, error) {
 	return struct{}{}, nil
 }

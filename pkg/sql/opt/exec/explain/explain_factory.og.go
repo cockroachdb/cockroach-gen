@@ -1912,6 +1912,30 @@ func (f *Factory) ConstructCreateFunction(
 	return _n, nil
 }
 
+func (f *Factory) ConstructLiteralValues(
+	rows tree.ExprContainer,
+	columns colinfo.ResultColumns,
+) (exec.Node, error) {
+	args := &literalValuesArgs{
+		Rows:    rows,
+		Columns: columns,
+	}
+	_n, err := newNode(literalValuesOp, args, nil /* ordering */)
+	if err != nil {
+		return nil, err
+	}
+	// Build the "real" node.
+	wrapped, err := f.wrappedFactory.ConstructLiteralValues(
+		rows,
+		columns,
+	)
+	if err != nil {
+		return nil, err
+	}
+	_n.wrappedNode = wrapped
+	return _n, nil
+}
+
 type execOperator int
 
 const (
@@ -1974,6 +1998,7 @@ const (
 	exportOp
 	alterRangeRelocateOp
 	createFunctionOp
+	literalValuesOp
 	numOperators
 )
 
@@ -2403,4 +2428,9 @@ type createFunctionArgs struct {
 	Cf       *tree.CreateFunction
 	Deps     opt.SchemaDeps
 	TypeDeps opt.SchemaTypeDeps
+}
+
+type literalValuesArgs struct {
+	Rows    tree.ExprContainer
+	Columns colinfo.ResultColumns
 }
