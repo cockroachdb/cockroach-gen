@@ -77,6 +77,7 @@ var KeywordsCategories = map[string]string{
 	"configure":                    "U",
 	"conflict":                     "U",
 	"connection":                   "U",
+	"connections":                  "U",
 	"constraint":                   "R",
 	"constraints":                  "U",
 	"controlchangefeed":            "U",
@@ -651,6 +652,7 @@ var KeywordNames = []string{
 	"configure",
 	"conflict",
 	"connection",
+	"connections",
 	"constraint",
 	"constraints",
 	"controlchangefeed",
@@ -1304,6 +1306,8 @@ func GetKeywordID(k string) int32 {
 		return CONFLICT
 	case "connection":
 		return CONNECTION
+	case "connections":
+		return CONNECTIONS
 	case "constraint":
 		return CONSTRAINT
 	case "constraints":
