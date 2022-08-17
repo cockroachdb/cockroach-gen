@@ -35,10 +35,10 @@ type Concern int32
 
 const (
 	// SlowExecution is for statement executions that either take longer than a predetermined
-	// threshold, configured by the sql.stats.insights.experimental.latency_threshold
+	// threshold, configured by the sql.insights.latency_threshold
 	// cluster setting, or that take significantly "longer than usual" for their statement
 	// fingerprint, based on some heuristics we're developing, which can be enabled by the
-	// sql.stats.insights.experimental.latency_quantile_detection.enabled cluster setting.
+	// sql.insights.anomaly_detection.enabled cluster setting.
 	Concern_SlowExecution Concern = 0
 )
 
