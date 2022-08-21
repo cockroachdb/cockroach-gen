@@ -553,6 +553,7 @@ var KeywordsCategories = map[string]string{
 	"varchar":                      "C",
 	"variadic":                     "R",
 	"varying":                      "U",
+	"verify_backup_table_data":     "U",
 	"view":                         "U",
 	"viewactivity":                 "U",
 	"viewactivityredacted":         "U",
@@ -1128,6 +1129,7 @@ var KeywordNames = []string{
 	"varchar",
 	"variadic",
 	"varying",
+	"verify_backup_table_data",
 	"view",
 	"viewactivity",
 	"viewactivityredacted",
@@ -2258,6 +2260,8 @@ func GetKeywordID(k string) int32 {
 		return VARIADIC
 	case "varying":
 		return VARYING
+	case "verify_backup_table_data":
+		return VERIFY_BACKUP_TABLE_DATA
 	case "view":
 		return VIEW
 	case "viewactivity":
