@@ -173,6 +173,8 @@ type LocalOnlySessionData struct {
 	// established the connection before SET ROLE was first performed.
 	// This is only populated when SET ROLE is used, otherwise the session_user
 	// is the same as the UserProto in SessionData.
+	// Postgres allows the SessionUser to be changed with SET SESSION AUTHORIZATION
+	// but CockroachDB doesn't allow that at the time of this writing.
 	SessionUserProto github_com_cockroachdb_cockroach_pkg_security_username.SQLUsernameProto `protobuf:"bytes,46,opt,name=session_user_proto,json=sessionUserProto,proto3,casttype=github.com/cockroachdb/cockroach/pkg/security/username.SQLUsernameProto" json:"session_user_proto,omitempty"`
 	// TxnRowsWrittenLog is the threshold for the number of rows written by a SQL
 	// transaction which - once exceeded - will trigger a logging event to SQL_PERF
