@@ -1218,8 +1218,9 @@ type DeleteRangeRequest struct {
 	// for conflicts and adjust MVCC stats). This option cannot be used in a
 	// transaction, and it cannot be combined with Inline or ReturnKeys.
 	//
-	// The caller must check the MVCCRangeTombstones version gate before using
-	// this parameter, as it is new in 22.2.
+	// The caller must check storage.CanUseMVCCRangeTombstones before using this
+	// parameter: it is new in 22.2, and controlled by the default-off cluster
+	// setting storage.mvcc.range_tombstones.enabled.
 	UseRangeTombstone bool `protobuf:"varint,5,opt,name=use_range_tombstone,json=useRangeTombstone,proto3" json:"use_range_tombstone,omitempty"`
 	// If enabled together with UseRangeTombstone, the MVCC range tombstone will
 	// only be written if there exists point key/tombstones in the span that
