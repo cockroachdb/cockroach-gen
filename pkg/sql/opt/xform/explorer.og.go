@@ -1048,7 +1048,7 @@ func (_e *explorer) exploreInnerJoin(
 				_project, _ := _member.(*memo.ProjectExpr)
 				if _project != nil {
 					right := _project.Input
-					if _e.funcs.IsCanonicalScanOrSelect(right) {
+					if _e.funcs.CanHoistProjectInput(right) {
 						projections := _project.Projections
 						if !_e.funcs.HasVolatileProjection(projections) {
 							passthrough := _project.Passthrough
@@ -1511,7 +1511,7 @@ func (_e *explorer) exploreLeftJoin(
 				_project, _ := _member.(*memo.ProjectExpr)
 				if _project != nil {
 					right := _project.Input
-					if _e.funcs.IsCanonicalScanOrSelect(right) {
+					if _e.funcs.CanHoistProjectInput(right) {
 						projections := _project.Projections
 						if !_e.funcs.HasVolatileProjection(projections) {
 							passthrough := _project.Passthrough
