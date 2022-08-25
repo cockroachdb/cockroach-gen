@@ -74,6 +74,14 @@ const _ = grpc.SupportPackageIsVersion4
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type MultiRaftClient interface {
 	RaftMessageBatch(ctx context.Context, opts ...grpc.CallOption) (MultiRaft_RaftMessageBatchClient, error)
+	// RaftSnapshot asks the server to accept and apply a range snapshot.
+	// The client is expected to initially send a message consisting solely of
+	// a Header, upon which the server will respond with a message with status
+	// ACCEPTED, or ERROR if it cannot accept the snapshot. Once accepted, the
+	// client will send multiple messages with KVBatch data followed by a
+	// terminal message with the final flag set to true. Once finalized,
+	// the server will ultimately send a message back with status APPLIED, or
+	// ERROR, including any collected traces from processing.
 	RaftSnapshot(ctx context.Context, opts ...grpc.CallOption) (MultiRaft_RaftSnapshotClient, error)
 	// DelegateRaftSnapshot asks the server to send a range snapshot to a target
 	// (so the client delegates the sending of the snapshot to the server). The
@@ -192,6 +200,14 @@ func (x *multiRaftDelegateRaftSnapshotClient) Recv() (*kvserverpb.DelegateSnapsh
 // MultiRaftServer is the server API for MultiRaft service.
 type MultiRaftServer interface {
 	RaftMessageBatch(MultiRaft_RaftMessageBatchServer) error
+	// RaftSnapshot asks the server to accept and apply a range snapshot.
+	// The client is expected to initially send a message consisting solely of
+	// a Header, upon which the server will respond with a message with status
+	// ACCEPTED, or ERROR if it cannot accept the snapshot. Once accepted, the
+	// client will send multiple messages with KVBatch data followed by a
+	// terminal message with the final flag set to true. Once finalized,
+	// the server will ultimately send a message back with status APPLIED, or
+	// ERROR, including any collected traces from processing.
 	RaftSnapshot(MultiRaft_RaftSnapshotServer) error
 	// DelegateRaftSnapshot asks the server to send a range snapshot to a target
 	// (so the client delegates the sending of the snapshot to the server). The
