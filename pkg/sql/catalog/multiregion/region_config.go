@@ -171,12 +171,12 @@ func (r *RegionConfig) ExtendZoneConfigWithGlobal(zc zonepb.ZoneConfig) (zonepb.
 		// across zones/regions as well.
 		if zc.NumVoters != nil && *zc.NumVoters < numVoters {
 			return zonepb.ZoneConfig{}, errors.Newf("zone config extension "+
-				"cannot set a voter number %v lower than the one required for the "+
+				"cannot set a voter number %v that is lower than the one required for the "+
 				"survival goal: %v with goal %v\n", *zc.NumVoters, numVoters, r.SurvivalGoal())
 		}
 		if zc.NumReplicas != nil && *zc.NumReplicas < numReplicas {
 			return zonepb.ZoneConfig{}, errors.Newf("zone config extension "+
-				"cannot set a replica number %v lower than the one required for the "+
+				"cannot set a replica number %v that is lower than the one required for the "+
 				"survival goal: %v with goal %v\n", *zc.NumReplicas, numReplicas, r.SurvivalGoal())
 		}
 	}
@@ -217,12 +217,12 @@ func (r *RegionConfig) ExtendZoneConfigWithRegionalIn(
 	// across zones/regions as well.
 	if zc.NumVoters != nil && *zc.NumVoters < numVoters {
 		return zonepb.ZoneConfig{}, errors.Newf("zone config extension "+
-			"cannot set a voter number %v lower than the one required for the "+
+			"cannot set a voter number %v that is lower than the one required for the "+
 			"survival goal: %v with goal %v\n", *zc.NumVoters, numVoters, r.SurvivalGoal())
 	}
 	if zc.NumReplicas != nil && *zc.NumReplicas < numReplicas {
 		return zonepb.ZoneConfig{}, errors.Newf("zone config extension "+
-			"cannot set a replica number %v lower than the one required for the "+
+			"cannot set a replica number %v that is lower than the one required for the "+
 			"survival goal: %v with goal %v\n", *zc.NumReplicas, numReplicas, r.SurvivalGoal())
 	}
 	return zc, nil
@@ -564,8 +564,11 @@ func validateZoneConfigExtension(
 		return nil
 	}
 
+	// If the extension does not inherit that field from the original zone config,
+	// we will use the one in the extension, and hence we need to validate that
+	// field.
 	// Lease preferences.
-	if len(zc.LeasePreferences) > 0 && len(ext.LeasePreferences) > 0 {
+	if !(ext.ShouldInheritLeasePreferences(&zc)) && len(zc.LeasePreferences) > 0 && len(ext.LeasePreferences) > 0 {
 		oriHomeRegionLeasePreference, idx1 := getHomeRegionLeasePreference(zc.LeasePreferences, homeRegion)
 		extHomeRegionLeasePreference, idx2 := getHomeRegionLeasePreference(ext.LeasePreferences, homeRegion)
 		if idx1 != -1 {
@@ -573,49 +576,49 @@ func validateZoneConfigExtension(
 			// extension's lease preferences.
 			if idx2 == -1 {
 				return errors.Newf("zone config extension cannot unset the home "+
-					"region's lease preference: %v\n", oriHomeRegionLeasePreference)
+					"region (%v) lease preference: %v\n", homeRegion, oriHomeRegionLeasePreference)
 			}
 			if idx1 != idx2 {
 				return errors.Newf("zone config extension cannot change priority"+
-					" of lease preference for the home region: %v\n", oriHomeRegionLeasePreference)
+					" of lease preference for the home region: %v)\n", oriHomeRegionLeasePreference)
 			}
 			if oriHomeRegionLeasePreference.Constraints[0].Type != extHomeRegionLeasePreference.Constraints[0].Type {
 				return errors.Newf("zone config extension %v violates the home"+
-					" region's lease preference: %v\n", extHomeRegionLeasePreference, oriHomeRegionLeasePreference)
+					" region (%v) lease preference: %v\n", extHomeRegionLeasePreference, homeRegion, oriHomeRegionLeasePreference)
 			}
 		}
 	}
 
 	// Replica constraints.
-	if len(zc.Constraints) > 0 && len(ext.Constraints) > 0 {
+	if !(ext.ShouldInheritConstraints(&zc)) && len(zc.Constraints) > 0 && len(ext.Constraints) > 0 {
 		oriHomeRegionReplicaConstraint, ok1 := getHomeRegionConstraintConjunction(zc.Constraints, homeRegion)
 		extHomeRegionReplicaConstraint, ok2 := getHomeRegionConstraintConjunction(ext.Constraints, homeRegion)
 		if ok1 {
 			if !ok2 {
 				return errors.Newf("zone config extension cannot unset the home"+
-					" region's replica constraint: %v\n", oriHomeRegionReplicaConstraint)
+					" region (%v) replica constraint: %v\n", homeRegion, oriHomeRegionReplicaConstraint)
 			}
 			if oriHomeRegionReplicaConstraint.Constraints[0].Type != extHomeRegionReplicaConstraint.Constraints[0].Type ||
 				oriHomeRegionReplicaConstraint.NumReplicas > extHomeRegionReplicaConstraint.NumReplicas {
 				return errors.Newf("zone config extension %v violates the home"+
-					" region's replica constraint: %v\n", extHomeRegionReplicaConstraint, oriHomeRegionReplicaConstraint)
+					" region (%v) replica constraint: %v\n", extHomeRegionReplicaConstraint, homeRegion, oriHomeRegionReplicaConstraint)
 			}
 		}
 	}
 
 	// Voter constraints.
-	if len(zc.VoterConstraints) > 0 && len(ext.VoterConstraints) > 0 {
-		oriHomeRegionVoterConstraint, ok1 := getHomeRegionConstraintConjunction(zc.Constraints, homeRegion)
-		extHomeRegionVoterConstraint, ok2 := getHomeRegionConstraintConjunction(ext.Constraints, homeRegion)
+	if !(ext.ShouldInheritVoterConstraints(&zc)) && len(zc.VoterConstraints) > 0 && len(ext.VoterConstraints) > 0 {
+		oriHomeRegionVoterConstraint, ok1 := getHomeRegionConstraintConjunction(zc.VoterConstraints, homeRegion)
+		extHomeRegionVoterConstraint, ok2 := getHomeRegionConstraintConjunction(ext.VoterConstraints, homeRegion)
 		if ok1 {
 			if !ok2 {
 				return errors.Newf("zone config extension cannot unset the home"+
-					" region's voter constraint: %v\n", oriHomeRegionVoterConstraint)
+					" region (%v) voter constraint: %v\n", homeRegion, oriHomeRegionVoterConstraint)
 			}
 			if oriHomeRegionVoterConstraint.Constraints[0].Type != extHomeRegionVoterConstraint.Constraints[0].Type ||
 				oriHomeRegionVoterConstraint.NumReplicas > extHomeRegionVoterConstraint.NumReplicas {
 				return errors.Newf("zone config extension %v violates the home"+
-					" region's voter constraint: %v\n", extHomeRegionVoterConstraint, oriHomeRegionVoterConstraint)
+					" region (%v) voter constraint: %v\n", extHomeRegionVoterConstraint, homeRegion, oriHomeRegionVoterConstraint)
 			}
 		}
 	}
