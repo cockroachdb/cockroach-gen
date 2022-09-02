@@ -481,7 +481,11 @@ type SnapshotRequest_Header struct {
 	// TODO(irfansharif): Remove this in v22.1.
 	DeprecatedUnreplicatedTruncatedState bool `protobuf:"varint,8,opt,name=deprecated_unreplicated_truncated_state,json=deprecatedUnreplicatedTruncatedState,proto3" json:"deprecated_unreplicated_truncated_state,omitempty"`
 	// The sending queue's name, to be utilized to ensure fairness across
-	// different snapshot sending sources.
+	// different snapshot sending sources. The default queue name, OTHER, is
+	// reserved for any uncategorized and unprioritized snapshots, and requests
+	// with sender queue name OTHER may not specify a non-zero
+	// sender_queue_priority.  To prioritize snapshots categorized as OTHER,
+	// first move them to a different queue name.
 	SenderQueueName SnapshotRequest_QueueName `protobuf:"varint,10,opt,name=sender_queue_name,json=senderQueueName,proto3,enum=cockroach.kv.kvserver.kvserverpb.SnapshotRequest_QueueName" json:"sender_queue_name,omitempty"`
 	// The sending queue's priority, to be utilized to prioritize snapshots
 	// from a particular sending source.
