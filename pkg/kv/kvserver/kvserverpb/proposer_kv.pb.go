@@ -162,7 +162,7 @@ type ComputeChecksum struct {
 	// inconsistency and we want to preserve as much state as possible.
 	Checkpoint bool `protobuf:"varint,4,opt,name=checkpoint,proto3" json:"checkpoint,omitempty"`
 	// Replicas processing this command which find themselves in this slice will
-	// terminate. See `CheckConsistencyRequest.Terminate`.
+	// terminate. See `ComputeChecksumRequest.Terminate`.
 	Terminate []roachpb.ReplicaDescriptor `protobuf:"bytes,6,rep,name=terminate,proto3" json:"terminate"`
 }
 
