@@ -141,6 +141,7 @@ var xxx_messageInfo_SimpleURI proto.InternalMessageInfo
 type ConnectionDetails struct {
 	Provider ConnectionProvider `protobuf:"varint,1,opt,name=provider,proto3,enum=cockroach.cloud.externalconn.connectionpb.ConnectionProvider" json:"provider,omitempty"`
 	// Types that are valid to be assigned to Details:
+	//
 	//	*ConnectionDetails_SimpleURI
 	Details isConnectionDetails_Details `protobuf_oneof:"details"`
 }

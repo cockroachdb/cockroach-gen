@@ -238,6 +238,7 @@ func (InvertedIndexColumnKind) EnumDescriptor() ([]byte, []int) {
 // LocalityConfig is used to figure the locality of a table.
 type LocalityConfig struct {
 	// Types that are valid to be assigned to Locality:
+	//
 	//	*LocalityConfig_Global_
 	//	*LocalityConfig_RegionalByTable_
 	//	*LocalityConfig_RegionalByRow_
@@ -451,14 +452,17 @@ var xxx_messageInfo_LocalityConfig_Global proto.InternalMessageInfo
 // As as example, sample field values for the following table:
 //
 // CREATE TABLE abc (
-//   a INT PRIMARY KEY USING HASH WITH (bucket_count=10),  // column id: 1
-//   b BYTES
+//
+//	a INT PRIMARY KEY USING HASH WITH (bucket_count=10),  // column id: 1
+//	b BYTES
+//
 // );
 //
 // Sharded descriptor:
-//   name:          "a_shard"
-//   shard_buckets: 10
-//   column_names:  ["a"]
+//
+//	name:          "a_shard"
+//	shard_buckets: 10
+//	column_names:  ["a"]
 type ShardedDescriptor struct {
 	// IsSharded indicates whether the index in question is a sharded one.
 	IsSharded bool `protobuf:"varint,1,opt,name=is_sharded,json=isSharded" json:"is_sharded"`

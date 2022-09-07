@@ -1086,45 +1086,48 @@ var xxx_messageInfo_InterleaveDescriptor_Ancestor proto.InternalMessageInfo
 //
 // Sample field values on the following table:
 //
-//   CREATE TABLE t (
-//     k1 INT NOT NULL,   // column ID: 1
-//     k2 INT NOT NULL,   // column ID: 2
-//     u INT NULL,        // column ID: 3
-//     v INT NULL,        // column ID: 4
-//     w INT NULL,        // column ID: 5
-//     CONSTRAINT "primary" PRIMARY KEY (k1, k2),
-//     INDEX k1v (k1, v) STORING (w),
-//     FAMILY "primary" (k1, k2, u, v, w)
-//   )
+//	CREATE TABLE t (
+//	  k1 INT NOT NULL,   // column ID: 1
+//	  k2 INT NOT NULL,   // column ID: 2
+//	  u INT NULL,        // column ID: 3
+//	  v INT NULL,        // column ID: 4
+//	  w INT NULL,        // column ID: 5
+//	  CONSTRAINT "primary" PRIMARY KEY (k1, k2),
+//	  INDEX k1v (k1, v) STORING (w),
+//	  FAMILY "primary" (k1, k2, u, v, w)
+//	)
 //
 // Primary index:
-//   name:                   primary
-//   id:                     1
-//   unique:                 true
-//   key_column_names:       k1, k2
-//   key_column_directions:  ASC, ASC
-//   key_column_ids:         1, 2   // k1, k2
+//
+//	name:                   primary
+//	id:                     1
+//	unique:                 true
+//	key_column_names:       k1, k2
+//	key_column_directions:  ASC, ASC
+//	key_column_ids:         1, 2   // k1, k2
 //
 // [old STORING encoding] Index k1v (k1, v) STORING (w):
-//   name:                   k1v
-//   id:                     2
-//   unique:                 false
-//   key_column_names:       k1, v
-//   key_column_directions:  ASC, ASC
-//   store_column_names:     w
-//   key_column_ids:         1, 4   // k1, v
-//   key_suffix_column_ids:  2, 5   // k2, w
+//
+//	name:                   k1v
+//	id:                     2
+//	unique:                 false
+//	key_column_names:       k1, v
+//	key_column_directions:  ASC, ASC
+//	store_column_names:     w
+//	key_column_ids:         1, 4   // k1, v
+//	key_suffix_column_ids:  2, 5   // k2, w
 //
 // [new STORING encoding] Index k1v (k1, v) STORING (w):
-//   name:                   k1v
-//   id:                     2
-//   unique:                 false
-//   key_column_names:       k1, v
-//   key_column_directions:  ASC, ASC
-//   store_column_names:     w
-//   key_column_ids:         1, 4   // k1, v
-//   key_suffix_column_ids:  2      // k2
-//   store_column_ids:       5      // w
+//
+//	name:                   k1v
+//	id:                     2
+//	unique:                 false
+//	key_column_names:       k1, v
+//	key_column_directions:  ASC, ASC
+//	store_column_names:     w
+//	key_column_ids:         1, 4   // k1, v
+//	key_suffix_column_ids:  2      // k2
+//	store_column_ids:       5      // w
 type IndexDescriptor struct {
 	Name    string                 `protobuf:"bytes,1,opt,name=name" json:"name"`
 	ID      IndexID                `protobuf:"varint,2,opt,name=id,casttype=IndexID" json:"id"`
@@ -1794,7 +1797,6 @@ func (*DescriptorMutation) XXX_OneofWrappers() []interface{} {
 // the partial effect of a committed transaction during the drain interval.
 // For instance during the drain interval a transaction can see the correct
 // assignment for C, and the old assignments for B.
-//
 type NameInfo struct {
 	// The database that the table belonged to before the rename (tables can be
 	// renamed from one db to another).
@@ -2936,19 +2938,19 @@ var xxx_messageInfo_SuperRegion proto.InternalMessageInfo
 // existing zone configuration inheritance rules.
 //
 // Rules (implemented in pkg/sql/region_util.go):
-// 1. database-level zone configs are extended first using the regional zone
-//    config extension and then with the regional_in[<primary_region>] zone
-//    config extension. In doing so, REGIONAL [ IN PRIMARY REGION ] tables can
-//    continue to inherit from the database level zone config.
-// 2. table-level zone configs use the extension associated with their locality
-//    type.
-//  2a. GLOBAL tables are extended with the global zone config extension.
-//  2b. REGIONAL IN <region> tables are extended first using the regional zone
-//      config extension and then with the regional_in[<affinity_region>] zone
-//      config extension.
-// 3. partition-level zone configs are extended first using the regional zone
-//    config extension and then with the regional_in[<partition_region>] zone
-//    config extension.
+//  1. database-level zone configs are extended first using the regional zone
+//     config extension and then with the regional_in[<primary_region>] zone
+//     config extension. In doing so, REGIONAL [ IN PRIMARY REGION ] tables can
+//     continue to inherit from the database level zone config.
+//  2. table-level zone configs use the extension associated with their locality
+//     type.
+//     2a. GLOBAL tables are extended with the global zone config extension.
+//     2b. REGIONAL IN <region> tables are extended first using the regional zone
+//     config extension and then with the regional_in[<affinity_region>] zone
+//     config extension.
+//  3. partition-level zone configs are extended first using the regional zone
+//     config extension and then with the regional_in[<partition_region>] zone
+//     config extension.
 type ZoneConfigExtensions struct {
 	// Global extends the zone config applied to GLOBAL tables.
 	Global *zonepb.ZoneConfig `protobuf:"bytes,1,opt,name=global" json:"global,omitempty"`

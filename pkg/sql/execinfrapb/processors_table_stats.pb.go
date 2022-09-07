@@ -137,32 +137,32 @@ var xxx_messageInfo_SketchSpec proto.InternalMessageInfo
 // This method is chosen because it allows to combine sample sets very easily.
 //
 // The internal schema of the processor is formed of three column groups:
-//   1. sampled row columns:
-//       - columns that map 1-1 to the columns in the input (same
-//         schema as the input). Note that columns unused in a histogram are
-//         set to NULL.
-//       - an INT column with the "rank" of the row; this is a random value
-//         associated with the row (necessary for combining sample sets).
-//   2. sketch columns:
-//       - an INT column indicating the sketch index
-//         (0 to len(sketches) - 1).
-//       - an INT column indicating the number of rows processed
-//       - an INT column indicating the number of rows with NULL values
-//         on all columns of the sketch.
-//       - an INT column indicating the sum of the size of all columns of the
-//         sketch in bytes.
-//       - a BYTES column with the binary sketch data (format
-//         dependent on the sketch type).
-//   3. inverted columns:
-//       - an INT column identifying the column index for this inverted sample
-//       - a BYTE column of the inverted index key.
+//  1. sampled row columns:
+//     - columns that map 1-1 to the columns in the input (same
+//     schema as the input). Note that columns unused in a histogram are
+//     set to NULL.
+//     - an INT column with the "rank" of the row; this is a random value
+//     associated with the row (necessary for combining sample sets).
+//  2. sketch columns:
+//     - an INT column indicating the sketch index
+//     (0 to len(sketches) - 1).
+//     - an INT column indicating the number of rows processed
+//     - an INT column indicating the number of rows with NULL values
+//     on all columns of the sketch.
+//     - an INT column indicating the sum of the size of all columns of the
+//     sketch in bytes.
+//     - a BYTES column with the binary sketch data (format
+//     dependent on the sketch type).
+//  3. inverted columns:
+//     - an INT column identifying the column index for this inverted sample
+//     - a BYTE column of the inverted index key.
 //
 // There are four row types produced:
-//   1. sample rows, using column group #1 and the numRows column from #2.
-//   2. sketch rows, using column group #2.
-//   3. inverted sample rows, using column group #3, the rank column from #1,
-//      and numRows column from #2.
-//   4. inverted sketch rows, using column group #2 and first column from #3.
+//  1. sample rows, using column group #1 and the numRows column from #2.
+//  2. sketch rows, using column group #2.
+//  3. inverted sample rows, using column group #3, the rank column from #1,
+//     and numRows column from #2.
+//  4. inverted sketch rows, using column group #2 and first column from #3.
 //
 // Rows have NULLs on all columns they do not use.
 type SamplerSpec struct {
@@ -217,17 +217,17 @@ var xxx_messageInfo_SamplerSpec proto.InternalMessageInfo
 // The input schema it expects matches the output schema of a sampler spec (see
 // the comment for SamplerSpec for all the details):
 //  1. sampled row columns:
-//    - sampled columns
-//    - row rank
+//     - sampled columns
+//     - row rank
 //  2. sketch columns:
-//    - sketch index
-//    - number of rows processed
-//    - number of rows encountered with NULL values on all columns of the sketch
-//    - average size of the columns of the sketch in bytes
-//    - binary sketch data
+//     - sketch index
+//     - number of rows processed
+//     - number of rows encountered with NULL values on all columns of the sketch
+//     - average size of the columns of the sketch in bytes
+//     - binary sketch data
 //  3. inverted columns:
-//    - column index for inverted sample
-//    - sample column
+//     - column index for inverted sample
+//     - sample column
 type SampleAggregatorSpec struct {
 	Sketches         []SketchSpec `protobuf:"bytes,1,rep,name=sketches" json:"sketches"`
 	InvertedSketches []SketchSpec `protobuf:"bytes,8,rep,name=inverted_sketches,json=invertedSketches" json:"inverted_sketches"`

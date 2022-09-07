@@ -966,10 +966,10 @@ var xxx_messageInfo_ConditionalPutResponse proto.InternalMessageInfo
 
 // An InitPutRequest is the argument to the InitPut() method.
 //
-// - If key doesn't exist, sets value.
-// - If key exists, returns a ConditionFailedError if value != existing value
-//   If failOnTombstones is set to true, tombstone values count as mismatched
-//   values and will cause a ConditionFailedError.
+//   - If key doesn't exist, sets value.
+//   - If key exists, returns a ConditionFailedError if value != existing value
+//     If failOnTombstones is set to true, tombstone values count as mismatched
+//     values and will cause a ConditionFailedError.
 type InitPutRequest struct {
 	RequestHeader `protobuf:"bytes,1,opt,name=header,proto3,embedded=header" json:"header"`
 	Value         Value `protobuf:"bytes,2,opt,name=value,proto3" json:"value"`
@@ -4554,13 +4554,13 @@ var xxx_messageInfo_AdminVerifyProtectedTimestampResponse_FailedRange proto.Inte
 // The following parameters can be used to make AddSSTable enforce these
 // guarantees, at a performance cost:
 //
-// * SSTTimestampToRequestTimestamp: ensures compliance with the timestamp cache
-//   and closed timestamp, by rewriting SST timestamps to the request timestamp.
-//   Also emits the SST via the range feed.
+//   - SSTTimestampToRequestTimestamp: ensures compliance with the timestamp cache
+//     and closed timestamp, by rewriting SST timestamps to the request timestamp.
+//     Also emits the SST via the range feed.
 //
-// * DisallowConflicts, DisallowShadowing, or DisallowShadowingBelow: ensures
-//   compliance with MVCC, by checking for conflicting keys in existing data
-//   instead of writing blindly.
+//   - DisallowConflicts, DisallowShadowing, or DisallowShadowingBelow: ensures
+//     compliance with MVCC, by checking for conflicting keys in existing data
+//     instead of writing blindly.
 //
 // If the above parameters are not enabled, the caller must make sure these
 // guarantees are upheld via other mechanisms. These options are orthogonal,
@@ -5228,7 +5228,9 @@ var xxx_messageInfo_MigrateResponse proto.InternalMessageInfo
 //
 // A resolved timestamp for a key span is a sibling concept a resolved timestamp
 // for a rangefeed, which is defined in:
-//   pkg/kv/kvserver/rangefeed/resolved_timestamp.go
+//
+//	pkg/kv/kvserver/rangefeed/resolved_timestamp.go
+//
 // Whereas a resolved timestamp for a rangefeed refers to a timestamp below
 // which no future updates will be published on the rangefeed, a resolved
 // timestamp for a key span refers to a timestamp below which no future state

@@ -551,12 +551,12 @@ type Factory interface {
 	//
 	// InsertFastPath implements a special (but very common) case of insert,
 	// satisfying the following conditions:
-	//  - the input is Values with at most mutations.MaxBatchSize, and there are no
-	//    subqueries;
-	//  - there are no other mutations in the statement, and the output of the
-	//    insert is not processed through side-effecting expressions.
-	//  - there are no self-referencing foreign keys;
-	//  - all FK checks can be performed using direct lookups into unique indexes.
+	//   - the input is Values with at most mutations.MaxBatchSize, and there are no
+	//     subqueries;
+	//   - there are no other mutations in the statement, and the output of the
+	//     insert is not processed through side-effecting expressions.
+	//   - there are no self-referencing foreign keys;
+	//   - all FK checks can be performed using direct lookups into unique indexes.
 	//
 	// In this case, the foreign-key checks can run before (or even concurrently
 	// with) the insert. If they are run before, the insert is allowed to
@@ -623,12 +623,12 @@ type Factory interface {
 	// contain the ordinal positions of the table columns that are involved in
 	// the Upsert. For example:
 	//
-	//   CREATE TABLE abc (a INT PRIMARY KEY, b INT, c INT)
-	//   INSERT INTO abc VALUES (10, 20, 30) ON CONFLICT (a) DO UPDATE SET b=25
+	//	CREATE TABLE abc (a INT PRIMARY KEY, b INT, c INT)
+	//	INSERT INTO abc VALUES (10, 20, 30) ON CONFLICT (a) DO UPDATE SET b=25
 	//
-	//   insertCols = {0, 1, 2}
-	//   fetchCols  = {0, 1, 2}
-	//   updateCols = {1}
+	//	insertCols = {0, 1, 2}
+	//	fetchCols  = {0, 1, 2}
+	//	updateCols = {1}
 	//
 	// The input is expected to first have 3 columns that will be inserted into
 	// columns {0, 1, 2} of the table. The next 3 columns contain the existing
@@ -677,9 +677,9 @@ type Factory interface {
 	// DeleteRange efficiently deletes contiguous rows stored in the given table's
 	// primary index. This fast path is only possible when certain conditions hold
 	// true:
-	//  - there are no secondary indexes;
-	//  - the input to the delete is a scan (without limits);
-	//  - there are no inbound FKs to the table.
+	//   - there are no secondary indexes;
+	//   - the input to the delete is a scan (without limits);
+	//   - there are no inbound FKs to the table.
 	//
 	// See the comment for ConstructScan for descriptions of the needed and
 	// indexConstraint parameters, since DeleteRange combines Delete + Scan into a
@@ -819,16 +819,16 @@ type Factory interface {
 	// ConstructRecursiveCTE creates a node for a RecursiveCTE operation.
 	//
 	// RecursiveCTE executes a recursive CTE:
-	//   * the initial plan is run first; the results are emitted and also saved
+	//   - the initial plan is run first; the results are emitted and also saved
 	//     in a buffer.
-	//   * so long as the last buffer is not empty:
-	//     - the RecursiveCTEIterationFn is used to create a plan for the
-	//       recursive side; a reference to the last buffer is passed to this
-	//       function. The returned plan uses this reference with a
-	//       ConstructScanBuffer call.
-	//     - the plan is executed; the results are emitted and also saved in a new
-	//       buffer for the next iteration. If Deduplicate is true, only rows that
-	//       haven't been returned yet are emitted and saved.
+	//   - so long as the last buffer is not empty:
+	//   - the RecursiveCTEIterationFn is used to create a plan for the
+	//     recursive side; a reference to the last buffer is passed to this
+	//     function. The returned plan uses this reference with a
+	//     ConstructScanBuffer call.
+	//   - the plan is executed; the results are emitted and also saved in a new
+	//     buffer for the next iteration. If Deduplicate is true, only rows that
+	//     haven't been returned yet are emitted and saved.
 	ConstructRecursiveCTE(
 		initial Node,
 		fn RecursiveCTEIterationFn,

@@ -76,8 +76,9 @@ func (Constraint_Type) EnumDescriptor() ([]byte, []int) {
 // values within a zone.
 //
 // TODO(spencer): flesh this out to include maximum number of values
-//   as well as whether there's an intersection between max values
-//   and TTL or a union.
+//
+//	as well as whether there's an intersection between max values
+//	and TTL or a union.
 type GCPolicy struct {
 	// TTLSeconds specifies the maximum age of a value before it's
 	// garbage collected. Only older versions of values are garbage
@@ -244,7 +245,8 @@ type ZoneConfig struct {
 	// can be served consistently from all replicas and do not block on writes. In
 	// exchange, writes get pushed into the future and must wait on commit to
 	// ensure linearizability. For more, see:
-	//   https://github.com/cockroachdb/cockroach/blob/master/docs/RFCS/20200811_non_blocking_txns.md
+	//
+	//	https://github.com/cockroachdb/cockroach/blob/master/docs/RFCS/20200811_non_blocking_txns.md
 	GlobalReads *bool `protobuf:"varint,12,opt,name=global_reads,json=globalReads" json:"global_reads,omitempty" yaml:"global_reads"`
 	// NumReplicas specifies the desired number of replicas. This includes voting
 	// and non-voting replicas.

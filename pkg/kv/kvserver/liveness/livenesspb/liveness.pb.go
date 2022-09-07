@@ -27,26 +27,26 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // MembershipStatus enumerates the possible membership states a node could in.
 //
-//    +--------------------+                                        +--------------------+
-//    |                    |     cockroach node decommission        |                    |
-//    |                    |--------------------------------------->|                    |
-//    |       Active       |                                        |  Decommissioning   |
-//    |                    |<---------------------------------------|                    |
-//    |                    |     cockroach node recommission        |                    |
-//    +--------------------+                                        +--------------------+
-//                                                                             |
-//                                                                             |
-//                                                                             |
-//                                                                             |
-//                                                                             |
-//                                                                             v
-//                                                                  +--------------------+
-//                                                                  |                    |
-//                                                                  |                    |
-//                                                                  |   Decommissioned   |
-//                                                                  |                    |
-//                                                                  |                    |
-//                                                                  +--------------------+
+//	+--------------------+                                        +--------------------+
+//	|                    |     cockroach node decommission        |                    |
+//	|                    |--------------------------------------->|                    |
+//	|       Active       |                                        |  Decommissioning   |
+//	|                    |<---------------------------------------|                    |
+//	|                    |     cockroach node recommission        |                    |
+//	+--------------------+                                        +--------------------+
+//	                                                                         |
+//	                                                                         |
+//	                                                                         |
+//	                                                                         |
+//	                                                                         |
+//	                                                                         v
+//	                                                              +--------------------+
+//	                                                              |                    |
+//	                                                              |                    |
+//	                                                              |   Decommissioned   |
+//	                                                              |                    |
+//	                                                              |                    |
+//	                                                              +--------------------+
 //
 // Note that we've intentionally elided a 'recommissioning' state. To
 // recommission a node is to simply cancel an inflight decommissioning process,

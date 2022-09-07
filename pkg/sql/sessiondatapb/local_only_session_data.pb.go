@@ -104,7 +104,8 @@ type LocalOnlySessionData struct {
 	// transaction.
 	ForceSavepointRestart bool `protobuf:"varint,19,opt,name=force_savepoint_restart,json=forceSavepointRestart,proto3" json:"force_savepoint_restart,omitempty"`
 	// AllowPrepareAsOptPlan must be set to allow use of
-	//   PREPARE name AS OPT PLAN '...'
+	//
+	//	PREPARE name AS OPT PLAN '...'
 	AllowPrepareAsOptPlan bool `protobuf:"varint,20,opt,name=allow_prepare_as_opt_plan,json=allowPrepareAsOptPlan,proto3" json:"allow_prepare_as_opt_plan,omitempty"`
 	// TempTablesEnabled indicates whether temporary tables can be created or not.
 	TempTablesEnabled bool `protobuf:"varint,21,opt,name=temp_tables_enabled,json=tempTablesEnabled,proto3" json:"temp_tables_enabled,omitempty"`

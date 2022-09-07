@@ -35,7 +35,7 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 // holder but the more restrictive it is to concurrent transactions attempting
 // to access the same keys.
 //
-// Compatibility Matrix
+// # Compatibility Matrix
 //
 // The following matrix presents the compatibility of locking strengths with one
 // another. A cell with an X means that the two strengths are incompatible with
@@ -44,17 +44,17 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 // are compatible with each other and that they can be held on a given key by
 // different transactions, concurrently.
 //
-//  +-----------+-----------+-----------+-----------+-----------+
-//  |           |   None    |  Shared   |  Upgrade  | Exclusive |
-//  +-----------+-----------+-----------+-----------+-----------+
-//  | None      |           |           |           |     X^†   |
-//  +-----------+-----------+-----------+-----------+-----------+
-//  | Shared    |           |           |     X     |     X     |
-//  +-----------+-----------+-----------+-----------+-----------+
-//  | Upgrade   |           |     X     |     X     |     X     |
-//  +-----------+-----------+-----------+-----------+-----------+
-//  | Exclusive |     X^†   |     X     |     X     |     X     |
-//  +-----------+-----------+-----------+-----------+-----------+
+//	+-----------+-----------+-----------+-----------+-----------+
+//	|           |   None    |  Shared   |  Upgrade  | Exclusive |
+//	+-----------+-----------+-----------+-----------+-----------+
+//	| None      |           |           |           |     X^†   |
+//	+-----------+-----------+-----------+-----------+-----------+
+//	| Shared    |           |           |     X     |     X     |
+//	+-----------+-----------+-----------+-----------+-----------+
+//	| Upgrade   |           |     X     |     X     |     X     |
+//	+-----------+-----------+-----------+-----------+-----------+
+//	| Exclusive |     X^†   |     X     |     X     |     X     |
+//	+-----------+-----------+-----------+-----------+-----------+
 //
 // [†] reads under optimistic concurrency control in CockroachDB only conflict
 // with Exclusive locks if the read's timestamp is equal to or greater than the

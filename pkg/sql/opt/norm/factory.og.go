@@ -99,15 +99,15 @@ SKIP_RULES:
 // Insert evaluates a relational input expression, and inserts values from it
 // into a target table. The input may be an arbitrarily complex expression:
 //
-//   INSERT INTO ab SELECT x, y+1 FROM xy ORDER BY y
+//	INSERT INTO ab SELECT x, y+1 FROM xy ORDER BY y
 //
 // It can also be a simple VALUES clause:
 //
-//   INSERT INTO ab VALUES (1, 2)
+//	INSERT INTO ab VALUES (1, 2)
 //
 // It may also return rows, which can be further composed:
 //
-//   SELECT a + b FROM [INSERT INTO ab VALUES (1, 2) RETURNING a, b]
+//	SELECT a + b FROM [INSERT INTO ab VALUES (1, 2) RETURNING a, b]
 //
 // The Insert operator is capable of inserting values into computed columns and
 // mutation columns, which are not writable (or even visible in the case of
@@ -160,7 +160,7 @@ SKIP_RULES:
 // subsets of rows can be selected from the target table and processed in order,
 // as with this example:
 //
-//   UPDATE abc SET b=10 WHERE a>0 ORDER BY b+c LIMIT 10
+//	UPDATE abc SET b=10 WHERE a>0 ORDER BY b+c LIMIT 10
 //
 // The Update operator will also update any computed columns, including mutation
 // columns that are computed.
@@ -265,14 +265,14 @@ SKIP_RULES:
 // instead update the existing row. The Upsert operator is used for all of these
 // syntactic variants:
 //
-//   INSERT..ON CONFLICT DO UPDATE
-//     INSERT INTO abc VALUES (1, 2, 3) ON CONFLICT (a) DO UPDATE SET b=10
+//	INSERT..ON CONFLICT DO UPDATE
+//	  INSERT INTO abc VALUES (1, 2, 3) ON CONFLICT (a) DO UPDATE SET b=10
 //
-//   INSERT..ON CONFLICT DO NOTHING
-//     INSERT INTO abc VALUES (1, 2, 3) ON CONFLICT DO NOTHING
+//	INSERT..ON CONFLICT DO NOTHING
+//	  INSERT INTO abc VALUES (1, 2, 3) ON CONFLICT DO NOTHING
 //
-//   UPSERT
-//     UPSERT INTO abc VALUES (1, 2, 3)
+//	UPSERT
+//	  UPSERT INTO abc VALUES (1, 2, 3)
 //
 // The Update operator will also insert/update any computed columns, including
 // mutation columns that are computed.
@@ -343,8 +343,7 @@ SKIP_RULES:
 // Delete is an operator used to delete all rows that are selected by a
 // relational input expression:
 //
-//   DELETE FROM abc WHERE a>0 ORDER BY b LIMIT 10
-//
+//	DELETE FROM abc WHERE a>0 ORDER BY b LIMIT 10
 func (_f *Factory) ConstructDelete(
 	input memo.RelExpr,
 	uniqueChecks memo.UniqueChecksExpr,
@@ -9113,11 +9112,11 @@ SKIP_RULES:
 //
 // The GroupingPrivate field contains an ordering; this ordering serves a
 // dual-purpose:
-//  - if we ignore any grouping columns, the remaining columns indicate an
-//    intra-group ordering; this is useful if there is an order-dependent
-//    aggregation (like ARRAY_AGG).
-//  - any prefix containing only grouping columns is used to execute the
-//    aggregation in a streaming fashion.
+//   - if we ignore any grouping columns, the remaining columns indicate an
+//     intra-group ordering; this is useful if there is an order-dependent
+//     aggregation (like ARRAY_AGG).
+//   - any prefix containing only grouping columns is used to execute the
+//     aggregation in a streaming fashion.
 //
 // Currently, the initially built GroupBy has all grouping columns as "optional"
 // in the ordering (we call this the "canonical" variant). Subsequently, the
@@ -10673,15 +10672,15 @@ SKIP_RULES:
 // into a single set containing rows from both inputs. Duplicate rows are
 // not discarded. For example:
 //
-//   SELECT x FROM xx UNION ALL SELECT y FROM yy
-//     x       y         out
-//   -----   -----      -----
-//     1       1          1
-//     1       2    ->    1
-//     2       3          1
-//                        2
-//                        2
-//                        3
+//	SELECT x FROM xx UNION ALL SELECT y FROM yy
+//	  x       y         out
+//	-----   -----      -----
+//	  1       1          1
+//	  1       2    ->    1
+//	  2       3          1
+//	                     2
+//	                     2
+//	                     3
 //
 // The SetPrivate field matches columns from the Left and Right inputs of the
 // UnionAll with the output columns. See the comment above SetPrivate for more
@@ -10751,15 +10750,15 @@ SKIP_RULES:
 // are not discarded. This effectively creates a one-to-one mapping between the
 // Left and Right rows. For example:
 //
-//   SELECT x FROM xx INTERSECT ALL SELECT y FROM yy
-//     x       y         out
-//   -----   -----      -----
-//     1       1          1
-//     1       1    ->    1
-//     1       2          2
-//     2       2          2
-//     2       3
-//     4
+//	SELECT x FROM xx INTERSECT ALL SELECT y FROM yy
+//	  x       y         out
+//	-----   -----      -----
+//	  1       1          1
+//	  1       1    ->    1
+//	  1       2          2
+//	  2       2          2
+//	  2       3
+//	  4
 //
 // The SetPrivate field matches columns from the Left and Right inputs of the
 // IntersectAll with the output columns. See the comment above SetPrivate for more
@@ -10793,15 +10792,16 @@ SKIP_RULES:
 // relation that do not have a corresponding row in the Right relation.
 // Duplicate rows are not discarded. This effectively creates a one-to-one
 // mapping between the Left and Right rows. For example:
-//   SELECT x FROM xx EXCEPT ALL SELECT y FROM yy
-//     x       y         out
-//   -----   -----      -----
-//     1       1    ->    1
-//     1       1          4
-//     1       2
-//     2       2
-//     2       3
-//     4
+//
+//	SELECT x FROM xx EXCEPT ALL SELECT y FROM yy
+//	  x       y         out
+//	-----   -----      -----
+//	  1       1    ->    1
+//	  1       1          4
+//	  1       2
+//	  2       2
+//	  2       3
+//	  4
 //
 // The SetPrivate field matches columns from the Left and Right inputs of the
 // ExceptAll with the output columns. See the comment above SetPrivate for more
@@ -10867,31 +10867,31 @@ SKIP_RULES:
 // 'us-west1' and 'europe-west1', and we have the following table and query,
 // issued from 'us-east1':
 //
-//   CREATE TABLE tab (
-//     k INT PRIMARY KEY,
-//     v INT
-//   ) LOCALITY REGIONAL BY ROW;
+//	CREATE TABLE tab (
+//	  k INT PRIMARY KEY,
+//	  v INT
+//	) LOCALITY REGIONAL BY ROW;
 //
-//   SELECT * FROM tab WHERE k = 10;
+//	SELECT * FROM tab WHERE k = 10;
 //
 // Normally, this would produce the following plan:
 //
-//   scan tab
-//    └── constraint: /3/1
-//         ├── [/'europe-west1'/10 - /'europe-west1'/10]
-//         ├── [/'us-east1'/10 - /'us-east1'/10]
-//         └── [/'us-west1'/10 - /'us-west1'/10]
+//	scan tab
+//	 └── constraint: /3/1
+//	      ├── [/'europe-west1'/10 - /'europe-west1'/10]
+//	      ├── [/'us-east1'/10 - /'us-east1'/10]
+//	      └── [/'us-west1'/10 - /'us-west1'/10]
 //
 // but if the session setting locality_optimized_partitioned_index_scan is enabled,
 // the optimizer will produce this plan, using locality optimized search:
 //
-//   locality-optimized-search
-//    ├── scan tab
-//    │    └── constraint: /9/7: [/'us-east1'/10 - /'us-east1'/10]
-//    └── scan tab
-//         └── constraint: /14/12
-//              ├── [/'europe-west1'/10 - /'europe-west1'/10]
-//              └── [/'us-west1'/10 - /'us-west1'/10]
+//	locality-optimized-search
+//	 ├── scan tab
+//	 │    └── constraint: /9/7: [/'us-east1'/10 - /'us-east1'/10]
+//	 └── scan tab
+//	      └── constraint: /14/12
+//	           ├── [/'europe-west1'/10 - /'europe-west1'/10]
+//	           └── [/'us-west1'/10 - /'us-west1'/10]
 //
 // As long as k = 10 is located in 'us-east1', the second plan will be much faster.
 // But if k = 10 is located in one of the other regions, the first plan would be
@@ -11552,7 +11552,7 @@ SKIP_RULES:
 // values from a,b,c picked "simultaneously". NULLs are used when a generator is
 // "shorter" than another.  For example:
 //
-//    zip([1,2,3], ['a','b']) = [(1,'a'), (2,'b'), (3, null)]
+//	zip([1,2,3], ['a','b']) = [(1,'a'), (2,'b'), (3, null)]
 //
 // ProjectSet corresponds to a relational operator project(R, a, b, c, ...)
 // which, for each row in R, produces all the rows produced by zip(a, b, c, ...)
@@ -11811,12 +11811,12 @@ SKIP_RULES:
 
 // ConstructRecursiveCTE constructs an expression for the RecursiveCTE operator.
 // RecursiveCTE implements the logic of a recursive CTE:
-//  * the Initial query is evaluated; the results are emitted and also saved into
-//    a "working table".
-//  * so long as the working table is not empty:
-//    - the Recursive query (which refers to the working table using a specific
-//      WithID) is evaluated; the results are emitted and also saved into a new
-//      "working table" for the next iteration.
+//   - the Initial query is evaluated; the results are emitted and also saved into
+//     a "working table".
+//   - so long as the working table is not empty:
+//   - the Recursive query (which refers to the working table using a specific
+//     WithID) is evaluated; the results are emitted and also saved into a new
+//     "working table" for the next iteration.
 func (_f *Factory) ConstructRecursiveCTE(
 	binding memo.RelExpr,
 	initial memo.RelExpr,
@@ -11864,8 +11864,8 @@ SKIP_RULES:
 // ConstructSubquery constructs an expression for the Subquery operator.
 // Subquery is a subquery in a single-row context. Here are some examples:
 //
-//   SELECT 1 = (SELECT 1)
-//   SELECT (1, 'a') = (SELECT 1, 'a')`
+//	SELECT 1 = (SELECT 1)
+//	SELECT (1, 'a') = (SELECT 1, 'a')`
 //
 // In a single-row context, the outer query is only valid if the subquery returns
 // at most one row. Subqueries in a multi-row context can be transformed to a
@@ -11904,17 +11904,17 @@ SKIP_RULES:
 // null if any of the comparisons are null, else returns false. The following
 // transformations map from various SQL operators into the Any operator:
 //
-//   <scalar> IN (<subquery>)
-//   ==> (Any <subquery> <scalar> EqOp)
+//	<scalar> IN (<subquery>)
+//	==> (Any <subquery> <scalar> EqOp)
 //
-//   <scalar> NOT IN (<subquery>)
-//   ==> (Not (Any <subquery> <scalar> EqOp))
+//	<scalar> NOT IN (<subquery>)
+//	==> (Not (Any <subquery> <scalar> EqOp))
 //
-//   <scalar> <cmp> {SOME|ANY}(<subquery>)
-//   ==> (Any <subquery> <scalar> <cmp>)
+//	<scalar> <cmp> {SOME|ANY}(<subquery>)
+//	==> (Any <subquery> <scalar> <cmp>)
 //
-//   <scalar> <cmp> ALL(<subquery>)
-//   ==> (Not (Any <subquery> <scalar> <negated-cmp>))
+//	<scalar> <cmp> ALL(<subquery>)
+//	==> (Not (Any <subquery> <scalar> <negated-cmp>))
 //
 // Any expects the input subquery to return a single column of any data type. The
 // scalar value is compared with that column using the specified comparison
@@ -12223,14 +12223,16 @@ SKIP_RULES:
 // the Typ field is not types.Unknown, then the value is known to be in the
 // domain of that type. This is important for preserving correct types in
 // replacement patterns. For example:
-//   (Plus (Function ...) (Const 1))
+//
+//	(Plus (Function ...) (Const 1))
 //
 // If the function in that expression has a static type of Int, but then it gets
 // constant folded to (Null), then its type must remain as Int. Any other type
 // violates logical equivalence of the expression, breaking type inference and
 // possibly changing the results of execution. The solution is to tag the null
 // with the correct type:
-//   (Plus (Null (Int)) (Const 1))
+//
+//	(Plus (Null (Int)) (Const 1))
 //
 // Null is its own operator rather than a Const datum in order to make matching
 // and replacement easier and more efficient, as patterns can contain (Null)
@@ -12366,8 +12368,8 @@ func (_f *Factory) ConstructProjectionsItem(
 // The aggregate expression can only consist of aggregate functions, variable
 // references, and modifiers like AggDistinct. Examples of valid expressions:
 //
-//   (Min (Variable 1))
-//   (Count (AggDistinct (Variable 1)))
+//	(Min (Variable 1))
+//	(Count (AggDistinct (Variable 1)))
 //
 // More complex arguments must be formulated using a Project operator as input to
 // the grouping operator.
@@ -19481,7 +19483,7 @@ SKIP_RULES:
 // that the conversion may cause truncation based on the target types' width,
 // such as in this example:
 //
-//   'hello'::VARCHAR(2)
+//	'hello'::VARCHAR(2)
 //
 // That expression has the effect of truncating the string to just 'he', since
 // the target data type allows a maximum of two characters. This is one example
@@ -19641,11 +19643,11 @@ SKIP_RULES:
 // ConstructCase constructs an expression for the Case operator.
 // Case is a CASE statement of the form:
 //
-//   CASE [ <Input> ]
-//       WHEN <condval1> THEN <expr1>
-//     [ WHEN <condval2> THEN <expr2> ] ...
-//     [ ELSE <expr> ]
-//   END
+//	CASE [ <Input> ]
+//	    WHEN <condval1> THEN <expr1>
+//	  [ WHEN <condval2> THEN <expr2> ] ...
+//	  [ ELSE <expr> ]
+//	END
 //
 // The Case operator evaluates <Input> (if not provided, Input is set to True),
 // then picks the WHEN branch where <condval> is equal to <Input>, then evaluates
@@ -19656,8 +19658,7 @@ SKIP_RULES:
 // Note that the Whens list inside Case is used to represent all the WHEN
 // branches. It is of the form:
 //
-//   [(When <condval1> <expr1>),(When <condval2> <expr2>),...]
-//
+//	[(When <condval1> <expr1>),(When <condval2> <expr2>),...]
 func (_f *Factory) ConstructCase(
 	input opt.ScalarExpr,
 	whens memo.ScalarListExpr,
@@ -19926,7 +19927,7 @@ SKIP_RULES:
 // ConstructCollate constructs an expression for the Collate operator.
 // Collate is an expression of the form
 //
-//     x COLLATE y
+//	x COLLATE y
 //
 // Where x is a "string type" (meaning either a normal string or a collated string),
 // and y is a locale. It evaluates to the string collated to the given locale.
@@ -21796,14 +21797,14 @@ SKIP_RULES:
 // ancestors via a call to the corresponding factory Construct methods. Here
 // is example usage:
 //
-//   var replace func(e opt.Expr) opt.Expr
-//   replace = func(e opt.Expr) opt.Expr {
-//     if e.Op() == opt.VariableOp {
-//       return getReplaceVar(e)
-//     }
-//     return factory.Replace(e, replace)
-//   }
-//   replace(root, replace)
+//	var replace func(e opt.Expr) opt.Expr
+//	replace = func(e opt.Expr) opt.Expr {
+//	  if e.Op() == opt.VariableOp {
+//	    return getReplaceVar(e)
+//	  }
+//	  return factory.Replace(e, replace)
+//	}
+//	replace(root, replace)
 //
 // Here, all variables in the tree are being replaced by some other expression
 // in a pre-order traversal of the tree. Post-order traversal is trivially

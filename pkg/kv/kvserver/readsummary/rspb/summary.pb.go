@@ -35,24 +35,27 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 //
 // For example, a high-resolution version of the summary may look like:
 //
-//                         #
-//    ^       ##     ##    #
+//	                     #
+//	^       ##     ##    #
+//
 // ts |    #  ##     ##    #    #######
-//    |    #  ##     ####  #    #######   ##
-//       ###  ##     #######    #######   ##  ###
-//       ----------- ----------------------------
-//          local               global
+//
+//	|    #  ##     ####  #    #######   ##
+//	   ###  ##     #######    #######   ##  ###
+//	   ----------- ----------------------------
+//	      local               global
 //
 // While a low-resolution (compressed) version of the summary may look like:
 //
-//                   ############################
-//    ^  ########### ############################
-// ts |  ########### ############################
-//    |  ########### ############################
-//       ########### ############################
-//       ----------- ----------------------------
-//          local               global
+//	               ############################
+//	^  ########### ############################
 //
+// ts |  ########### ############################
+//
+//	|  ########### ############################
+//	   ########### ############################
+//	   ----------- ----------------------------
+//	      local               global
 type ReadSummary struct {
 	Local  Segment `protobuf:"bytes,1,opt,name=local,proto3" json:"local"`
 	Global Segment `protobuf:"bytes,2,opt,name=global,proto3" json:"global"`

@@ -295,7 +295,9 @@ var xxx_messageInfo_Column proto.InternalMessageInfo
 // ColumnType needs to be an element distinct from Column although they have a
 // 1:1 relationship because their lifecycle is not the same.
 // Column transitions through the two-version-invariant status path:
-//   PUBLIC -> WRITE_ONLY -> DELETE_ONLY -> ABSENT
+//
+//	PUBLIC -> WRITE_ONLY -> DELETE_ONLY -> ABSENT
+//
 // regardless of whether only the column is dropped (meaning ABSENT is reached
 // post-commit) or whether the whole table is dropped. We accommodate the
 // latter case by having ColumnType reach ABSENT in the pre-commit phase

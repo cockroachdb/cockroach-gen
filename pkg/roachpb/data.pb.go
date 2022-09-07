@@ -324,7 +324,7 @@ var xxx_messageInfo_Span proto.InternalMessageInfo
 // avoid unnecessary encoding and decoding as the value gets read from disk and
 // passed through the network. The format is:
 //
-//   <4-byte-checksum><1-byte-tag><encoded-data>
+//	<4-byte-checksum><1-byte-tag><encoded-data>
 //
 // A CRC-32-IEEE checksum is computed from the associated key, tag and encoded
 // data, in that order.
@@ -681,12 +681,12 @@ var xxx_messageInfo_ModifiedSpanTrigger proto.InternalMessageInfo
 
 // StickyBitTrigger indicates that the sticky bit of a range should be changed.
 // This trigger is used in two cases:
-// 1. Unsplitting a range. Note that unsplitting and merging are different
-//    operations. Unsplitting a range will only update the expiration time
-//    associated with the range to hlc.Timestamp{}.
-// 2. Splitting at the start key of a range. In this case, no range is split but
-//    the sticky bit is might be updated, so we need to use this trigger instead
-//    of SplitTrigger.
+//  1. Unsplitting a range. Note that unsplitting and merging are different
+//     operations. Unsplitting a range will only update the expiration time
+//     associated with the range to hlc.Timestamp{}.
+//  2. Splitting at the start key of a range. In this case, no range is split but
+//     the sticky bit is might be updated, so we need to use this trigger instead
+//     of SplitTrigger.
 //
 // Note that the sticky_bit should always be set to the same timestamp used to
 // update the range descriptor and it's the client's responsibility that the

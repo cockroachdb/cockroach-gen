@@ -1733,11 +1733,11 @@ var xxx_messageInfo_SettingsResponse_Value proto.InternalMessageInfo
 // balancer. In this mode, a successful response is returned only if the
 // node:
 //
-// - is not in the process of shutting down or booting up (including
-//   waiting for cluster bootstrap);
-// - is regarded as healthy by the cluster via the recent broadcast of
-//   a liveness beacon. Absent either of these conditions, an error
-//   code will result.
+//   - is not in the process of shutting down or booting up (including
+//     waiting for cluster bootstrap);
+//   - is regarded as healthy by the cluster via the recent broadcast of
+//     a liveness beacon. Absent either of these conditions, an error
+//     code will result.
 //
 // API: PUBLIC
 type HealthRequest struct {

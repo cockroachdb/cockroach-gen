@@ -145,10 +145,12 @@ var xxx_messageInfo_PrivilegeDescriptor proto.InternalMessageInfo
 // should have at creation time.
 // DefaultPrivilegesForRole is further broken down depending on the object type.
 // The object types (TargetObjectType) are:
-//   1: Tables
-//   2: Sequences
-//   3: Types
-//   4: Schemas
+//
+//	1: Tables
+//	2: Sequences
+//	3: Types
+//	4: Schemas
+//
 // DefaultPrivilegesPerObject are keyed on AlterDefaultPrivilegesTargetObject
 // and it's value is a PrivilegeDescriptor that is only used for
 // the list of UserPrivileges for that object.

@@ -29,17 +29,17 @@ var _ = math.Inf
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // Each processor has the following components:
-//  - one or more input synchronizers; each one merges rows between one or more
-//    input streams;
 //
-//  - a processor "core" which encapsulates the inner logic of each processor;
+//   - one or more input synchronizers; each one merges rows between one or more
+//     input streams;
 //
-//  - a post-processing stage which allows "inline" post-processing on results
-//    (like projection or filtering);
+//   - a processor "core" which encapsulates the inner logic of each processor;
 //
-//  - one or more output synchronizers; each one directs rows to one or more
-//  output streams.
+//   - a post-processing stage which allows "inline" post-processing on results
+//     (like projection or filtering);
 //
+//   - one or more output synchronizers; each one directs rows to one or more
+//     output streams.
 //
 // == Internal columns ==
 //

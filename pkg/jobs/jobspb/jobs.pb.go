@@ -1934,19 +1934,20 @@ var xxx_messageInfo_DroppedTableDetails proto.InternalMessageInfo
 //
 // 1. Index (non-interleaved) deletions: One or more deletions of an index on a
 // table.
-//      details.Indexes -> the indexes to GC. These indexes must be
-//      non-interleaved.
-//      details.ParentID -> the table with the indexes.
 //
-// 2. Table deletions: The deletion of a single table.
-//      details.Tables -> the tables to be deleted.
+//	details.Indexes -> the indexes to GC. These indexes must be
+//	non-interleaved.
+//	details.ParentID -> the table with the indexes.
 //
-// 3. Database deletions: The deletion of a database and therefore all its tables.
-//      details.Tables -> the IDs of the tables to GC.
-//      details.ParentID -> the ID of the database to drop.
+//  2. Table deletions: The deletion of a single table.
+//     details.Tables -> the tables to be deleted.
 //
-// 4. Tenant deletion: The deletion of a tenant key range.
-//      details.TenantID -> the ID of the tenant to delete.
+//  3. Database deletions: The deletion of a database and therefore all its tables.
+//     details.Tables -> the IDs of the tables to GC.
+//     details.ParentID -> the ID of the database to drop.
+//
+//  4. Tenant deletion: The deletion of a tenant key range.
+//     details.TenantID -> the ID of the tenant to delete.
 type SchemaChangeGCDetails struct {
 	// Indexes to GC.
 	Indexes []SchemaChangeGCDetails_DroppedIndex `protobuf:"bytes,1,rep,name=indexes,proto3" json:"indexes"`

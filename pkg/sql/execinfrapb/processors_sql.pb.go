@@ -746,10 +746,10 @@ var xxx_messageInfo_IndexSkipTableReaderSpec proto.InternalMessageInfo
 // preserve the order of the input rows.
 //
 // The "internal columns" of a JoinReader (see ProcessorSpec) are either:
-//  - the fetched columns (see IndexFetchSpec), if we are performing an index
-//    join (no lookup columns) or if we are performing a semi or anti join, or
-//  - the concatenation of the columns of the input stream with the fetched
-//    columns.
+//   - the fetched columns (see IndexFetchSpec), if we are performing an index
+//     join (no lookup columns) or if we are performing a semi or anti join, or
+//   - the concatenation of the columns of the input stream with the fetched
+//     columns.
 //
 // Internally, only the values for the columns needed by the post-processing
 // stage are populated.
@@ -758,10 +758,12 @@ var xxx_messageInfo_IndexSkipTableReaderSpec proto.InternalMessageInfo
 // Input stream columns: | a | b |              Fetched columns: | c | d | e |
 //
 // If performing a lookup join on a = c (lookup columns is [0]):
-//        Internal columns: | a | b | c | d | e |
+//
+//	Internal columns: | a | b | c | d | e |
 //
 // If performing an index join (where a = c and b = d) (lookup columns is []):
-//        Internal columns: | c | d | e |
+//
+//	Internal columns: | c | d | e |
 //
 // There is a special case when a "join reader" is used as the second join in
 // a pair of joins to accomplish a LEFT_OUTER, LEFT_SEMI or LEFT_ANTI join.
@@ -1222,21 +1224,22 @@ var xxx_messageInfo_ZigzagJoinerSpec_Side proto.InternalMessageInfo
 // MergeJoinerSpec is the specification for a merge join processor. The processor
 // has two inputs and one output. The inputs must have the same ordering on the
 // columns that have equality constraints. For example:
-//   SELECT * FROM T1 INNER JOIN T2 ON T1.C1 = T2.C5 AND T1.C2 = T2.C4
+//
+//	SELECT * FROM T1 INNER JOIN T2 ON T1.C1 = T2.C5 AND T1.C2 = T2.C4
 //
 // To perform a merge join, the streams corresponding to T1 and T2 must have the
 // same ordering on columns C1, C2 and C5, C4 respectively. For example: C1+,C2-
 // and C5+,C4-.
 //
 // The "internal columns" of a MergeJoiner (see ProcessorSpec) are:
-// - for INNER, LEFT_OUTER, RIGHT_OUTER, FULL_OUTER - the concatenation of left
-//   input columns and right input columns.
-//   If the left input has N columns and the right input has M columns, the
-//   first N columns contain values from the left side and the following M
-//   columns contain values from the right side.
-// - for LEFT_SEMI, LEFT_ANTI, INTERSECT_ALL, EXCEPT_ALL - the left input
-//   columns.
-// - for RIGHT_SEMI, RIGHT_ANTI - the right input columns.
+//   - for INNER, LEFT_OUTER, RIGHT_OUTER, FULL_OUTER - the concatenation of left
+//     input columns and right input columns.
+//     If the left input has N columns and the right input has M columns, the
+//     first N columns contain values from the left side and the following M
+//     columns contain values from the right side.
+//   - for LEFT_SEMI, LEFT_ANTI, INTERSECT_ALL, EXCEPT_ALL - the left input
+//     columns.
+//   - for RIGHT_SEMI, RIGHT_ANTI - the right input columns.
 //
 // Note that, regardless of the join type, an optional ON expression can refer
 // to columns from both inputs.
@@ -1310,14 +1313,14 @@ var xxx_messageInfo_MergeJoinerSpec proto.InternalMessageInfo
 // left row (i+1).
 //
 // The "internal columns" of a HashJoiner (see ProcessorSpec) are:
-// - for INNER, LEFT_OUTER, RIGHT_OUTER, FULL_OUTER - the concatenation of left
-//   input columns and right input columns.
-//   If the left input has N columns and the right input has M columns, the
-//   first N columns contain values from the left side and the following M
-//   columns contain values from the right side.
-// - for LEFT_SEMI, LEFT_ANTI, INTERSECT_ALL, EXCEPT_ALL - the left input
-//   columns.
-// - for RIGHT_SEMI, RIGHT_ANTI - the right input columns.
+//   - for INNER, LEFT_OUTER, RIGHT_OUTER, FULL_OUTER - the concatenation of left
+//     input columns and right input columns.
+//     If the left input has N columns and the right input has M columns, the
+//     first N columns contain values from the left side and the following M
+//     columns contain values from the right side.
+//   - for LEFT_SEMI, LEFT_ANTI, INTERSECT_ALL, EXCEPT_ALL - the left input
+//     columns.
+//   - for RIGHT_SEMI, RIGHT_ANTI - the right input columns.
 //
 // Note that, regardless of the join type, an optional ON expression can refer
 // to columns from both inputs.

@@ -160,9 +160,9 @@ var xxx_messageInfo_AdminQuery proto.InternalMessageInfo
 // SlowQuery is recorded when a query triggers the "slow query" condition.
 //
 // As of this writing, the condition requires:
-// - the cluster setting `sql.log.slow_query.latency_threshold`
-//   set to a non-zero value, AND
-// - EITHER of the following conditions:
+//   - the cluster setting `sql.log.slow_query.latency_threshold`
+//     set to a non-zero value, AND
+//   - EITHER of the following conditions:
 //   - the actual age of the query exceeds the configured threshold; AND/OR
 //   - the query performs a full table/index scan AND the cluster setting
 //     `sql.log.slow_query.experimental_full_table_scans.enabled` is set.
