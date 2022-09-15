@@ -4107,8 +4107,8 @@ type ExportRequest struct {
 	// which covers the point key at c, but resuming from c@2 will contain the
 	// MVCC range tombstone [c-f)@5 which overlaps with the MVCC range tombstone
 	// in the previous response in the interval [c-c\0)@5. This overlap will not
-	// cause problems with multiplexed iteration using NewPebbleSSTIterator(),
-	// nor when ingesting the SSTs via `AddSSTable`.
+	// cause problems with multiplexed iteration using NewSSTIterator(), nor when
+	// ingesting the SSTs via `AddSSTable`.
 	SplitMidKey bool `protobuf:"varint,13,opt,name=split_mid_key,json=splitMidKey,proto3" json:"split_mid_key,omitempty"`
 	// Return the exported SST data in the response.
 	ReturnSST bool `protobuf:"varint,5,opt,name=return_sst,json=returnSst,proto3" json:"return_sst,omitempty"`
