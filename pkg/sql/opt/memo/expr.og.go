@@ -3515,6 +3515,14 @@ type LookupJoinPrivate struct {
 	// in all cases.
 	KeyCols opt.ColList
 
+	// DerivedEquivCols is the set of lookup join equijoin columns which are part
+	// of synthesized equality constraints based on another equality join
+	// condition and a computed index key column in the lookup table. Since these
+	// columns are not reducing the selectivity of the join, but are just added to
+	// facilitate index lookups, they should not be used in determining join
+	// selectivity.
+	DerivedEquivCols opt.ColSet
+
 	// LookupExpr represents the part of the join condition used to perform
 	// the lookup into the index. It should only be set when KeyCols is empty.
 	// LookupExpr is used instead of KeyCols when the lookup condition is
@@ -25863,6 +25871,7 @@ func (in *interner) InternLookupJoin(val *LookupJoinExpr) *LookupJoinExpr {
 	in.hasher.HashTableID(val.Table)
 	in.hasher.HashIndexOrdinal(val.Index)
 	in.hasher.HashColList(val.KeyCols)
+	in.hasher.HashColSet(val.DerivedEquivCols)
 	in.hasher.HashFiltersExpr(val.LookupExpr)
 	in.hasher.HashFiltersExpr(val.RemoteLookupExpr)
 	in.hasher.HashColSet(val.Cols)
@@ -25884,6 +25893,7 @@ func (in *interner) InternLookupJoin(val *LookupJoinExpr) *LookupJoinExpr {
 				in.hasher.IsTableIDEqual(val.Table, existing.Table) &&
 				in.hasher.IsIndexOrdinalEqual(val.Index, existing.Index) &&
 				in.hasher.IsColListEqual(val.KeyCols, existing.KeyCols) &&
+				in.hasher.IsColSetEqual(val.DerivedEquivCols, existing.DerivedEquivCols) &&
 				in.hasher.IsFiltersExprEqual(val.LookupExpr, existing.LookupExpr) &&
 				in.hasher.IsFiltersExprEqual(val.RemoteLookupExpr, existing.RemoteLookupExpr) &&
 				in.hasher.IsColSetEqual(val.Cols, existing.Cols) &&
