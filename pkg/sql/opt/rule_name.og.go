@@ -247,6 +247,7 @@ const (
 	SimplifySameVarEqualities
 	SimplifySameVarInequalities
 	SimplifyNotDisjoint
+	ConvertJSONSubscriptToFetchValue
 	SimplifySelectFilters
 	ConsolidateSelectFilters
 	DeduplicateSelectFilters

@@ -19796,6 +19796,23 @@ func (_f *Factory) ConstructIndirection(
 		}
 	}
 
+	// [ConvertJSONSubscriptToFetchValue]
+	{
+		if _f.funcs.IsJSON(input) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.ConvertJSONSubscriptToFetchValue) {
+				_expr := _f.ConstructFetchVal(
+					input,
+					index,
+				)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.ConvertJSONSubscriptToFetchValue, nil, _expr)
+				}
+				_f.constructorStackDepth--
+				return _expr
+			}
+		}
+	}
+
 SKIP_RULES:
 	e := _f.mem.MemoizeIndirection(input, index)
 	expr := _f.onConstructScalar(e)
