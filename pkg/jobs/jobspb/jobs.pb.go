@@ -3380,6 +3380,19 @@ type Progress struct {
 	Progress       isProgress_Progress `protobuf_oneof:"progress"`
 	ModifiedMicros int64               `protobuf:"varint,2,opt,name=modified_micros,json=modifiedMicros,proto3" json:"modified_micros,omitempty"`
 	RunningStatus  string              `protobuf:"bytes,4,opt,name=running_status,json=runningStatus,proto3" json:"running_status,omitempty"`
+	//                ------ COMPLIANCE NOTE ------
+	// If you're updating this `Progress` proto, consider its impact on compliance.
+	// Currently, we include this data unredacted in debug zip bundles as part of the
+	// dump of `system.jobs`. The current assumption is that none of these details
+	// protos contain PII aside from Key spans.
+	//
+	// If you need to add a new details proto that will include PII beyond just key
+	// spans, `system.jobs.progress` will need to be redacted or excluded from debug
+	// zip to maintain compliance. Exclusion can be configured in
+	// `zip_table_registry.go`.
+	//
+	// If you're unsure, reach out to the compliance team for help.
+	//
 	// Types that are valid to be assigned to Details:
 	//	*Progress_Backup
 	//	*Progress_Restore
