@@ -44,7 +44,6 @@ type CommonSQLEventDetails struct {
 	// The application name for the session where the event was emitted.
 	// This is included in the event to ease filtering of logging output
 	// by application.
-	// Application names starting with a dollar sign (`$`) are not considered sensitive.
 	ApplicationName string `protobuf:"bytes,4,opt,name=application_name,json=applicationName,proto3" json:",omitempty" redact:"nonsensitive"`
 	// The mapping of SQL placeholders to their values, for prepared statements.
 	PlaceholderValues []string `protobuf:"bytes,5,rep,name=placeholder_values,json=placeholderValues,proto3" json:",omitempty"`
