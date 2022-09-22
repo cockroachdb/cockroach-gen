@@ -11163,23 +11163,26 @@ func (_f *Factory) ConstructLimit(
 			fns := _window.Windows
 			if _f.funcs.AllArePrefixSafe(fns) {
 				private := &_window.WindowPrivate
-				newOrdering, ok := _f.funcs.MakeSegmentedOrdering(input, _f.funcs.WindowPartition(private), _f.funcs.WindowOrdering(private), ordering)
-				if ok {
-					if _f.matchedRule == nil || _f.matchedRule(opt.PushLimitIntoWindow) {
-						_expr := _f.ConstructWindow(
-							_f.ConstructLimit(
-								input,
-								limit,
-								_f.funcs.DerefOrderingChoice(newOrdering),
-							),
-							fns,
-							private,
-						)
-						if _f.appliedRule != nil {
-							_f.appliedRule(opt.PushLimitIntoWindow, nil, _expr)
+				inputCols := _f.funcs.OutputCols(input)
+				if _f.funcs.OrderingCanProjectCols(ordering, inputCols) {
+					newOrdering, ok := _f.funcs.MakeSegmentedOrdering(input, _f.funcs.WindowPartition(private), _f.funcs.WindowOrdering(private), ordering)
+					if ok {
+						if _f.matchedRule == nil || _f.matchedRule(opt.PushLimitIntoWindow) {
+							_expr := _f.ConstructWindow(
+								_f.ConstructLimit(
+									input,
+									limit,
+									_f.funcs.PruneOrdering(_f.funcs.DerefOrderingChoice(newOrdering), inputCols),
+								),
+								fns,
+								private,
+							)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.PushLimitIntoWindow, nil, _expr)
+							}
+							_f.constructorStackDepth--
+							return _expr
 						}
-						_f.constructorStackDepth--
-						return _expr
 					}
 				}
 			}
