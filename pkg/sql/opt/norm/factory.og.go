@@ -18480,21 +18480,23 @@ func (_f *Factory) ConstructFloorDiv(
 		}
 	}
 
-	// [FoldDivOne]
+	// [FoldFloorDivOne]
 	{
 		_const, _ := right.(*memo.ConstExpr)
 		if _const != nil {
 			if _f.funcs.EqualsNumber(_const.Value, 1) {
-				if _f.matchedRule == nil || _f.matchedRule(opt.FoldDivOne) {
-					_expr := _f.ConstructCast(
-						left,
-						_f.funcs.BinaryType(opt.FloorDivOp, left, _const),
-					)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.FoldDivOne, nil, _expr)
+				if _f.funcs.IsInt(left) {
+					if _f.matchedRule == nil || _f.matchedRule(opt.FoldFloorDivOne) {
+						_expr := _f.ConstructCast(
+							left,
+							_f.funcs.BinaryType(opt.FloorDivOp, left, _const),
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.FoldFloorDivOne, nil, _expr)
+						}
+						_f.constructorStackDepth--
+						return _expr
 					}
-					_f.constructorStackDepth--
-					return _expr
 				}
 			}
 		}
