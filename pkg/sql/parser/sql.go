@@ -28238,7 +28238,7 @@ sqldefault:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
 //line sql-gen.y:4286
 		{
-			return unimplemented(sqllex, "create function with 'VARIADIC' argument class")
+			return unimplementedWithIssueDetail(sqllex, 88947, "variadic user-defined functions")
 		}
 	case 505:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
