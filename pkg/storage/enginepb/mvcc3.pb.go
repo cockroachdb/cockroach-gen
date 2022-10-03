@@ -200,6 +200,8 @@ var xxx_messageInfo_IgnoredSeqNumRange proto.InternalMessageInfo
 
 // MVCCValueHeader holds MVCC-level metadata for a versioned value.
 // Used by storage.MVCCValue.
+//
+// NB: Make sure to update MVCCValueHeader.IsEmpty() when adding fields.
 type MVCCValueHeader struct {
 	// The local clock timestamp records the value of the local HLC clock on the
 	// leaseholder when the key was originally written. It is used to make claims
