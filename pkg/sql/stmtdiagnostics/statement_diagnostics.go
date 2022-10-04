@@ -128,6 +128,14 @@ func (r *Request) isConditional() bool {
 	return r.minExecutionLatency != 0
 }
 
+// continueCollecting returns true if we want to continue collecting bundles for
+// this request.
+func (r *Request) continueCollecting(st *cluster.Settings) bool {
+	return collectUntilExpiration.Get(&st.SV) && // continuous collection must be enabled
+		r.samplingProbability != 0 && !r.expiresAt.IsZero() && // conditions for continuous collection must be set
+		!r.isExpired(timeutil.Now()) // the request must not have expired yet
+}
+
 // NewRegistry constructs a new Registry.
 func NewRegistry(ie sqlutil.InternalExecutor, db *kv.DB, st *cluster.Settings) *Registry {
 	r := &Registry{
@@ -410,35 +418,28 @@ func (r *Registry) CancelRequest(ctx context.Context, requestID int64) error {
 	return nil
 }
 
-// IsExecLatencyConditionMet returns true if the completed request's execution
-// latency satisfies the request's condition. If false is returned, it inlines
-// the logic of RemoveOngoing.
-func (r *Registry) IsExecLatencyConditionMet(
-	requestID RequestID, req Request, execLatency time.Duration,
-) bool {
-	if req.minExecutionLatency <= execLatency {
-		return true
-	}
-	// This is a conditional request and the condition is not satisfied, so we
-	// only need to remove the request if it has expired.
-	if req.isExpired(timeutil.Now()) {
-		r.mu.Lock()
-		defer r.mu.Unlock()
-		delete(r.mu.requestFingerprints, requestID)
-	}
-	return false
+// IsConditionSatisfied returns whether the completed request satisfies its
+// condition.
+func (r *Registry) IsConditionSatisfied(req Request, execLatency time.Duration) bool {
+	return req.minExecutionLatency <= execLatency
 }
 
-// RemoveOngoing removes the given request from the list of ongoing queries.
-func (r *Registry) RemoveOngoing(requestID RequestID, req Request) {
-	r.mu.Lock()
-	defer r.mu.Unlock()
-	if req.isConditional() {
-		if req.isExpired(timeutil.Now()) {
+// MaybeRemoveRequest checks whether the request needs to be removed from the
+// local Registry and removes it if so. Note that the registries on other nodes
+// will learn about it via polling of the system table.
+func (r *Registry) MaybeRemoveRequest(requestID RequestID, req Request, execLatency time.Duration) {
+	// We should remove the request from the registry if its condition is
+	// satisfied unless we want to continue collecting bundles for this request.
+	shouldRemove := r.IsConditionSatisfied(req, execLatency) && !req.continueCollecting(r.st)
+	// Always remove the expired requests.
+	if shouldRemove || req.isExpired(timeutil.Now()) {
+		r.mu.Lock()
+		defer r.mu.Unlock()
+		if req.isConditional() {
 			delete(r.mu.requestFingerprints, requestID)
+		} else {
+			delete(r.mu.unconditionalOngoing, requestID)
 		}
-	} else {
-		delete(r.mu.unconditionalOngoing, requestID)
 	}
 }
 
@@ -448,8 +449,7 @@ func (r *Registry) RemoveOngoing(requestID RequestID, req Request) {
 // case ShouldCollectDiagnostics will return true again on this node for the
 // same diagnostics request only for conditional requests.
 //
-// If shouldCollect is true, RemoveOngoing needs to be called (which is inlined
-// by IsExecLatencyConditionMet when that returns false).
+// If shouldCollect is true, MaybeRemoveRequest needs to be called.
 func (r *Registry) ShouldCollectDiagnostics(
 	ctx context.Context, fingerprint string,
 ) (shouldCollect bool, reqID RequestID, req Request) {
@@ -511,6 +511,23 @@ func (r *Registry) InsertStatementDiagnostics(
 	collectionErr error,
 ) (CollectedInstanceID, error) {
 	var diagID CollectedInstanceID
+	if ctx.Err() != nil {
+		// The only two possible errors on the context are the context
+		// cancellation or the context deadline being exceeded. The former seems
+		// more likely, and the cancellation is most likely to have occurred due
+		// to a statement timeout, so we still want to proceed with saving the
+		// statement bundle. Thus, we override the canceled context, but first
+		// we'll log the error as a warning.
+		log.Warningf(
+			ctx, "context has an error when saving the bundle, proceeding "+
+				"with the background one (with deadline of 10 seconds): %v", ctx.Err(),
+		)
+		// We want to be conservative, so we add a deadline of 10 seconds on top
+		// of the background context.
+		var cancel context.CancelFunc
+		ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second) // nolint:context
+		defer cancel()
+	}
 	err := r.db.Txn(ctx, func(ctx context.Context, txn *kv.Txn) error {
 		if requestID != 0 {
 			row, err := r.ie.QueryRowEx(ctx, "stmt-diag-check-completed", txn,

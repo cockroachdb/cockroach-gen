@@ -14,6 +14,7 @@ import (
 	"context"
 	gosql "database/sql"
 	"fmt"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -25,6 +26,7 @@ import (
 	"github.com/cockroachdb/cockroach/pkg/settings/cluster"
 	"github.com/cockroachdb/cockroach/pkg/sql"
 	"github.com/cockroachdb/cockroach/pkg/sql/catalog/systemschema"
+	"github.com/cockroachdb/cockroach/pkg/sql/sqlerrors"
 	"github.com/cockroachdb/cockroach/pkg/sql/stmtdiagnostics"
 	"github.com/cockroachdb/cockroach/pkg/testutils"
 	"github.com/cockroachdb/cockroach/pkg/testutils/serverutils"
@@ -43,13 +45,24 @@ func TestDiagnosticsRequest(t *testing.T) {
 	s, db, _ := serverutils.StartServer(t, base.TestServerArgs{})
 	ctx := context.Background()
 	defer s.Stopper().Stop(ctx)
+	registry := s.ExecutorConfig().(sql.ExecutorConfig).StmtDiagnosticsRecorder
 	_, err := db.Exec("CREATE TABLE test (x int PRIMARY KEY)")
 	require.NoError(t, err)
 
-	completedQuery := "SELECT completed, statement_diagnostics_id FROM system.statement_diagnostics_requests WHERE ID = $1"
+	var collectUntilExpirationEnabled bool
 	isCompleted := func(reqID int64) (completed bool, diagnosticsID gosql.NullInt64) {
+		completedQuery := "SELECT completed, statement_diagnostics_id FROM system.statement_diagnostics_requests WHERE ID = $1"
 		reqRow := db.QueryRow(completedQuery, reqID)
 		require.NoError(t, reqRow.Scan(&completed, &diagnosticsID))
+		if completed && !collectUntilExpirationEnabled {
+			// Ensure that if the request was completed and the continuous
+			// collection is not enabled, the local registry no longer has the
+			// request.
+			require.False(
+				t, registry.TestingFindRequest(reqID), "request was "+
+					"completed and should have been removed from the registry",
+			)
+		}
 		return completed, diagnosticsID
 	}
 	checkNotCompleted := func(reqID int64) {
@@ -74,6 +87,7 @@ func TestDiagnosticsRequest(t *testing.T) {
 		return nil
 	}
 	setCollectUntilExpiration := func(v bool) {
+		collectUntilExpirationEnabled = v
 		_, err := db.Exec(
 			fmt.Sprintf("SET CLUSTER SETTING sql.stmt_diagnostics.collect_continuously.enabled = %t", v))
 		require.NoError(t, err)
@@ -84,7 +98,6 @@ func TestDiagnosticsRequest(t *testing.T) {
 		require.NoError(t, err)
 	}
 
-	registry := s.ExecutorConfig().(sql.ExecutorConfig).StmtDiagnosticsRecorder
 	var minExecutionLatency, expiresAfter time.Duration
 	var samplingProbability float64
 
@@ -135,6 +148,27 @@ func TestDiagnosticsRequest(t *testing.T) {
 		_, err = db.Exec("EXECUTE stmt(1)")
 		require.NoError(t, err)
 		checkCompleted(id)
+	})
+
+	// Verify that if the traced query times out, the bundle is still saved.
+	t.Run("timeout", func(t *testing.T) {
+		reqID, err := registry.InsertRequestInternal(ctx, "SELECT pg_sleep(_)", samplingProbability, minExecutionLatency, expiresAfter)
+		require.NoError(t, err)
+		checkNotCompleted(reqID)
+
+		// Set the statement timeout (as well as clean it up in a defer).
+		_, err = db.Exec("SET statement_timeout = '100ms';")
+		require.NoError(t, err)
+		defer func() {
+			_, err = db.Exec("RESET statement_timeout;")
+			require.NoError(t, err)
+		}()
+
+		// Run the query that times out.
+		_, err = db.Exec("SELECT pg_sleep(999999)")
+		require.Error(t, err)
+		require.True(t, strings.Contains(err.Error(), sqlerrors.QueryTimeoutError.Error()))
+		checkCompleted(reqID)
 	})
 
 	// Verify that the bundle for a conditional request is only created when the
@@ -422,7 +456,7 @@ func TestDiagnosticsRequest(t *testing.T) {
 		// We should not find the request and a subsequent executions should not
 		// capture anything.
 		testutils.SucceedsSoon(t, func() error {
-			if found := registry.TestingFindRequest(stmtdiagnostics.RequestID(reqID)); found {
+			if found := registry.TestingFindRequest(reqID); found {
 				return errors.New("expected expired request to no longer be tracked")
 			}
 			return nil
