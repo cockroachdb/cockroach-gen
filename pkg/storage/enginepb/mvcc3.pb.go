@@ -393,11 +393,9 @@ type RangeAppliedState struct {
 	RaftClosedTimestamp hlc.Timestamp `protobuf:"bytes,4,opt,name=raft_closed_timestamp,json=raftClosedTimestamp,proto3" json:"raft_closed_timestamp"`
 	// raft_applied_index_term is the term corresponding to raft_applied_index.
 	// The serialized proto will not contain this field until code starts
-	// setting it to a value > 0. This is desirable since we don't want a mixed
-	// version cluster to have divergent replica state simply because we have
-	// introduced this field. An explicit migration,
-	// AddRaftAppliedIndexTermMigration, will cause this field to start being
-	// populated.
+	// setting it to a value > 0 (in v22.1). This is desirable since we don't
+	// want a mixed version cluster (v21.2 and v22.1) to have divergent replica
+	// state simply because we have introduced this field.
 	RaftAppliedIndexTerm uint64 `protobuf:"varint,5,opt,name=raft_applied_index_term,json=raftAppliedIndexTerm,proto3" json:"raft_applied_index_term,omitempty"`
 }
 
