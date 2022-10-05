@@ -39950,7 +39950,6 @@ sqldefault:
 
 					var typ tree.ResolvableTypeReference
 					var ok bool
-					var err error
 					var unimp int
 					typ, ok, unimp = types.TypeForNonKeywordTypeName(typName)
 					if !ok {
@@ -39958,10 +39957,11 @@ sqldefault:
 						case 0:
 
 							aIdx := sqllex.(*lexer).NewAnnotation()
-							typ, err = name.ToUnresolvedObjectName(aIdx)
+							un, err := name.ToUnresolvedObjectName(aIdx)
 							if err != nil {
 								return setErr(sqllex, err)
 							}
+							typ = &un
 						case -1:
 							return unimplemented(sqllex, "type name "+typName)
 						default:
@@ -39976,7 +39976,7 @@ sqldefault:
 				if err != nil {
 					return setErr(sqllex, err)
 				}
-				sqlVAL.union.val = &tree.CastExpr{Expr: tree.NewStrVal(sqlDollar[2].str), Type: res, SyntaxMode: tree.CastPrepend}
+				sqlVAL.union.val = &tree.CastExpr{Expr: tree.NewStrVal(sqlDollar[2].str), Type: &res, SyntaxMode: tree.CastPrepend}
 			}
 		}
 	case 2363:
