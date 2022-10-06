@@ -174,6 +174,7 @@ const (
 	FoldMultOne
 	FoldOneMult
 	FoldDivOne
+	FoldFloorDivOne
 	InvertMinus
 	EliminateUnaryMinus
 	SimplifyLimitOrdering
