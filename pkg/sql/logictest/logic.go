@@ -291,7 +291,7 @@ import (
 //            duration. If the test succeeds at any time during that period, it
 //            is considered successful. Otherwise, it is a failure. See
 //            testutils.SucceedsSoon for more information. If run with the
-//            -rewrite flag, inserts a 500ms sleep before executing the query
+//            -rewrite flag, inserts a 2s sleep before executing the query
 //            once.
 //      - async: runs the query asynchronously, marking it as a pending
 //            query using the label parameter as a unique name, to be completed
@@ -1494,8 +1494,13 @@ func (t *logicTest) newCluster(
 	var randomWorkmem int
 	if t.rng.Float64() < 0.5 && !serverArgs.DisableWorkmemRandomization {
 		// Randomize sql.distsql.temp_storage.workmem cluster setting in
-		// [10KiB, 100KiB) range.
-		randomWorkmem = 10<<10 + t.rng.Intn(90<<10)
+		// [10KiB, 100KiB) range for normal tests and even bigger for sqlite
+		// tests.
+		if *Bigtest {
+			randomWorkmem = 100<<10 + t.rng.Intn(90<<10)
+		} else {
+			randomWorkmem = 10<<10 + t.rng.Intn(90<<10)
+		}
 	}
 
 	// Set cluster settings.
@@ -2722,9 +2727,9 @@ func (t *logicTest) processSubtest(
 							t.purgeZoneConfig()
 							// The presence of the retry flag indicates that we expect this
 							// query may need some time to succeed. If we are rewriting, wait
-							// 500ms before executing the query.
+							// 2s before executing the query.
 							// TODO(rytaft): We may want to make this sleep time configurable.
-							time.Sleep(time.Millisecond * 500)
+							time.Sleep(time.Second * 2)
 						}
 						if err := t.execQuery(query); err != nil {
 							t.Error(err)

@@ -660,11 +660,17 @@ type Factory interface {
 	// The fetchCols set contains the ordinal positions of the fetch columns in
 	// the target table. The input must contain those columns in the same order
 	// as they appear in the table schema.
+	//
+	// The passthrough parameter contains all the result columns that are part of
+	// the input node that the update node needs to return (passing through from
+	// the input). The pass through columns are used to return any column from the
+	// USING tables that are referenced in the RETURNING clause.
 	ConstructDelete(
 		input Node,
 		table cat.Table,
 		fetchCols TableColumnOrdinalSet,
 		returnCols TableColumnOrdinalSet,
+		passthrough colinfo.ResultColumns,
 		// If set, the operator will commit the transaction as part of its execution.
 		// This is false when executing inside an explicit transaction, or there are
 		// multiple mutations in a statement, or the output of the mutation is
@@ -1289,6 +1295,7 @@ func (StubFactory) ConstructDelete(
 	table cat.Table,
 	fetchCols TableColumnOrdinalSet,
 	returnCols TableColumnOrdinalSet,
+	passthrough colinfo.ResultColumns,
 	autoCommit bool,
 ) (Node, error) {
 	return struct{}{}, nil

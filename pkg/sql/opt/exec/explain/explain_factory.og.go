@@ -1243,6 +1243,7 @@ func (f *Factory) ConstructDelete(
 	table cat.Table,
 	fetchCols exec.TableColumnOrdinalSet,
 	returnCols exec.TableColumnOrdinalSet,
+	passthrough colinfo.ResultColumns,
 	// If set, the operator will commit the transaction as part of its execution.
 	// This is false when executing inside an explicit transaction, or there are
 	// multiple mutations in a statement, or the output of the mutation is
@@ -1251,11 +1252,12 @@ func (f *Factory) ConstructDelete(
 ) (exec.Node, error) {
 	inputNode := input.(*Node)
 	args := &deleteArgs{
-		Input:      inputNode,
-		Table:      table,
-		FetchCols:  fetchCols,
-		ReturnCols: returnCols,
-		AutoCommit: autoCommit,
+		Input:       inputNode,
+		Table:       table,
+		FetchCols:   fetchCols,
+		ReturnCols:  returnCols,
+		Passthrough: passthrough,
+		AutoCommit:  autoCommit,
 	}
 	_n, err := newNode(deleteOp, args, nil /* ordering */, inputNode)
 	if err != nil {
@@ -1267,6 +1269,7 @@ func (f *Factory) ConstructDelete(
 		table,
 		fetchCols,
 		returnCols,
+		passthrough,
 		autoCommit,
 	)
 	if err != nil {
@@ -2287,11 +2290,12 @@ type upsertArgs struct {
 }
 
 type deleteArgs struct {
-	Input      *Node
-	Table      cat.Table
-	FetchCols  exec.TableColumnOrdinalSet
-	ReturnCols exec.TableColumnOrdinalSet
-	AutoCommit bool
+	Input       *Node
+	Table       cat.Table
+	FetchCols   exec.TableColumnOrdinalSet
+	ReturnCols  exec.TableColumnOrdinalSet
+	Passthrough colinfo.ResultColumns
+	AutoCommit  bool
 }
 
 type deleteRangeArgs struct {

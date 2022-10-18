@@ -29,9 +29,11 @@ func registerAdmission(r registry.Registry) {
 	// over some latency threshold. Will be Useful to track over time.
 
 	registerElasticControlForBackups(r)
+	registerElasticControlForCDC(r)
 	registerMultiStoreOverload(r)
 	registerSnapshotOverload(r)
 	registerTPCCOverload(r)
+	registerTPCCSevereOverload(r)
 
 	// TODO(irfansharif): Once registerMultiTenantFairness is unskipped and
 	// observed to be non-flaky for 3-ish months, transfer ownership to the AC

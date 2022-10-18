@@ -741,6 +741,7 @@ func (f *PlanGistFactory) ConstructDelete(
 	table cat.Table,
 	fetchCols exec.TableColumnOrdinalSet,
 	returnCols exec.TableColumnOrdinalSet,
+	passthrough colinfo.ResultColumns,
 	// If set, the operator will commit the transaction as part of its execution.
 	// This is false when executing inside an explicit transaction, or there are
 	// multiple mutations in a statement, or the output of the mutation is
@@ -749,12 +750,14 @@ func (f *PlanGistFactory) ConstructDelete(
 ) (exec.Node, error) {
 	f.encodeOperator(deleteOp)
 	f.encodeDataSource(table.ID(), table.Name())
+	f.encodeResultColumns(passthrough)
 	f.encodeBool(autoCommit)
 	node, err := f.wrappedFactory.ConstructDelete(
 		input,
 		table,
 		fetchCols,
 		returnCols,
+		passthrough,
 		autoCommit,
 	)
 	return node, err
@@ -1311,6 +1314,7 @@ func (f *PlanGistFactory) decodeOperatorBody(op execOperator) (*Node, error) {
 	case deleteOp:
 		var args deleteArgs
 		args.Table = f.decodeTable()
+		args.Passthrough = f.decodeResultColumns()
 		args.AutoCommit = f.decodeBool()
 		args.Input = f.popChild()
 		_n, err = newNode(op, &args, reqOrdering, args.Input)
