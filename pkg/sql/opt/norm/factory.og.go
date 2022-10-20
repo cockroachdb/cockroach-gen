@@ -13005,19 +13005,21 @@ func (_f *Factory) ConstructEq(
 				leftRight := _plus.Right
 				if opt.IsConstValueOp(leftRight) {
 					if opt.IsConstValueOp(right) {
-						if _f.funcs.CanConstructBinary(opt.MinusOp, right, leftRight) {
-							result, ok := _f.funcs.FoldBinaryCheckOverflow(opt.MinusOp, right, leftRight)
-							if ok {
-								if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpPlusConst) {
-									_expr := _f.ConstructEq(
-										leftLeft,
-										result,
-									)
-									if _f.appliedRule != nil {
-										_f.appliedRule(opt.NormalizeCmpPlusConst, nil, _expr)
+						if _f.funcs.ArithmeticErrorsOnOverflow(_f.funcs.TypeOf(right), _f.funcs.TypeOf(leftRight)) {
+							if _f.funcs.CanConstructBinary(opt.MinusOp, right, leftRight) {
+								result, ok := _f.funcs.FoldBinaryCheckNull(opt.MinusOp, right, leftRight)
+								if ok {
+									if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpPlusConst) {
+										_expr := _f.ConstructEq(
+											leftLeft,
+											result,
+										)
+										if _f.appliedRule != nil {
+											_f.appliedRule(opt.NormalizeCmpPlusConst, nil, _expr)
+										}
+										_f.constructorStackDepth--
+										return _expr
 									}
-									_f.constructorStackDepth--
-									return _expr
 								}
 							}
 						}
@@ -13036,19 +13038,21 @@ func (_f *Factory) ConstructEq(
 				leftRight := _minus.Right
 				if opt.IsConstValueOp(leftRight) {
 					if opt.IsConstValueOp(right) {
-						if _f.funcs.CanConstructBinary(opt.PlusOp, right, leftRight) {
-							result, ok := _f.funcs.FoldBinaryCheckOverflow(opt.PlusOp, right, leftRight)
-							if ok {
-								if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpMinusConst) {
-									_expr := _f.ConstructEq(
-										leftLeft,
-										result,
-									)
-									if _f.appliedRule != nil {
-										_f.appliedRule(opt.NormalizeCmpMinusConst, nil, _expr)
+						if _f.funcs.ArithmeticErrorsOnOverflow(_f.funcs.TypeOf(right), _f.funcs.TypeOf(leftRight)) {
+							if _f.funcs.CanConstructBinary(opt.PlusOp, right, leftRight) {
+								result, ok := _f.funcs.FoldBinaryCheckNull(opt.PlusOp, right, leftRight)
+								if ok {
+									if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpMinusConst) {
+										_expr := _f.ConstructEq(
+											leftLeft,
+											result,
+										)
+										if _f.appliedRule != nil {
+											_f.appliedRule(opt.NormalizeCmpMinusConst, nil, _expr)
+										}
+										_f.constructorStackDepth--
+										return _expr
 									}
-									_f.constructorStackDepth--
-									return _expr
 								}
 							}
 						}
@@ -13067,19 +13071,21 @@ func (_f *Factory) ConstructEq(
 				leftRight := _minus.Right
 				if !(opt.IsConstValueOp(leftRight)) {
 					if opt.IsConstValueOp(right) {
-						if _f.funcs.CanConstructBinary(opt.MinusOp, leftLeft, right) {
-							result, ok := _f.funcs.FoldBinaryCheckOverflow(opt.MinusOp, leftLeft, right)
-							if ok {
-								if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpConstMinus) {
-									_expr := _f.ConstructEq(
-										result,
-										leftRight,
-									)
-									if _f.appliedRule != nil {
-										_f.appliedRule(opt.NormalizeCmpConstMinus, nil, _expr)
+						if _f.funcs.ArithmeticErrorsOnOverflow(_f.funcs.TypeOf(leftLeft), _f.funcs.TypeOf(right)) {
+							if _f.funcs.CanConstructBinary(opt.MinusOp, leftLeft, right) {
+								result, ok := _f.funcs.FoldBinaryCheckNull(opt.MinusOp, leftLeft, right)
+								if ok {
+									if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpConstMinus) {
+										_expr := _f.ConstructEq(
+											result,
+											leftRight,
+										)
+										if _f.appliedRule != nil {
+											_f.appliedRule(opt.NormalizeCmpConstMinus, nil, _expr)
+										}
+										_f.constructorStackDepth--
+										return _expr
 									}
-									_f.constructorStackDepth--
-									return _expr
 								}
 							}
 						}
@@ -13442,19 +13448,21 @@ func (_f *Factory) ConstructLt(
 				leftRight := _plus.Right
 				if opt.IsConstValueOp(leftRight) {
 					if opt.IsConstValueOp(right) {
-						if _f.funcs.CanConstructBinary(opt.MinusOp, right, leftRight) {
-							result, ok := _f.funcs.FoldBinaryCheckOverflow(opt.MinusOp, right, leftRight)
-							if ok {
-								if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpPlusConst) {
-									_expr := _f.ConstructLt(
-										leftLeft,
-										result,
-									)
-									if _f.appliedRule != nil {
-										_f.appliedRule(opt.NormalizeCmpPlusConst, nil, _expr)
+						if _f.funcs.ArithmeticErrorsOnOverflow(_f.funcs.TypeOf(right), _f.funcs.TypeOf(leftRight)) {
+							if _f.funcs.CanConstructBinary(opt.MinusOp, right, leftRight) {
+								result, ok := _f.funcs.FoldBinaryCheckNull(opt.MinusOp, right, leftRight)
+								if ok {
+									if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpPlusConst) {
+										_expr := _f.ConstructLt(
+											leftLeft,
+											result,
+										)
+										if _f.appliedRule != nil {
+											_f.appliedRule(opt.NormalizeCmpPlusConst, nil, _expr)
+										}
+										_f.constructorStackDepth--
+										return _expr
 									}
-									_f.constructorStackDepth--
-									return _expr
 								}
 							}
 						}
@@ -13473,19 +13481,21 @@ func (_f *Factory) ConstructLt(
 				leftRight := _minus.Right
 				if opt.IsConstValueOp(leftRight) {
 					if opt.IsConstValueOp(right) {
-						if _f.funcs.CanConstructBinary(opt.PlusOp, right, leftRight) {
-							result, ok := _f.funcs.FoldBinaryCheckOverflow(opt.PlusOp, right, leftRight)
-							if ok {
-								if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpMinusConst) {
-									_expr := _f.ConstructLt(
-										leftLeft,
-										result,
-									)
-									if _f.appliedRule != nil {
-										_f.appliedRule(opt.NormalizeCmpMinusConst, nil, _expr)
+						if _f.funcs.ArithmeticErrorsOnOverflow(_f.funcs.TypeOf(right), _f.funcs.TypeOf(leftRight)) {
+							if _f.funcs.CanConstructBinary(opt.PlusOp, right, leftRight) {
+								result, ok := _f.funcs.FoldBinaryCheckNull(opt.PlusOp, right, leftRight)
+								if ok {
+									if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpMinusConst) {
+										_expr := _f.ConstructLt(
+											leftLeft,
+											result,
+										)
+										if _f.appliedRule != nil {
+											_f.appliedRule(opt.NormalizeCmpMinusConst, nil, _expr)
+										}
+										_f.constructorStackDepth--
+										return _expr
 									}
-									_f.constructorStackDepth--
-									return _expr
 								}
 							}
 						}
@@ -13504,19 +13514,21 @@ func (_f *Factory) ConstructLt(
 				leftRight := _minus.Right
 				if !(opt.IsConstValueOp(leftRight)) {
 					if opt.IsConstValueOp(right) {
-						if _f.funcs.CanConstructBinary(opt.MinusOp, leftLeft, right) {
-							result, ok := _f.funcs.FoldBinaryCheckOverflow(opt.MinusOp, leftLeft, right)
-							if ok {
-								if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpConstMinus) {
-									_expr := _f.ConstructLt(
-										result,
-										leftRight,
-									)
-									if _f.appliedRule != nil {
-										_f.appliedRule(opt.NormalizeCmpConstMinus, nil, _expr)
+						if _f.funcs.ArithmeticErrorsOnOverflow(_f.funcs.TypeOf(leftLeft), _f.funcs.TypeOf(right)) {
+							if _f.funcs.CanConstructBinary(opt.MinusOp, leftLeft, right) {
+								result, ok := _f.funcs.FoldBinaryCheckNull(opt.MinusOp, leftLeft, right)
+								if ok {
+									if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpConstMinus) {
+										_expr := _f.ConstructLt(
+											result,
+											leftRight,
+										)
+										if _f.appliedRule != nil {
+											_f.appliedRule(opt.NormalizeCmpConstMinus, nil, _expr)
+										}
+										_f.constructorStackDepth--
+										return _expr
 									}
-									_f.constructorStackDepth--
-									return _expr
 								}
 							}
 						}
@@ -13834,19 +13846,21 @@ func (_f *Factory) ConstructGt(
 				leftRight := _plus.Right
 				if opt.IsConstValueOp(leftRight) {
 					if opt.IsConstValueOp(right) {
-						if _f.funcs.CanConstructBinary(opt.MinusOp, right, leftRight) {
-							result, ok := _f.funcs.FoldBinaryCheckOverflow(opt.MinusOp, right, leftRight)
-							if ok {
-								if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpPlusConst) {
-									_expr := _f.ConstructGt(
-										leftLeft,
-										result,
-									)
-									if _f.appliedRule != nil {
-										_f.appliedRule(opt.NormalizeCmpPlusConst, nil, _expr)
+						if _f.funcs.ArithmeticErrorsOnOverflow(_f.funcs.TypeOf(right), _f.funcs.TypeOf(leftRight)) {
+							if _f.funcs.CanConstructBinary(opt.MinusOp, right, leftRight) {
+								result, ok := _f.funcs.FoldBinaryCheckNull(opt.MinusOp, right, leftRight)
+								if ok {
+									if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpPlusConst) {
+										_expr := _f.ConstructGt(
+											leftLeft,
+											result,
+										)
+										if _f.appliedRule != nil {
+											_f.appliedRule(opt.NormalizeCmpPlusConst, nil, _expr)
+										}
+										_f.constructorStackDepth--
+										return _expr
 									}
-									_f.constructorStackDepth--
-									return _expr
 								}
 							}
 						}
@@ -13865,19 +13879,21 @@ func (_f *Factory) ConstructGt(
 				leftRight := _minus.Right
 				if opt.IsConstValueOp(leftRight) {
 					if opt.IsConstValueOp(right) {
-						if _f.funcs.CanConstructBinary(opt.PlusOp, right, leftRight) {
-							result, ok := _f.funcs.FoldBinaryCheckOverflow(opt.PlusOp, right, leftRight)
-							if ok {
-								if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpMinusConst) {
-									_expr := _f.ConstructGt(
-										leftLeft,
-										result,
-									)
-									if _f.appliedRule != nil {
-										_f.appliedRule(opt.NormalizeCmpMinusConst, nil, _expr)
+						if _f.funcs.ArithmeticErrorsOnOverflow(_f.funcs.TypeOf(right), _f.funcs.TypeOf(leftRight)) {
+							if _f.funcs.CanConstructBinary(opt.PlusOp, right, leftRight) {
+								result, ok := _f.funcs.FoldBinaryCheckNull(opt.PlusOp, right, leftRight)
+								if ok {
+									if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpMinusConst) {
+										_expr := _f.ConstructGt(
+											leftLeft,
+											result,
+										)
+										if _f.appliedRule != nil {
+											_f.appliedRule(opt.NormalizeCmpMinusConst, nil, _expr)
+										}
+										_f.constructorStackDepth--
+										return _expr
 									}
-									_f.constructorStackDepth--
-									return _expr
 								}
 							}
 						}
@@ -13896,19 +13912,21 @@ func (_f *Factory) ConstructGt(
 				leftRight := _minus.Right
 				if !(opt.IsConstValueOp(leftRight)) {
 					if opt.IsConstValueOp(right) {
-						if _f.funcs.CanConstructBinary(opt.MinusOp, leftLeft, right) {
-							result, ok := _f.funcs.FoldBinaryCheckOverflow(opt.MinusOp, leftLeft, right)
-							if ok {
-								if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpConstMinus) {
-									_expr := _f.ConstructGt(
-										result,
-										leftRight,
-									)
-									if _f.appliedRule != nil {
-										_f.appliedRule(opt.NormalizeCmpConstMinus, nil, _expr)
+						if _f.funcs.ArithmeticErrorsOnOverflow(_f.funcs.TypeOf(leftLeft), _f.funcs.TypeOf(right)) {
+							if _f.funcs.CanConstructBinary(opt.MinusOp, leftLeft, right) {
+								result, ok := _f.funcs.FoldBinaryCheckNull(opt.MinusOp, leftLeft, right)
+								if ok {
+									if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpConstMinus) {
+										_expr := _f.ConstructGt(
+											result,
+											leftRight,
+										)
+										if _f.appliedRule != nil {
+											_f.appliedRule(opt.NormalizeCmpConstMinus, nil, _expr)
+										}
+										_f.constructorStackDepth--
+										return _expr
 									}
-									_f.constructorStackDepth--
-									return _expr
 								}
 							}
 						}
@@ -14226,19 +14244,21 @@ func (_f *Factory) ConstructLe(
 				leftRight := _plus.Right
 				if opt.IsConstValueOp(leftRight) {
 					if opt.IsConstValueOp(right) {
-						if _f.funcs.CanConstructBinary(opt.MinusOp, right, leftRight) {
-							result, ok := _f.funcs.FoldBinaryCheckOverflow(opt.MinusOp, right, leftRight)
-							if ok {
-								if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpPlusConst) {
-									_expr := _f.ConstructLe(
-										leftLeft,
-										result,
-									)
-									if _f.appliedRule != nil {
-										_f.appliedRule(opt.NormalizeCmpPlusConst, nil, _expr)
+						if _f.funcs.ArithmeticErrorsOnOverflow(_f.funcs.TypeOf(right), _f.funcs.TypeOf(leftRight)) {
+							if _f.funcs.CanConstructBinary(opt.MinusOp, right, leftRight) {
+								result, ok := _f.funcs.FoldBinaryCheckNull(opt.MinusOp, right, leftRight)
+								if ok {
+									if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpPlusConst) {
+										_expr := _f.ConstructLe(
+											leftLeft,
+											result,
+										)
+										if _f.appliedRule != nil {
+											_f.appliedRule(opt.NormalizeCmpPlusConst, nil, _expr)
+										}
+										_f.constructorStackDepth--
+										return _expr
 									}
-									_f.constructorStackDepth--
-									return _expr
 								}
 							}
 						}
@@ -14257,19 +14277,21 @@ func (_f *Factory) ConstructLe(
 				leftRight := _minus.Right
 				if opt.IsConstValueOp(leftRight) {
 					if opt.IsConstValueOp(right) {
-						if _f.funcs.CanConstructBinary(opt.PlusOp, right, leftRight) {
-							result, ok := _f.funcs.FoldBinaryCheckOverflow(opt.PlusOp, right, leftRight)
-							if ok {
-								if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpMinusConst) {
-									_expr := _f.ConstructLe(
-										leftLeft,
-										result,
-									)
-									if _f.appliedRule != nil {
-										_f.appliedRule(opt.NormalizeCmpMinusConst, nil, _expr)
+						if _f.funcs.ArithmeticErrorsOnOverflow(_f.funcs.TypeOf(right), _f.funcs.TypeOf(leftRight)) {
+							if _f.funcs.CanConstructBinary(opt.PlusOp, right, leftRight) {
+								result, ok := _f.funcs.FoldBinaryCheckNull(opt.PlusOp, right, leftRight)
+								if ok {
+									if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpMinusConst) {
+										_expr := _f.ConstructLe(
+											leftLeft,
+											result,
+										)
+										if _f.appliedRule != nil {
+											_f.appliedRule(opt.NormalizeCmpMinusConst, nil, _expr)
+										}
+										_f.constructorStackDepth--
+										return _expr
 									}
-									_f.constructorStackDepth--
-									return _expr
 								}
 							}
 						}
@@ -14288,19 +14310,21 @@ func (_f *Factory) ConstructLe(
 				leftRight := _minus.Right
 				if !(opt.IsConstValueOp(leftRight)) {
 					if opt.IsConstValueOp(right) {
-						if _f.funcs.CanConstructBinary(opt.MinusOp, leftLeft, right) {
-							result, ok := _f.funcs.FoldBinaryCheckOverflow(opt.MinusOp, leftLeft, right)
-							if ok {
-								if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpConstMinus) {
-									_expr := _f.ConstructLe(
-										result,
-										leftRight,
-									)
-									if _f.appliedRule != nil {
-										_f.appliedRule(opt.NormalizeCmpConstMinus, nil, _expr)
+						if _f.funcs.ArithmeticErrorsOnOverflow(_f.funcs.TypeOf(leftLeft), _f.funcs.TypeOf(right)) {
+							if _f.funcs.CanConstructBinary(opt.MinusOp, leftLeft, right) {
+								result, ok := _f.funcs.FoldBinaryCheckNull(opt.MinusOp, leftLeft, right)
+								if ok {
+									if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpConstMinus) {
+										_expr := _f.ConstructLe(
+											result,
+											leftRight,
+										)
+										if _f.appliedRule != nil {
+											_f.appliedRule(opt.NormalizeCmpConstMinus, nil, _expr)
+										}
+										_f.constructorStackDepth--
+										return _expr
 									}
-									_f.constructorStackDepth--
-									return _expr
 								}
 							}
 						}
@@ -14618,19 +14642,21 @@ func (_f *Factory) ConstructGe(
 				leftRight := _plus.Right
 				if opt.IsConstValueOp(leftRight) {
 					if opt.IsConstValueOp(right) {
-						if _f.funcs.CanConstructBinary(opt.MinusOp, right, leftRight) {
-							result, ok := _f.funcs.FoldBinaryCheckOverflow(opt.MinusOp, right, leftRight)
-							if ok {
-								if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpPlusConst) {
-									_expr := _f.ConstructGe(
-										leftLeft,
-										result,
-									)
-									if _f.appliedRule != nil {
-										_f.appliedRule(opt.NormalizeCmpPlusConst, nil, _expr)
+						if _f.funcs.ArithmeticErrorsOnOverflow(_f.funcs.TypeOf(right), _f.funcs.TypeOf(leftRight)) {
+							if _f.funcs.CanConstructBinary(opt.MinusOp, right, leftRight) {
+								result, ok := _f.funcs.FoldBinaryCheckNull(opt.MinusOp, right, leftRight)
+								if ok {
+									if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpPlusConst) {
+										_expr := _f.ConstructGe(
+											leftLeft,
+											result,
+										)
+										if _f.appliedRule != nil {
+											_f.appliedRule(opt.NormalizeCmpPlusConst, nil, _expr)
+										}
+										_f.constructorStackDepth--
+										return _expr
 									}
-									_f.constructorStackDepth--
-									return _expr
 								}
 							}
 						}
@@ -14649,19 +14675,21 @@ func (_f *Factory) ConstructGe(
 				leftRight := _minus.Right
 				if opt.IsConstValueOp(leftRight) {
 					if opt.IsConstValueOp(right) {
-						if _f.funcs.CanConstructBinary(opt.PlusOp, right, leftRight) {
-							result, ok := _f.funcs.FoldBinaryCheckOverflow(opt.PlusOp, right, leftRight)
-							if ok {
-								if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpMinusConst) {
-									_expr := _f.ConstructGe(
-										leftLeft,
-										result,
-									)
-									if _f.appliedRule != nil {
-										_f.appliedRule(opt.NormalizeCmpMinusConst, nil, _expr)
+						if _f.funcs.ArithmeticErrorsOnOverflow(_f.funcs.TypeOf(right), _f.funcs.TypeOf(leftRight)) {
+							if _f.funcs.CanConstructBinary(opt.PlusOp, right, leftRight) {
+								result, ok := _f.funcs.FoldBinaryCheckNull(opt.PlusOp, right, leftRight)
+								if ok {
+									if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpMinusConst) {
+										_expr := _f.ConstructGe(
+											leftLeft,
+											result,
+										)
+										if _f.appliedRule != nil {
+											_f.appliedRule(opt.NormalizeCmpMinusConst, nil, _expr)
+										}
+										_f.constructorStackDepth--
+										return _expr
 									}
-									_f.constructorStackDepth--
-									return _expr
 								}
 							}
 						}
@@ -14680,19 +14708,21 @@ func (_f *Factory) ConstructGe(
 				leftRight := _minus.Right
 				if !(opt.IsConstValueOp(leftRight)) {
 					if opt.IsConstValueOp(right) {
-						if _f.funcs.CanConstructBinary(opt.MinusOp, leftLeft, right) {
-							result, ok := _f.funcs.FoldBinaryCheckOverflow(opt.MinusOp, leftLeft, right)
-							if ok {
-								if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpConstMinus) {
-									_expr := _f.ConstructGe(
-										result,
-										leftRight,
-									)
-									if _f.appliedRule != nil {
-										_f.appliedRule(opt.NormalizeCmpConstMinus, nil, _expr)
+						if _f.funcs.ArithmeticErrorsOnOverflow(_f.funcs.TypeOf(leftLeft), _f.funcs.TypeOf(right)) {
+							if _f.funcs.CanConstructBinary(opt.MinusOp, leftLeft, right) {
+								result, ok := _f.funcs.FoldBinaryCheckNull(opt.MinusOp, leftLeft, right)
+								if ok {
+									if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpConstMinus) {
+										_expr := _f.ConstructGe(
+											result,
+											leftRight,
+										)
+										if _f.appliedRule != nil {
+											_f.appliedRule(opt.NormalizeCmpConstMinus, nil, _expr)
+										}
+										_f.constructorStackDepth--
+										return _expr
 									}
-									_f.constructorStackDepth--
-									return _expr
 								}
 							}
 						}
