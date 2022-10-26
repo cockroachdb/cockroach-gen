@@ -3668,6 +3668,7 @@ type DistSQLRemoteFlows_Info struct {
 	// Timestamp must be in the UTC timezone.
 	Timestamp time.Time `protobuf:"bytes,2,opt,name=timestamp,proto3,stdtime" json:"timestamp"`
 	// Status is the current status of this remote flow.
+	// TODO(yuzefovich): remove this in 23.2.
 	Status DistSQLRemoteFlows_Status `protobuf:"varint,3,opt,name=status,proto3,enum=cockroach.server.serverpb.DistSQLRemoteFlows_Status" json:"status,omitempty"`
 	// Stmt is the SQL statement for which this flow is executing.
 	Stmt string `protobuf:"bytes,4,opt,name=stmt,proto3" json:"stmt,omitempty"`
