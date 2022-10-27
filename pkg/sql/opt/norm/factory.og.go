@@ -11935,6 +11935,29 @@ func (_f *Factory) ConstructAny(
 		goto SKIP_RULES
 	}
 
+	// [InlineAnyWithScan]
+	{
+		_withScan, _ := input.(*memo.WithScanExpr)
+		if _withScan != nil {
+			withScanPrivate := &_withScan.WithScanPrivate
+			if _f.funcs.CanInlineWithScan(withScanPrivate, scalar) {
+				anyPrivate := subqueryPrivate
+				if _f.matchedRule == nil || _f.matchedRule(opt.InlineAnyWithScan) {
+					_expr := _f.ConstructAny(
+						_f.funcs.InlineWithScan(withScanPrivate),
+						scalar,
+						anyPrivate,
+					)
+					if _f.appliedRule != nil {
+						_f.appliedRule(opt.InlineAnyWithScan, nil, _expr)
+					}
+					_f.constructorStackDepth--
+					return _expr
+				}
+			}
+		}
+	}
+
 	// [InlineAnyValuesSingleCol]
 	{
 		values := input

@@ -227,6 +227,7 @@ const (
 	EliminateCoalesce
 	SimplifyCoalesce
 	EliminateCast
+	InlineAnyWithScan
 	NormalizeInConst
 	FoldInNull
 	SimplifyInSingleElement

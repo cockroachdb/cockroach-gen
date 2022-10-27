@@ -8059,6 +8059,11 @@ type WithScanPrivate struct {
 	// most cases the column set is sufficient to do this, but various rules make
 	// it possible to construct WithScan expressions with no columns.
 	ID opt.UniqueID
+
+	// CanInlineInPlace is true when the WithScanExpr is allowed to be inlined
+	// when it is normalized as opposed to inlining which takes place when the
+	// WithExpr is normalized.
+	CanInlineInPlace bool
 }
 
 // RecursiveCTEExpr implements the logic of a recursive CTE:
@@ -27230,6 +27235,7 @@ func (in *interner) InternWithScan(val *WithScanExpr) *WithScanExpr {
 	in.hasher.HashColList(val.InCols)
 	in.hasher.HashColList(val.OutCols)
 	in.hasher.HashUniqueID(val.ID)
+	in.hasher.HashBool(val.CanInlineInPlace)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
@@ -27238,7 +27244,8 @@ func (in *interner) InternWithScan(val *WithScanExpr) *WithScanExpr {
 				in.hasher.IsStringEqual(val.Name, existing.Name) &&
 				in.hasher.IsColListEqual(val.InCols, existing.InCols) &&
 				in.hasher.IsColListEqual(val.OutCols, existing.OutCols) &&
-				in.hasher.IsUniqueIDEqual(val.ID, existing.ID) {
+				in.hasher.IsUniqueIDEqual(val.ID, existing.ID) &&
+				in.hasher.IsBoolEqual(val.CanInlineInPlace, existing.CanInlineInPlace) {
 				return existing
 			}
 		}
