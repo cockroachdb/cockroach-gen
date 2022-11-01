@@ -805,15 +805,6 @@ func NewServer(cfg Config, stopper *stop.Stopper) (*Server, error) {
 		internalExecutor,
 	)
 
-	// Configure the path to the file that blocks starting background jobs.
-	var jobAdoptionStopFile string
-	for _, spec := range cfg.Stores.Specs {
-		if !spec.InMemory && spec.Path != "" {
-			jobAdoptionStopFile = filepath.Join(spec.Path, jobs.PreventAdoptionFile)
-			break
-		}
-	}
-
 	// Instantiate the KV prober.
 	kvProber := kvprober.NewProber(kvprober.Opts{
 		Tracer:                  cfg.AmbientCtx.Tracer,
@@ -879,7 +870,6 @@ func NewServer(cfg Config, stopper *stop.Stopper) (*Server, error) {
 		circularInternalExecutor: internalExecutor,
 		internalExecutorFactory:  internalExecutorFactory,
 		circularJobRegistry:      jobRegistry,
-		jobAdoptionStopFile:      jobAdoptionStopFile,
 		protectedtsProvider:      protectedtsProvider,
 		rangeFeedFactory:         rangeFeedFactory,
 		sqlStatusServer:          sStatus,
@@ -1806,6 +1796,12 @@ func (s *Server) PGServer() *pgwire.Server {
 	return s.sqlServer.pgServer
 }
 
+// LogicalClusterID implements cli.serverStartupInterface. This
+// implementation exports the logical cluster ID of the system tenant.
+func (s *Server) LogicalClusterID() uuid.UUID {
+	return s.sqlServer.LogicalClusterID()
+}
+
 // StartDiagnostics starts periodic diagnostics reporting and update checking.
 // NOTE: This is not called in PreStart so that it's disabled by default for
 // testing.
@@ -1816,22 +1812,6 @@ func (s *Server) StartDiagnostics(ctx context.Context) {
 
 func init() {
 	tracing.RegisterTagRemapping("n", "node")
-}
-
-// RunLocalSQL calls fn on a SQL internal executor on this server.
-// This is meant for use for SQL initialization during bootstrapping.
-//
-// The internal SQL interface should be used instead of a regular SQL
-// network connection for SQL initializations when setting up a new
-// server, because it is possible for the server to listen on a
-// network interface that is not reachable from loopback. It is also
-// possible for the TLS certificates to be invalid when used locally
-// (e.g. if the hostname in the cert is an advertised address that's
-// only reachable externally).
-func (s *Server) RunLocalSQL(
-	ctx context.Context, fn func(ctx context.Context, sqlExec *sql.InternalExecutor) error,
-) error {
-	return fn(ctx, s.sqlServer.internalExecutor)
 }
 
 // Insecure returns true iff the server has security disabled.

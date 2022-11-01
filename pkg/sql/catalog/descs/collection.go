@@ -14,11 +14,11 @@ package descs
 
 import (
 	"context"
+	"strings"
 
 	"github.com/cockroachdb/cockroach/pkg/clusterversion"
 	"github.com/cockroachdb/cockroach/pkg/keys"
 	"github.com/cockroachdb/cockroach/pkg/kv"
-	"github.com/cockroachdb/cockroach/pkg/settings"
 	"github.com/cockroachdb/cockroach/pkg/settings/cluster"
 	"github.com/cockroachdb/cockroach/pkg/sql/catalog"
 	"github.com/cockroachdb/cockroach/pkg/sql/catalog/catalogkeys"
@@ -28,6 +28,7 @@ import (
 	"github.com/cockroachdb/cockroach/pkg/sql/catalog/internal/validate"
 	"github.com/cockroachdb/cockroach/pkg/sql/catalog/lease"
 	"github.com/cockroachdb/cockroach/pkg/sql/catalog/nstree"
+	"github.com/cockroachdb/cockroach/pkg/sql/sem/catconstants"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 	"github.com/cockroachdb/cockroach/pkg/sql/sqlerrors"
 	"github.com/cockroachdb/cockroach/pkg/sql/sqlliveness"
@@ -35,35 +36,8 @@ import (
 	"github.com/cockroachdb/cockroach/pkg/util/hlc"
 	"github.com/cockroachdb/cockroach/pkg/util/iterutil"
 	"github.com/cockroachdb/cockroach/pkg/util/log"
-	"github.com/cockroachdb/cockroach/pkg/util/mon"
 	"github.com/cockroachdb/errors"
 )
-
-// newCollection constructs a Collection.
-func newCollection(
-	ctx context.Context,
-	leaseMgr *lease.Manager,
-	settings *cluster.Settings,
-	codec keys.SQLCodec,
-	hydrated *hydrateddesc.Cache,
-	systemDatabase *catkv.SystemDatabaseCache,
-	virtualSchemas catalog.VirtualSchemas,
-	temporarySchemaProvider TemporarySchemaProvider,
-	monitor *mon.BytesMonitor,
-) *Collection {
-	v := settings.Version.ActiveVersion(ctx)
-	cr := catkv.NewCatalogReader(codec, v, systemDatabase)
-	return &Collection{
-		settings:    settings,
-		version:     v,
-		hydrated:    hydrated,
-		virtual:     makeVirtualDescriptors(virtualSchemas),
-		leased:      makeLeasedDescriptors(leaseMgr),
-		uncommitted: makeUncommittedDescriptors(monitor),
-		stored:      catkv.MakeStoredCatalog(cr, monitor),
-		temporary:   makeTemporaryDescriptors(settings, codec, temporarySchemaProvider),
-	}
-}
 
 // Collection is a collection of descriptors held by a single session that
 // serves SQL requests, or a background job using descriptors. The
@@ -111,8 +85,12 @@ type Collection struct {
 	// non-public schema elements during a schema change).
 	synthetic syntheticDescriptors
 
-	// temporary contains logic to access temporary schema descriptors.
-	temporary temporaryDescriptors
+	// temporarySchemaProvider is used to access temporary schema descriptors.
+	temporarySchemaProvider TemporarySchemaProvider
+
+	// validationModeProvider is used to access the session var which determines
+	// the descriptor validation mode: 'on', 'off' or 'read_only'.
+	validationModeProvider DescriptorValidationModeProvider
 
 	// hydrated is node-level cache of table descriptors which utilize
 	// user-defined types.
@@ -255,22 +233,13 @@ func (tc *Collection) AddUncommittedDescriptor(
 	return tc.uncommitted.upsert(ctx, desc)
 }
 
-// ValidateOnWriteEnabled is the cluster setting used to enable or disable
-// validating descriptors prior to writing.
-var ValidateOnWriteEnabled = settings.RegisterBoolSetting(
-	settings.TenantWritable,
-	"sql.catalog.descs.validate_on_write.enabled",
-	"set to true to validate descriptors prior to writing, false to disable; default is true",
-	true, /* defaultValue */
-)
-
 // WriteDescToBatch calls MaybeIncrementVersion, adds the descriptor to the
 // collection as an uncommitted descriptor, and writes it into b.
 func (tc *Collection) WriteDescToBatch(
 	ctx context.Context, kvTrace bool, desc catalog.MutableDescriptor, b *kv.Batch,
 ) error {
 	desc.MaybeIncrementVersion()
-	if !tc.skipValidationOnWrite && ValidateOnWriteEnabled.Get(&tc.settings.SV) {
+	if !tc.skipValidationOnWrite && tc.validationModeProvider.ValidateDescriptorsOnWrite() {
 		if err := validate.Self(tc.version, desc); err != nil {
 			return err
 		}
@@ -362,6 +331,81 @@ func (tc *Collection) GetUncommittedTables() (tables []catalog.TableDescriptor) 
 
 func newMutableSyntheticDescriptorAssertionError(id descpb.ID) error {
 	return errors.AssertionFailedf("attempted mutable access of synthetic descriptor %d", id)
+}
+
+// GetAllDescriptorsForDatabase retrieves the complete set of descriptors
+// in the requested database.
+func (tc *Collection) GetAllDescriptorsForDatabase(
+	ctx context.Context, txn *kv.Txn, db catalog.DatabaseDescriptor,
+) (nstree.Catalog, error) {
+	ns, err := tc.stored.GetAllDescriptorNamesForDatabase(ctx, txn, db)
+	if err != nil {
+		return ns, err
+	}
+	var ids catalog.DescriptorIDSet
+	ids.Add(db.GetID())
+	_ = ns.ForEachNamespaceEntry(func(e nstree.NamespaceEntry) error {
+		if !strings.HasPrefix(e.GetName(), catconstants.PgTempSchemaName) &&
+			e.GetID() != catconstants.PublicSchemaID {
+			ids.Add(e.GetID())
+		}
+		return nil
+	})
+	var functionIDs catalog.DescriptorIDSet
+	addSchema := func(sc catalog.SchemaDescriptor) {
+		_ = sc.ForEachFunctionOverload(func(overload descpb.SchemaDescriptor_FunctionOverload) error {
+			functionIDs.Add(overload.ID)
+			return nil
+		})
+	}
+	for _, f := range []func(func(descriptor catalog.Descriptor) error) error{
+		tc.uncommitted.iterateUncommittedByID,
+		tc.synthetic.iterateSyntheticByID,
+	} {
+		_ = f(func(desc catalog.Descriptor) error {
+			if desc.GetParentID() == db.GetID() {
+				ids.Add(desc.GetID())
+			}
+			if sc, isSchema := desc.(catalog.SchemaDescriptor); isSchema {
+				addSchema(sc)
+			}
+			return nil
+		})
+	}
+	flags := tree.CommonLookupFlags{
+		AvoidLeased:    true,
+		IncludeOffline: true,
+		IncludeDropped: true,
+	}
+	// getDescriptorsByID must be used to ensure proper validation hydration etc.
+	descs, err := tc.getDescriptorsByID(ctx, txn, flags, ids.Ordered()...)
+	if err != nil {
+		return nstree.Catalog{}, err
+	}
+	var ret nstree.MutableCatalog
+	for _, desc := range descs {
+		ret.UpsertDescriptorEntry(desc)
+	}
+	_ = ns.ForEachSchemaNamespaceEntryInDatabase(db.GetID(), func(
+		e nstree.NamespaceEntry,
+	) error {
+		if sc, ok := ret.LookupDescriptorEntry(
+			e.GetID(),
+		).(catalog.SchemaDescriptor); ok {
+			addSchema(sc)
+		}
+
+		return nil
+	})
+
+	descs, err = tc.getDescriptorsByID(ctx, txn, flags, functionIDs.Ordered()...)
+	if err != nil {
+		return nstree.Catalog{}, err
+	}
+	for _, desc := range descs {
+		ret.UpsertDescriptorEntry(desc)
+	}
+	return ret.Catalog, nil
 }
 
 // GetAllDescriptors returns all descriptors visible by the transaction,
@@ -466,14 +510,17 @@ func (tc *Collection) GetAllTableDescriptorsInDatabase(
 	if desc := all.LookupDescriptorEntry(db.GetID()); desc == nil || desc.DescriptorType() != catalog.Database {
 		return nil, sqlerrors.NewUndefinedDatabaseError(db.GetName())
 	}
+	dbID := db.GetID()
 	var ret []catalog.TableDescriptor
-	for _, desc := range all.OrderedDescriptors() {
-		if desc.GetParentID() == db.GetID() {
-			if table, ok := desc.(catalog.TableDescriptor); ok {
-				ret = append(ret, table)
-			}
+	_ = all.ForEachDescriptorEntry(func(desc catalog.Descriptor) error {
+		if desc.GetParentID() != dbID {
+			return nil
 		}
-	}
+		if table, ok := desc.(catalog.TableDescriptor); ok {
+			ret = append(ret, table)
+		}
+		return nil
+	})
 	return ret, nil
 }
 
@@ -588,11 +635,12 @@ func (tc *Collection) SetSession(session sqlliveness.Session) {
 	tc.sqlLivenessSession = session
 }
 
-// SetTemporaryDescriptors is used in the context of the internal executor
-// to override the temporary descriptors during temporary object
-// cleanup.
-func (tc *Collection) SetTemporaryDescriptors(provider TemporarySchemaProvider) {
-	tc.temporary = makeTemporaryDescriptors(tc.settings, tc.codec(), provider)
+// SetDescriptorSessionDataProvider sets a DescriptorSessionDataProvider for
+// this Collection.
+func (tc *Collection) SetDescriptorSessionDataProvider(dsdp DescriptorSessionDataProvider) {
+	tc.stored.DescriptorValidationModeProvider = dsdp
+	tc.temporarySchemaProvider = dsdp
+	tc.validationModeProvider = dsdp
 }
 
 // Direct exports the catkv.Direct interface.
@@ -600,7 +648,7 @@ type Direct = catkv.Direct
 
 // Direct provides direct access to the underlying KV-storage.
 func (tc *Collection) Direct() Direct {
-	return catkv.MakeDirect(tc.codec(), tc.version)
+	return catkv.MakeDirect(tc.codec(), tc.version, tc.validationModeProvider)
 }
 
 // MakeTestCollection makes a Collection that can be used for tests.

@@ -65,6 +65,7 @@ import (
 	"github.com/cockroachdb/cockroach/pkg/sql"
 	"github.com/cockroachdb/cockroach/pkg/sql/cacheutil"
 	"github.com/cockroachdb/cockroach/pkg/sql/catalog/catalogkeys"
+	"github.com/cockroachdb/cockroach/pkg/sql/catalog/catsessiondata"
 	"github.com/cockroachdb/cockroach/pkg/sql/catalog/descidgen"
 	"github.com/cockroachdb/cockroach/pkg/sql/catalog/descs"
 	"github.com/cockroachdb/cockroach/pkg/sql/catalog/hydrateddesc"
@@ -325,7 +326,6 @@ type sqlServerArgs struct {
 	// pointer to an empty struct in this configuration, which newSQLServer
 	// fills.
 	circularJobRegistry *jobs.Registry
-	jobAdoptionStopFile string
 
 	// The executorConfig uses the provider.
 	protectedtsProvider protectedts.Provider
@@ -421,9 +421,16 @@ type stopperSessionEventListener struct {
 
 var _ slinstance.SessionEventListener = &stopperSessionEventListener{}
 
-func (s *stopperSessionEventListener) OnSessionDeleted(ctx context.Context) {
+// OnSessionDeleted implements the slinstance.SessionEventListener interface.
+func (s *stopperSessionEventListener) OnSessionDeleted(
+	ctx context.Context,
+) (createAnotherSession bool) {
 	s.trigger.signalStop(ctx,
 		MakeShutdownRequest(ShutdownReasonFatalError, errors.New("sql liveness session deleted")))
+	// Return false in order to prevent the sqlliveness loop from creating a new
+	// session. We're shutting down the server and creating a new session would
+	// only cause confusion.
+	return false
 }
 
 // newSQLServer constructs a new SQLServer. The caller is responsible for
@@ -442,6 +449,15 @@ func newSQLServer(ctx context.Context, cfg sqlServerArgs) (*SQLServer, error) {
 			codec = keys.MakeSQLCodec(override)
 		}
 	}
+
+	var jobAdoptionStopFile string
+	for _, spec := range cfg.Stores.Specs {
+		if !spec.InMemory && spec.Path != "" {
+			jobAdoptionStopFile = filepath.Join(spec.Path, jobs.PreventAdoptionFile)
+			break
+		}
+	}
+
 	// Create blob service for inter-node file sharing.
 	blobService, err := blobs.NewBlobService(cfg.Settings.ExternalIODir)
 	if err != nil {
@@ -531,7 +547,7 @@ func newSQLServer(ctx context.Context, cfg sqlServerArgs) (*SQLServer, error) {
 				// in sql/jobs/registry.go on planHookMaker.
 				return sql.MakeJobExecContext(opName, user, &sql.MemoryMetrics{}, execCfg)
 			},
-			cfg.jobAdoptionStopFile,
+			jobAdoptionStopFile,
 			td,
 			jobsKnobs,
 		)
@@ -658,6 +674,7 @@ func newSQLServer(ctx context.Context, cfg sqlServerArgs) (*SQLServer, error) {
 		hydratedDescCache,
 		spanConfig.splitter,
 		spanConfig.limiter,
+		catsessiondata.DefaultDescriptorSessionDataProvider,
 	)
 
 	clusterIDForSQL := cfg.rpcContext.LogicalClusterID

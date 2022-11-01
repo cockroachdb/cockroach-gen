@@ -21,6 +21,7 @@ import (
 	"github.com/cockroachdb/cockroach/pkg/sql/catalog/internal/validate"
 	"github.com/cockroachdb/cockroach/pkg/sql/catalog/nstree"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/catconstants"
+	"github.com/cockroachdb/cockroach/pkg/sql/sem/catid"
 	"github.com/cockroachdb/cockroach/pkg/util/mon"
 	"github.com/cockroachdb/errors"
 )
@@ -33,6 +34,7 @@ import (
 // a catalogReader and used for direct catalog access, see MakeDirect.
 type StoredCatalog struct {
 	CatalogReader
+	DescriptorValidationModeProvider
 
 	// cache mirrors the descriptors in storage.
 	// This map does not store descriptors by name.
@@ -58,19 +60,35 @@ type StoredCatalog struct {
 	// above.
 	allSchemasForDatabase map[descpb.ID]map[descpb.ID]string
 
+	// allDescriptorsForDatabase maps databaseID->nstree.Catalog
+	allDescriptorsForDatabase map[descpb.ID]nstree.Catalog
+
 	// memAcc is the actual account of an injected, upstream monitor
 	// to track memory usage of StoredCatalog.
 	memAcc *mon.BoundAccount
 }
 
+// DescriptorValidationModeProvider encapsulates the descriptor_validation
+// session variable state.
+type DescriptorValidationModeProvider interface {
+
+	// ValidateDescriptorsOnRead returns true iff 'on' or 'read_only'.
+	ValidateDescriptorsOnRead() bool
+
+	// ValidateDescriptorsOnWrite returns true iff 'on'.
+	ValidateDescriptorsOnWrite() bool
+}
+
 // MakeStoredCatalog returns a new instance of StoredCatalog.
-func MakeStoredCatalog(cr CatalogReader, monitor *mon.BytesMonitor) StoredCatalog {
-	sd := StoredCatalog{CatalogReader: cr}
+func MakeStoredCatalog(
+	cr CatalogReader, dvmp DescriptorValidationModeProvider, monitor *mon.BytesMonitor,
+) StoredCatalog {
+	sc := StoredCatalog{CatalogReader: cr, DescriptorValidationModeProvider: dvmp}
 	if monitor != nil {
 		memAcc := monitor.MakeBoundAccount()
-		sd.memAcc = &memAcc
+		sc.memAcc = &memAcc
 	}
-	return sd
+	return sc
 }
 
 // Reset zeroes the object for re-use in a new transaction.
@@ -82,10 +100,11 @@ func (sc *StoredCatalog) Reset(ctx context.Context) {
 	}
 	old := *sc
 	*sc = StoredCatalog{
-		CatalogReader: old.CatalogReader,
-		cache:         old.cache,
-		nameIndex:     old.nameIndex,
-		memAcc:        old.memAcc,
+		CatalogReader:                    old.CatalogReader,
+		DescriptorValidationModeProvider: old.DescriptorValidationModeProvider,
+		cache:                            old.cache,
+		nameIndex:                        old.nameIndex,
+		memAcc:                           old.memAcc,
 	}
 }
 
@@ -189,6 +208,27 @@ func (sc *StoredCatalog) EnsureAllDatabaseDescriptors(ctx context.Context, txn *
 	return nil
 }
 
+// GetAllDescriptorNamesForDatabase generates a new map catalog with namespace
+// entries for all children of the requested database. It stores the result in
+// the cache.
+func (sc *StoredCatalog) GetAllDescriptorNamesForDatabase(
+	ctx context.Context, txn *kv.Txn, db catalog.DatabaseDescriptor,
+) (nstree.Catalog, error) {
+	if sc.allDescriptorsForDatabase == nil {
+		sc.allDescriptorsForDatabase = make(map[descpb.ID]nstree.Catalog)
+	}
+	c, ok := sc.allDescriptorsForDatabase[db.GetID()]
+	if !ok {
+		var err error
+		c, err = sc.ScanNamespaceForDatabaseEntries(ctx, txn, db)
+		if err != nil {
+			return nstree.Catalog{}, err
+		}
+		sc.allDescriptorsForDatabase[db.GetID()] = c
+	}
+	return c, nil
+}
+
 func (sc *StoredCatalog) ensureAllSchemaIDsAndNamesForDatabase(
 	ctx context.Context, txn *kv.Txn, db catalog.DatabaseDescriptor,
 ) error {
@@ -233,8 +273,8 @@ func (sc *StoredCatalog) GetSchemaIDsAndNamesForDatabase(
 
 // IsIDKnownToNotExist returns false iff there definitely is no descriptor
 // in storage with that ID.
-func (sc *StoredCatalog) IsIDKnownToNotExist(id descpb.ID) bool {
-	if !sc.hasAllDescriptors {
+func (sc *StoredCatalog) IsIDKnownToNotExist(id descpb.ID, parentID catid.DescID) bool {
+	if !sc.hasAllDescriptors && !sc.hasAllDescriptorForDatabase(parentID) {
 		return false
 	}
 	return sc.GetCachedByID(id) == nil
@@ -356,6 +396,14 @@ func (sc *StoredCatalog) NewValidationDereferencer(txn *kv.Txn) validate.Validat
 	}
 }
 
+func (sc *StoredCatalog) hasAllDescriptorForDatabase(id catid.DescID) bool {
+	if id == 0 {
+		return false
+	}
+	_, ok := sc.allDescriptorsForDatabase[id]
+	return ok
+}
+
 type storedCatalogBackedDereferencer struct {
 	sc  *StoredCatalog
 	txn *kv.Txn
@@ -396,10 +444,12 @@ func (c storedCatalogBackedDereferencer) DereferenceDescriptors(
 			if desc == nil {
 				continue
 			}
-			if err = validate.Self(version, desc); err != nil {
-				return nil, err
+			if c.sc.ValidateDescriptorsOnRead() {
+				if err = validate.Self(version, desc); err != nil {
+					return nil, err
+				}
+				c.sc.UpdateValidationLevel(desc, catalog.ValidationLevelSelfOnly)
 			}
-			c.sc.UpdateValidationLevel(desc, catalog.ValidationLevelSelfOnly)
 			ret[fallbackRetIndexes[j]] = desc
 		}
 	}

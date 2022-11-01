@@ -1091,7 +1091,7 @@ WHERE
 		defer filterState.Unlock()
 		return filterState.txnID
 	}
-	rf.setFilter(func(ctx context.Context, request roachpb.BatchRequest) *roachpb.Error {
+	rf.setFilter(func(ctx context.Context, request *roachpb.BatchRequest) *roachpb.Error {
 		if request.Txn == nil || request.Txn.Name != sql.SQLTxnName {
 			return nil
 		}
@@ -1130,7 +1130,7 @@ WHERE
 	// fail. We'll want to ensure that we get a retriable error. Use the below
 	// pattern to detect when the user transaction has finished planning and is
 	// now executing: we don't want to inject the error during planning.
-	rf.setFilter(func(ctx context.Context, request roachpb.BatchRequest) *roachpb.Error {
+	rf.setFilter(func(ctx context.Context, request *roachpb.BatchRequest) *roachpb.Error {
 		if request.Txn == nil {
 			return nil
 		}
@@ -1374,12 +1374,8 @@ func dropLargeDatabaseGeneric(
 	s, db, _ := serverutils.StartServer(t, base.TestServerArgs{UseDatabase: `test`})
 	defer s.Stopper().Stop(ctx)
 	sqlDB := sqlutils.MakeSQLRunner(db)
-	sqlDB.Exec(t, `
-SET CLUSTER SETTING sql.catalog.descs.validate_on_write.enabled=no;
-`)
-	sqlDB.Exec(t, `
-CREATE DATABASE largedb;
-`)
+	sqlDB.Exec(t, `SET descriptor_validation = read_only`)
+	sqlDB.Exec(t, `CREATE DATABASE largedb`)
 	stmts, err := sqltestutils.GenerateViewBasedGraphSchema(workloadParams)
 	require.NoError(t, err)
 	for _, stmt := range stmts {

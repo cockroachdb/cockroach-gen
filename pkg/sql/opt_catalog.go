@@ -798,13 +798,16 @@ func newOptTable(
 				col.ColumnDesc().GeneratedAsIdentitySequenceOption,
 			)
 		} else {
-			// Note: a WriteOnly or DeleteOnly mutation column doesn't require any
-			// special treatment inside the optimizer, other than having the correct
-			// visibility.
+			// We need to propagate the mutation state for computed columns, so that
+			// the optimizer can correctly determine if these columns should be
+			// accessible. We need this to be propagated since virtual columns may
+			// depend on other columns, and in cascaded drop operations their accessibility
+			// will be impacted.
 			ot.columns[col.Ordinal()].InitVirtualComputed(
 				col.Ordinal(),
 				cat.StableID(col.GetID()),
 				col.ColName(),
+				kind,
 				col.GetType(),
 				col.IsNullable(),
 				visibility,
@@ -2429,7 +2432,11 @@ func (oi *optVirtualIndex) InvertedColumn() cat.IndexColumn {
 
 // Predicate is part of the cat.Index interface.
 func (oi *optVirtualIndex) Predicate() (string, bool) {
-	return "", false
+	if oi.idx == nil {
+		return "", false
+	}
+	pred := oi.idx.GetPredicate()
+	return pred, pred != ""
 }
 
 // Zone is part of the cat.Index interface.

@@ -42,9 +42,11 @@ const (
 	Status_TXN_DROPPED Status = 4
 	Status_DROPPED     Status = 5
 	// Intermediate states on the column and index dropping and adding paths.
+	// WRITE_ONLY is also used on constraint adding and dropping paths.
 	Status_WRITE_ONLY  Status = 6
 	Status_DELETE_ONLY Status = 7
 	// Intermediate states on the index dropping and adding paths.
+	// VALIDATED is also used on constraint adding and dropping paths.
 	Status_VALIDATED     Status = 8
 	Status_MERGED        Status = 9
 	Status_MERGE_ONLY    Status = 10
