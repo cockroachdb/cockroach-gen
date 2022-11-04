@@ -4041,6 +4041,9 @@ func (m *ComputeChecksumResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_ComputeChecksumResponse proto.InternalMessageInfo
 
 // RetryTracingEvent is the trace recording used to track retries.
+//
+// TODO(adityamaru): Delete in 23.2 since we have stopped emitting this
+// StructuredEvent in 23.1.
 type RetryTracingEvent struct {
 	Operation     string `protobuf:"bytes,1,opt,name=operation,proto3" json:"operation,omitempty"`
 	AttemptNumber int32  `protobuf:"varint,2,opt,name=attempt_number,json=attemptNumber,proto3" json:"attempt_number,omitempty"`
