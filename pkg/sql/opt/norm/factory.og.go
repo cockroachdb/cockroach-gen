@@ -1850,7 +1850,7 @@ func (_f *Factory) ConstructProject(
 			right := input.Child(1).(memo.RelExpr)
 			on := *input.Child(2).(*memo.FiltersExpr)
 			private := input.Private().(*memo.JoinPrivate)
-			needed := _f.funcs.UnionCols4(_f.funcs.OuterCols(right), _f.funcs.FilterOuterCols(on), _f.funcs.ProjectionOuterCols(projections), passthrough)
+			needed := _f.funcs.UnionCols4(_f.funcs.OuterCols(right), _f.funcs.FilterOuterCols(_f.funcs.AddDerivedOnClauseConditionsFromFKContraints(on, left, right)), _f.funcs.ProjectionOuterCols(projections), passthrough)
 			if _f.funcs.CanPruneCols(left, needed) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.PruneJoinLeftCols) {
 					on := on
@@ -1882,7 +1882,7 @@ func (_f *Factory) ConstructProject(
 			right := input.Child(1).(memo.RelExpr)
 			on := *input.Child(2).(*memo.FiltersExpr)
 			private := input.Private().(*memo.JoinPrivate)
-			needed := _f.funcs.UnionCols3(_f.funcs.FilterOuterCols(on), _f.funcs.ProjectionOuterCols(projections), passthrough)
+			needed := _f.funcs.UnionCols3(_f.funcs.FilterOuterCols(_f.funcs.AddDerivedOnClauseConditionsFromFKContraints(on, left, right)), _f.funcs.ProjectionOuterCols(projections), passthrough)
 			if _f.funcs.CanPruneCols(right, needed) {
 				if _f.matchedRule == nil || _f.matchedRule(opt.PruneJoinRightCols) {
 					on := on
