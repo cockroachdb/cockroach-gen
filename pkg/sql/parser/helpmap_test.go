@@ -44,6 +44,7 @@ var expectedHelpStrings = []string{
 	"CREATE SEQUENCE",
 	"CREATE STATISTICS",
 	"CREATE TABLE",
+	"CREATE TENANT",
 	"CREATE TYPE",
 	"CREATE VIEW",
 	"CREATE",
