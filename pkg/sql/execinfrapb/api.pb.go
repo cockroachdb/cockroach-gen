@@ -322,10 +322,9 @@ func (m *ConsumerHandshake) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_ConsumerHandshake proto.InternalMessageInfo
 
-// CancelDeadFlowsRequest is a request to cancel some flows that have been
-// scheduled to run on the receiving node but haven't been started yet (i.e.
-// they are in the queue to be run). This request originates on the node that
-// performed SetupFlow RPC in order to setup flows mentioned in the request.
+// CancelDeadFlowsRequest is a request to cancel some flows that are running on
+// the receiving node. This request originates on the node that performed
+// SetupFlow RPC in order to setup flows mentioned in the request.
 type CancelDeadFlowsRequest struct {
 	// FlowIDs is a list of IDs of flows to be canceled if they are currently in
 	// the queue to be scheduled. If a particular flow is not found for any reason
@@ -465,10 +464,9 @@ type DistSQLClient interface {
 	// SetupFlow instantiates a flow (subgraphs of a distributed SQL
 	// computation) on the receiving node.
 	SetupFlow(ctx context.Context, in *SetupFlowRequest, opts ...grpc.CallOption) (*SimpleResponse, error)
-	// CancelDeadFlows cancels all specified flows that are currently scheduled to
-	// run on the receiving node but haven't been started yet because the flows
-	// are dead (the client of SetupFlow RPC has abandoned them). Flows that have
-	// been started aren't affected even if mentioned in the request.
+	// CancelDeadFlows cancels all specified flows that are currently running on
+	// the receiving node because the flows are dead (the client of SetupFlow RPC
+	// has encountered an error).
 	//
 	// This RPC is performed on a best effort basis, so any errors returned from
 	// it should be ignored.
@@ -548,10 +546,9 @@ type DistSQLServer interface {
 	// SetupFlow instantiates a flow (subgraphs of a distributed SQL
 	// computation) on the receiving node.
 	SetupFlow(context.Context, *SetupFlowRequest) (*SimpleResponse, error)
-	// CancelDeadFlows cancels all specified flows that are currently scheduled to
-	// run on the receiving node but haven't been started yet because the flows
-	// are dead (the client of SetupFlow RPC has abandoned them). Flows that have
-	// been started aren't affected even if mentioned in the request.
+	// CancelDeadFlows cancels all specified flows that are currently running on
+	// the receiving node because the flows are dead (the client of SetupFlow RPC
+	// has encountered an error).
 	//
 	// This RPC is performed on a best effort basis, so any errors returned from
 	// it should be ignored.
