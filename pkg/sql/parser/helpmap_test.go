@@ -62,6 +62,7 @@ var expectedHelpStrings = []string{
 	"DROP SCHEMA",
 	"DROP SEQUENCE",
 	"DROP TABLE",
+	"DROP TENANT",
 	"DROP TYPE",
 	"DROP VIEW",
 	"DROP",
