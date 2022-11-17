@@ -278,6 +278,8 @@ const (
 	PushSelectIntoWindow
 	PushLimitIntoWindow
 	InlineWith
+	ApplyLimitToRecursiveCTEScan
+	TryAddLimitToRecursiveBranch
 
 	// startExploreRule tracks the number of normalization rules;
 	// all rules greater than this value are exploration rules.

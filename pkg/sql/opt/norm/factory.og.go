@@ -11834,6 +11834,55 @@ func (_f *Factory) ConstructRecursiveCTE(
 		goto SKIP_RULES
 	}
 
+	// [ApplyLimitToRecursiveCTEScan]
+	{
+		if !_f.funcs.HasBoundedCardinality(binding) {
+			if _f.funcs.HasBoundedCardinality(initial) {
+				if _f.funcs.HasBoundedCardinality(recursive) {
+					private := recursiveCTEPrivate
+					if _f.matchedRule == nil || _f.matchedRule(opt.ApplyLimitToRecursiveCTEScan) {
+						_expr := _f.funcs.ApplyLimitToRecursiveCTEScan(binding, initial, recursive, private).(memo.RelExpr)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.ApplyLimitToRecursiveCTEScan, nil, _expr)
+						}
+						_f.constructorStackDepth--
+						return _expr
+					}
+				}
+			}
+		}
+	}
+
+	// [TryAddLimitToRecursiveBranch]
+	{
+		if !_f.funcs.HasBoundedCardinality(binding) {
+			if _f.funcs.HasBoundedCardinality(initial) {
+				if !_f.funcs.HasBoundedCardinality(recursive) {
+					private := recursiveCTEPrivate
+					if _f.funcs.CanAddRecursiveLimit(recursive, _f.funcs.GetRecursiveWithID(private), _f.funcs.MakeEmptyColSet()) {
+						if _f.matchedRule == nil || _f.matchedRule(opt.TryAddLimitToRecursiveBranch) {
+							_expr := _f.ConstructRecursiveCTE(
+								binding,
+								initial,
+								_f.ConstructLimit(
+									recursive,
+									_f.funcs.GetLimitFromCardinality(initial),
+									_f.funcs.EmptyOrdering(),
+								),
+								private,
+							)
+							if _f.appliedRule != nil {
+								_f.appliedRule(opt.TryAddLimitToRecursiveBranch, nil, _expr)
+							}
+							_f.constructorStackDepth--
+							return _expr
+						}
+					}
+				}
+			}
+		}
+	}
+
 SKIP_RULES:
 	e := _f.mem.MemoizeRecursiveCTE(binding, initial, recursive, recursiveCTEPrivate)
 	expr := _f.onConstructRelational(e)
