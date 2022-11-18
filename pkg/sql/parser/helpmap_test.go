@@ -130,6 +130,7 @@ var expectedHelpStrings = []string{
 	"SHOW STATISTICS",
 	"SHOW SYNTAX",
 	"SHOW TABLES",
+	"SHOW TENANT",
 	"SHOW TRACE",
 	"SHOW TRANSACTION",
 	"SHOW TRANSACTIONS",
