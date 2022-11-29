@@ -116,11 +116,6 @@ var _ rangecache.RangeDescriptorDB = (*Connector)(nil)
 // network.
 var _ config.SystemConfigProvider = (*Connector)(nil)
 
-// Connector is capable of find the region of every node in the cluster.
-// This is necessary for region validation for zone configurations and
-// multi-region primitives.
-var _ serverpb.RegionsServer = (*Connector)(nil)
-
 // Connector is capable of finding debug information about the current
 // tenant within the cluster. This is necessary for things such as
 // debug zip and range reports.
@@ -128,6 +123,10 @@ var _ serverpb.TenantStatusServer = (*Connector)(nil)
 
 // Connector is capable of accessing span configurations for secondary tenants.
 var _ spanconfig.KVAccessor = (*Connector)(nil)
+
+// Reporter is capable of generating span configuration conformance reports for
+// secondary tenants.
+var _ spanconfig.Reporter = (*Connector)(nil)
 
 // NewConnector creates a new Connector.
 // NOTE: Calling Start will set cfg.RPCContext.ClusterID.
@@ -411,34 +410,37 @@ func (c *Connector) RangeLookup(
 	return nil, nil, ctx.Err()
 }
 
-// Regions implements the serverpb.RegionsServer interface.
+// Regions implements the serverpb.TenantStatusServer interface
 func (c *Connector) Regions(
 	ctx context.Context, req *serverpb.RegionsRequest,
-) (resp *serverpb.RegionsResponse, _ error) {
-	if err := c.withClient(ctx, func(ctx context.Context, c *client) error {
-		var err error
-		resp, err = c.Regions(ctx, req)
-		return err
-	}); err != nil {
-		return nil, err
-	}
+) (resp *serverpb.RegionsResponse, retErr error) {
+	retErr = c.withClient(ctx, func(ctx context.Context, client *client) (err error) {
+		resp, err = client.Regions(ctx, req)
+		return
+	})
+	return
+}
 
-	return resp, nil
+// NodeLocality implements the serverpb.TenantStatusServer interface
+func (c *Connector) NodeLocality(
+	ctx context.Context, req *serverpb.NodeLocalityRequest,
+) (resp *serverpb.NodeLocalityResponse, retErr error) {
+	retErr = c.withClient(ctx, func(ctx context.Context, client *client) (err error) {
+		resp, err = client.NodeLocality(ctx, req)
+		return
+	})
+	return
 }
 
 // TenantRanges implements the serverpb.TenantStatusServer interface
 func (c *Connector) TenantRanges(
 	ctx context.Context, req *serverpb.TenantRangesRequest,
-) (resp *serverpb.TenantRangesResponse, _ error) {
-	if err := c.withClient(ctx, func(ctx context.Context, c *client) error {
-		var err error
-		resp, err = c.TenantRanges(ctx, req)
-		return err
-	}); err != nil {
-		return nil, err
-	}
-
-	return resp, nil
+) (resp *serverpb.TenantRangesResponse, retErr error) {
+	retErr = c.withClient(ctx, func(ctx context.Context, client *client) (err error) {
+		resp, err = client.TenantRanges(ctx, req)
+		return
+	})
+	return
 }
 
 // FirstRange implements the kvcoord.RangeDescriptorDB interface.
@@ -524,6 +526,27 @@ func (c *Connector) UpdateSpanConfigRecords(
 		}
 		return nil
 	})
+}
+
+// SpanConfigConformance implements the spanconfig.Reporter interface.
+func (c *Connector) SpanConfigConformance(
+	ctx context.Context, spans []roachpb.Span,
+) (roachpb.SpanConfigConformanceReport, error) {
+	var report roachpb.SpanConfigConformanceReport
+	if err := c.withClient(ctx, func(ctx context.Context, c *client) error {
+		resp, err := c.SpanConfigConformance(ctx, &roachpb.SpanConfigConformanceRequest{
+			Spans: spans,
+		})
+		if err != nil {
+			return err
+		}
+
+		report = resp.Report
+		return nil
+	}); err != nil {
+		return roachpb.SpanConfigConformanceReport{}, err
+	}
+	return report, nil
 }
 
 // GetAllSystemSpanConfigsThatApply implements the spanconfig.KVAccessor

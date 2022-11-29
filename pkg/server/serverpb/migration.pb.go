@@ -452,6 +452,9 @@ type MigrationClient interface {
 	PurgeOutdatedReplicas(ctx context.Context, in *PurgeOutdatedReplicasRequest, opts ...grpc.CallOption) (*PurgeOutdatedReplicasResponse, error)
 	// WaitForSpanConfigSubscription waits until the target node is wholly
 	// subscribed to the global span configurations state.
+	//
+	// TODO(irfansharif): This can be removed -- 22.2 nodes will never issue this
+	// RPC.
 	WaitForSpanConfigSubscription(ctx context.Context, in *WaitForSpanConfigSubscriptionRequest, opts ...grpc.CallOption) (*WaitForSpanConfigSubscriptionResponse, error)
 }
 
@@ -532,6 +535,9 @@ type MigrationServer interface {
 	PurgeOutdatedReplicas(context.Context, *PurgeOutdatedReplicasRequest) (*PurgeOutdatedReplicasResponse, error)
 	// WaitForSpanConfigSubscription waits until the target node is wholly
 	// subscribed to the global span configurations state.
+	//
+	// TODO(irfansharif): This can be removed -- 22.2 nodes will never issue this
+	// RPC.
 	WaitForSpanConfigSubscription(context.Context, *WaitForSpanConfigSubscriptionRequest) (*WaitForSpanConfigSubscriptionResponse, error)
 }
 

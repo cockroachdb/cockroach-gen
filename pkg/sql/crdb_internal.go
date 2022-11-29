@@ -1198,6 +1198,8 @@ CREATE TABLE crdb_internal.node_statement_statistics (
   bytes_read_var      FLOAT NOT NULL,
   rows_read_avg       FLOAT NOT NULL,
   rows_read_var       FLOAT NOT NULL,
+  rows_written_avg    FLOAT NOT NULL,
+  rows_written_var    FLOAT NOT NULL,
   network_bytes_avg   FLOAT,
   network_bytes_var   FLOAT,
   network_msgs_avg    FLOAT,
@@ -1303,6 +1305,8 @@ CREATE TABLE crdb_internal.node_statement_statistics (
 				tree.NewDFloat(tree.DFloat(stats.Stats.BytesRead.GetVariance(stats.Stats.Count))),   // bytes_read_var
 				tree.NewDFloat(tree.DFloat(stats.Stats.RowsRead.Mean)),                              // rows_read_avg
 				tree.NewDFloat(tree.DFloat(stats.Stats.RowsRead.GetVariance(stats.Stats.Count))),    // rows_read_var
+				tree.NewDFloat(tree.DFloat(stats.Stats.RowsWritten.Mean)),                           // rows_written_avg
+				tree.NewDFloat(tree.DFloat(stats.Stats.RowsWritten.GetVariance(stats.Stats.Count))), // rows_written_var
 				execStatAvg(stats.Stats.ExecStats.Count, stats.Stats.ExecStats.NetworkBytes),        // network_bytes_avg
 				execStatVar(stats.Stats.ExecStats.Count, stats.Stats.ExecStats.NetworkBytes),        // network_bytes_var
 				execStatAvg(stats.Stats.ExecStats.Count, stats.Stats.ExecStats.NetworkMessages),     // network_msgs_avg
@@ -2817,7 +2821,7 @@ CREATE TABLE crdb_internal.create_function_statements (
 				tree.NewDInt(tree.DInt(fnIDToScID[fnDesc.GetID()])), // schema_id
 				tree.NewDString(fnIDToScName[fnDesc.GetID()]),       // schema_name
 				tree.NewDInt(tree.DInt(fnDesc.GetID())),             // function_id
-				tree.NewDString(fnDesc.GetName()),                   //function_name
+				tree.NewDString(fnDesc.GetName()),                   // function_name
 				tree.NewDString(tree.AsString(treeNode)),            // create_statement
 			)
 			if err != nil {
@@ -2938,12 +2942,12 @@ func showAlterStatement(
 	alterStmts *tree.DArray,
 	validateStmts *tree.DArray,
 ) error {
-	return table.ForeachOutboundFK(func(fk *descpb.ForeignKeyConstraint) error {
+	for _, fk := range table.OutboundForeignKeys() {
 		f := tree.NewFmtCtx(tree.FmtSimple)
 		f.WriteString("ALTER TABLE ")
 		f.FormatNode(tn)
 		f.WriteString(" ADD CONSTRAINT ")
-		f.FormatNameP(&fk.Name)
+		f.FormatName(fk.GetName())
 		f.WriteByte(' ')
 		// Passing in EmptySearchPath causes the schema name to show up in the
 		// constraint definition, which we need for `cockroach dump` output to be
@@ -2952,7 +2956,7 @@ func showAlterStatement(
 			&f.Buffer,
 			contextName,
 			table,
-			fk,
+			fk.ForeignKeyDesc(),
 			lCtx,
 			sessiondata.EmptySearchPath,
 		); err != nil {
@@ -2966,10 +2970,13 @@ func showAlterStatement(
 		f.WriteString("ALTER TABLE ")
 		f.FormatNode(tn)
 		f.WriteString(" VALIDATE CONSTRAINT ")
-		f.FormatNameP(&fk.Name)
+		f.FormatName(fk.GetName())
 
-		return validateStmts.Append(tree.NewDString(f.CloseAndGetString()))
-	})
+		if err := validateStmts.Append(tree.NewDString(f.CloseAndGetString())); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // crdbInternalTableColumnsTable exposes the column descriptors.
@@ -3285,31 +3292,31 @@ CREATE TABLE crdb_internal.backward_dependencies (
 			tableID := tree.NewDInt(tree.DInt(table.GetID()))
 			tableName := tree.NewDString(table.GetName())
 
-			if err := table.ForeachOutboundFK(func(fk *descpb.ForeignKeyConstraint) error {
-				refTbl, err := tableLookup.getTableByID(fk.ReferencedTableID)
+			for _, fk := range table.OutboundForeignKeys() {
+				refTbl, err := tableLookup.getTableByID(fk.GetReferencedTableID())
 				if err != nil {
 					return err
 				}
-				refConstraint, err := tabledesc.FindFKReferencedUniqueConstraint(refTbl, fk.ReferencedColumnIDs)
+				refConstraint, err := tabledesc.FindFKReferencedUniqueConstraint(refTbl, fk)
 				if err != nil {
 					return err
 				}
 				var refIdxID descpb.IndexID
-				if refIdx, ok := refConstraint.(*descpb.IndexDescriptor); ok {
-					refIdxID = refIdx.ID
+				if refIdx := refConstraint.AsUniqueWithIndex(); refIdx != nil {
+					refIdxID = refIdx.GetID()
 				}
-				return addRow(
+				if err := addRow(
 					tableID, tableName,
 					tree.DNull,
 					tree.DNull,
-					tree.NewDInt(tree.DInt(fk.ReferencedTableID)),
+					tree.NewDInt(tree.DInt(fk.GetReferencedTableID())),
 					fkDep,
 					tree.NewDInt(tree.DInt(refIdxID)),
-					tree.NewDString(fk.Name),
+					tree.NewDString(fk.GetName()),
 					tree.DNull,
-				)
-			}); err != nil {
-				return err
+				); err != nil {
+					return err
+				}
 			}
 
 			// Record the view dependencies.
@@ -3417,19 +3424,18 @@ CREATE TABLE crdb_internal.forward_dependencies (
 			func(db catalog.DatabaseDescriptor, _ catalog.SchemaDescriptor, table catalog.TableDescriptor) error {
 				tableID := tree.NewDInt(tree.DInt(table.GetID()))
 				tableName := tree.NewDString(table.GetName())
-
-				if err := table.ForeachInboundFK(func(fk *descpb.ForeignKeyConstraint) error {
-					return addRow(
+				for _, fk := range table.InboundForeignKeys() {
+					if err := addRow(
 						tableID, tableName,
 						tree.DNull,
-						tree.NewDInt(tree.DInt(fk.OriginTableID)),
+						tree.NewDInt(tree.DInt(fk.GetOriginTableID())),
 						fkDep,
 						tree.DNull,
 						tree.DNull,
 						tree.DNull,
-					)
-				}); err != nil {
-					return err
+					); err != nil {
+						return err
+					}
 				}
 
 				reportDependedOnBy := func(
@@ -3660,15 +3666,11 @@ CREATE TABLE crdb_internal.ranges_no_leases (
 			return nil, nil, err
 		}
 
-		// Map node descriptors to localities
-		descriptors, err := getAllNodeDescriptors(p)
+		resp, err := p.ExecCfg().TenantStatusServer.NodeLocality(ctx, &serverpb.NodeLocalityRequest{})
 		if err != nil {
 			return nil, nil, err
 		}
-		nodeIDToLocality := make(map[roachpb.NodeID]roachpb.Locality)
-		for _, desc := range descriptors {
-			nodeIDToLocality[desc.NodeID] = desc.Locality
-		}
+		nodeIDToLocality := resp.NodeLocalities
 
 		var desc roachpb.RangeDescriptor
 
@@ -4592,7 +4594,7 @@ CREATE TABLE crdb_internal.regions (
 )
 	`,
 	populate: func(ctx context.Context, p *planner, _ catalog.DatabaseDescriptor, addRow func(...tree.Datum) error) error {
-		resp, err := p.extendedEvalCtx.RegionsServer.Regions(ctx, &serverpb.RegionsRequest{})
+		resp, err := p.extendedEvalCtx.TenantStatusServer.Regions(ctx, &serverpb.RegionsRequest{})
 		if err != nil {
 			return err
 		}
@@ -5290,33 +5292,28 @@ CREATE TABLE crdb_internal.cross_db_references (
 				// references to a different database.
 				if table.IsTable() {
 					objectDatabaseName := lookupFn.getDatabaseName(table)
-					err := table.ForeachOutboundFK(
-						func(fk *descpb.ForeignKeyConstraint) error {
-							referencedTable, err := lookupFn.getTableByID(fk.ReferencedTableID)
+					for _, fk := range table.OutboundForeignKeys() {
+						referencedTable, err := lookupFn.getTableByID(fk.GetReferencedTableID())
+						if err != nil {
+							return err
+						}
+						if referencedTable.GetParentID() != table.GetParentID() {
+							refSchemaName, err := lookupFn.getSchemaNameByID(referencedTable.GetParentSchemaID())
 							if err != nil {
 								return err
 							}
-							if referencedTable.GetParentID() != table.GetParentID() {
-								refSchemaName, err := lookupFn.getSchemaNameByID(referencedTable.GetParentSchemaID())
-								if err != nil {
-									return err
-								}
-								refDatabaseName := lookupFn.getDatabaseName(referencedTable)
+							refDatabaseName := lookupFn.getDatabaseName(referencedTable)
 
-								if err := addRow(tree.NewDString(objectDatabaseName),
-									tree.NewDString(sc.GetName()),
-									tree.NewDString(table.GetName()),
-									tree.NewDString(refDatabaseName),
-									tree.NewDString(refSchemaName),
-									tree.NewDString(referencedTable.GetName()),
-									tree.NewDString("table foreign key reference")); err != nil {
-									return err
-								}
+							if err := addRow(tree.NewDString(objectDatabaseName),
+								tree.NewDString(sc.GetName()),
+								tree.NewDString(table.GetName()),
+								tree.NewDString(refDatabaseName),
+								tree.NewDString(refSchemaName),
+								tree.NewDString(referencedTable.GetName()),
+								tree.NewDString("table foreign key reference")); err != nil {
+								return err
 							}
-							return nil
-						})
-					if err != nil {
-						return err
+						}
 					}
 
 					// Check for sequence dependencies

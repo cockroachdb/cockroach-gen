@@ -65,18 +65,18 @@ type StatementStatistics struct {
 	LegacyLastErrRedacted string `protobuf:"bytes,11,opt,name=legacy_last_err_redacted,json=legacyLastErrRedacted" json:"legacy_last_err_redacted"`
 	// NumRows collects the number of rows returned or observed.
 	NumRows NumericStat `protobuf:"bytes,5,opt,name=num_rows,json=numRows" json:"num_rows"`
-	// IdleLat is the time spent in an open transaction waiting
+	// IdleLat is the time spent in seconds in an open transaction waiting
 	// for the client to send the statement.
 	IdleLat NumericStat `protobuf:"bytes,28,opt,name=idle_lat,json=idleLat" json:"idle_lat"`
-	// ParseLat is the time to transform the SQL string into an AST.
+	// ParseLat is the time in seconds to transform the SQL string into an AST.
 	ParseLat NumericStat `protobuf:"bytes,6,opt,name=parse_lat,json=parseLat" json:"parse_lat"`
-	// PlanLat is the time to transform the AST into a logical query plan.
+	// PlanLat is the time spent in seconds to transform the AST into a logical query plan.
 	PlanLat NumericStat `protobuf:"bytes,7,opt,name=plan_lat,json=planLat" json:"plan_lat"`
-	// RunLat is the time to run the query and fetch/compute the result rows.
+	// RunLat is the time in seconds to run the query and fetch/compute the result rows.
 	RunLat NumericStat `protobuf:"bytes,8,opt,name=run_lat,json=runLat" json:"run_lat"`
-	// ServiceLat is the time to service the query, from start of parse to end of execute.
+	// ServiceLat is the time in seconds to service the query, from start of parse to end of execute.
 	ServiceLat NumericStat `protobuf:"bytes,9,opt,name=service_lat,json=serviceLat" json:"service_lat"`
-	// OverheadLat is the difference between ServiceLat and the sum of parse+plan+run latencies.
+	// OverheadLat is the difference (seconds) between ServiceLat and the sum of parse+plan+run latencies.
 	// We store it separately (as opposed to computing it post-hoc) because the combined
 	// variance for the overhead cannot be derived from the variance of the separate latencies.
 	OverheadLat NumericStat `protobuf:"bytes,10,opt,name=overhead_lat,json=overheadLat" json:"overhead_lat"`
@@ -148,12 +148,12 @@ type TransactionStatistics struct {
 	// NumRows collects the total number of rows returned, observed or affected
 	// across all statements.
 	NumRows NumericStat `protobuf:"bytes,3,opt,name=num_rows,json=numRows" json:"num_rows"`
-	// ServiceLat is the time to service the transaction, from the time a
+	// ServiceLat is the time in seconds to service the transaction, from the time a
 	// transaction was received to end of execution.
 	ServiceLat NumericStat `protobuf:"bytes,4,opt,name=service_lat,json=serviceLat" json:"service_lat"`
-	// RetryLat is the amount of time spent retrying the transaction.
+	// RetryLat is the amount of time in seconds spent retrying the transaction.
 	RetryLat NumericStat `protobuf:"bytes,5,opt,name=retry_lat,json=retryLat" json:"retry_lat"`
-	// CommitLat is the amount of time required to commit the transaction after
+	// CommitLat is the amount of time in seconds required to commit the transaction after
 	// all statement operations have been applied.
 	CommitLat NumericStat `protobuf:"bytes,6,opt,name=commit_lat,json=commitLat" json:"commit_lat"`
 	// BytesRead collects the number of bytes read from disk.
@@ -582,7 +582,7 @@ type ExecStats struct {
 	NetworkBytes NumericStat `protobuf:"bytes,2,opt,name=network_bytes,json=networkBytes" json:"network_bytes"`
 	// MaxMemUsage collects the maximum memory usage that occurred on a node.
 	MaxMemUsage NumericStat `protobuf:"bytes,3,opt,name=max_mem_usage,json=maxMemUsage" json:"max_mem_usage"`
-	// ContentionTime collects the time this statement spent contending.
+	// ContentionTime collects the time in seconds this statement spent contending.
 	ContentionTime NumericStat `protobuf:"bytes,4,opt,name=contention_time,json=contentionTime" json:"contention_time"`
 	// NetworkMessages collects the number of messages that were sent over the
 	// network.

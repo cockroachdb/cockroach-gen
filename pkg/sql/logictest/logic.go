@@ -58,6 +58,7 @@ import (
 	"github.com/cockroachdb/cockroach/pkg/sql/pgwire/pgcode"
 	"github.com/cockroachdb/cockroach/pkg/sql/pgwire/pgerror"
 	"github.com/cockroachdb/cockroach/pkg/sql/randgen"
+	"github.com/cockroachdb/cockroach/pkg/sql/rowinfra"
 	"github.com/cockroachdb/cockroach/pkg/sql/schemachanger/corpus"
 	"github.com/cockroachdb/cockroach/pkg/sql/schemachanger/scexec"
 	"github.com/cockroachdb/cockroach/pkg/sql/schemachanger/scplan"
@@ -1233,6 +1234,10 @@ func getFreePort() (int, error) {
 	return port, err
 }
 
+// Prevent a lint failure "this value is never used" in
+// `(*logicTest).setup` when bazel.BuiltWithBazel returns false.
+var _ = ((*logicTest)(nil)).newTestServerCluster
+
 // newTestServerCluster creates a 3-node cluster using the cockroach-go library.
 // bootstrapBinaryPath is given by the config's CockroachGoBootstrapVersion.
 // upgradeBinaryPath is given by the config's CockroachGoUpgradeVersion, or
@@ -1805,6 +1810,7 @@ func (t *logicTest) setup(
 	t.testCleanupFuncs = append(t.testCleanupFuncs, tempExternalIODirCleanup)
 
 	if cfg.UseCockroachGoTestserver {
+		skip.WithIssue(t.t(), 92637)
 		if !bazel.BuiltWithBazel() {
 			skip.IgnoreLint(t.t(), "cockroach-go/testserver can only be uzed in bazel builds")
 		}
@@ -1823,6 +1829,11 @@ func (t *logicTest) setup(
 		if err != nil {
 			t.Fatal(err)
 		}
+
+		// Prevent a lint failure "this value is never used" when
+		// bazel.BuiltWithBazel returns false above.
+		_ = bootstrapBinaryPath
+
 		localBinaryPath, found := bazel.FindBinary("pkg/cmd/cockroach-short/cockroach-short_/", "cockroach-short")
 		if !found {
 			t.Fatal(errors.New("cockroach binary not found"))
@@ -3999,6 +4010,9 @@ type TestServerArgs struct {
 	// If set, then we will disable the metamorphic randomization of
 	// smallEngineBlocks variable.
 	DisableSmallEngineBlocks bool
+	// If positive, it provides a lower bound for the default-batch-bytes-limit
+	// metamorphic constant.
+	BatchBytesLimitLowerBound int64
 }
 
 // RunLogicTests runs logic tests for all files matching the given glob.
@@ -4093,6 +4107,15 @@ func RunLogicTest(
 	if serverArgsCopy.ForceProductionValues {
 		if err := coldata.SetBatchSizeForTests(coldata.DefaultColdataBatchSize); err != nil {
 			panic(errors.Wrapf(err, "could not set batch size for test"))
+		}
+	} else if serverArgsCopy.BatchBytesLimitLowerBound > 0 {
+		// If we're not forcing the production values, but we're asked to have a
+		// lower bound on the batch bytes limit, then check whether the lower
+		// bound is already satisfied and update the value if not.
+		min := rowinfra.BytesLimit(serverArgsCopy.BatchBytesLimitLowerBound)
+		if rowinfra.GetDefaultBatchBytesLimit(false /* forceProductionValue */) < min {
+			value := min + rowinfra.BytesLimit(rng.Intn(100<<10))
+			rowinfra.SetDefaultBatchBytesLimitForTests(value)
 		}
 	}
 	hasOverride, overriddenBackupRestoreProbability := logictestbase.ReadBackupRestoreProbabilityOverride(t, path)

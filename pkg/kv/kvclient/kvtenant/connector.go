@@ -58,12 +58,7 @@ type Connector interface {
 	// (e.g. is the Range being requested owned by the requesting tenant?).
 	rangecache.RangeDescriptorDB
 
-	// RegionsServer provides access to a tenant's available regions. This is
-	// necessary for region validation for zone configurations and multi-region
-	// primitives.
-	serverpb.RegionsServer
-
-	// TenantStatusServer is the subset of the serverpb.StatusInterface that is
+	// TenantStatusServer is the subset of the serverpb.StatusServer that is
 	// used by the SQL system to query for debug information, such as tenant-specific
 	// range reports.
 	serverpb.TenantStatusServer
@@ -75,6 +70,10 @@ type Connector interface {
 	// KVAccessor provides access to the subset of the cluster's span configs
 	// applicable to secondary tenants.
 	spanconfig.KVAccessor
+
+	// Reporter provides access to conformance reports, i.e. whether ranges
+	// backing queried keyspans conform the span configs that apply to them.
+	spanconfig.Reporter
 
 	// OverridesMonitor provides access to tenant cluster setting overrides.
 	settingswatcher.OverridesMonitor
