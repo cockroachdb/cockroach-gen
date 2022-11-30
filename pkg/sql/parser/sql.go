@@ -26500,7 +26500,7 @@ sqldefault:
 		}
 	case 232:
 		sqlDollar = sqlS[sqlpt-10 : sqlpt+1]
-//line sql-gen.y:2679
+//line sql-gen.y:2678
 		{
 			sqlVAL.union.val = &tree.AlterTableAlterPrimaryKey{
 				Columns:       sqlDollar[7].union.idxElems(),
