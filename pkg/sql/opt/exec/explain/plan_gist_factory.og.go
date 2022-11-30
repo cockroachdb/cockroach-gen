@@ -750,7 +750,6 @@ func (f *PlanGistFactory) ConstructDelete(
 ) (exec.Node, error) {
 	f.encodeOperator(deleteOp)
 	f.encodeDataSource(table.ID(), table.Name())
-	f.encodeResultColumns(passthrough)
 	f.encodeBool(autoCommit)
 	node, err := f.wrappedFactory.ConstructDelete(
 		input,
@@ -1314,7 +1313,6 @@ func (f *PlanGistFactory) decodeOperatorBody(op execOperator) (*Node, error) {
 	case deleteOp:
 		var args deleteArgs
 		args.Table = f.decodeTable()
-		args.Passthrough = f.decodeResultColumns()
 		args.AutoCommit = f.decodeBool()
 		args.Input = f.popChild()
 		_n, err = newNode(op, &args, reqOrdering, args.Input)
