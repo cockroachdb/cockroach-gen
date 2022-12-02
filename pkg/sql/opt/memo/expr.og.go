@@ -11347,6 +11347,65 @@ func (e *BBoxIntersectsExpr) DataType() *types.T {
 	return types.Bool
 }
 
+// TSMatchesExpr is the @@ operator when used with tsquery/tsvector operands.
+// It maps to tree.TSMatches.
+type TSMatchesExpr struct {
+	Left  opt.ScalarExpr
+	Right opt.ScalarExpr
+
+	rank opt.ScalarRank
+}
+
+var _ opt.ScalarExpr = &TSMatchesExpr{}
+
+func (e *TSMatchesExpr) Rank() opt.ScalarRank {
+	return e.rank
+}
+
+func (e *TSMatchesExpr) Op() opt.Operator {
+	return opt.TSMatchesOp
+}
+
+func (e *TSMatchesExpr) ChildCount() int {
+	return 2
+}
+
+func (e *TSMatchesExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Left
+	case 1:
+		return e.Right
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *TSMatchesExpr) Private() interface{} {
+	return nil
+}
+
+func (e *TSMatchesExpr) String() string {
+	f := makeExprFmtCtxForString(ExprFmtHideQualifications, nil, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *TSMatchesExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Left = child.(opt.ScalarExpr)
+		return
+	case 1:
+		e.Right = child.(opt.ScalarExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *TSMatchesExpr) DataType() *types.T {
+	return types.Bool
+}
+
 // AnyScalarExpr is the form of ANY which refers to an ANY operation on a
 // tuple or array, as opposed to Any which operates on a subquery.
 type AnyScalarExpr struct {
@@ -21800,6 +21859,27 @@ func (m *Memo) MemoizeBBoxIntersects(
 	return interned
 }
 
+func (m *Memo) MemoizeTSMatches(
+	left opt.ScalarExpr,
+	right opt.ScalarExpr,
+) *TSMatchesExpr {
+	const size = int64(unsafe.Sizeof(TSMatchesExpr{}))
+	e := &TSMatchesExpr{
+		Left:  left,
+		Right: right,
+		rank:  m.NextRank(),
+	}
+	interned := m.interner.InternTSMatches(e)
+	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
+		m.memEstimate += size
+		m.CheckExpr(e)
+	}
+	return interned
+}
+
 func (m *Memo) MemoizeAnyScalar(
 	left opt.ScalarExpr,
 	right opt.ScalarExpr,
@@ -25441,6 +25521,8 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternBBoxCovers(t)
 	case *BBoxIntersectsExpr:
 		return in.InternBBoxIntersects(t)
+	case *TSMatchesExpr:
+		return in.InternTSMatches(t)
 	case *AnyScalarExpr:
 		return in.InternAnyScalar(t)
 	case *BitandExpr:
@@ -28333,6 +28415,26 @@ func (in *interner) InternBBoxIntersects(val *BBoxIntersectsExpr) *BBoxIntersect
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*BBoxIntersectsExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Left, existing.Left) &&
+				in.hasher.IsScalarExprEqual(val.Right, existing.Right) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternTSMatches(val *TSMatchesExpr) *TSMatchesExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.TSMatchesOp)
+	in.hasher.HashScalarExpr(val.Left)
+	in.hasher.HashScalarExpr(val.Right)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*TSMatchesExpr); ok {
 			if in.hasher.IsScalarExprEqual(val.Left, existing.Left) &&
 				in.hasher.IsScalarExprEqual(val.Right, existing.Right) {
 				return existing
