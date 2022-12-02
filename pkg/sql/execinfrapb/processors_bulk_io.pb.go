@@ -92,6 +92,9 @@ func (BackfillerSpec_Type) EnumDescriptor() ([]byte, []int) {
 // descriptor in the database, and doesn't emit any rows nor support
 // any post-processing.
 type BackfillerSpec struct {
+	// TODO(lidor): job_id is not needed when interoperability with 22.2 is
+	// dropped, the new way to send the job tag is using 'job_tag' in the
+	// SetupFlowRequest message.
 	JobID int64                  `protobuf:"varint,13,opt,name=job_id,json=jobId" json:"job_id"`
 	Type  BackfillerSpec_Type    `protobuf:"varint,1,opt,name=type,enum=cockroach.sql.distsqlrun.BackfillerSpec_Type" json:"type"`
 	Table descpb.TableDescriptor `protobuf:"bytes,2,opt,name=table" json:"table"`
@@ -197,6 +200,9 @@ func (m *JobProgress) XXX_DiscardUnknown() {
 var xxx_messageInfo_JobProgress proto.InternalMessageInfo
 
 type ReadImportDataSpec struct {
+	// TODO(lidor): job_id is not needed when interoperability with 22.2 is
+	// dropped, the new way to send the job tag is using 'job_tag' in the
+	// SetupFlowRequest message.
 	JobID  int64                `protobuf:"varint,19,opt,name=job_id,json=jobId" json:"job_id"`
 	Format roachpb.IOFileFormat `protobuf:"bytes,8,opt,name=format" json:"format"`
 	// sample_size is the rate at which to output rows, based on an input row's size.
@@ -442,6 +448,9 @@ func (m *StreamIngestionFrontierSpec) XXX_DiscardUnknown() {
 var xxx_messageInfo_StreamIngestionFrontierSpec proto.InternalMessageInfo
 
 type BackupDataSpec struct {
+	// TODO(lidor): job_id is not needed when interoperability with 22.2 is
+	// dropped, the new way to send the job tag is using 'job_tag' in the
+	// SetupFlowRequest message.
 	JobID            int64                          `protobuf:"varint,11,opt,name=job_id,json=jobId" json:"job_id"`
 	Spans            []roachpb.Span                 `protobuf:"bytes,1,rep,name=spans" json:"spans"`
 	IntroducedSpans  []roachpb.Span                 `protobuf:"bytes,2,rep,name=introduced_spans,json=introducedSpans" json:"introduced_spans"`
@@ -634,6 +643,9 @@ func (m *RestoreSpanEntry) XXX_DiscardUnknown() {
 var xxx_messageInfo_RestoreSpanEntry proto.InternalMessageInfo
 
 type RestoreDataSpec struct {
+	// TODO(lidor): job_id is not needed when interoperability with 22.2 is
+	// dropped, the new way to send the job tag is using 'job_tag' in the
+	// SetupFlowRequest message.
 	JobID        int64                          `protobuf:"varint,6,opt,name=job_id,json=jobId" json:"job_id"`
 	RestoreTime  hlc.Timestamp                  `protobuf:"bytes,1,opt,name=restore_time,json=restoreTime" json:"restore_time"`
 	Encryption   *roachpb.FileEncryptionOptions `protobuf:"bytes,2,opt,name=encryption" json:"encryption,omitempty"`
@@ -675,6 +687,9 @@ func (m *RestoreDataSpec) XXX_DiscardUnknown() {
 var xxx_messageInfo_RestoreDataSpec proto.InternalMessageInfo
 
 type SplitAndScatterSpec struct {
+	// TODO(lidor): job_id is not needed when interoperability with 22.2 is
+	// dropped, the new way to send the job tag is using 'job_tag' in the
+	// SetupFlowRequest message.
 	JobID        int64                                   `protobuf:"varint,4,opt,name=job_id,json=jobId" json:"job_id"`
 	Chunks       []SplitAndScatterSpec_RestoreEntryChunk `protobuf:"bytes,1,rep,name=chunks" json:"chunks"`
 	TableRekeys  []TableRekey                            `protobuf:"bytes,2,rep,name=table_rekeys,json=tableRekeys" json:"table_rekeys"`
