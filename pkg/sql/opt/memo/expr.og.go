@@ -16846,8 +16846,9 @@ func (e *NthValueExpr) DataType() *types.T {
 // about the UDF including the name of the function, the statements in the
 // function body, and a pointer to its type.
 type UDFExpr struct {
-	// Input contains the scalar expressions given as input to the UDF.
-	Input ScalarListExpr
+	// Args contains the scalar expressions given as arguments to the UDF
+	// invocation.
+	Args ScalarListExpr
 	UDFPrivate
 
 	rank opt.ScalarRank
@@ -16870,7 +16871,7 @@ func (e *UDFExpr) ChildCount() int {
 func (e *UDFExpr) Child(nth int) opt.Expr {
 	switch nth {
 	case 0:
-		return &e.Input
+		return &e.Args
 	}
 	panic(errors.AssertionFailedf("child index out of range"))
 }
@@ -16888,7 +16889,7 @@ func (e *UDFExpr) String() string {
 func (e *UDFExpr) SetChild(nth int, child opt.Expr) {
 	switch nth {
 	case 0:
-		e.Input = *child.(*ScalarListExpr)
+		e.Args = *child.(*ScalarListExpr)
 		return
 	}
 	panic(errors.AssertionFailedf("child index out of range"))
@@ -16906,11 +16907,11 @@ type UDFPrivate struct {
 	// body.
 	Body RelListExpr
 
-	// ArgCols is a list of columns that are references to arguments of the
-	// function. The i-th column in the list corresponds to the i-th argument of
-	// the function. During execution of the UDF, these columns are replaced with
-	// the constant value inputs to the function.
-	ArgCols opt.ColList
+	// Params is the list of columns representing parameters of the function. The
+	// i-th column in the list corresponds to the i-th parameter of the function.
+	// During execution of the UDF, these columns are replaced with the arguments
+	// of the function invocation.
+	Params opt.ColList
 
 	// Typ is the return type of the function.
 	Typ *types.T
@@ -23732,12 +23733,12 @@ func (m *Memo) MemoizeNthValue(
 }
 
 func (m *Memo) MemoizeUDF(
-	input ScalarListExpr,
+	args ScalarListExpr,
 	uDFPrivate *UDFPrivate,
 ) *UDFExpr {
 	const size = int64(unsafe.Sizeof(UDFExpr{}))
 	e := &UDFExpr{
-		Input:      input,
+		Args:       args,
 		UDFPrivate: *uDFPrivate,
 		rank:       m.NextRank(),
 	}
@@ -30224,10 +30225,10 @@ func (in *interner) InternNthValue(val *NthValueExpr) *NthValueExpr {
 func (in *interner) InternUDF(val *UDFExpr) *UDFExpr {
 	in.hasher.Init()
 	in.hasher.HashOperator(opt.UDFOp)
-	in.hasher.HashScalarListExpr(val.Input)
+	in.hasher.HashScalarListExpr(val.Args)
 	in.hasher.HashString(val.Name)
 	in.hasher.HashRelListExpr(val.Body)
-	in.hasher.HashColList(val.ArgCols)
+	in.hasher.HashColList(val.Params)
 	in.hasher.HashType(val.Typ)
 	in.hasher.HashVolatility(val.Volatility)
 	in.hasher.HashBool(val.CalledOnNullInput)
@@ -30235,10 +30236,10 @@ func (in *interner) InternUDF(val *UDFExpr) *UDFExpr {
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*UDFExpr); ok {
-			if in.hasher.IsScalarListExprEqual(val.Input, existing.Input) &&
+			if in.hasher.IsScalarListExprEqual(val.Args, existing.Args) &&
 				in.hasher.IsStringEqual(val.Name, existing.Name) &&
 				in.hasher.IsRelListExprEqual(val.Body, existing.Body) &&
-				in.hasher.IsColListEqual(val.ArgCols, existing.ArgCols) &&
+				in.hasher.IsColListEqual(val.Params, existing.Params) &&
 				in.hasher.IsTypeEqual(val.Typ, existing.Typ) &&
 				in.hasher.IsVolatilityEqual(val.Volatility, existing.Volatility) &&
 				in.hasher.IsBoolEqual(val.CalledOnNullInput, existing.CalledOnNullInput) {

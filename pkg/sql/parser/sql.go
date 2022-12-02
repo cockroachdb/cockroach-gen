@@ -741,14 +741,14 @@ func (u *sqlSymUnion) functionOptions() tree.FunctionOptions {
 func (u *sqlSymUnion) functionOption() tree.FunctionOption {
 	return u.val.(tree.FunctionOption)
 }
-func (u *sqlSymUnion) functionArgs() tree.FuncArgs {
-	return u.val.(tree.FuncArgs)
+func (u *sqlSymUnion) functionParams() tree.FuncParams {
+	return u.val.(tree.FuncParams)
 }
-func (u *sqlSymUnion) functionArg() tree.FuncArg {
-	return u.val.(tree.FuncArg)
+func (u *sqlSymUnion) functionParam() tree.FuncParam {
+	return u.val.(tree.FuncParam)
 }
-func (u *sqlSymUnion) functionArgClass() tree.FuncArgClass {
-	return u.val.(tree.FuncArgClass)
+func (u *sqlSymUnion) functionParamClass() tree.FuncParamClass {
+	return u.val.(tree.FuncParamClass)
 }
 func (u *sqlSymUnion) stmts() tree.Statements {
 	return u.val.(tree.Statements)
@@ -28492,7 +28492,7 @@ sqldefault:
 				IsProcedure: false,
 				Replace:     sqlDollar[2].union.bool(),
 				FuncName:    name,
-				Args:        sqlDollar[6].union.functionArgs(),
+				Params:      sqlDollar[6].union.functionParams(),
 				ReturnType: tree.FuncReturnType{
 					Type:  sqlDollar[10].union.typeReference(),
 					IsSet: sqlDollar[9].union.bool(),
@@ -28535,31 +28535,31 @@ sqldefault:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
 //line sql-gen.y:4236
 		{
-			sqlVAL.union.val = sqlDollar[1].union.functionArgs()
+			sqlVAL.union.val = sqlDollar[1].union.functionParams()
 		}
 	case 493:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
 //line sql-gen.y:4237
 		{
-			sqlVAL.union.val = tree.FuncArgs{}
+			sqlVAL.union.val = tree.FuncParams{}
 		}
 	case 494:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
 //line sql-gen.y:4240
 		{
-			sqlVAL.union.val = tree.FuncArgs{sqlDollar[1].union.functionArg()}
+			sqlVAL.union.val = tree.FuncParams{sqlDollar[1].union.functionParam()}
 		}
 	case 495:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
 //line sql-gen.y:4242
 		{
-			sqlVAL.union.val = append(sqlDollar[1].union.functionArgs(), sqlDollar[3].union.functionArg())
+			sqlVAL.union.val = append(sqlDollar[1].union.functionParams(), sqlDollar[3].union.functionParam())
 		}
 	case 497:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
 //line sql-gen.y:4249
 		{
-			arg := sqlDollar[1].union.functionArg()
+			arg := sqlDollar[1].union.functionParam()
 			arg.DefaultVal = sqlDollar[3].union.expr()
 			sqlVAL.union.val = arg
 		}
@@ -28567,7 +28567,7 @@ sqldefault:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
 //line sql-gen.y:4255
 		{
-			arg := sqlDollar[1].union.functionArg()
+			arg := sqlDollar[1].union.functionParam()
 			arg.DefaultVal = sqlDollar[3].union.expr()
 			sqlVAL.union.val = arg
 		}
@@ -28575,55 +28575,55 @@ sqldefault:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
 //line sql-gen.y:4263
 		{
-			sqlVAL.union.val = tree.FuncArg{
+			sqlVAL.union.val = tree.FuncParam{
 				Name:  tree.Name(sqlDollar[2].str),
 				Type:  sqlDollar[3].union.typeReference(),
-				Class: sqlDollar[1].union.functionArgClass(),
+				Class: sqlDollar[1].union.functionParamClass(),
 			}
 		}
 	case 500:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
 //line sql-gen.y:4271
 		{
-			sqlVAL.union.val = tree.FuncArg{
+			sqlVAL.union.val = tree.FuncParam{
 				Name:  tree.Name(sqlDollar[1].str),
 				Type:  sqlDollar[3].union.typeReference(),
-				Class: sqlDollar[2].union.functionArgClass(),
+				Class: sqlDollar[2].union.functionParamClass(),
 			}
 		}
 	case 501:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
 //line sql-gen.y:4279
 		{
-			sqlVAL.union.val = tree.FuncArg{
+			sqlVAL.union.val = tree.FuncParam{
 				Name:  tree.Name(sqlDollar[1].str),
 				Type:  sqlDollar[2].union.typeReference(),
-				Class: tree.FunctionArgIn,
+				Class: tree.FunctionParamIn,
 			}
 		}
 	case 502:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
 //line sql-gen.y:4287
 		{
-			sqlVAL.union.val = tree.FuncArg{
+			sqlVAL.union.val = tree.FuncParam{
 				Type:  sqlDollar[2].union.typeReference(),
-				Class: sqlDollar[1].union.functionArgClass(),
+				Class: sqlDollar[1].union.functionParamClass(),
 			}
 		}
 	case 503:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
 //line sql-gen.y:4294
 		{
-			sqlVAL.union.val = tree.FuncArg{
+			sqlVAL.union.val = tree.FuncParam{
 				Type:  sqlDollar[1].union.typeReference(),
-				Class: tree.FunctionArgIn,
+				Class: tree.FunctionParamIn,
 			}
 		}
 	case 504:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
 //line sql-gen.y:4302
 		{
-			sqlVAL.union.val = tree.FunctionArgIn
+			sqlVAL.union.val = tree.FunctionParamIn
 		}
 	case 505:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
@@ -28894,7 +28894,7 @@ sqldefault:
 		{
 			sqlVAL.union.val = tree.FuncObj{
 				FuncName: sqlDollar[1].union.unresolvedObjectName().ToFunctionName(),
-				Args:     sqlDollar[2].union.functionArgs(),
+				Params:   sqlDollar[2].union.functionParams(),
 			}
 		}
 	case 552:
@@ -28909,25 +28909,25 @@ sqldefault:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
 //line sql-gen.y:4507
 		{
-			sqlVAL.union.val = sqlDollar[2].union.functionArgs()
+			sqlVAL.union.val = sqlDollar[2].union.functionParams()
 		}
 	case 554:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
 //line sql-gen.y:4511
 		{
-			sqlVAL.union.val = tree.FuncArgs{}
+			sqlVAL.union.val = tree.FuncParams{}
 		}
 	case 555:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
 //line sql-gen.y:4517
 		{
-			sqlVAL.union.val = tree.FuncArgs{sqlDollar[1].union.functionArg()}
+			sqlVAL.union.val = tree.FuncParams{sqlDollar[1].union.functionParam()}
 		}
 	case 556:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
 //line sql-gen.y:4521
 		{
-			sqlVAL.union.val = append(sqlDollar[1].union.functionArgs(), sqlDollar[3].union.functionArg())
+			sqlVAL.union.val = append(sqlDollar[1].union.functionParams(), sqlDollar[3].union.functionParam())
 		}
 	case 557:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
