@@ -19337,6 +19337,126 @@ type ExportPrivate struct {
 	Columns opt.ColList
 }
 
+// ShowCompletionsExpr represents a SHOW COMPLETIONS statement.
+type ShowCompletionsExpr struct {
+	ShowCompletionsPrivate
+
+	grp  exprGroup
+	next RelExpr
+}
+
+var _ RelExpr = &ShowCompletionsExpr{}
+
+func (e *ShowCompletionsExpr) Op() opt.Operator {
+	return opt.ShowCompletionsOp
+}
+
+func (e *ShowCompletionsExpr) ChildCount() int {
+	return 0
+}
+
+func (e *ShowCompletionsExpr) Child(nth int) opt.Expr {
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *ShowCompletionsExpr) Private() interface{} {
+	return &e.ShowCompletionsPrivate
+}
+
+func (e *ShowCompletionsExpr) String() string {
+	f := makeExprFmtCtxForString(ExprFmtHideQualifications, e.Memo(), nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *ShowCompletionsExpr) SetChild(nth int, child opt.Expr) {
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *ShowCompletionsExpr) Memo() *Memo {
+	return e.grp.memo()
+}
+
+func (e *ShowCompletionsExpr) Relational() *props.Relational {
+	return e.grp.relational()
+}
+
+func (e *ShowCompletionsExpr) FirstExpr() RelExpr {
+	return e.grp.firstExpr()
+}
+
+func (e *ShowCompletionsExpr) NextExpr() RelExpr {
+	return e.next
+}
+
+func (e *ShowCompletionsExpr) RequiredPhysical() *physical.Required {
+	return e.grp.bestProps().required
+}
+
+func (e *ShowCompletionsExpr) ProvidedPhysical() *physical.Provided {
+	return e.grp.bestProps().provided
+}
+
+func (e *ShowCompletionsExpr) Cost() Cost {
+	return e.grp.bestProps().cost
+}
+
+func (e *ShowCompletionsExpr) group() exprGroup {
+	return e.grp
+}
+
+func (e *ShowCompletionsExpr) bestProps() *bestProps {
+	return e.grp.bestProps()
+}
+
+func (e *ShowCompletionsExpr) setNext(member RelExpr) {
+	if e.next != nil {
+		panic(errors.AssertionFailedf("expression already has its next defined: %s", e))
+	}
+	e.next = member
+}
+
+func (e *ShowCompletionsExpr) setGroup(member RelExpr) {
+	if e.grp != nil {
+		panic(errors.AssertionFailedf("expression is already in a group: %s", e))
+	}
+	e.grp = member.group()
+	LastGroupMember(member).setNext(e)
+}
+
+type showCompletionsGroup struct {
+	mem   *Memo
+	rel   props.Relational
+	first ShowCompletionsExpr
+	best  bestProps
+}
+
+var _ exprGroup = &showCompletionsGroup{}
+
+func (g *showCompletionsGroup) memo() *Memo {
+	return g.mem
+}
+
+func (g *showCompletionsGroup) relational() *props.Relational {
+	return &g.rel
+}
+
+func (g *showCompletionsGroup) firstExpr() RelExpr {
+	return &g.first
+}
+
+func (g *showCompletionsGroup) bestProps() *bestProps {
+	return &g.best
+}
+
+type ShowCompletionsPrivate struct {
+	// Command is the tree.ShowCompletions AST node.
+	Command *tree.ShowCompletions
+
+	// Columns stores the column IDs for the statement result columns.
+	Columns opt.ColList
+}
+
 // CreateStatisticsExpr represents a CREATE STATISTICS or ANALYZE statement.
 type CreateStatisticsExpr struct {
 	CreateStatisticsPrivate
@@ -24235,6 +24355,28 @@ func (m *Memo) MemoizeExport(
 	return interned.FirstExpr()
 }
 
+func (m *Memo) MemoizeShowCompletions(
+	showCompletionsPrivate *ShowCompletionsPrivate,
+) RelExpr {
+	const size = int64(unsafe.Sizeof(showCompletionsGroup{}))
+	grp := &showCompletionsGroup{mem: m, first: ShowCompletionsExpr{
+		ShowCompletionsPrivate: *showCompletionsPrivate,
+	}}
+	e := &grp.first
+	e.grp = grp
+	interned := m.interner.InternShowCompletions(e)
+	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
+		m.logPropsBuilder.buildShowCompletionsProps(e, &grp.rel)
+		grp.rel.Populated = true
+		m.memEstimate += size
+		m.CheckExpr(e)
+	}
+	return interned.FirstExpr()
+}
+
 func (m *Memo) MemoizeCreateStatistics(
 	createStatisticsPrivate *CreateStatisticsPrivate,
 ) RelExpr {
@@ -25273,6 +25415,20 @@ func (m *Memo) AddExportToGroup(e *ExportExpr, grp RelExpr) *ExportExpr {
 	return interned
 }
 
+func (m *Memo) AddShowCompletionsToGroup(e *ShowCompletionsExpr, grp RelExpr) *ShowCompletionsExpr {
+	const size = int64(unsafe.Sizeof(ShowCompletionsExpr{}))
+	interned := m.interner.InternShowCompletions(e)
+	if interned == e {
+		e.setGroup(grp)
+		m.memEstimate += size
+		m.CheckExpr(e)
+	} else if interned.group() != grp.group() {
+		// This is a group collision, do nothing.
+		return nil
+	}
+	return interned
+}
+
 func (m *Memo) AddCreateStatisticsToGroup(e *CreateStatisticsExpr, grp RelExpr) *CreateStatisticsExpr {
 	const size = int64(unsafe.Sizeof(CreateStatisticsExpr{}))
 	interned := m.interner.InternCreateStatistics(e)
@@ -25761,6 +25917,8 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternCancelSessions(t)
 	case *ExportExpr:
 		return in.InternExport(t)
+	case *ShowCompletionsExpr:
+		return in.InternShowCompletions(t)
 	case *CreateStatisticsExpr:
 		return in.InternCreateStatistics(t)
 	case *AlterRangeRelocateExpr:
@@ -30828,6 +30986,26 @@ func (in *interner) InternExport(val *ExportExpr) *ExportExpr {
 	return val
 }
 
+func (in *interner) InternShowCompletions(val *ShowCompletionsExpr) *ShowCompletionsExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.ShowCompletionsOp)
+	in.hasher.HashPointer(unsafe.Pointer(val.Command))
+	in.hasher.HashColList(val.Columns)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*ShowCompletionsExpr); ok {
+			if in.hasher.IsPointerEqual(unsafe.Pointer(val.Command), unsafe.Pointer(existing.Command)) &&
+				in.hasher.IsColListEqual(val.Columns, existing.Columns) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
 func (in *interner) InternCreateStatistics(val *CreateStatisticsExpr) *CreateStatisticsExpr {
 	in.hasher.Init()
 	in.hasher.HashOperator(opt.CreateStatisticsOp)
@@ -31016,6 +31194,8 @@ func (b *logicalPropsBuilder) buildProps(e RelExpr, rel *props.Relational) {
 		b.buildCancelSessionsProps(t, rel)
 	case *ExportExpr:
 		b.buildExportProps(t, rel)
+	case *ShowCompletionsExpr:
+		b.buildShowCompletionsProps(t, rel)
 	case *CreateStatisticsExpr:
 		b.buildCreateStatisticsProps(t, rel)
 	case *AlterRangeRelocateExpr:

@@ -921,6 +921,13 @@ type Factory interface {
 		rows tree.ExprContainer,
 		columns colinfo.ResultColumns,
 	) (Node, error)
+
+	// ConstructShowCompletions creates a node for a ShowCompletions operation.
+	//
+	// ShowCompletions implements SHOW COMPLETIONS.
+	ConstructShowCompletions(
+		command *tree.ShowCompletions,
+	) (Node, error)
 }
 
 // StubFactory is a do-nothing implementation of Factory, used for testing.
@@ -1486,6 +1493,12 @@ func (StubFactory) ConstructCreateFunction(
 func (StubFactory) ConstructLiteralValues(
 	rows tree.ExprContainer,
 	columns colinfo.ResultColumns,
+) (Node, error) {
+	return struct{}{}, nil
+}
+
+func (StubFactory) ConstructShowCompletions(
+	command *tree.ShowCompletions,
 ) (Node, error) {
 	return struct{}{}, nil
 }

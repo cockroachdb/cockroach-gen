@@ -1114,6 +1114,16 @@ func (f *PlanGistFactory) ConstructLiteralValues(
 	return node, err
 }
 
+func (f *PlanGistFactory) ConstructShowCompletions(
+	command *tree.ShowCompletions,
+) (exec.Node, error) {
+	f.encodeOperator(showCompletionsOp)
+	node, err := f.wrappedFactory.ConstructShowCompletions(
+		command,
+	)
+	return node, err
+}
+
 func (f *PlanGistFactory) decodeOperatorBody(op execOperator) (*Node, error) {
 	var _n *Node
 	var reqOrdering exec.OutputOrdering
@@ -1417,6 +1427,9 @@ func (f *PlanGistFactory) decodeOperatorBody(op execOperator) (*Node, error) {
 	case literalValuesOp:
 		var args literalValuesArgs
 		args.Columns = f.decodeResultColumns()
+		_n, err = newNode(op, &args, reqOrdering)
+	case showCompletionsOp:
+		var args showCompletionsArgs
 		_n, err = newNode(op, &args, reqOrdering)
 	default:
 		return nil, errors.Newf("invalid op: %d", op)

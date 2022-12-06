@@ -21935,6 +21935,26 @@ SKIP_RULES:
 	return expr
 }
 
+// ConstructShowCompletions constructs an expression for the ShowCompletions operator.
+// ShowCompletions represents a SHOW COMPLETIONS statement.
+func (_f *Factory) ConstructShowCompletions(
+	showCompletionsPrivate *memo.ShowCompletionsPrivate,
+) memo.RelExpr {
+	_f.constructorStackDepth++
+	if _f.constructorStackDepth > maxConstructorStackDepth {
+		// If the constructor call stack depth exceeds the limit, call
+		// onMaxConstructorStackDepthExceeded and skip all rules.
+		_f.onMaxConstructorStackDepthExceeded()
+		goto SKIP_RULES
+	}
+
+SKIP_RULES:
+	e := _f.mem.MemoizeShowCompletions(showCompletionsPrivate)
+	expr := _f.onConstructRelational(e)
+	_f.constructorStackDepth--
+	return expr
+}
+
 // ConstructCreateStatistics constructs an expression for the CreateStatistics operator.
 // CreateStatistics represents a CREATE STATISTICS or ANALYZE statement.
 func (_f *Factory) ConstructCreateStatistics(
@@ -23587,6 +23607,9 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		}
 		return t
 
+	case *memo.ShowCompletionsExpr:
+		return t
+
 	case *memo.CreateStatisticsExpr:
 		return t
 
@@ -25044,6 +25067,9 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 			&t.ExportPrivate,
 		)
 
+	case *memo.ShowCompletionsExpr:
+		return f.mem.MemoizeShowCompletions(&t.ShowCompletionsPrivate)
+
 	case *memo.CreateStatisticsExpr:
 		return f.mem.MemoizeCreateStatistics(&t.CreateStatisticsPrivate)
 
@@ -26248,6 +26274,10 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 			args[1].(opt.ScalarExpr),
 			*args[2].(*memo.KVOptionsExpr),
 			args[3].(*memo.ExportPrivate),
+		)
+	case opt.ShowCompletionsOp:
+		return f.ConstructShowCompletions(
+			args[0].(*memo.ShowCompletionsPrivate),
 		)
 	case opt.CreateStatisticsOp:
 		return f.ConstructCreateStatistics(

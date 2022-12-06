@@ -1939,6 +1939,27 @@ func (f *Factory) ConstructLiteralValues(
 	return _n, nil
 }
 
+func (f *Factory) ConstructShowCompletions(
+	command *tree.ShowCompletions,
+) (exec.Node, error) {
+	args := &showCompletionsArgs{
+		Command: command,
+	}
+	_n, err := newNode(showCompletionsOp, args, nil /* ordering */)
+	if err != nil {
+		return nil, err
+	}
+	// Build the "real" node.
+	wrapped, err := f.wrappedFactory.ConstructShowCompletions(
+		command,
+	)
+	if err != nil {
+		return nil, err
+	}
+	_n.wrappedNode = wrapped
+	return _n, nil
+}
+
 type execOperator int
 
 const (
@@ -2002,6 +2023,7 @@ const (
 	alterRangeRelocateOp
 	createFunctionOp
 	literalValuesOp
+	showCompletionsOp
 	numOperators
 )
 
@@ -2437,4 +2459,8 @@ type createFunctionArgs struct {
 type literalValuesArgs struct {
 	Rows    tree.ExprContainer
 	Columns colinfo.ResultColumns
+}
+
+type showCompletionsArgs struct {
+	Command *tree.ShowCompletions
 }
