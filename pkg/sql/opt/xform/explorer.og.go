@@ -395,39 +395,41 @@ func (_e *explorer) exploreSelect(
 					scanPrivate := &_scan.ScanPrivate
 					if _e.funcs.IsCanonicalScan(scanPrivate) {
 						if _e.funcs.HasStrictKey(_scan) {
-							filters := _root.Filters
-							leftFilter, rightFilter, itemToReplace, ok := _e.funcs.SplitDisjunction(scanPrivate, filters)
-							if ok {
-								if _e.o.matchedRule == nil || _e.o.matchedRule(opt.SplitDisjunction) {
-									leftScanPrivate := _e.funcs.DuplicateScanPrivate(scanPrivate)
-									leftScan := _e.f.ConstructScan(
-										leftScanPrivate,
-									)
-									rightScanPrivate := _e.funcs.DuplicateScanPrivate(scanPrivate)
-									rightScan := _e.f.ConstructScan(
-										rightScanPrivate,
-									)
-									_expr := &memo.DistinctOnExpr{
-										Input: _e.f.ConstructUnionAll(
-											_e.f.ConstructSelect(
-												leftScan,
-												_e.funcs.RemapScanColsInFilter(_e.funcs.ReplaceFiltersItem(filters, itemToReplace, leftFilter), scanPrivate, leftScanPrivate),
+							if !_e.funcs.HasZeroOrOneRow(_scan) {
+								filters := _root.Filters
+								leftFilter, rightFilter, itemToReplace, ok := _e.funcs.SplitDisjunction(scanPrivate, filters)
+								if ok {
+									if _e.o.matchedRule == nil || _e.o.matchedRule(opt.SplitDisjunction) {
+										leftScanPrivate := _e.funcs.DuplicateScanPrivate(scanPrivate)
+										leftScan := _e.f.ConstructScan(
+											leftScanPrivate,
+										)
+										rightScanPrivate := _e.funcs.DuplicateScanPrivate(scanPrivate)
+										rightScan := _e.f.ConstructScan(
+											rightScanPrivate,
+										)
+										_expr := &memo.DistinctOnExpr{
+											Input: _e.f.ConstructUnionAll(
+												_e.f.ConstructSelect(
+													leftScan,
+													_e.funcs.RemapScanColsInFilter(_e.funcs.ReplaceFiltersItem(filters, itemToReplace, leftFilter), scanPrivate, leftScanPrivate),
+												),
+												_e.f.ConstructSelect(
+													rightScan,
+													_e.funcs.RemapScanColsInFilter(_e.funcs.ReplaceFiltersItem(filters, itemToReplace, rightFilter), scanPrivate, rightScanPrivate),
+												),
+												_e.funcs.MakeSetPrivate(_e.funcs.OutputCols(leftScan), _e.funcs.OutputCols(rightScan), _e.funcs.OutputCols(_scan)),
 											),
-											_e.f.ConstructSelect(
-												rightScan,
-												_e.funcs.RemapScanColsInFilter(_e.funcs.ReplaceFiltersItem(filters, itemToReplace, rightFilter), scanPrivate, rightScanPrivate),
-											),
-											_e.funcs.MakeSetPrivate(_e.funcs.OutputCols(leftScan), _e.funcs.OutputCols(rightScan), _e.funcs.OutputCols(_scan)),
-										),
-										Aggregations:    _e.funcs.MakeAggCols(opt.ConstAggOp, _e.funcs.NonKeyCols(_scan)),
-										GroupingPrivate: *_e.funcs.MakeGrouping(_e.funcs.KeyCols(_scan), _e.funcs.EmptyOrdering()),
-									}
-									_interned := _e.mem.AddDistinctOnToGroup(_expr, _root)
-									if _e.o.appliedRule != nil {
-										if _interned != _expr {
-											_e.o.appliedRule(opt.SplitDisjunction, _root, nil)
-										} else {
-											_e.o.appliedRule(opt.SplitDisjunction, _root, _interned)
+											Aggregations:    _e.funcs.MakeAggCols(opt.ConstAggOp, _e.funcs.NonKeyCols(_scan)),
+											GroupingPrivate: *_e.funcs.MakeGrouping(_e.funcs.KeyCols(_scan), _e.funcs.EmptyOrdering()),
+										}
+										_interned := _e.mem.AddDistinctOnToGroup(_expr, _root)
+										if _e.o.appliedRule != nil {
+											if _interned != _expr {
+												_e.o.appliedRule(opt.SplitDisjunction, _root, nil)
+											} else {
+												_e.o.appliedRule(opt.SplitDisjunction, _root, _interned)
+											}
 										}
 									}
 								}

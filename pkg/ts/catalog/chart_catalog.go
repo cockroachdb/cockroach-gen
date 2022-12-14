@@ -693,6 +693,10 @@ var charts = []sectionDescription{
 				Title:   "Bytes Written Per Second",
 				Metrics: []string{"rebalancing.writebytespersecond"},
 			},
+			{
+				Title:   "CPU Nanos Used Per Second",
+				Metrics: []string{"rebalancing.cpunanospersecond"},
+			},
 		},
 	},
 	{
@@ -3243,6 +3247,19 @@ var charts = []sectionDescription{
 				Title: "Last Completed Backups",
 				Metrics: []string{
 					"schedules.BACKUP.last-completed-time",
+				},
+			},
+		},
+	},
+	{
+		Organization: [][]string{{Jobs, "Schedules", "Changefeed"}},
+		Charts: []chartDescription{
+			{
+				Title: "Counts",
+				Metrics: []string{
+					"schedules.CHANGEFEED.started",
+					"schedules.CHANGEFEED.succeeded",
+					"schedules.CHANGEFEED.failed",
 				},
 			},
 		},
