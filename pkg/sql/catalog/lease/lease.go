@@ -15,6 +15,7 @@ import (
 	"context"
 	"fmt"
 	"sort"
+	"strconv"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -31,6 +32,7 @@ import (
 	"github.com/cockroachdb/cockroach/pkg/sql/catalog/catalogkeys"
 	"github.com/cockroachdb/cockroach/pkg/sql/catalog/descbuilder"
 	"github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb"
+	"github.com/cockroachdb/cockroach/pkg/sql/catalog/internal/catkv"
 	"github.com/cockroachdb/cockroach/pkg/sql/catalog/systemschema"
 	"github.com/cockroachdb/cockroach/pkg/sql/enum"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
@@ -135,10 +137,13 @@ func (m *Manager) WaitForOneVersion(
 			// descriptors can be removed or made invalid. For instance, the
 			// descriptor could be a type or a schema which is dropped by a subsequent
 			// concurrent schema change.
-			desc, err = m.storage.makeDirect(ctx).MaybeGetDescriptorByIDUnvalidated(ctx, txn, id)
+			const isDescriptorRequired = false
+			cr := m.storage.newCatalogReader(ctx)
+			c, err := cr.GetByIDs(ctx, txn, []descpb.ID{id}, isDescriptorRequired, catalog.Any)
 			if err != nil {
 				return err
 			}
+			desc = c.LookupDescriptor(id)
 			if desc == nil {
 				return errors.Wrapf(catalog.ErrDescriptorNotFound, "waiting for leases to drain on descriptor %d", id)
 			}
@@ -493,55 +498,50 @@ func acquireNodeLease(
 	ctx context.Context, m *Manager, id descpb.ID, typ AcquireType,
 ) (bool, error) {
 	start := timeutil.Now()
-	log.VEventf(ctx, 2, "acquiring lease for descriptor %d", id)
+	log.VEventf(ctx, 2, "acquiring lease for descriptor %d...", id)
 	var toRelease *storedLease
-	resultChan, didAcquire := m.storage.group.DoChan(fmt.Sprintf("acquire%d", id), func() (interface{}, error) {
-		// Note that we use a new `context` here to avoid a situation where a cancellation
-		// of the first context cancels other callers to the `acquireNodeLease()` method,
-		// because of its use of `singleflight.Group`. See issue #41780 for how this has
-		// happened.
-		lt := logtags.FromContext(ctx)
-		ctx, cancel := m.stopper.WithCancelOnQuiesce(logtags.AddTags(m.ambientCtx.AnnotateCtx(context.Background()), lt))
-		defer cancel()
-		if m.IsDraining() {
-			return nil, errors.New("cannot acquire lease when draining")
-		}
-		newest := m.findNewest(id)
-		var minExpiration hlc.Timestamp
-		if newest != nil {
-			minExpiration = newest.getExpiration()
-		}
-		desc, expiration, regionPrefix, err := m.storage.acquire(ctx, minExpiration, id)
-		if err != nil {
-			return nil, err
-		}
-		t := m.findDescriptorState(id, false /* create */)
-		t.mu.Lock()
-		t.mu.takenOffline = false
-		defer t.mu.Unlock()
-		var newDescVersionState *descriptorVersionState
-		newDescVersionState, toRelease, err = t.upsertLeaseLocked(ctx, desc, expiration, regionPrefix)
-		if err != nil {
-			return nil, err
-		}
-		if newDescVersionState != nil {
-			m.names.insert(newDescVersionState)
-		}
-		if toRelease != nil {
-			releaseLease(ctx, toRelease, m)
-		}
-		return true, nil
-	})
+	future, didAcquire := m.storage.group.DoChan(ctx,
+		strconv.Itoa(int(id)),
+		singleflight.DoOpts{
+			Stop:               m.stopper,
+			InheritCancelation: false,
+		},
+		func(ctx context.Context) (interface{}, error) {
+			if m.IsDraining() {
+				return nil, errors.New("cannot acquire lease when draining")
+			}
+			newest := m.findNewest(id)
+			var minExpiration hlc.Timestamp
+			if newest != nil {
+				minExpiration = newest.getExpiration()
+			}
+			desc, expiration, regionPrefix, err := m.storage.acquire(ctx, minExpiration, id)
+			if err != nil {
+				return nil, err
+			}
+			t := m.findDescriptorState(id, false /* create */)
+			t.mu.Lock()
+			t.mu.takenOffline = false
+			defer t.mu.Unlock()
+			var newDescVersionState *descriptorVersionState
+			newDescVersionState, toRelease, err = t.upsertLeaseLocked(ctx, desc, expiration, regionPrefix)
+			if err != nil {
+				return nil, err
+			}
+			if newDescVersionState != nil {
+				m.names.insert(newDescVersionState)
+			}
+			if toRelease != nil {
+				releaseLease(ctx, toRelease, m)
+			}
+			return true, nil
+		})
 	if m.testingKnobs.LeaseStoreTestingKnobs.LeaseAcquireResultBlockEvent != nil {
 		m.testingKnobs.LeaseStoreTestingKnobs.LeaseAcquireResultBlockEvent(typ, id)
 	}
-	select {
-	case <-ctx.Done():
-		return false, ctx.Err()
-	case result := <-resultChan:
-		if result.Err != nil {
-			return false, result.Err
-		}
+	result := future.WaitForResult(ctx)
+	if result.Err != nil {
+		return false, result.Err
 	}
 	log.VEventf(ctx, 2, "acquired lease for descriptor %d, took %v", id, timeutil.Since(start))
 	return didAcquire, nil
@@ -720,7 +720,8 @@ func NewLeaseManager(
 			internalExecutor: internalExecutor,
 			settings:         settings,
 			codec:            codec,
-			group:            &singleflight.Group{},
+			sysDBCache:       catkv.NewSystemDatabaseCache(codec, settings),
+			group:            singleflight.NewGroup("acquire-lease", "descriptor ID"),
 			testingKnobs:     testingKnobs.LeaseStoreTestingKnobs,
 			outstandingLeases: metric.NewGauge(metric.Metadata{
 				Name:        "sql.leases.active",
@@ -928,6 +929,7 @@ func (m *Manager) resolveName(
 	parentSchemaID descpb.ID,
 	name string,
 ) (id descpb.ID, _ error) {
+	req := []descpb.NameInfo{{ParentID: parentID, ParentSchemaID: parentSchemaID, Name: name}}
 	if err := m.storage.db.Txn(ctx, func(ctx context.Context, txn *kv.Txn) error {
 		// Run the name lookup as high-priority, thereby pushing any intents out of
 		// its way. We don't want schema changes to prevent name resolution/lease
@@ -940,9 +942,14 @@ func (m *Manager) resolveName(
 		if err := txn.SetFixedTimestamp(ctx, timestamp); err != nil {
 			return err
 		}
-		var err error
-		id, err = m.storage.makeDirect(ctx).LookupDescriptorID(ctx, txn, parentID, parentSchemaID, name)
-		return err
+		c, err := m.storage.newCatalogReader(ctx).GetByNames(ctx, txn, req)
+		if err != nil {
+			return err
+		}
+		if e := c.LookupNamespaceEntry(&req[0]); e != nil {
+			id = e.GetID()
+		}
+		return nil
 	}); err != nil {
 		return id, err
 	}
@@ -1379,9 +1386,14 @@ func (m *Manager) DB() *kv.DB {
 	return m.storage.db
 }
 
-// Codec return the Manager's SQLCodec.
+// Codec returns the Manager's SQLCodec.
 func (m *Manager) Codec() keys.SQLCodec {
 	return m.storage.codec
+}
+
+// SystemDatabaseCache returns the Manager's catkv.SystemDatabaseCache.
+func (m *Manager) SystemDatabaseCache() *catkv.SystemDatabaseCache {
+	return m.storage.sysDBCache
 }
 
 // Metrics contains a pointer to all relevant lease.Manager metrics, for

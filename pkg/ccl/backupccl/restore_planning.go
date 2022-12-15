@@ -325,7 +325,7 @@ func allocateDescriptorRewrites(
 				}
 
 				// See if there is an existing schema with the same name.
-				id, err := col.Direct().LookupSchemaID(ctx, txn, parentID, sc.Name)
+				id, err := col.LookupSchemaID(ctx, txn, parentID, sc.Name)
 				if err != nil {
 					return err
 				}
@@ -335,7 +335,11 @@ func allocateDescriptorRewrites(
 				} else {
 					// If we found an existing schema, then we need to remap all references
 					// to this schema to the existing one.
-					desc, err := col.Direct().MustGetSchemaDescByID(ctx, txn, id)
+					desc, err := col.GetImmutableSchemaByID(ctx, txn, id, tree.SchemaLookupFlags{
+						AvoidLeased:    true,
+						IncludeDropped: true,
+						IncludeOffline: true,
+					})
 					if err != nil {
 						return err
 					}
@@ -378,13 +382,17 @@ func allocateDescriptorRewrites(
 				// Check that the table name is _not_ in use.
 				// This would fail the CPut later anyway, but this yields a prettier error.
 				tableName := tree.NewUnqualifiedTableName(tree.Name(table.GetName()))
-				err := col.Direct().CheckObjectCollision(ctx, txn, parentID, table.GetParentSchemaID(), tableName)
+				err := descs.CheckObjectNameCollision(ctx, col, txn, parentID, table.GetParentSchemaID(), tableName)
 				if err != nil {
 					return err
 				}
 
 				// Check privileges.
-				parentDB, err := col.Direct().MustGetDatabaseDescByID(ctx, txn, parentID)
+				_, parentDB, err := col.GetImmutableDatabaseByID(ctx, txn, parentID, tree.DatabaseLookupFlags{
+					AvoidLeased:    true,
+					IncludeDropped: true,
+					IncludeOffline: true,
+				})
 				if err != nil {
 					return errors.Wrapf(err,
 						"failed to lookup parent DB %d", errors.Safe(parentID))
@@ -449,7 +457,11 @@ func allocateDescriptorRewrites(
 						targetDB, typ.Name)
 				}
 				// Check privileges on the parent DB.
-				parentDB, err := col.Direct().MustGetDatabaseDescByID(ctx, txn, parentID)
+				_, parentDB, err := col.GetImmutableDatabaseByID(ctx, txn, parentID, tree.DatabaseLookupFlags{
+					AvoidLeased:    true,
+					IncludeDropped: true,
+					IncludeOffline: true,
+				})
 				if err != nil {
 					return errors.Wrapf(err,
 						"failed to lookup parent DB %d", errors.Safe(parentID))
@@ -464,8 +476,9 @@ func allocateDescriptorRewrites(
 					}
 					return
 				}
-				desc, err := col.Direct().GetDescriptorCollidingWithObject(
+				desc, err := descs.GetDescriptorCollidingWithObjectName(
 					ctx,
+					col,
 					txn,
 					parentID,
 					getParentSchemaID(typ),
@@ -492,7 +505,7 @@ func allocateDescriptorRewrites(
 					// Ensure that there isn't a collision with the array type name.
 					arrTyp := typesByID[typ.ArrayTypeID]
 					typeName := tree.NewUnqualifiedTypeName(arrTyp.GetName())
-					err = col.Direct().CheckObjectCollision(ctx, txn, parentID, getParentSchemaID(typ), typeName)
+					err = descs.CheckObjectNameCollision(ctx, col, txn, parentID, getParentSchemaID(typ), typeName)
 					if err != nil {
 						return errors.Wrapf(err, "name collision for %q's array type", typ.Name)
 					}
@@ -696,7 +709,11 @@ func getDatabaseIDAndDesc(
 		return dbID, nil, errors.Errorf("a database named %q needs to exist", targetDB)
 	}
 	// Check privileges on the parent DB.
-	dbDesc, err = col.Direct().MustGetDatabaseDescByID(ctx, txn, dbID)
+	_, dbDesc, err = col.GetImmutableDatabaseByID(ctx, txn, dbID, tree.DatabaseLookupFlags{
+		AvoidLeased:    true,
+		IncludeDropped: true,
+		IncludeOffline: true,
+	})
 	if err != nil {
 		return 0, nil, errors.Wrapf(err,
 			"failed to lookup parent DB %d", errors.Safe(dbID))
@@ -1229,23 +1246,20 @@ func checkPrivilegesForRestore(
 		requiresRestoreSystemPrivilege := restoreStmt.DescriptorCoverage == tree.AllDescriptors ||
 			restoreStmt.Targets.TenantID.IsSet()
 
-		var hasRestoreSystemPrivilege bool
-		if p.ExecCfg().Settings.Version.IsActive(ctx, clusterversion.V22_2SystemPrivilegesTable) {
-			err := p.CheckPrivilegeForUser(ctx, syntheticprivilege.GlobalPrivilegeObject,
-				privilege.RESTORE, p.User())
-			hasRestoreSystemPrivilege = err == nil
-		}
-
-		if requiresRestoreSystemPrivilege && hasRestoreSystemPrivilege {
+		if requiresRestoreSystemPrivilege {
+			if err := p.CheckPrivilegeForUser(
+				ctx, syntheticprivilege.GlobalPrivilegeObject, privilege.RESTORE, p.User(),
+			); err != nil {
+				return pgerror.Wrapf(
+					err,
+					pgcode.InsufficientPrivilege,
+					"only users with the admin role or the RESTORE system privilege are allowed to perform"+
+						" a cluster restore")
+			}
 			return checkRestoreDestinationPrivileges(ctx, p, from)
-		} else if requiresRestoreSystemPrivilege && !hasRestoreSystemPrivilege {
-			return pgerror.Newf(pgcode.InsufficientPrivilege,
-				"only users with the admin role or the RESTORE system privilege are allowed to perform"+
-					" a cluster restore")
 		}
 	}
 
-	var hasRestoreSystemPrivilege bool
 	// If running a database restore, check that the user has the `RESTORE` system
 	// privilege.
 	//
@@ -1253,15 +1267,10 @@ func checkPrivilegesForRestore(
 	// error. In 22.2 we continue to check for old style privileges and role
 	// options.
 	if len(restoreStmt.Targets.Databases) > 0 {
-		if p.ExecCfg().Settings.Version.IsActive(ctx, clusterversion.V22_2SystemPrivilegesTable) {
-			err := p.CheckPrivilegeForUser(ctx, syntheticprivilege.GlobalPrivilegeObject,
-				privilege.RESTORE, p.User())
-			hasRestoreSystemPrivilege = err == nil
+		hasRestoreSystemPrivilege := p.CheckPrivilegeForUser(ctx, syntheticprivilege.GlobalPrivilegeObject, privilege.RESTORE, p.User()) == nil
+		if hasRestoreSystemPrivilege {
+			return checkRestoreDestinationPrivileges(ctx, p, from)
 		}
-	}
-
-	if hasRestoreSystemPrivilege {
-		return checkRestoreDestinationPrivileges(ctx, p, from)
 	}
 
 	// The following checks are to maintain compatability with pre-22.2 privilege
