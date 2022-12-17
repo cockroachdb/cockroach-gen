@@ -237,6 +237,7 @@ var KeywordsCategories = map[string]string{
 	"into":                           "R",
 	"into_db":                        "U",
 	"inverted":                       "U",
+	"invisible":                      "U",
 	"invoker":                        "U",
 	"is":                             "T",
 	"iserror":                        "C",
@@ -819,6 +820,7 @@ var KeywordNames = []string{
 	"into",
 	"into_db",
 	"inverted",
+	"invisible",
 	"invoker",
 	"is",
 	"iserror",
@@ -1640,6 +1642,8 @@ func GetKeywordID(k string) int32 {
 		return INTO_DB
 	case "inverted":
 		return INVERTED
+	case "invisible":
+		return INVISIBLE
 	case "invoker":
 		return INVOKER
 	case "is":
