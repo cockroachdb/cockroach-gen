@@ -4090,6 +4090,53 @@ func (_e *explorer) exploreLimit(
 		}
 	}
 
+	// [GenerateStreamingGroupByLimitOrderingHint]
+	{
+		_partlyExplored := _rootOrd < _rootState.start
+		aggregation := _root.Input
+		_state := _e.lookupExploreState(aggregation)
+		if !_state.fullyExplored {
+			_fullyExplored = false
+		}
+		var _member memo.RelExpr
+		for _ord := 0; _ord < _state.end; _ord++ {
+			if _member == nil {
+				_member = aggregation.FirstExpr()
+			} else {
+				_member = _member.NextExpr()
+			}
+			if !_partlyExplored || _ord >= _state.start {
+				if _member.Op() == opt.GroupByOp || _member.Op() == opt.DistinctOnOp {
+					input := _member.Child(0).(memo.RelExpr)
+					aggs := *_member.Child(1).(*memo.AggregationsExpr)
+					private := _member.Private().(*memo.GroupingPrivate)
+					if _e.funcs.IsCanonicalGroupBy(private) {
+						_const, _ := _root.Limit.(*memo.ConstExpr)
+						if _const != nil {
+							limit := _const.Value
+							if _e.funcs.IsPositiveInt(limit) {
+								ordering := _root.Ordering
+								groupingCols, newOrdering, ok := _e.funcs.GroupingColsClosureOverlappingOrdering(input, private, ordering)
+								if ok {
+									if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateStreamingGroupByLimitOrderingHint) {
+										var _last memo.RelExpr
+										if _e.o.appliedRule != nil {
+											_last = memo.LastGroupMember(_root)
+										}
+										_e.funcs.GenerateStreamingGroupByLimitOrderingHint(_root, _root, aggregation, input, aggs, private, groupingCols, newOrdering)
+										if _e.o.appliedRule != nil {
+											_e.o.appliedRule(opt.GenerateStreamingGroupByLimitOrderingHint, _root, _last.NextExpr())
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	return _fullyExplored
 }
 
