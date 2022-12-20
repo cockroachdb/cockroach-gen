@@ -71,9 +71,9 @@ import (
 	"github.com/kr/pretty"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.etcd.io/etcd/raft/v3"
-	"go.etcd.io/etcd/raft/v3/raftpb"
-	"go.etcd.io/etcd/raft/v3/tracker"
+	"go.etcd.io/raft/v3"
+	"go.etcd.io/raft/v3/raftpb"
+	"go.etcd.io/raft/v3/tracker"
 	"golang.org/x/net/trace"
 )
 
@@ -825,10 +825,11 @@ func TestLeaseReplicaNotInDesc(t *testing.T) {
 		},
 	}
 	tc.repl.mu.Lock()
-	_, _, pErr := kvserverbase.CheckForcedErr(
+	fr := kvserverbase.CheckForcedErr(
 		ctx, makeIDKey(), &raftCmd, false, /* isLocal */
 		&tc.repl.mu.state,
 	)
+	pErr := fr.ForcedError
 	tc.repl.mu.Unlock()
 	if _, isErr := pErr.GetDetail().(*roachpb.LeaseRejectedError); !isErr {
 		t.Fatal(pErr)
