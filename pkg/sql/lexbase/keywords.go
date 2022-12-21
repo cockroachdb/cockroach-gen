@@ -422,6 +422,7 @@ var KeywordsCategories = map[string]string{
 	"restrict":                       "U",
 	"restricted":                     "U",
 	"resume":                         "U",
+	"retention":                      "U",
 	"retry":                          "U",
 	"return":                         "U",
 	"returning":                      "R",
@@ -1005,6 +1006,7 @@ var KeywordNames = []string{
 	"restrict",
 	"restricted",
 	"resume",
+	"retention",
 	"retry",
 	"return",
 	"returning",
@@ -2012,6 +2014,8 @@ func GetKeywordID(k string) int32 {
 		return RESTRICTED
 	case "resume":
 		return RESUME
+	case "retention":
+		return RETENTION
 	case "retry":
 		return RETRY
 	case "return":
