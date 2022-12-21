@@ -947,9 +947,7 @@ type JoinReaderSpec struct {
 	// only be set to true if maintain_ordering is also true.
 	// maintain_lookup_ordering can be used if the output needs to be ordered by
 	// a prefix of input columns followed by index (lookup) columns without
-	// requiring a (buffered) sort. As an additional restriction due to
-	// implementation details, maintain_lookup_ordering can only be used when the
-	// index columns that participate in the output ordering are all ASC.
+	// requiring a (buffered) sort.
 	MaintainLookupOrdering bool `protobuf:"varint,22,opt,name=maintain_lookup_ordering,json=maintainLookupOrdering" json:"maintain_lookup_ordering"`
 }
 
