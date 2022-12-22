@@ -389,6 +389,7 @@ func (_e *explorer) exploreSelect(
 			} else {
 				_member = _member.NextExpr()
 			}
+			input = _member
 			if !_partlyExplored || _ord >= _state.start {
 				_scan, _ := _member.(*memo.ScanExpr)
 				if _scan != nil {
@@ -456,6 +457,7 @@ func (_e *explorer) exploreSelect(
 			} else {
 				_member = _member.NextExpr()
 			}
+			input = _member
 			if !_partlyExplored || _ord >= _state.start {
 				_scan, _ := _member.(*memo.ScanExpr)
 				if _scan != nil {
@@ -847,6 +849,7 @@ func (_e *explorer) exploreInnerJoin(
 			} else {
 				_member = _member.NextExpr()
 			}
+			project = _member
 			_partlyExplored := _partlyExplored && _ord < _state.start
 			_project, _ := _member.(*memo.ProjectExpr)
 			if _project != nil {
@@ -911,6 +914,7 @@ func (_e *explorer) exploreInnerJoin(
 			} else {
 				_member = _member.NextExpr()
 			}
+			project = _member
 			_partlyExplored := _partlyExplored && _ord < _state.start
 			_project, _ := _member.(*memo.ProjectExpr)
 			if _project != nil {
@@ -991,6 +995,7 @@ func (_e *explorer) exploreInnerJoin(
 			} else {
 				_member = _member.NextExpr()
 			}
+			left = _member
 			if !_partlyExplored || _ord >= _state.start {
 				_indexJoin, _ := _member.(*memo.IndexJoinExpr)
 				if _indexJoin != nil {
@@ -1046,6 +1051,7 @@ func (_e *explorer) exploreInnerJoin(
 			} else {
 				_member = _member.NextExpr()
 			}
+			proj = _member
 			if !_partlyExplored || _ord >= _state.start {
 				_project, _ := _member.(*memo.ProjectExpr)
 				if _project != nil {
@@ -1365,6 +1371,7 @@ func (_e *explorer) exploreLeftJoin(
 			} else {
 				_member = _member.NextExpr()
 			}
+			project = _member
 			_partlyExplored := _partlyExplored && _ord < _state.start
 			_project, _ := _member.(*memo.ProjectExpr)
 			if _project != nil {
@@ -1429,6 +1436,7 @@ func (_e *explorer) exploreLeftJoin(
 			} else {
 				_member = _member.NextExpr()
 			}
+			project = _member
 			_partlyExplored := _partlyExplored && _ord < _state.start
 			_project, _ := _member.(*memo.ProjectExpr)
 			if _project != nil {
@@ -1995,6 +2003,7 @@ func (_e *explorer) exploreSemiJoin(
 			} else {
 				_member = _member.NextExpr()
 			}
+			project = _member
 			_partlyExplored := _partlyExplored && _ord < _state.start
 			_project, _ := _member.(*memo.ProjectExpr)
 			if _project != nil {
@@ -2059,6 +2068,7 @@ func (_e *explorer) exploreSemiJoin(
 			} else {
 				_member = _member.NextExpr()
 			}
+			project = _member
 			_partlyExplored := _partlyExplored && _ord < _state.start
 			_project, _ := _member.(*memo.ProjectExpr)
 			if _project != nil {
@@ -2413,6 +2423,7 @@ func (_e *explorer) exploreAntiJoin(
 			} else {
 				_member = _member.NextExpr()
 			}
+			project = _member
 			_partlyExplored := _partlyExplored && _ord < _state.start
 			_project, _ := _member.(*memo.ProjectExpr)
 			if _project != nil {
@@ -2477,6 +2488,7 @@ func (_e *explorer) exploreAntiJoin(
 			} else {
 				_member = _member.NextExpr()
 			}
+			project = _member
 			_partlyExplored := _partlyExplored && _ord < _state.start
 			_project, _ := _member.(*memo.ProjectExpr)
 			if _project != nil {
@@ -2742,6 +2754,7 @@ func (_e *explorer) exploreGroupBy(
 			} else {
 				_member = _member.NextExpr()
 			}
+			scan = _member
 			if !_partlyExplored || _ord >= _state.start {
 				_scan, _ := _member.(*memo.ScanExpr)
 				if _scan != nil {
@@ -2806,6 +2819,7 @@ func (_e *explorer) exploreGroupBy(
 					} else {
 						_member = _member.NextExpr()
 					}
+					scan = _member
 					if !_partlyExplored || _ord >= _state.start {
 						_scan, _ := _member.(*memo.ScanExpr)
 						if _scan != nil {
@@ -3154,6 +3168,7 @@ func (_e *explorer) exploreDistinctOn(
 			} else {
 				_member = _member.NextExpr()
 			}
+			scan = _member
 			if !_partlyExplored || _ord >= _state.start {
 				_scan, _ := _member.(*memo.ScanExpr)
 				if _scan != nil {
@@ -3218,6 +3233,7 @@ func (_e *explorer) exploreDistinctOn(
 					} else {
 						_member = _member.NextExpr()
 					}
+					scan = _member
 					if !_partlyExplored || _ord >= _state.start {
 						_scan, _ := _member.(*memo.ScanExpr)
 						if _scan != nil {
@@ -3413,6 +3429,7 @@ func (_e *explorer) exploreEnsureUpsertDistinctOn(
 			} else {
 				_member = _member.NextExpr()
 			}
+			scan = _member
 			if !_partlyExplored || _ord >= _state.start {
 				_scan, _ := _member.(*memo.ScanExpr)
 				if _scan != nil {
@@ -3477,6 +3494,7 @@ func (_e *explorer) exploreEnsureUpsertDistinctOn(
 					} else {
 						_member = _member.NextExpr()
 					}
+					scan = _member
 					if !_partlyExplored || _ord >= _state.start {
 						_scan, _ := _member.(*memo.ScanExpr)
 						if _scan != nil {
@@ -3949,6 +3967,7 @@ func (_e *explorer) exploreLimit(
 			} else {
 				_member = _member.NextExpr()
 			}
+			scan = _member
 			if !_partlyExplored || _ord >= _state.start {
 				_scan, _ := _member.(*memo.ScanExpr)
 				if _scan != nil {
@@ -4017,6 +4036,7 @@ func (_e *explorer) exploreLimit(
 					} else {
 						_member = _member.NextExpr()
 					}
+					scan = _member
 					if !_partlyExplored || _ord >= _state.start {
 						_scan, _ := _member.(*memo.ScanExpr)
 						if _scan != nil {
@@ -4105,6 +4125,7 @@ func (_e *explorer) exploreLimit(
 			} else {
 				_member = _member.NextExpr()
 			}
+			aggregation = _member
 			if !_partlyExplored || _ord >= _state.start {
 				if _member.Op() == opt.GroupByOp || _member.Op() == opt.DistinctOnOp {
 					input := _member.Child(0).(memo.RelExpr)
