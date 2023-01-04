@@ -21516,6 +21516,21 @@ func (_f *Factory) ConstructUDF(
 		goto SKIP_RULES
 	}
 
+	// [InlineUDF]
+	{
+		private := uDFPrivate
+		if _f.funcs.IsInlinableUDF(args, private) {
+			if _f.matchedRule == nil || _f.matchedRule(opt.InlineUDF) {
+				_expr := _f.funcs.ConvertUDFToSubquery(args, private).(opt.ScalarExpr)
+				if _f.appliedRule != nil {
+					_f.appliedRule(opt.InlineUDF, nil, _expr)
+				}
+				_f.constructorStackDepth--
+				return _expr
+			}
+		}
+	}
+
 SKIP_RULES:
 	e := _f.mem.MemoizeUDF(args, uDFPrivate)
 	expr := _f.onConstructScalar(e)

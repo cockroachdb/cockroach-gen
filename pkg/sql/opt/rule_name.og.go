@@ -128,6 +128,7 @@ const (
 	PushSelectIntoInlinableProject
 	InlineSelectVirtualColumns
 	InlineProjectInProject
+	InlineUDF
 	CommuteRightJoin
 	SimplifyJoinFilters
 	DetectJoinContradiction
