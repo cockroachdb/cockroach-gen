@@ -322,6 +322,7 @@ const (
 	GenerateTopK
 	GenerateLimitedTopKScans
 	GeneratePartialOrderTopK
+	GenerateStreamingGroupByLimitOrderingHint
 	EliminateIndexJoinInsideProject
 	GenerateIndexScans
 	GenerateLocalityOptimizedScan
