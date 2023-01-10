@@ -2298,12 +2298,12 @@ SELECT [DISTINCT [ ON ( <expr> [ , ... ] ) ] ]
 		SeeAlso: `SELECT, TABLE, WEBDOCS/table-expressions.html
 `,
 	},
-	//line sql.y: 12215
+	//line sql.y: 12221
 	`<SOURCE>`: {
 		ShortDescription: `define a data source for SELECT`,
-		//line sql.y: 12216
+		//line sql.y: 12222
 		Category: hDML,
-		//line sql.y: 12217
+		//line sql.y: 12223
 		Text: `
 Data sources:
   <tablename> [ @ { <idxname> | <indexflags> } ]
@@ -2330,7 +2330,7 @@ Join types:
   { INNER | { LEFT | RIGHT | FULL } [OUTER] } [ { HASH | MERGE | LOOKUP | INVERTED } ]
 
 `,
-		//line sql.y: 12242
+		//line sql.y: 12248
 		SeeAlso: `WEBDOCS/table-expressions.html
 `,
 	},
