@@ -5,6 +5,7 @@ package xform
 import (
 	"github.com/cockroachdb/cockroach/pkg/sql/opt"
 	"github.com/cockroachdb/cockroach/pkg/sql/opt/memo"
+	"github.com/cockroachdb/cockroach/pkg/sql/opt/props/physical"
 	"github.com/cockroachdb/cockroach/pkg/sql/sem/tree"
 )
 
@@ -12,56 +13,57 @@ func (_e *explorer) exploreGroupMember(
 	state *exploreState,
 	member memo.RelExpr,
 	ordinal int,
+	required *physical.Required,
 ) (_fullyExplored bool) {
 	switch t := member.(type) {
 	case *memo.MemoCycleTestRelExpr:
-		return _e.exploreMemoCycleTestRel(state, t, ordinal)
+		return _e.exploreMemoCycleTestRel(state, t, ordinal, required)
 	case *memo.ScanExpr:
-		return _e.exploreScan(state, t, ordinal)
+		return _e.exploreScan(state, t, ordinal, required)
 	case *memo.SelectExpr:
-		return _e.exploreSelect(state, t, ordinal)
+		return _e.exploreSelect(state, t, ordinal, required)
 	case *memo.ProjectExpr:
-		return _e.exploreProject(state, t, ordinal)
+		return _e.exploreProject(state, t, ordinal, required)
 	case *memo.InnerJoinExpr:
-		return _e.exploreInnerJoin(state, t, ordinal)
+		return _e.exploreInnerJoin(state, t, ordinal, required)
 	case *memo.LeftJoinExpr:
-		return _e.exploreLeftJoin(state, t, ordinal)
+		return _e.exploreLeftJoin(state, t, ordinal, required)
 	case *memo.RightJoinExpr:
-		return _e.exploreRightJoin(state, t, ordinal)
+		return _e.exploreRightJoin(state, t, ordinal, required)
 	case *memo.FullJoinExpr:
-		return _e.exploreFullJoin(state, t, ordinal)
+		return _e.exploreFullJoin(state, t, ordinal, required)
 	case *memo.SemiJoinExpr:
-		return _e.exploreSemiJoin(state, t, ordinal)
+		return _e.exploreSemiJoin(state, t, ordinal, required)
 	case *memo.AntiJoinExpr:
-		return _e.exploreAntiJoin(state, t, ordinal)
+		return _e.exploreAntiJoin(state, t, ordinal, required)
 	case *memo.LookupJoinExpr:
-		return _e.exploreLookupJoin(state, t, ordinal)
+		return _e.exploreLookupJoin(state, t, ordinal, required)
 	case *memo.GroupByExpr:
-		return _e.exploreGroupBy(state, t, ordinal)
+		return _e.exploreGroupBy(state, t, ordinal, required)
 	case *memo.ScalarGroupByExpr:
-		return _e.exploreScalarGroupBy(state, t, ordinal)
+		return _e.exploreScalarGroupBy(state, t, ordinal, required)
 	case *memo.DistinctOnExpr:
-		return _e.exploreDistinctOn(state, t, ordinal)
+		return _e.exploreDistinctOn(state, t, ordinal, required)
 	case *memo.EnsureDistinctOnExpr:
-		return _e.exploreEnsureDistinctOn(state, t, ordinal)
+		return _e.exploreEnsureDistinctOn(state, t, ordinal, required)
 	case *memo.UpsertDistinctOnExpr:
-		return _e.exploreUpsertDistinctOn(state, t, ordinal)
+		return _e.exploreUpsertDistinctOn(state, t, ordinal, required)
 	case *memo.EnsureUpsertDistinctOnExpr:
-		return _e.exploreEnsureUpsertDistinctOn(state, t, ordinal)
+		return _e.exploreEnsureUpsertDistinctOn(state, t, ordinal, required)
 	case *memo.UnionExpr:
-		return _e.exploreUnion(state, t, ordinal)
+		return _e.exploreUnion(state, t, ordinal, required)
 	case *memo.IntersectExpr:
-		return _e.exploreIntersect(state, t, ordinal)
+		return _e.exploreIntersect(state, t, ordinal, required)
 	case *memo.ExceptExpr:
-		return _e.exploreExcept(state, t, ordinal)
+		return _e.exploreExcept(state, t, ordinal, required)
 	case *memo.IntersectAllExpr:
-		return _e.exploreIntersectAll(state, t, ordinal)
+		return _e.exploreIntersectAll(state, t, ordinal, required)
 	case *memo.ExceptAllExpr:
-		return _e.exploreExceptAll(state, t, ordinal)
+		return _e.exploreExceptAll(state, t, ordinal, required)
 	case *memo.LimitExpr:
-		return _e.exploreLimit(state, t, ordinal)
+		return _e.exploreLimit(state, t, ordinal, required)
 	case *memo.TopKExpr:
-		return _e.exploreTopK(state, t, ordinal)
+		return _e.exploreTopK(state, t, ordinal, required)
 	}
 
 	// No rules for other operator types.
@@ -72,6 +74,7 @@ func (_e *explorer) exploreMemoCycleTestRel(
 	_rootState *exploreState,
 	_root *memo.MemoCycleTestRelExpr,
 	_rootOrd int,
+	_required *physical.Required,
 ) (_fullyExplored bool) {
 	_fullyExplored = true
 
@@ -139,6 +142,7 @@ func (_e *explorer) exploreScan(
 	_rootState *exploreState,
 	_root *memo.ScanExpr,
 	_rootOrd int,
+	_required *physical.Required,
 ) (_fullyExplored bool) {
 	_fullyExplored = true
 
@@ -152,7 +156,7 @@ func (_e *explorer) exploreScan(
 					if _e.o.appliedRule != nil {
 						_last = memo.LastGroupMember(_root)
 					}
-					_e.funcs.GenerateIndexScans(_root, scanPrivate)
+					_e.funcs.GenerateIndexScans(_root, _required, scanPrivate)
 					if _e.o.appliedRule != nil {
 						_e.o.appliedRule(opt.GenerateIndexScans, _root, _last.NextExpr())
 					}
@@ -171,7 +175,7 @@ func (_e *explorer) exploreScan(
 					if _e.o.appliedRule != nil {
 						_last = memo.LastGroupMember(_root)
 					}
-					_e.funcs.GenerateLocalityOptimizedScan(_root, scanPrivate)
+					_e.funcs.GenerateLocalityOptimizedScan(_root, _required, scanPrivate)
 					if _e.o.appliedRule != nil {
 						_e.o.appliedRule(opt.GenerateLocalityOptimizedScan, _root, _last.NextExpr())
 					}
@@ -187,6 +191,7 @@ func (_e *explorer) exploreSelect(
 	_rootState *exploreState,
 	_root *memo.SelectExpr,
 	_rootOrd int,
+	_required *physical.Required,
 ) (_fullyExplored bool) {
 	_fullyExplored = true
 
@@ -215,7 +220,7 @@ func (_e *explorer) exploreSelect(
 							if _e.o.appliedRule != nil {
 								_last = memo.LastGroupMember(_root)
 							}
-							_e.funcs.GeneratePartialIndexScans(_root, scanPrivate, filters)
+							_e.funcs.GeneratePartialIndexScans(_root, _required, scanPrivate, filters)
 							if _e.o.appliedRule != nil {
 								_e.o.appliedRule(opt.GeneratePartialIndexScans, _root, _last.NextExpr())
 							}
@@ -251,7 +256,7 @@ func (_e *explorer) exploreSelect(
 							if _e.o.appliedRule != nil {
 								_last = memo.LastGroupMember(_root)
 							}
-							_e.funcs.GenerateConstrainedScans(_root, scanPrivate, filters)
+							_e.funcs.GenerateConstrainedScans(_root, _required, scanPrivate, filters)
 							if _e.o.appliedRule != nil {
 								_e.o.appliedRule(opt.GenerateConstrainedScans, _root, _last.NextExpr())
 							}
@@ -288,7 +293,7 @@ func (_e *explorer) exploreSelect(
 								if _e.o.appliedRule != nil {
 									_last = memo.LastGroupMember(_root)
 								}
-								_e.funcs.GenerateInvertedIndexScans(_root, scanPrivate, filters)
+								_e.funcs.GenerateInvertedIndexScans(_root, _required, scanPrivate, filters)
 								if _e.o.appliedRule != nil {
 									_e.o.appliedRule(opt.GenerateInvertedIndexScans, _root, _last.NextExpr())
 								}
@@ -325,7 +330,7 @@ func (_e *explorer) exploreSelect(
 							if _e.o.appliedRule != nil {
 								_last = memo.LastGroupMember(_root)
 							}
-							_e.funcs.GenerateZigzagJoins(_root, scan, filters)
+							_e.funcs.GenerateZigzagJoins(_root, _required, scan, filters)
 							if _e.o.appliedRule != nil {
 								_e.o.appliedRule(opt.GenerateZigzagJoins, _root, _last.NextExpr())
 							}
@@ -362,7 +367,7 @@ func (_e *explorer) exploreSelect(
 								if _e.o.appliedRule != nil {
 									_last = memo.LastGroupMember(_root)
 								}
-								_e.funcs.GenerateInvertedIndexZigzagJoins(_root, scan, filters)
+								_e.funcs.GenerateInvertedIndexZigzagJoins(_root, _required, scan, filters)
 								if _e.o.appliedRule != nil {
 									_e.o.appliedRule(opt.GenerateInvertedIndexZigzagJoins, _root, _last.NextExpr())
 								}
@@ -515,6 +520,7 @@ func (_e *explorer) exploreProject(
 	_rootState *exploreState,
 	_root *memo.ProjectExpr,
 	_rootOrd int,
+	_required *physical.Required,
 ) (_fullyExplored bool) {
 	_fullyExplored = true
 
@@ -567,6 +573,7 @@ func (_e *explorer) exploreInnerJoin(
 	_rootState *exploreState,
 	_root *memo.InnerJoinExpr,
 	_rootOrd int,
+	_required *physical.Required,
 ) (_fullyExplored bool) {
 	_fullyExplored = true
 
@@ -579,7 +586,7 @@ func (_e *explorer) exploreInnerJoin(
 					if _e.o.appliedRule != nil {
 						_last = memo.LastGroupMember(_root)
 					}
-					_e.funcs.ReorderJoins(_root)
+					_e.funcs.ReorderJoins(_root, _required)
 					if _e.o.appliedRule != nil {
 						_e.o.appliedRule(opt.ReorderJoins, _root, _last.NextExpr())
 					}
@@ -635,7 +642,7 @@ func (_e *explorer) exploreInnerJoin(
 				if _e.o.appliedRule != nil {
 					_last = memo.LastGroupMember(_root)
 				}
-				_e.funcs.GenerateMergeJoins(_root, opt.InnerJoinOp, left, right, on, private)
+				_e.funcs.GenerateMergeJoins(_root, _required, opt.InnerJoinOp, left, right, on, private)
 				if _e.o.appliedRule != nil {
 					_e.o.appliedRule(opt.GenerateMergeJoins, _root, _last.NextExpr())
 				}
@@ -670,7 +677,7 @@ func (_e *explorer) exploreInnerJoin(
 							if _e.o.appliedRule != nil {
 								_last = memo.LastGroupMember(_root)
 							}
-							_e.funcs.GenerateLookupJoins(_root, opt.InnerJoinOp, left, scanPrivate, on, private)
+							_e.funcs.GenerateLookupJoins(_root, _required, opt.InnerJoinOp, left, scanPrivate, on, private)
 							if _e.o.appliedRule != nil {
 								_e.o.appliedRule(opt.GenerateLookupJoins, _root, _last.NextExpr())
 							}
@@ -709,7 +716,7 @@ func (_e *explorer) exploreInnerJoin(
 								if _e.o.appliedRule != nil {
 									_last = memo.LastGroupMember(_root)
 								}
-								_e.funcs.GenerateInvertedJoins(_root, opt.InnerJoinOp, left, scanPrivate, on, private)
+								_e.funcs.GenerateInvertedJoins(_root, _required, opt.InnerJoinOp, left, scanPrivate, on, private)
 								if _e.o.appliedRule != nil {
 									_e.o.appliedRule(opt.GenerateInvertedJoins, _root, _last.NextExpr())
 								}
@@ -764,7 +771,7 @@ func (_e *explorer) exploreInnerJoin(
 										if _e.o.appliedRule != nil {
 											_last = memo.LastGroupMember(_root)
 										}
-										_e.funcs.GenerateInvertedJoins(_root, opt.InnerJoinOp, left, scanPrivate, _e.funcs.ConcatFilters(on, filters), private)
+										_e.funcs.GenerateInvertedJoins(_root, _required, opt.InnerJoinOp, left, scanPrivate, _e.funcs.ConcatFilters(on, filters), private)
 										if _e.o.appliedRule != nil {
 											_e.o.appliedRule(opt.GenerateInvertedJoinsFromSelect, _root, _last.NextExpr())
 										}
@@ -820,7 +827,7 @@ func (_e *explorer) exploreInnerJoin(
 									if _e.o.appliedRule != nil {
 										_last = memo.LastGroupMember(_root)
 									}
-									_e.funcs.GenerateLookupJoins(_root, opt.InnerJoinOp, left, scanPrivate, _e.funcs.ConcatFilters(on, filters), private)
+									_e.funcs.GenerateLookupJoins(_root, _required, opt.InnerJoinOp, left, scanPrivate, _e.funcs.ConcatFilters(on, filters), private)
 									if _e.o.appliedRule != nil {
 										_e.o.appliedRule(opt.GenerateLookupJoinsWithFilter, _root, _last.NextExpr())
 									}
@@ -882,7 +889,7 @@ func (_e *explorer) exploreInnerJoin(
 												if _e.o.appliedRule != nil {
 													_last = memo.LastGroupMember(_root)
 												}
-												_e.funcs.GenerateLookupJoinsWithVirtualCols(_root, opt.InnerJoinOp, left, _e.funcs.OutputCols(_project), projectedVirtualCols, scanPrivate, on, private)
+												_e.funcs.GenerateLookupJoinsWithVirtualCols(_root, _required, opt.InnerJoinOp, left, _e.funcs.OutputCols(_project), projectedVirtualCols, scanPrivate, on, private)
 												if _e.o.appliedRule != nil {
 													_e.o.appliedRule(opt.GenerateLookupJoinsWithVirtualCols, _root, _last.NextExpr())
 												}
@@ -962,7 +969,7 @@ func (_e *explorer) exploreInnerJoin(
 														if _e.o.appliedRule != nil {
 															_last = memo.LastGroupMember(_root)
 														}
-														_e.funcs.GenerateLookupJoinsWithVirtualCols(_root, opt.InnerJoinOp, left, _e.funcs.OutputCols(_project), projectedVirtualCols, scanPrivate, _e.funcs.ConcatFilters(on, filters), private)
+														_e.funcs.GenerateLookupJoinsWithVirtualCols(_root, _required, opt.InnerJoinOp, left, _e.funcs.OutputCols(_project), projectedVirtualCols, scanPrivate, _e.funcs.ConcatFilters(on, filters), private)
 														if _e.o.appliedRule != nil {
 															_e.o.appliedRule(opt.GenerateLookupJoinsWithVirtualColsAndFilter, _root, _last.NextExpr())
 														}
@@ -1098,6 +1105,7 @@ func (_e *explorer) exploreLeftJoin(
 	_rootState *exploreState,
 	_root *memo.LeftJoinExpr,
 	_rootOrd int,
+	_required *physical.Required,
 ) (_fullyExplored bool) {
 	_fullyExplored = true
 
@@ -1110,7 +1118,7 @@ func (_e *explorer) exploreLeftJoin(
 					if _e.o.appliedRule != nil {
 						_last = memo.LastGroupMember(_root)
 					}
-					_e.funcs.ReorderJoins(_root)
+					_e.funcs.ReorderJoins(_root, _required)
 					if _e.o.appliedRule != nil {
 						_e.o.appliedRule(opt.ReorderJoins, _root, _last.NextExpr())
 					}
@@ -1157,7 +1165,7 @@ func (_e *explorer) exploreLeftJoin(
 				if _e.o.appliedRule != nil {
 					_last = memo.LastGroupMember(_root)
 				}
-				_e.funcs.GenerateMergeJoins(_root, opt.LeftJoinOp, left, right, on, private)
+				_e.funcs.GenerateMergeJoins(_root, _required, opt.LeftJoinOp, left, right, on, private)
 				if _e.o.appliedRule != nil {
 					_e.o.appliedRule(opt.GenerateMergeJoins, _root, _last.NextExpr())
 				}
@@ -1192,7 +1200,7 @@ func (_e *explorer) exploreLeftJoin(
 							if _e.o.appliedRule != nil {
 								_last = memo.LastGroupMember(_root)
 							}
-							_e.funcs.GenerateLookupJoins(_root, opt.LeftJoinOp, left, scanPrivate, on, private)
+							_e.funcs.GenerateLookupJoins(_root, _required, opt.LeftJoinOp, left, scanPrivate, on, private)
 							if _e.o.appliedRule != nil {
 								_e.o.appliedRule(opt.GenerateLookupJoins, _root, _last.NextExpr())
 							}
@@ -1231,7 +1239,7 @@ func (_e *explorer) exploreLeftJoin(
 								if _e.o.appliedRule != nil {
 									_last = memo.LastGroupMember(_root)
 								}
-								_e.funcs.GenerateInvertedJoins(_root, opt.LeftJoinOp, left, scanPrivate, on, private)
+								_e.funcs.GenerateInvertedJoins(_root, _required, opt.LeftJoinOp, left, scanPrivate, on, private)
 								if _e.o.appliedRule != nil {
 									_e.o.appliedRule(opt.GenerateInvertedJoins, _root, _last.NextExpr())
 								}
@@ -1286,7 +1294,7 @@ func (_e *explorer) exploreLeftJoin(
 										if _e.o.appliedRule != nil {
 											_last = memo.LastGroupMember(_root)
 										}
-										_e.funcs.GenerateInvertedJoins(_root, opt.LeftJoinOp, left, scanPrivate, _e.funcs.ConcatFilters(on, filters), private)
+										_e.funcs.GenerateInvertedJoins(_root, _required, opt.LeftJoinOp, left, scanPrivate, _e.funcs.ConcatFilters(on, filters), private)
 										if _e.o.appliedRule != nil {
 											_e.o.appliedRule(opt.GenerateInvertedJoinsFromSelect, _root, _last.NextExpr())
 										}
@@ -1342,7 +1350,7 @@ func (_e *explorer) exploreLeftJoin(
 									if _e.o.appliedRule != nil {
 										_last = memo.LastGroupMember(_root)
 									}
-									_e.funcs.GenerateLookupJoins(_root, opt.LeftJoinOp, left, scanPrivate, _e.funcs.ConcatFilters(on, filters), private)
+									_e.funcs.GenerateLookupJoins(_root, _required, opt.LeftJoinOp, left, scanPrivate, _e.funcs.ConcatFilters(on, filters), private)
 									if _e.o.appliedRule != nil {
 										_e.o.appliedRule(opt.GenerateLookupJoinsWithFilter, _root, _last.NextExpr())
 									}
@@ -1404,7 +1412,7 @@ func (_e *explorer) exploreLeftJoin(
 												if _e.o.appliedRule != nil {
 													_last = memo.LastGroupMember(_root)
 												}
-												_e.funcs.GenerateLookupJoinsWithVirtualCols(_root, opt.LeftJoinOp, left, _e.funcs.OutputCols(_project), projectedVirtualCols, scanPrivate, on, private)
+												_e.funcs.GenerateLookupJoinsWithVirtualCols(_root, _required, opt.LeftJoinOp, left, _e.funcs.OutputCols(_project), projectedVirtualCols, scanPrivate, on, private)
 												if _e.o.appliedRule != nil {
 													_e.o.appliedRule(opt.GenerateLookupJoinsWithVirtualCols, _root, _last.NextExpr())
 												}
@@ -1484,7 +1492,7 @@ func (_e *explorer) exploreLeftJoin(
 														if _e.o.appliedRule != nil {
 															_last = memo.LastGroupMember(_root)
 														}
-														_e.funcs.GenerateLookupJoinsWithVirtualCols(_root, opt.LeftJoinOp, left, _e.funcs.OutputCols(_project), projectedVirtualCols, scanPrivate, _e.funcs.ConcatFilters(on, filters), private)
+														_e.funcs.GenerateLookupJoinsWithVirtualCols(_root, _required, opt.LeftJoinOp, left, _e.funcs.OutputCols(_project), projectedVirtualCols, scanPrivate, _e.funcs.ConcatFilters(on, filters), private)
 														if _e.o.appliedRule != nil {
 															_e.o.appliedRule(opt.GenerateLookupJoinsWithVirtualColsAndFilter, _root, _last.NextExpr())
 														}
@@ -1566,6 +1574,7 @@ func (_e *explorer) exploreRightJoin(
 	_rootState *exploreState,
 	_root *memo.RightJoinExpr,
 	_rootOrd int,
+	_required *physical.Required,
 ) (_fullyExplored bool) {
 	_fullyExplored = true
 
@@ -1581,7 +1590,7 @@ func (_e *explorer) exploreRightJoin(
 				if _e.o.appliedRule != nil {
 					_last = memo.LastGroupMember(_root)
 				}
-				_e.funcs.GenerateMergeJoins(_root, opt.RightJoinOp, left, right, on, private)
+				_e.funcs.GenerateMergeJoins(_root, _required, opt.RightJoinOp, left, right, on, private)
 				if _e.o.appliedRule != nil {
 					_e.o.appliedRule(opt.GenerateMergeJoins, _root, _last.NextExpr())
 				}
@@ -1596,6 +1605,7 @@ func (_e *explorer) exploreFullJoin(
 	_rootState *exploreState,
 	_root *memo.FullJoinExpr,
 	_rootOrd int,
+	_required *physical.Required,
 ) (_fullyExplored bool) {
 	_fullyExplored = true
 
@@ -1608,7 +1618,7 @@ func (_e *explorer) exploreFullJoin(
 					if _e.o.appliedRule != nil {
 						_last = memo.LastGroupMember(_root)
 					}
-					_e.funcs.ReorderJoins(_root)
+					_e.funcs.ReorderJoins(_root, _required)
 					if _e.o.appliedRule != nil {
 						_e.o.appliedRule(opt.ReorderJoins, _root, _last.NextExpr())
 					}
@@ -1629,7 +1639,7 @@ func (_e *explorer) exploreFullJoin(
 				if _e.o.appliedRule != nil {
 					_last = memo.LastGroupMember(_root)
 				}
-				_e.funcs.GenerateMergeJoins(_root, opt.FullJoinOp, left, right, on, private)
+				_e.funcs.GenerateMergeJoins(_root, _required, opt.FullJoinOp, left, right, on, private)
 				if _e.o.appliedRule != nil {
 					_e.o.appliedRule(opt.GenerateMergeJoins, _root, _last.NextExpr())
 				}
@@ -1644,6 +1654,7 @@ func (_e *explorer) exploreSemiJoin(
 	_rootState *exploreState,
 	_root *memo.SemiJoinExpr,
 	_rootOrd int,
+	_required *physical.Required,
 ) (_fullyExplored bool) {
 	_fullyExplored = true
 
@@ -1656,7 +1667,7 @@ func (_e *explorer) exploreSemiJoin(
 					if _e.o.appliedRule != nil {
 						_last = memo.LastGroupMember(_root)
 					}
-					_e.funcs.ReorderJoins(_root)
+					_e.funcs.ReorderJoins(_root, _required)
 					if _e.o.appliedRule != nil {
 						_e.o.appliedRule(opt.ReorderJoins, _root, _last.NextExpr())
 					}
@@ -1789,7 +1800,7 @@ func (_e *explorer) exploreSemiJoin(
 				if _e.o.appliedRule != nil {
 					_last = memo.LastGroupMember(_root)
 				}
-				_e.funcs.GenerateMergeJoins(_root, opt.SemiJoinOp, left, right, on, private)
+				_e.funcs.GenerateMergeJoins(_root, _required, opt.SemiJoinOp, left, right, on, private)
 				if _e.o.appliedRule != nil {
 					_e.o.appliedRule(opt.GenerateMergeJoins, _root, _last.NextExpr())
 				}
@@ -1824,7 +1835,7 @@ func (_e *explorer) exploreSemiJoin(
 							if _e.o.appliedRule != nil {
 								_last = memo.LastGroupMember(_root)
 							}
-							_e.funcs.GenerateLookupJoins(_root, opt.SemiJoinOp, left, scanPrivate, on, private)
+							_e.funcs.GenerateLookupJoins(_root, _required, opt.SemiJoinOp, left, scanPrivate, on, private)
 							if _e.o.appliedRule != nil {
 								_e.o.appliedRule(opt.GenerateLookupJoins, _root, _last.NextExpr())
 							}
@@ -1863,7 +1874,7 @@ func (_e *explorer) exploreSemiJoin(
 								if _e.o.appliedRule != nil {
 									_last = memo.LastGroupMember(_root)
 								}
-								_e.funcs.GenerateInvertedJoins(_root, opt.SemiJoinOp, left, scanPrivate, on, private)
+								_e.funcs.GenerateInvertedJoins(_root, _required, opt.SemiJoinOp, left, scanPrivate, on, private)
 								if _e.o.appliedRule != nil {
 									_e.o.appliedRule(opt.GenerateInvertedJoins, _root, _last.NextExpr())
 								}
@@ -1918,7 +1929,7 @@ func (_e *explorer) exploreSemiJoin(
 										if _e.o.appliedRule != nil {
 											_last = memo.LastGroupMember(_root)
 										}
-										_e.funcs.GenerateInvertedJoins(_root, opt.SemiJoinOp, left, scanPrivate, _e.funcs.ConcatFilters(on, filters), private)
+										_e.funcs.GenerateInvertedJoins(_root, _required, opt.SemiJoinOp, left, scanPrivate, _e.funcs.ConcatFilters(on, filters), private)
 										if _e.o.appliedRule != nil {
 											_e.o.appliedRule(opt.GenerateInvertedJoinsFromSelect, _root, _last.NextExpr())
 										}
@@ -1974,7 +1985,7 @@ func (_e *explorer) exploreSemiJoin(
 									if _e.o.appliedRule != nil {
 										_last = memo.LastGroupMember(_root)
 									}
-									_e.funcs.GenerateLookupJoins(_root, opt.SemiJoinOp, left, scanPrivate, _e.funcs.ConcatFilters(on, filters), private)
+									_e.funcs.GenerateLookupJoins(_root, _required, opt.SemiJoinOp, left, scanPrivate, _e.funcs.ConcatFilters(on, filters), private)
 									if _e.o.appliedRule != nil {
 										_e.o.appliedRule(opt.GenerateLookupJoinsWithFilter, _root, _last.NextExpr())
 									}
@@ -2036,7 +2047,7 @@ func (_e *explorer) exploreSemiJoin(
 												if _e.o.appliedRule != nil {
 													_last = memo.LastGroupMember(_root)
 												}
-												_e.funcs.GenerateLookupJoinsWithVirtualCols(_root, opt.SemiJoinOp, left, _e.funcs.OutputCols(_project), projectedVirtualCols, scanPrivate, on, private)
+												_e.funcs.GenerateLookupJoinsWithVirtualCols(_root, _required, opt.SemiJoinOp, left, _e.funcs.OutputCols(_project), projectedVirtualCols, scanPrivate, on, private)
 												if _e.o.appliedRule != nil {
 													_e.o.appliedRule(opt.GenerateLookupJoinsWithVirtualCols, _root, _last.NextExpr())
 												}
@@ -2116,7 +2127,7 @@ func (_e *explorer) exploreSemiJoin(
 														if _e.o.appliedRule != nil {
 															_last = memo.LastGroupMember(_root)
 														}
-														_e.funcs.GenerateLookupJoinsWithVirtualCols(_root, opt.SemiJoinOp, left, _e.funcs.OutputCols(_project), projectedVirtualCols, scanPrivate, _e.funcs.ConcatFilters(on, filters), private)
+														_e.funcs.GenerateLookupJoinsWithVirtualCols(_root, _required, opt.SemiJoinOp, left, _e.funcs.OutputCols(_project), projectedVirtualCols, scanPrivate, _e.funcs.ConcatFilters(on, filters), private)
 														if _e.o.appliedRule != nil {
 															_e.o.appliedRule(opt.GenerateLookupJoinsWithVirtualColsAndFilter, _root, _last.NextExpr())
 														}
@@ -2141,6 +2152,7 @@ func (_e *explorer) exploreAntiJoin(
 	_rootState *exploreState,
 	_root *memo.AntiJoinExpr,
 	_rootOrd int,
+	_required *physical.Required,
 ) (_fullyExplored bool) {
 	_fullyExplored = true
 
@@ -2153,7 +2165,7 @@ func (_e *explorer) exploreAntiJoin(
 					if _e.o.appliedRule != nil {
 						_last = memo.LastGroupMember(_root)
 					}
-					_e.funcs.ReorderJoins(_root)
+					_e.funcs.ReorderJoins(_root, _required)
 					if _e.o.appliedRule != nil {
 						_e.o.appliedRule(opt.ReorderJoins, _root, _last.NextExpr())
 					}
@@ -2209,7 +2221,7 @@ func (_e *explorer) exploreAntiJoin(
 				if _e.o.appliedRule != nil {
 					_last = memo.LastGroupMember(_root)
 				}
-				_e.funcs.GenerateMergeJoins(_root, opt.AntiJoinOp, left, right, on, private)
+				_e.funcs.GenerateMergeJoins(_root, _required, opt.AntiJoinOp, left, right, on, private)
 				if _e.o.appliedRule != nil {
 					_e.o.appliedRule(opt.GenerateMergeJoins, _root, _last.NextExpr())
 				}
@@ -2244,7 +2256,7 @@ func (_e *explorer) exploreAntiJoin(
 							if _e.o.appliedRule != nil {
 								_last = memo.LastGroupMember(_root)
 							}
-							_e.funcs.GenerateLookupJoins(_root, opt.AntiJoinOp, left, scanPrivate, on, private)
+							_e.funcs.GenerateLookupJoins(_root, _required, opt.AntiJoinOp, left, scanPrivate, on, private)
 							if _e.o.appliedRule != nil {
 								_e.o.appliedRule(opt.GenerateLookupJoins, _root, _last.NextExpr())
 							}
@@ -2283,7 +2295,7 @@ func (_e *explorer) exploreAntiJoin(
 								if _e.o.appliedRule != nil {
 									_last = memo.LastGroupMember(_root)
 								}
-								_e.funcs.GenerateInvertedJoins(_root, opt.AntiJoinOp, left, scanPrivate, on, private)
+								_e.funcs.GenerateInvertedJoins(_root, _required, opt.AntiJoinOp, left, scanPrivate, on, private)
 								if _e.o.appliedRule != nil {
 									_e.o.appliedRule(opt.GenerateInvertedJoins, _root, _last.NextExpr())
 								}
@@ -2338,7 +2350,7 @@ func (_e *explorer) exploreAntiJoin(
 										if _e.o.appliedRule != nil {
 											_last = memo.LastGroupMember(_root)
 										}
-										_e.funcs.GenerateInvertedJoins(_root, opt.AntiJoinOp, left, scanPrivate, _e.funcs.ConcatFilters(on, filters), private)
+										_e.funcs.GenerateInvertedJoins(_root, _required, opt.AntiJoinOp, left, scanPrivate, _e.funcs.ConcatFilters(on, filters), private)
 										if _e.o.appliedRule != nil {
 											_e.o.appliedRule(opt.GenerateInvertedJoinsFromSelect, _root, _last.NextExpr())
 										}
@@ -2394,7 +2406,7 @@ func (_e *explorer) exploreAntiJoin(
 									if _e.o.appliedRule != nil {
 										_last = memo.LastGroupMember(_root)
 									}
-									_e.funcs.GenerateLookupJoins(_root, opt.AntiJoinOp, left, scanPrivate, _e.funcs.ConcatFilters(on, filters), private)
+									_e.funcs.GenerateLookupJoins(_root, _required, opt.AntiJoinOp, left, scanPrivate, _e.funcs.ConcatFilters(on, filters), private)
 									if _e.o.appliedRule != nil {
 										_e.o.appliedRule(opt.GenerateLookupJoinsWithFilter, _root, _last.NextExpr())
 									}
@@ -2456,7 +2468,7 @@ func (_e *explorer) exploreAntiJoin(
 												if _e.o.appliedRule != nil {
 													_last = memo.LastGroupMember(_root)
 												}
-												_e.funcs.GenerateLookupJoinsWithVirtualCols(_root, opt.AntiJoinOp, left, _e.funcs.OutputCols(_project), projectedVirtualCols, scanPrivate, on, private)
+												_e.funcs.GenerateLookupJoinsWithVirtualCols(_root, _required, opt.AntiJoinOp, left, _e.funcs.OutputCols(_project), projectedVirtualCols, scanPrivate, on, private)
 												if _e.o.appliedRule != nil {
 													_e.o.appliedRule(opt.GenerateLookupJoinsWithVirtualCols, _root, _last.NextExpr())
 												}
@@ -2536,7 +2548,7 @@ func (_e *explorer) exploreAntiJoin(
 														if _e.o.appliedRule != nil {
 															_last = memo.LastGroupMember(_root)
 														}
-														_e.funcs.GenerateLookupJoinsWithVirtualCols(_root, opt.AntiJoinOp, left, _e.funcs.OutputCols(_project), projectedVirtualCols, scanPrivate, _e.funcs.ConcatFilters(on, filters), private)
+														_e.funcs.GenerateLookupJoinsWithVirtualCols(_root, _required, opt.AntiJoinOp, left, _e.funcs.OutputCols(_project), projectedVirtualCols, scanPrivate, _e.funcs.ConcatFilters(on, filters), private)
 														if _e.o.appliedRule != nil {
 															_e.o.appliedRule(opt.GenerateLookupJoinsWithVirtualColsAndFilter, _root, _last.NextExpr())
 														}
@@ -2561,6 +2573,7 @@ func (_e *explorer) exploreLookupJoin(
 	_rootState *exploreState,
 	_root *memo.LookupJoinExpr,
 	_rootOrd int,
+	_required *physical.Required,
 ) (_fullyExplored bool) {
 	_fullyExplored = true
 
@@ -2601,23 +2614,87 @@ func (_e *explorer) exploreLookupJoin(
 	{
 		if _rootOrd >= _rootState.start {
 			input := _root.Input
-			on := _root.On
-			private := &_root.LookupJoinPrivate
-			if !_e.funcs.IsAntiJoin(private) {
-				localExpr, remoteExpr, ok := _e.funcs.GetLocalityOptimizedLookupJoinExprs(on, private)
-				if ok {
-					if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateLocalityOptimizedLookupJoin) {
-						_expr := &memo.LookupJoinExpr{
-							Input:             input,
-							On:                on,
-							LookupJoinPrivate: *_e.funcs.CreateLocalityOptimizedLookupJoinPrivate(localExpr, remoteExpr, private),
+			if !_e.funcs.IsSelectFromRemoteTableRowsOnly(input) {
+				on := _root.On
+				private := &_root.LookupJoinPrivate
+				if !_e.funcs.IsAntiJoin(private) {
+					localExpr, remoteExpr, ok := _e.funcs.GetLocalityOptimizedLookupJoinExprs(on, private)
+					if ok {
+						if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateLocalityOptimizedLookupJoin) {
+							_expr := &memo.LookupJoinExpr{
+								Input:             input,
+								On:                on,
+								LookupJoinPrivate: *_e.funcs.CreateLocalityOptimizedLookupJoinPrivate(localExpr, remoteExpr, private),
+							}
+							_interned := _e.mem.AddLookupJoinToGroup(_expr, _root)
+							if _e.o.appliedRule != nil {
+								if _interned != _expr {
+									_e.o.appliedRule(opt.GenerateLocalityOptimizedLookupJoin, _root, nil)
+								} else {
+									_e.o.appliedRule(opt.GenerateLocalityOptimizedLookupJoin, _root, _interned)
+								}
+							}
 						}
-						_interned := _e.mem.AddLookupJoinToGroup(_expr, _root)
-						if _e.o.appliedRule != nil {
-							if _interned != _expr {
-								_e.o.appliedRule(opt.GenerateLocalityOptimizedLookupJoin, _root, nil)
-							} else {
-								_e.o.appliedRule(opt.GenerateLocalityOptimizedLookupJoin, _root, _interned)
+					}
+				}
+			}
+		}
+	}
+
+	// [GenerateLocalityOptimizedSearchOfLocalityOptimizedJoin]
+	{
+		if _rootOrd >= _rootState.start {
+			input := _root.Input
+			if _e.funcs.IsRegionalByRowTableScanOrSelect(input) {
+				if _e.funcs.IsCardinalityAboveMaxForLocalityOptimizedScan(input) {
+					on := _root.On
+					private := &_root.LookupJoinPrivate
+					if !_e.funcs.IsAntiJoin(private) {
+						localExpr, remoteExpr, ok := _e.funcs.GetLocalityOptimizedLookupJoinExprs(on, private)
+						if ok {
+							inputScan, inputFilters, ok2 := _e.funcs.CanMaybeGenerateLocalityOptimizedSearchOfLookupJoins(_root)
+							if ok2 {
+								if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateLocalityOptimizedSearchOfLocalityOptimizedJoin) {
+									var _last memo.RelExpr
+									if _e.o.appliedRule != nil {
+										_last = memo.LastGroupMember(_root)
+									}
+									_e.funcs.GenerateLocalityOptimizedSearchOfLookupJoins(_root, _required, _root, inputScan, inputFilters, _e.funcs.CreateLocalityOptimizedLookupJoinPrivate(localExpr, remoteExpr, private))
+									if _e.o.appliedRule != nil {
+										_e.o.appliedRule(opt.GenerateLocalityOptimizedSearchOfLocalityOptimizedJoin, _root, _last.NextExpr())
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// [GenerateLocalityOptimizedSearchOfLookupJoins]
+	{
+		if _rootOrd >= _rootState.start {
+			input := _root.Input
+			if _e.funcs.IsRegionalByRowTableScanOrSelect(input) {
+				if _e.funcs.IsCardinalityAboveMaxForLocalityOptimizedScan(input) {
+					if _e.funcs.LookupsAreLocal(_root) {
+						private := &_root.LookupJoinPrivate
+						if !_e.funcs.IsAntiJoin(private) {
+							if !_e.funcs.IsLocalityOptimizedJoin(private) {
+								inputScan, inputFilters, ok := _e.funcs.CanMaybeGenerateLocalityOptimizedSearchOfLookupJoins(_root)
+								if ok {
+									if _e.o.matchedRule == nil || _e.o.matchedRule(opt.GenerateLocalityOptimizedSearchOfLookupJoins) {
+										var _last memo.RelExpr
+										if _e.o.appliedRule != nil {
+											_last = memo.LastGroupMember(_root)
+										}
+										_e.funcs.GenerateLocalityOptimizedSearchLOJ(_root, _required, _root, inputScan, inputFilters)
+										if _e.o.appliedRule != nil {
+											_e.o.appliedRule(opt.GenerateLocalityOptimizedSearchOfLookupJoins, _root, _last.NextExpr())
+										}
+									}
+								}
 							}
 						}
 					}
@@ -2633,6 +2710,7 @@ func (_e *explorer) exploreGroupBy(
 	_rootState *exploreState,
 	_root *memo.GroupByExpr,
 	_rootOrd int,
+	_required *physical.Required,
 ) (_fullyExplored bool) {
 	_fullyExplored = true
 
@@ -2659,7 +2737,7 @@ func (_e *explorer) exploreGroupBy(
 											if _e.o.appliedRule != nil {
 												_last = memo.LastGroupMember(_root)
 											}
-											_e.funcs.MakeProjectFromPassthroughAggs(_root, _e.f.ConstructLimit(
+											_e.funcs.MakeProjectFromPassthroughAggs(_root, _required, _e.f.ConstructLimit(
 												input,
 												_e.funcs.IntConst(tree.NewDInt(1)),
 												_e.funcs.MakeOrderingChoiceFromColumn(opt.MinOp, col),
@@ -2700,7 +2778,7 @@ func (_e *explorer) exploreGroupBy(
 										if _e.o.appliedRule != nil {
 											_last = memo.LastGroupMember(_root)
 										}
-										_e.funcs.MakeProjectFromPassthroughAggs(_root, _e.f.ConstructLimit(
+										_e.funcs.MakeProjectFromPassthroughAggs(_root, _required, _e.f.ConstructLimit(
 											input,
 											_e.funcs.IntConst(tree.NewDInt(1)),
 											_e.funcs.MakeOrderingChoiceFromColumn(opt.MaxOp, col),
@@ -2730,7 +2808,7 @@ func (_e *explorer) exploreGroupBy(
 					if _e.o.appliedRule != nil {
 						_last = memo.LastGroupMember(_root)
 					}
-					_e.funcs.GenerateStreamingGroupBy(_root, opt.GroupByOp, input, aggs, private)
+					_e.funcs.GenerateStreamingGroupBy(_root, _required, opt.GroupByOp, input, aggs, private)
 					if _e.o.appliedRule != nil {
 						_e.o.appliedRule(opt.GenerateStreamingGroupBy, _root, _last.NextExpr())
 					}
@@ -2914,6 +2992,7 @@ func (_e *explorer) exploreScalarGroupBy(
 	_rootState *exploreState,
 	_root *memo.ScalarGroupByExpr,
 	_rootOrd int,
+	_required *physical.Required,
 ) (_fullyExplored bool) {
 	_fullyExplored = true
 
@@ -2945,7 +3024,7 @@ func (_e *explorer) exploreScalarGroupBy(
 									if _e.o.appliedRule != nil {
 										_last = memo.LastGroupMember(_root)
 									}
-									_e.funcs.MakeMinMaxScalarSubqueries(_root, scanPrivate, aggregations)
+									_e.funcs.MakeMinMaxScalarSubqueries(_root, _required, scanPrivate, aggregations)
 									if _e.o.appliedRule != nil {
 										_e.o.appliedRule(opt.ReplaceScalarMinMaxWithScalarSubqueries, _root, _last.NextExpr())
 									}
@@ -3001,7 +3080,7 @@ func (_e *explorer) exploreScalarGroupBy(
 											if _e.o.appliedRule != nil {
 												_last = memo.LastGroupMember(_root)
 											}
-											_e.funcs.MakeMinMaxScalarSubqueriesWithFilter(_root, scanPrivate, aggregations, filters)
+											_e.funcs.MakeMinMaxScalarSubqueriesWithFilter(_root, _required, scanPrivate, aggregations, filters)
 											if _e.o.appliedRule != nil {
 												_e.o.appliedRule(opt.ReplaceFilteredScalarMinMaxWithSubqueries, _root, _last.NextExpr())
 											}
@@ -3129,6 +3208,7 @@ func (_e *explorer) exploreDistinctOn(
 	_rootState *exploreState,
 	_root *memo.DistinctOnExpr,
 	_rootOrd int,
+	_required *physical.Required,
 ) (_fullyExplored bool) {
 	_fullyExplored = true
 
@@ -3144,7 +3224,7 @@ func (_e *explorer) exploreDistinctOn(
 					if _e.o.appliedRule != nil {
 						_last = memo.LastGroupMember(_root)
 					}
-					_e.funcs.GenerateStreamingGroupBy(_root, opt.DistinctOnOp, input, aggs, private)
+					_e.funcs.GenerateStreamingGroupBy(_root, _required, opt.DistinctOnOp, input, aggs, private)
 					if _e.o.appliedRule != nil {
 						_e.o.appliedRule(opt.GenerateStreamingGroupBy, _root, _last.NextExpr())
 					}
@@ -3328,6 +3408,7 @@ func (_e *explorer) exploreEnsureDistinctOn(
 	_rootState *exploreState,
 	_root *memo.EnsureDistinctOnExpr,
 	_rootOrd int,
+	_required *physical.Required,
 ) (_fullyExplored bool) {
 	_fullyExplored = true
 
@@ -3343,7 +3424,7 @@ func (_e *explorer) exploreEnsureDistinctOn(
 					if _e.o.appliedRule != nil {
 						_last = memo.LastGroupMember(_root)
 					}
-					_e.funcs.GenerateStreamingGroupBy(_root, opt.EnsureDistinctOnOp, input, aggs, private)
+					_e.funcs.GenerateStreamingGroupBy(_root, _required, opt.EnsureDistinctOnOp, input, aggs, private)
 					if _e.o.appliedRule != nil {
 						_e.o.appliedRule(opt.GenerateStreamingGroupBy, _root, _last.NextExpr())
 					}
@@ -3359,6 +3440,7 @@ func (_e *explorer) exploreUpsertDistinctOn(
 	_rootState *exploreState,
 	_root *memo.UpsertDistinctOnExpr,
 	_rootOrd int,
+	_required *physical.Required,
 ) (_fullyExplored bool) {
 	_fullyExplored = true
 
@@ -3374,7 +3456,7 @@ func (_e *explorer) exploreUpsertDistinctOn(
 					if _e.o.appliedRule != nil {
 						_last = memo.LastGroupMember(_root)
 					}
-					_e.funcs.GenerateStreamingGroupBy(_root, opt.UpsertDistinctOnOp, input, aggs, private)
+					_e.funcs.GenerateStreamingGroupBy(_root, _required, opt.UpsertDistinctOnOp, input, aggs, private)
 					if _e.o.appliedRule != nil {
 						_e.o.appliedRule(opt.GenerateStreamingGroupBy, _root, _last.NextExpr())
 					}
@@ -3390,6 +3472,7 @@ func (_e *explorer) exploreEnsureUpsertDistinctOn(
 	_rootState *exploreState,
 	_root *memo.EnsureUpsertDistinctOnExpr,
 	_rootOrd int,
+	_required *physical.Required,
 ) (_fullyExplored bool) {
 	_fullyExplored = true
 
@@ -3405,7 +3488,7 @@ func (_e *explorer) exploreEnsureUpsertDistinctOn(
 					if _e.o.appliedRule != nil {
 						_last = memo.LastGroupMember(_root)
 					}
-					_e.funcs.GenerateStreamingGroupBy(_root, opt.EnsureUpsertDistinctOnOp, input, aggs, private)
+					_e.funcs.GenerateStreamingGroupBy(_root, _required, opt.EnsureUpsertDistinctOnOp, input, aggs, private)
 					if _e.o.appliedRule != nil {
 						_e.o.appliedRule(opt.GenerateStreamingGroupBy, _root, _last.NextExpr())
 					}
@@ -3589,6 +3672,7 @@ func (_e *explorer) exploreUnion(
 	_rootState *exploreState,
 	_root *memo.UnionExpr,
 	_rootOrd int,
+	_required *physical.Required,
 ) (_fullyExplored bool) {
 	_fullyExplored = true
 
@@ -3604,7 +3688,7 @@ func (_e *explorer) exploreUnion(
 					if _e.o.appliedRule != nil {
 						_last = memo.LastGroupMember(_root)
 					}
-					_e.funcs.GenerateStreamingSetOp(_root, opt.UnionOp, left, right, private)
+					_e.funcs.GenerateStreamingSetOp(_root, _required, opt.UnionOp, left, right, private)
 					if _e.o.appliedRule != nil {
 						_e.o.appliedRule(opt.GenerateStreamingSetOp, _root, _last.NextExpr())
 					}
@@ -3620,6 +3704,7 @@ func (_e *explorer) exploreIntersect(
 	_rootState *exploreState,
 	_root *memo.IntersectExpr,
 	_rootOrd int,
+	_required *physical.Required,
 ) (_fullyExplored bool) {
 	_fullyExplored = true
 
@@ -3635,7 +3720,7 @@ func (_e *explorer) exploreIntersect(
 					if _e.o.appliedRule != nil {
 						_last = memo.LastGroupMember(_root)
 					}
-					_e.funcs.GenerateStreamingSetOp(_root, opt.IntersectOp, left, right, private)
+					_e.funcs.GenerateStreamingSetOp(_root, _required, opt.IntersectOp, left, right, private)
 					if _e.o.appliedRule != nil {
 						_e.o.appliedRule(opt.GenerateStreamingSetOp, _root, _last.NextExpr())
 					}
@@ -3651,6 +3736,7 @@ func (_e *explorer) exploreExcept(
 	_rootState *exploreState,
 	_root *memo.ExceptExpr,
 	_rootOrd int,
+	_required *physical.Required,
 ) (_fullyExplored bool) {
 	_fullyExplored = true
 
@@ -3666,7 +3752,7 @@ func (_e *explorer) exploreExcept(
 					if _e.o.appliedRule != nil {
 						_last = memo.LastGroupMember(_root)
 					}
-					_e.funcs.GenerateStreamingSetOp(_root, opt.ExceptOp, left, right, private)
+					_e.funcs.GenerateStreamingSetOp(_root, _required, opt.ExceptOp, left, right, private)
 					if _e.o.appliedRule != nil {
 						_e.o.appliedRule(opt.GenerateStreamingSetOp, _root, _last.NextExpr())
 					}
@@ -3682,6 +3768,7 @@ func (_e *explorer) exploreIntersectAll(
 	_rootState *exploreState,
 	_root *memo.IntersectAllExpr,
 	_rootOrd int,
+	_required *physical.Required,
 ) (_fullyExplored bool) {
 	_fullyExplored = true
 
@@ -3697,7 +3784,7 @@ func (_e *explorer) exploreIntersectAll(
 					if _e.o.appliedRule != nil {
 						_last = memo.LastGroupMember(_root)
 					}
-					_e.funcs.GenerateStreamingSetOp(_root, opt.IntersectAllOp, left, right, private)
+					_e.funcs.GenerateStreamingSetOp(_root, _required, opt.IntersectAllOp, left, right, private)
 					if _e.o.appliedRule != nil {
 						_e.o.appliedRule(opt.GenerateStreamingSetOp, _root, _last.NextExpr())
 					}
@@ -3713,6 +3800,7 @@ func (_e *explorer) exploreExceptAll(
 	_rootState *exploreState,
 	_root *memo.ExceptAllExpr,
 	_rootOrd int,
+	_required *physical.Required,
 ) (_fullyExplored bool) {
 	_fullyExplored = true
 
@@ -3728,7 +3816,7 @@ func (_e *explorer) exploreExceptAll(
 					if _e.o.appliedRule != nil {
 						_last = memo.LastGroupMember(_root)
 					}
-					_e.funcs.GenerateStreamingSetOp(_root, opt.ExceptAllOp, left, right, private)
+					_e.funcs.GenerateStreamingSetOp(_root, _required, opt.ExceptAllOp, left, right, private)
 					if _e.o.appliedRule != nil {
 						_e.o.appliedRule(opt.GenerateStreamingSetOp, _root, _last.NextExpr())
 					}
@@ -3744,6 +3832,7 @@ func (_e *explorer) exploreLimit(
 	_rootState *exploreState,
 	_root *memo.LimitExpr,
 	_rootOrd int,
+	_required *physical.Required,
 ) (_fullyExplored bool) {
 	_fullyExplored = true
 
@@ -3794,7 +3883,7 @@ func (_e *explorer) exploreLimit(
 												if _e.o.appliedRule != nil {
 													_last = memo.LastGroupMember(_root)
 												}
-												_e.funcs.GenerateLimitedGroupByScans(_root, scanPrivate, aggs, groupbyPrivate, _const, ordering)
+												_e.funcs.GenerateLimitedGroupByScans(_root, _required, scanPrivate, aggs, groupbyPrivate, _const, ordering)
 												if _e.o.appliedRule != nil {
 													_e.o.appliedRule(opt.GenerateLimitedGroupByScans, _root, _last.NextExpr())
 												}
@@ -3839,7 +3928,7 @@ func (_e *explorer) exploreLimit(
 									if _e.o.appliedRule != nil {
 										_last = memo.LastGroupMember(_root)
 									}
-									_e.funcs.GenerateLimitedScans(_root, scanPrivate, limit, ordering)
+									_e.funcs.GenerateLimitedScans(_root, _required, scanPrivate, limit, ordering)
 									if _e.o.appliedRule != nil {
 										_e.o.appliedRule(opt.GenerateLimitedScans, _root, _last.NextExpr())
 									}
@@ -4144,7 +4233,7 @@ func (_e *explorer) exploreLimit(
 										if _e.o.appliedRule != nil {
 											_last = memo.LastGroupMember(_root)
 										}
-										_e.funcs.GenerateStreamingGroupByLimitOrderingHint(_root, _root, aggregation, input, aggs, private, groupingCols, newOrdering)
+										_e.funcs.GenerateStreamingGroupByLimitOrderingHint(_root, _required, _root, aggregation, input, aggs, private, groupingCols, newOrdering)
 										if _e.o.appliedRule != nil {
 											_e.o.appliedRule(opt.GenerateStreamingGroupByLimitOrderingHint, _root, _last.NextExpr())
 										}
@@ -4165,6 +4254,7 @@ func (_e *explorer) exploreTopK(
 	_rootState *exploreState,
 	_root *memo.TopKExpr,
 	_rootOrd int,
+	_required *physical.Required,
 ) (_fullyExplored bool) {
 	_fullyExplored = true
 
@@ -4193,7 +4283,7 @@ func (_e *explorer) exploreTopK(
 							if _e.o.appliedRule != nil {
 								_last = memo.LastGroupMember(_root)
 							}
-							_e.funcs.GenerateLimitedTopKScans(_root, scanPrivate, topKPrivate)
+							_e.funcs.GenerateLimitedTopKScans(_root, _required, scanPrivate, topKPrivate)
 							if _e.o.appliedRule != nil {
 								_e.o.appliedRule(opt.GenerateLimitedTopKScans, _root, _last.NextExpr())
 							}
@@ -4214,7 +4304,7 @@ func (_e *explorer) exploreTopK(
 				if _e.o.appliedRule != nil {
 					_last = memo.LastGroupMember(_root)
 				}
-				_e.funcs.GeneratePartialOrderTopK(_root, input, private)
+				_e.funcs.GeneratePartialOrderTopK(_root, _required, input, private)
 				if _e.o.appliedRule != nil {
 					_e.o.appliedRule(opt.GeneratePartialOrderTopK, _root, _last.NextExpr())
 				}

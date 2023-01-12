@@ -450,6 +450,8 @@ func (_f *Factory) ConstructScan(
 	}
 
 SKIP_RULES:
+	_tabMeta := _f.Memo().Metadata().TableMeta(scanPrivate.Table)
+	scanPrivate.Distribution.FromIndexScan(_f.ctx, _f.evalCtx, _tabMeta, scanPrivate.Index, scanPrivate.Constraint)
 	e := _f.mem.MemoizeScan(scanPrivate)
 	expr := _f.onConstructRelational(e)
 	_f.constructorStackDepth--

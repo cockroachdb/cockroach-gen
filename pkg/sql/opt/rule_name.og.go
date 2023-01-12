@@ -319,6 +319,8 @@ const (
 	HoistProjectFromLeftJoin
 	GenerateLocalityOptimizedAntiJoin
 	GenerateLocalityOptimizedLookupJoin
+	GenerateLocalityOptimizedSearchOfLocalityOptimizedJoin
+	GenerateLocalityOptimizedSearchOfLookupJoins
 	GenerateLimitedScans
 	PushLimitIntoFilteredScan
 	PushLimitIntoIndexJoin

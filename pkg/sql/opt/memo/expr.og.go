@@ -1566,6 +1566,10 @@ type ScanPrivate struct {
 	// rows.
 	HardLimit ScanLimit
 
+	// Distribution specifies the leaseholder regions of the scanned rows if
+	// they can be statically determined.
+	Distribution physical.Distribution
+
 	// Flags modify how the table is scanned, such as which index is used to scan.
 	Flags ScanFlags
 
@@ -3751,6 +3755,19 @@ type LookupJoinPrivate struct {
 	// LocalityOptimized is used as a hint to the coster to reduce the cost of
 	// this lookup join.
 	LocalityOptimized bool
+
+	// ChildOfLocalityOptimizedSearch is true if this join is nested under a
+	// LocalityOptimizedSearchExpr. This differs from the LocalityOptimized
+	// flag above as that case handles a REGIONAL BY ROW (or otherwise row
+	// partitioned) tables as the lookup table. This flag handles the case
+	// with a REGIONAL BY ROW table as the input table. The flag is used for
+	// static locality checks of the `enforce_home_region` setting and to avoid
+	// infinite rewrite rule recursion in rules
+	// GenerateLocalityOptimizedSearchOfLocalityOptimizedJoin and
+	// GenerateLocalityOptimizedSearchOfLOJs. Both the LocalityOptimized flag
+	// and ChildOfLocalityOptimizedSearch may be set (e.g. in the case where
+	// both the input table and lookup table have REGIONAL BY ROW partitioning).
+	ChildOfLocalityOptimizedSearch bool
 
 	// ConstFilters contains the constant filters that are represented as equality
 	// conditions on the KeyCols. These filters are needed by the statistics code to
@@ -26267,6 +26284,7 @@ func (in *interner) InternScan(val *ScanExpr) *ScanExpr {
 	in.hasher.HashPointer(unsafe.Pointer(val.Constraint))
 	in.hasher.HashInvertedSpans(val.InvertedConstraint)
 	in.hasher.HashScanLimit(val.HardLimit)
+	in.hasher.HashDistribution(val.Distribution)
 	in.hasher.HashScanFlags(val.Flags)
 	in.hasher.HashLocking(val.Locking)
 	in.hasher.HashBool(val.LocalityOptimized)
@@ -26282,6 +26300,7 @@ func (in *interner) InternScan(val *ScanExpr) *ScanExpr {
 				in.hasher.IsPointerEqual(unsafe.Pointer(val.Constraint), unsafe.Pointer(existing.Constraint)) &&
 				in.hasher.IsInvertedSpansEqual(val.InvertedConstraint, existing.InvertedConstraint) &&
 				in.hasher.IsScanLimitEqual(val.HardLimit, existing.HardLimit) &&
+				in.hasher.IsDistributionEqual(val.Distribution, existing.Distribution) &&
 				in.hasher.IsScanFlagsEqual(val.Flags, existing.Flags) &&
 				in.hasher.IsLockingEqual(val.Locking, existing.Locking) &&
 				in.hasher.IsBoolEqual(val.LocalityOptimized, existing.LocalityOptimized) &&
@@ -26306,6 +26325,7 @@ func (in *interner) InternPlaceholderScan(val *PlaceholderScanExpr) *Placeholder
 	in.hasher.HashPointer(unsafe.Pointer(val.Constraint))
 	in.hasher.HashInvertedSpans(val.InvertedConstraint)
 	in.hasher.HashScanLimit(val.HardLimit)
+	in.hasher.HashDistribution(val.Distribution)
 	in.hasher.HashScanFlags(val.Flags)
 	in.hasher.HashLocking(val.Locking)
 	in.hasher.HashBool(val.LocalityOptimized)
@@ -26322,6 +26342,7 @@ func (in *interner) InternPlaceholderScan(val *PlaceholderScanExpr) *Placeholder
 				in.hasher.IsPointerEqual(unsafe.Pointer(val.Constraint), unsafe.Pointer(existing.Constraint)) &&
 				in.hasher.IsInvertedSpansEqual(val.InvertedConstraint, existing.InvertedConstraint) &&
 				in.hasher.IsScanLimitEqual(val.HardLimit, existing.HardLimit) &&
+				in.hasher.IsDistributionEqual(val.Distribution, existing.Distribution) &&
 				in.hasher.IsScanFlagsEqual(val.Flags, existing.Flags) &&
 				in.hasher.IsLockingEqual(val.Locking, existing.Locking) &&
 				in.hasher.IsBoolEqual(val.LocalityOptimized, existing.LocalityOptimized) &&
@@ -26662,6 +26683,7 @@ func (in *interner) InternLookupJoin(val *LookupJoinExpr) *LookupJoinExpr {
 	in.hasher.HashBool(val.IsSecondJoinInPairedJoiner)
 	in.hasher.HashColumnID(val.ContinuationCol)
 	in.hasher.HashBool(val.LocalityOptimized)
+	in.hasher.HashBool(val.ChildOfLocalityOptimizedSearch)
 	in.hasher.HashFiltersExpr(val.ConstFilters)
 	in.hasher.HashLocking(val.Locking)
 	in.hasher.HashJoinFlags(val.Flags)
@@ -26685,6 +26707,7 @@ func (in *interner) InternLookupJoin(val *LookupJoinExpr) *LookupJoinExpr {
 				in.hasher.IsBoolEqual(val.IsSecondJoinInPairedJoiner, existing.IsSecondJoinInPairedJoiner) &&
 				in.hasher.IsColumnIDEqual(val.ContinuationCol, existing.ContinuationCol) &&
 				in.hasher.IsBoolEqual(val.LocalityOptimized, existing.LocalityOptimized) &&
+				in.hasher.IsBoolEqual(val.ChildOfLocalityOptimizedSearch, existing.ChildOfLocalityOptimizedSearch) &&
 				in.hasher.IsFiltersExprEqual(val.ConstFilters, existing.ConstFilters) &&
 				in.hasher.IsLockingEqual(val.Locking, existing.Locking) &&
 				in.hasher.IsJoinFlagsEqual(val.Flags, existing.Flags) &&
