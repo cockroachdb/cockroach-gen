@@ -35431,7 +35431,7 @@ sqldefault:
 //line sql-gen.y:8949
 		{
 			sqlVAL.union.val = tree.ListPartition{
-				Name:         tree.UnrestrictedName(sqlDollar[1].str),
+				Name:         tree.Name(sqlDollar[1].str),
 				Exprs:        sqlDollar[5].union.exprs(),
 				Subpartition: sqlDollar[7].union.partitionBy(),
 			}
@@ -35453,7 +35453,7 @@ sqldefault:
 //line sql-gen.y:8969
 		{
 			sqlVAL.union.val = tree.RangePartition{
-				Name:         tree.UnrestrictedName(sqlDollar[1].str),
+				Name:         tree.Name(sqlDollar[1].str),
 				From:         sqlDollar[5].union.exprs(),
 				To:           sqlDollar[9].union.exprs(),
 				Subpartition: sqlDollar[11].union.partitionBy(),
