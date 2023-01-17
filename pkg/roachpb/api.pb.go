@@ -7214,7 +7214,11 @@ type Header struct {
 	//
 	// Requests with a non-zero timestamp are not allowed to set this field.
 	BoundedStaleness *BoundedStalenessHeader `protobuf:"bytes,22,opt,name=bounded_staleness,json=boundedStaleness,proto3" json:"bounded_staleness,omitempty"`
-	TraceInfo        *tracingpb.TraceInfo    `protobuf:"bytes,25,opt,name=trace_info,json=traceInfo,proto3" json:"trace_info,omitempty"`
+	// trace_info gives the server information about the trace that the RPC is
+	// part of. This is not set for local RPCs that don't go through gRPC.
+	//
+	// If a recording mode is set, the response will have collect_spans filled in.
+	TraceInfo *tracingpb.TraceInfo `protobuf:"bytes,25,opt,name=trace_info,json=traceInfo,proto3" json:"trace_info,omitempty"`
 }
 
 func (m *Header) Reset()         { *m = Header{} }
@@ -7480,7 +7484,13 @@ type BatchResponse_Header struct {
 	// It can be used by the receiver to update its local HLC.
 	Now github_com_cockroachdb_cockroach_pkg_util_hlc.ClockTimestamp `protobuf:"bytes,5,opt,name=now,proto3,casttype=github.com/cockroachdb/cockroach/pkg/util/hlc.ClockTimestamp" json:"now"`
 	// collected_spans stores trace spans recorded during the execution of this
-	// request.
+	// request, if recording is requested through trace_info on the request.
+	//
+	// The server fills in reply.CollectedSpans only when the client asked for
+	// it by setting trace_info on the request, and specifying a recording mode.
+	// Notably, the client does not set trace_info on local RPCs which don't go
+	// through gRPC; for local RPCs, the Tracer is shared between the client and
+	// the server, and the server span is a child of the server span.
 	CollectedSpans []tracingpb.RecordedSpan `protobuf:"bytes,6,rep,name=collected_spans,json=collectedSpans,proto3" json:"collected_spans"`
 	// Range used to execute the request. The server only populates this if the
 	// server detects the client's client_range_info to be stale. Otherwise, it
