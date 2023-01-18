@@ -12951,11 +12951,13 @@ func (_f *Factory) ConstructEq(
 			leftLeft := _plus.Left
 			if !(opt.IsConstValueOp(leftLeft)) {
 				leftRight := _plus.Right
-				if opt.IsConstValueOp(leftRight) {
-					if opt.IsConstValueOp(right) {
-						if _f.funcs.ArithmeticErrorsOnOverflow(_f.funcs.TypeOf(right), _f.funcs.TypeOf(leftRight)) {
-							if _f.funcs.CanConstructBinary(opt.MinusOp, right, leftRight) {
-								result, ok := _f.funcs.FoldBinaryCheckNull(opt.MinusOp, right, leftRight)
+				_const, _ := leftRight.(*memo.ConstExpr)
+				if _const != nil {
+					_const2, _ := right.(*memo.ConstExpr)
+					if _const2 != nil {
+						if _f.funcs.ArithmeticErrorsOnOverflow(_f.funcs.TypeOf(_const2), _f.funcs.TypeOf(_const)) {
+							if _f.funcs.CanConstructBinary(opt.MinusOp, _const2, _const) {
+								result, ok := _f.funcs.FoldBinaryCheckNull(opt.MinusOp, _const2, _const)
 								if ok {
 									if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpPlusConst) {
 										_expr := _f.ConstructEq(
@@ -12984,11 +12986,13 @@ func (_f *Factory) ConstructEq(
 			leftLeft := _minus.Left
 			if !(opt.IsConstValueOp(leftLeft)) {
 				leftRight := _minus.Right
-				if opt.IsConstValueOp(leftRight) {
-					if opt.IsConstValueOp(right) {
-						if _f.funcs.ArithmeticErrorsOnOverflow(_f.funcs.TypeOf(right), _f.funcs.TypeOf(leftRight)) {
-							if _f.funcs.CanConstructBinary(opt.PlusOp, right, leftRight) {
-								result, ok := _f.funcs.FoldBinaryCheckNull(opt.PlusOp, right, leftRight)
+				_const, _ := leftRight.(*memo.ConstExpr)
+				if _const != nil {
+					_const2, _ := right.(*memo.ConstExpr)
+					if _const2 != nil {
+						if _f.funcs.ArithmeticErrorsOnOverflow(_f.funcs.TypeOf(_const2), _f.funcs.TypeOf(_const)) {
+							if _f.funcs.CanConstructBinary(opt.PlusOp, _const2, _const) {
+								result, ok := _f.funcs.FoldBinaryCheckNull(opt.PlusOp, _const2, _const)
 								if ok {
 									if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpMinusConst) {
 										_expr := _f.ConstructEq(
@@ -13015,13 +13019,15 @@ func (_f *Factory) ConstructEq(
 		_minus, _ := left.(*memo.MinusExpr)
 		if _minus != nil {
 			leftLeft := _minus.Left
-			if opt.IsConstValueOp(leftLeft) {
+			_const, _ := leftLeft.(*memo.ConstExpr)
+			if _const != nil {
 				leftRight := _minus.Right
 				if !(opt.IsConstValueOp(leftRight)) {
-					if opt.IsConstValueOp(right) {
-						if _f.funcs.ArithmeticErrorsOnOverflow(_f.funcs.TypeOf(leftLeft), _f.funcs.TypeOf(right)) {
-							if _f.funcs.CanConstructBinary(opt.MinusOp, leftLeft, right) {
-								result, ok := _f.funcs.FoldBinaryCheckNull(opt.MinusOp, leftLeft, right)
+					_const2, _ := right.(*memo.ConstExpr)
+					if _const2 != nil {
+						if _f.funcs.ArithmeticErrorsOnOverflow(_f.funcs.TypeOf(_const), _f.funcs.TypeOf(_const2)) {
+							if _f.funcs.CanConstructBinary(opt.MinusOp, _const, _const2) {
+								result, ok := _f.funcs.FoldBinaryCheckNull(opt.MinusOp, _const, _const2)
 								if ok {
 									if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpConstMinus) {
 										_expr := _f.ConstructEq(
@@ -13394,11 +13400,13 @@ func (_f *Factory) ConstructLt(
 			leftLeft := _plus.Left
 			if !(opt.IsConstValueOp(leftLeft)) {
 				leftRight := _plus.Right
-				if opt.IsConstValueOp(leftRight) {
-					if opt.IsConstValueOp(right) {
-						if _f.funcs.ArithmeticErrorsOnOverflow(_f.funcs.TypeOf(right), _f.funcs.TypeOf(leftRight)) {
-							if _f.funcs.CanConstructBinary(opt.MinusOp, right, leftRight) {
-								result, ok := _f.funcs.FoldBinaryCheckNull(opt.MinusOp, right, leftRight)
+				_const, _ := leftRight.(*memo.ConstExpr)
+				if _const != nil {
+					_const2, _ := right.(*memo.ConstExpr)
+					if _const2 != nil {
+						if _f.funcs.ArithmeticErrorsOnOverflow(_f.funcs.TypeOf(_const2), _f.funcs.TypeOf(_const)) {
+							if _f.funcs.CanConstructBinary(opt.MinusOp, _const2, _const) {
+								result, ok := _f.funcs.FoldBinaryCheckNull(opt.MinusOp, _const2, _const)
 								if ok {
 									if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpPlusConst) {
 										_expr := _f.ConstructLt(
@@ -13427,11 +13435,13 @@ func (_f *Factory) ConstructLt(
 			leftLeft := _minus.Left
 			if !(opt.IsConstValueOp(leftLeft)) {
 				leftRight := _minus.Right
-				if opt.IsConstValueOp(leftRight) {
-					if opt.IsConstValueOp(right) {
-						if _f.funcs.ArithmeticErrorsOnOverflow(_f.funcs.TypeOf(right), _f.funcs.TypeOf(leftRight)) {
-							if _f.funcs.CanConstructBinary(opt.PlusOp, right, leftRight) {
-								result, ok := _f.funcs.FoldBinaryCheckNull(opt.PlusOp, right, leftRight)
+				_const, _ := leftRight.(*memo.ConstExpr)
+				if _const != nil {
+					_const2, _ := right.(*memo.ConstExpr)
+					if _const2 != nil {
+						if _f.funcs.ArithmeticErrorsOnOverflow(_f.funcs.TypeOf(_const2), _f.funcs.TypeOf(_const)) {
+							if _f.funcs.CanConstructBinary(opt.PlusOp, _const2, _const) {
+								result, ok := _f.funcs.FoldBinaryCheckNull(opt.PlusOp, _const2, _const)
 								if ok {
 									if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpMinusConst) {
 										_expr := _f.ConstructLt(
@@ -13458,13 +13468,15 @@ func (_f *Factory) ConstructLt(
 		_minus, _ := left.(*memo.MinusExpr)
 		if _minus != nil {
 			leftLeft := _minus.Left
-			if opt.IsConstValueOp(leftLeft) {
+			_const, _ := leftLeft.(*memo.ConstExpr)
+			if _const != nil {
 				leftRight := _minus.Right
 				if !(opt.IsConstValueOp(leftRight)) {
-					if opt.IsConstValueOp(right) {
-						if _f.funcs.ArithmeticErrorsOnOverflow(_f.funcs.TypeOf(leftLeft), _f.funcs.TypeOf(right)) {
-							if _f.funcs.CanConstructBinary(opt.MinusOp, leftLeft, right) {
-								result, ok := _f.funcs.FoldBinaryCheckNull(opt.MinusOp, leftLeft, right)
+					_const2, _ := right.(*memo.ConstExpr)
+					if _const2 != nil {
+						if _f.funcs.ArithmeticErrorsOnOverflow(_f.funcs.TypeOf(_const), _f.funcs.TypeOf(_const2)) {
+							if _f.funcs.CanConstructBinary(opt.MinusOp, _const, _const2) {
+								result, ok := _f.funcs.FoldBinaryCheckNull(opt.MinusOp, _const, _const2)
 								if ok {
 									if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpConstMinus) {
 										_expr := _f.ConstructLt(
@@ -13792,11 +13804,13 @@ func (_f *Factory) ConstructGt(
 			leftLeft := _plus.Left
 			if !(opt.IsConstValueOp(leftLeft)) {
 				leftRight := _plus.Right
-				if opt.IsConstValueOp(leftRight) {
-					if opt.IsConstValueOp(right) {
-						if _f.funcs.ArithmeticErrorsOnOverflow(_f.funcs.TypeOf(right), _f.funcs.TypeOf(leftRight)) {
-							if _f.funcs.CanConstructBinary(opt.MinusOp, right, leftRight) {
-								result, ok := _f.funcs.FoldBinaryCheckNull(opt.MinusOp, right, leftRight)
+				_const, _ := leftRight.(*memo.ConstExpr)
+				if _const != nil {
+					_const2, _ := right.(*memo.ConstExpr)
+					if _const2 != nil {
+						if _f.funcs.ArithmeticErrorsOnOverflow(_f.funcs.TypeOf(_const2), _f.funcs.TypeOf(_const)) {
+							if _f.funcs.CanConstructBinary(opt.MinusOp, _const2, _const) {
+								result, ok := _f.funcs.FoldBinaryCheckNull(opt.MinusOp, _const2, _const)
 								if ok {
 									if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpPlusConst) {
 										_expr := _f.ConstructGt(
@@ -13825,11 +13839,13 @@ func (_f *Factory) ConstructGt(
 			leftLeft := _minus.Left
 			if !(opt.IsConstValueOp(leftLeft)) {
 				leftRight := _minus.Right
-				if opt.IsConstValueOp(leftRight) {
-					if opt.IsConstValueOp(right) {
-						if _f.funcs.ArithmeticErrorsOnOverflow(_f.funcs.TypeOf(right), _f.funcs.TypeOf(leftRight)) {
-							if _f.funcs.CanConstructBinary(opt.PlusOp, right, leftRight) {
-								result, ok := _f.funcs.FoldBinaryCheckNull(opt.PlusOp, right, leftRight)
+				_const, _ := leftRight.(*memo.ConstExpr)
+				if _const != nil {
+					_const2, _ := right.(*memo.ConstExpr)
+					if _const2 != nil {
+						if _f.funcs.ArithmeticErrorsOnOverflow(_f.funcs.TypeOf(_const2), _f.funcs.TypeOf(_const)) {
+							if _f.funcs.CanConstructBinary(opt.PlusOp, _const2, _const) {
+								result, ok := _f.funcs.FoldBinaryCheckNull(opt.PlusOp, _const2, _const)
 								if ok {
 									if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpMinusConst) {
 										_expr := _f.ConstructGt(
@@ -13856,13 +13872,15 @@ func (_f *Factory) ConstructGt(
 		_minus, _ := left.(*memo.MinusExpr)
 		if _minus != nil {
 			leftLeft := _minus.Left
-			if opt.IsConstValueOp(leftLeft) {
+			_const, _ := leftLeft.(*memo.ConstExpr)
+			if _const != nil {
 				leftRight := _minus.Right
 				if !(opt.IsConstValueOp(leftRight)) {
-					if opt.IsConstValueOp(right) {
-						if _f.funcs.ArithmeticErrorsOnOverflow(_f.funcs.TypeOf(leftLeft), _f.funcs.TypeOf(right)) {
-							if _f.funcs.CanConstructBinary(opt.MinusOp, leftLeft, right) {
-								result, ok := _f.funcs.FoldBinaryCheckNull(opt.MinusOp, leftLeft, right)
+					_const2, _ := right.(*memo.ConstExpr)
+					if _const2 != nil {
+						if _f.funcs.ArithmeticErrorsOnOverflow(_f.funcs.TypeOf(_const), _f.funcs.TypeOf(_const2)) {
+							if _f.funcs.CanConstructBinary(opt.MinusOp, _const, _const2) {
+								result, ok := _f.funcs.FoldBinaryCheckNull(opt.MinusOp, _const, _const2)
 								if ok {
 									if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpConstMinus) {
 										_expr := _f.ConstructGt(
@@ -14190,11 +14208,13 @@ func (_f *Factory) ConstructLe(
 			leftLeft := _plus.Left
 			if !(opt.IsConstValueOp(leftLeft)) {
 				leftRight := _plus.Right
-				if opt.IsConstValueOp(leftRight) {
-					if opt.IsConstValueOp(right) {
-						if _f.funcs.ArithmeticErrorsOnOverflow(_f.funcs.TypeOf(right), _f.funcs.TypeOf(leftRight)) {
-							if _f.funcs.CanConstructBinary(opt.MinusOp, right, leftRight) {
-								result, ok := _f.funcs.FoldBinaryCheckNull(opt.MinusOp, right, leftRight)
+				_const, _ := leftRight.(*memo.ConstExpr)
+				if _const != nil {
+					_const2, _ := right.(*memo.ConstExpr)
+					if _const2 != nil {
+						if _f.funcs.ArithmeticErrorsOnOverflow(_f.funcs.TypeOf(_const2), _f.funcs.TypeOf(_const)) {
+							if _f.funcs.CanConstructBinary(opt.MinusOp, _const2, _const) {
+								result, ok := _f.funcs.FoldBinaryCheckNull(opt.MinusOp, _const2, _const)
 								if ok {
 									if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpPlusConst) {
 										_expr := _f.ConstructLe(
@@ -14223,11 +14243,13 @@ func (_f *Factory) ConstructLe(
 			leftLeft := _minus.Left
 			if !(opt.IsConstValueOp(leftLeft)) {
 				leftRight := _minus.Right
-				if opt.IsConstValueOp(leftRight) {
-					if opt.IsConstValueOp(right) {
-						if _f.funcs.ArithmeticErrorsOnOverflow(_f.funcs.TypeOf(right), _f.funcs.TypeOf(leftRight)) {
-							if _f.funcs.CanConstructBinary(opt.PlusOp, right, leftRight) {
-								result, ok := _f.funcs.FoldBinaryCheckNull(opt.PlusOp, right, leftRight)
+				_const, _ := leftRight.(*memo.ConstExpr)
+				if _const != nil {
+					_const2, _ := right.(*memo.ConstExpr)
+					if _const2 != nil {
+						if _f.funcs.ArithmeticErrorsOnOverflow(_f.funcs.TypeOf(_const2), _f.funcs.TypeOf(_const)) {
+							if _f.funcs.CanConstructBinary(opt.PlusOp, _const2, _const) {
+								result, ok := _f.funcs.FoldBinaryCheckNull(opt.PlusOp, _const2, _const)
 								if ok {
 									if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpMinusConst) {
 										_expr := _f.ConstructLe(
@@ -14254,13 +14276,15 @@ func (_f *Factory) ConstructLe(
 		_minus, _ := left.(*memo.MinusExpr)
 		if _minus != nil {
 			leftLeft := _minus.Left
-			if opt.IsConstValueOp(leftLeft) {
+			_const, _ := leftLeft.(*memo.ConstExpr)
+			if _const != nil {
 				leftRight := _minus.Right
 				if !(opt.IsConstValueOp(leftRight)) {
-					if opt.IsConstValueOp(right) {
-						if _f.funcs.ArithmeticErrorsOnOverflow(_f.funcs.TypeOf(leftLeft), _f.funcs.TypeOf(right)) {
-							if _f.funcs.CanConstructBinary(opt.MinusOp, leftLeft, right) {
-								result, ok := _f.funcs.FoldBinaryCheckNull(opt.MinusOp, leftLeft, right)
+					_const2, _ := right.(*memo.ConstExpr)
+					if _const2 != nil {
+						if _f.funcs.ArithmeticErrorsOnOverflow(_f.funcs.TypeOf(_const), _f.funcs.TypeOf(_const2)) {
+							if _f.funcs.CanConstructBinary(opt.MinusOp, _const, _const2) {
+								result, ok := _f.funcs.FoldBinaryCheckNull(opt.MinusOp, _const, _const2)
 								if ok {
 									if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpConstMinus) {
 										_expr := _f.ConstructLe(
@@ -14588,11 +14612,13 @@ func (_f *Factory) ConstructGe(
 			leftLeft := _plus.Left
 			if !(opt.IsConstValueOp(leftLeft)) {
 				leftRight := _plus.Right
-				if opt.IsConstValueOp(leftRight) {
-					if opt.IsConstValueOp(right) {
-						if _f.funcs.ArithmeticErrorsOnOverflow(_f.funcs.TypeOf(right), _f.funcs.TypeOf(leftRight)) {
-							if _f.funcs.CanConstructBinary(opt.MinusOp, right, leftRight) {
-								result, ok := _f.funcs.FoldBinaryCheckNull(opt.MinusOp, right, leftRight)
+				_const, _ := leftRight.(*memo.ConstExpr)
+				if _const != nil {
+					_const2, _ := right.(*memo.ConstExpr)
+					if _const2 != nil {
+						if _f.funcs.ArithmeticErrorsOnOverflow(_f.funcs.TypeOf(_const2), _f.funcs.TypeOf(_const)) {
+							if _f.funcs.CanConstructBinary(opt.MinusOp, _const2, _const) {
+								result, ok := _f.funcs.FoldBinaryCheckNull(opt.MinusOp, _const2, _const)
 								if ok {
 									if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpPlusConst) {
 										_expr := _f.ConstructGe(
@@ -14621,11 +14647,13 @@ func (_f *Factory) ConstructGe(
 			leftLeft := _minus.Left
 			if !(opt.IsConstValueOp(leftLeft)) {
 				leftRight := _minus.Right
-				if opt.IsConstValueOp(leftRight) {
-					if opt.IsConstValueOp(right) {
-						if _f.funcs.ArithmeticErrorsOnOverflow(_f.funcs.TypeOf(right), _f.funcs.TypeOf(leftRight)) {
-							if _f.funcs.CanConstructBinary(opt.PlusOp, right, leftRight) {
-								result, ok := _f.funcs.FoldBinaryCheckNull(opt.PlusOp, right, leftRight)
+				_const, _ := leftRight.(*memo.ConstExpr)
+				if _const != nil {
+					_const2, _ := right.(*memo.ConstExpr)
+					if _const2 != nil {
+						if _f.funcs.ArithmeticErrorsOnOverflow(_f.funcs.TypeOf(_const2), _f.funcs.TypeOf(_const)) {
+							if _f.funcs.CanConstructBinary(opt.PlusOp, _const2, _const) {
+								result, ok := _f.funcs.FoldBinaryCheckNull(opt.PlusOp, _const2, _const)
 								if ok {
 									if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpMinusConst) {
 										_expr := _f.ConstructGe(
@@ -14652,13 +14680,15 @@ func (_f *Factory) ConstructGe(
 		_minus, _ := left.(*memo.MinusExpr)
 		if _minus != nil {
 			leftLeft := _minus.Left
-			if opt.IsConstValueOp(leftLeft) {
+			_const, _ := leftLeft.(*memo.ConstExpr)
+			if _const != nil {
 				leftRight := _minus.Right
 				if !(opt.IsConstValueOp(leftRight)) {
-					if opt.IsConstValueOp(right) {
-						if _f.funcs.ArithmeticErrorsOnOverflow(_f.funcs.TypeOf(leftLeft), _f.funcs.TypeOf(right)) {
-							if _f.funcs.CanConstructBinary(opt.MinusOp, leftLeft, right) {
-								result, ok := _f.funcs.FoldBinaryCheckNull(opt.MinusOp, leftLeft, right)
+					_const2, _ := right.(*memo.ConstExpr)
+					if _const2 != nil {
+						if _f.funcs.ArithmeticErrorsOnOverflow(_f.funcs.TypeOf(_const), _f.funcs.TypeOf(_const2)) {
+							if _f.funcs.CanConstructBinary(opt.MinusOp, _const, _const2) {
+								result, ok := _f.funcs.FoldBinaryCheckNull(opt.MinusOp, _const, _const2)
 								if ok {
 									if _f.matchedRule == nil || _f.matchedRule(opt.NormalizeCmpConstMinus) {
 										_expr := _f.ConstructGe(
