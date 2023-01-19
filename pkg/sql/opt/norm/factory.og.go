@@ -11986,24 +11986,27 @@ func (_f *Factory) ConstructAny(
 		goto SKIP_RULES
 	}
 
-	// [InlineAnyWithScan]
+	// [InlineAnyWithScanOfValues]
 	{
 		_withScan, _ := input.(*memo.WithScanExpr)
 		if _withScan != nil {
 			withScanPrivate := &_withScan.WithScanPrivate
-			if _f.funcs.CanInlineWithScan(withScanPrivate, scalar) {
-				anyPrivate := subqueryPrivate
-				if _f.matchedRule == nil || _f.matchedRule(opt.InlineAnyWithScan) {
-					_expr := _f.ConstructAny(
-						_f.funcs.InlineWithScan(withScanPrivate),
-						scalar,
-						anyPrivate,
-					)
-					if _f.appliedRule != nil {
-						_f.appliedRule(opt.InlineAnyWithScan, nil, _expr)
+			values, ok := _f.funcs.BoundValues(withScanPrivate)
+			if ok {
+				if _f.funcs.CanInlineWithScanOfValues(values, withScanPrivate, scalar) {
+					anyPrivate := subqueryPrivate
+					if _f.matchedRule == nil || _f.matchedRule(opt.InlineAnyWithScanOfValues) {
+						_expr := _f.ConstructAny(
+							_f.funcs.InlineWithScanOfValues(values, withScanPrivate),
+							scalar,
+							anyPrivate,
+						)
+						if _f.appliedRule != nil {
+							_f.appliedRule(opt.InlineAnyWithScanOfValues, nil, _expr)
+						}
+						_f.constructorStackDepth--
+						return _expr
 					}
-					_f.constructorStackDepth--
-					return _expr
 				}
 			}
 		}

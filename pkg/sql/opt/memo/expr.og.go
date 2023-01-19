@@ -7927,9 +7927,11 @@ type WithPrivate struct {
 	// it in the EXPLAIN plan).
 	OriginalExpr tree.Statement
 
-	// Mtr is used to specify whether or not to override the optimizer's
-	// default decision for materializing or not materializing tables.
-	Mtr tree.MaterializeClause
+	// Mtr is the materialization behavior of the CTE, specified by MATERIALIZED,
+	// NOT MATERIALIZED, or an empty materialize clause. These modes partially
+	// affect whether or not a CTE is inlined during normalization. See
+	// CanInlineWith.
+	Mtr tree.CTEMaterializeClause
 
 	// Ordering specifies the order required of the binding, and thus controls
 	// the order in which the rows are materialized. Can only be used when Mtr is
@@ -8081,10 +8083,9 @@ type WithScanPrivate struct {
 	// it possible to construct WithScan expressions with no columns.
 	ID opt.UniqueID
 
-	// CanInlineInPlace is true when the WithScanExpr is allowed to be inlined
-	// when it is normalized as opposed to inlining which takes place when the
-	// WithExpr is normalized.
-	CanInlineInPlace bool
+	// Mtr is the materialization behavior of the CTE referenced by the WithScan.
+	// It matches the Mtr field of the WithPrivate with a matching WithID.
+	Mtr tree.CTEMaterializeClause
 }
 
 // RecursiveCTEExpr implements the logic of a recursive CTE:
@@ -27467,7 +27468,7 @@ func (in *interner) InternWith(val *WithExpr) *WithExpr {
 	in.hasher.HashRelExpr(val.Main)
 	in.hasher.HashWithID(val.ID)
 	in.hasher.HashStatement(val.OriginalExpr)
-	in.hasher.HashMaterializeClause(val.Mtr)
+	in.hasher.HashCTEMaterializeClause(val.Mtr)
 	in.hasher.HashOrderingChoice(val.BindingOrdering)
 	in.hasher.HashString(val.Name)
 
@@ -27478,7 +27479,7 @@ func (in *interner) InternWith(val *WithExpr) *WithExpr {
 				in.hasher.IsRelExprEqual(val.Main, existing.Main) &&
 				in.hasher.IsWithIDEqual(val.ID, existing.ID) &&
 				in.hasher.IsStatementEqual(val.OriginalExpr, existing.OriginalExpr) &&
-				in.hasher.IsMaterializeClauseEqual(val.Mtr, existing.Mtr) &&
+				in.hasher.IsCTEMaterializeClauseEqual(val.Mtr, existing.Mtr) &&
 				in.hasher.IsOrderingChoiceEqual(val.BindingOrdering, existing.BindingOrdering) &&
 				in.hasher.IsStringEqual(val.Name, existing.Name) {
 				return existing
@@ -27498,7 +27499,7 @@ func (in *interner) InternWithScan(val *WithScanExpr) *WithScanExpr {
 	in.hasher.HashColList(val.InCols)
 	in.hasher.HashColList(val.OutCols)
 	in.hasher.HashUniqueID(val.ID)
-	in.hasher.HashBool(val.CanInlineInPlace)
+	in.hasher.HashCTEMaterializeClause(val.Mtr)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
@@ -27508,7 +27509,7 @@ func (in *interner) InternWithScan(val *WithScanExpr) *WithScanExpr {
 				in.hasher.IsColListEqual(val.InCols, existing.InCols) &&
 				in.hasher.IsColListEqual(val.OutCols, existing.OutCols) &&
 				in.hasher.IsUniqueIDEqual(val.ID, existing.ID) &&
-				in.hasher.IsBoolEqual(val.CanInlineInPlace, existing.CanInlineInPlace) {
+				in.hasher.IsCTEMaterializeClauseEqual(val.Mtr, existing.Mtr) {
 				return existing
 			}
 		}
