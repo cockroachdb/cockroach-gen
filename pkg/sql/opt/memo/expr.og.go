@@ -17002,11 +17002,6 @@ type UDFPrivate struct {
 	// immutable, or leakproof function will see a snapshot of the data as of the
 	// start of the statement calling the function.
 	Volatility volatility.V
-
-	// CalledOnNullInput is true if the function should be called when any of its
-	// inputs are NULL. If false, the function will not be evaluated in the
-	// presence of NULL inputs, and will instead evaluate directly to NULL.
-	CalledOnNullInput bool
 }
 
 // KVOptionsExpr is a set of KVOptionItems that specify arbitrary keys and values
@@ -30514,7 +30509,6 @@ func (in *interner) InternUDF(val *UDFExpr) *UDFExpr {
 	in.hasher.HashColList(val.Params)
 	in.hasher.HashType(val.Typ)
 	in.hasher.HashVolatility(val.Volatility)
-	in.hasher.HashBool(val.CalledOnNullInput)
 
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
@@ -30524,8 +30518,7 @@ func (in *interner) InternUDF(val *UDFExpr) *UDFExpr {
 				in.hasher.IsRelListExprEqual(val.Body, existing.Body) &&
 				in.hasher.IsColListEqual(val.Params, existing.Params) &&
 				in.hasher.IsTypeEqual(val.Typ, existing.Typ) &&
-				in.hasher.IsVolatilityEqual(val.Volatility, existing.Volatility) &&
-				in.hasher.IsBoolEqual(val.CalledOnNullInput, existing.CalledOnNullInput) {
+				in.hasher.IsVolatilityEqual(val.Volatility, existing.Volatility) {
 				return existing
 			}
 		}
