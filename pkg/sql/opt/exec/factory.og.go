@@ -3,6 +3,8 @@
 package exec
 
 import (
+	"context"
+
 	"github.com/cockroachdb/cockroach/pkg/sql/catalog/colinfo"
 	"github.com/cockroachdb/cockroach/pkg/sql/catalog/descpb"
 	"github.com/cockroachdb/cockroach/pkg/sql/inverted"
@@ -51,6 +53,9 @@ type Factory interface {
 		checks []Node,
 		rootRowCount int64,
 	) (Plan, error)
+
+	// Ctx returns the ctx of this execution.
+	Ctx() context.Context
 
 	// ConstructScan creates a node for a Scan operation.
 	//
@@ -295,11 +300,17 @@ type Factory interface {
 	// left node to completion and possibly short-circuit if the limit is reached
 	// before executing the right node. The limit is guaranteed but the short-circuit
 	// behavior is not.
+	//
+	// If true, EnforceHomeRegion specifies that the UNION ALL operation should
+	// error out if it attempts to read rows beyond the leftmost branch. This
+	// should only be set if performing the UNION ALL on behalf of a
+	// locality-optimized search.
 	ConstructUnionAll(
 		left Node,
 		right Node,
 		reqOrdering OutputOrdering,
 		hardLimit uint64,
+		enforceHomeRegion bool,
 	) (Node, error)
 
 	// ConstructSort creates a node for a Sort operation.
@@ -354,7 +365,8 @@ type Factory interface {
 	// contains the lookup join conditions targeting ranges located on local nodes
 	// (relative to the gateway region), and remoteLookupExpr contains the lookup
 	// join conditions targeting remote nodes; lookupCols are ordinals for the table
-	// columns we are retrieving.
+	// columns we are retrieving. If RemoteOnlyLookups is true, all lookups target
+	// rows in remote regions.
 	//
 	// The node produces the columns in the input and (unless join type is
 	// LeftSemiJoin or LeftAntiJoin) the lookupCols, ordered by ordinal. The ON
@@ -375,6 +387,7 @@ type Factory interface {
 		reqOrdering OutputOrdering,
 		locking opt.Locking,
 		limitHint int64,
+		remoteOnlyLookups bool,
 	) (Node, error)
 
 	// ConstructInvertedJoin creates a node for a InvertedJoin operation.
@@ -945,6 +958,10 @@ func (StubFactory) ConstructPlan(
 	return struct{}{}, nil
 }
 
+func (StubFactory) Ctx() context.Context {
+	return context.Background()
+}
+
 func (StubFactory) ConstructScan(
 	table cat.Table,
 	index cat.Index,
@@ -1095,6 +1112,7 @@ func (StubFactory) ConstructUnionAll(
 	right Node,
 	reqOrdering OutputOrdering,
 	hardLimit uint64,
+	enforceHomeRegion bool,
 ) (Node, error) {
 	return struct{}{}, nil
 }
@@ -1142,6 +1160,7 @@ func (StubFactory) ConstructLookupJoin(
 	reqOrdering OutputOrdering,
 	locking opt.Locking,
 	limitHint int64,
+	remoteOnlyLookups bool,
 ) (Node, error) {
 	return struct{}{}, nil
 }

@@ -3787,6 +3787,11 @@ type LookupJoinPrivate struct {
 	// different wait policies are used by SELECT .. FOR UPDATE/SHARE SKIP
 	// LOCKED/NOWAIT statements to react differently to conflicting locks.
 	Locking opt.Locking
+
+	// RemoteOnlyLookups is true when this join is defined with only lookups
+	// that read into remote regions, though the lookups are defined in
+	// LookupExpr, not RemoteLookupExpr.
+	RemoteOnlyLookups bool
 	JoinPrivate
 }
 
@@ -26682,6 +26687,7 @@ func (in *interner) InternLookupJoin(val *LookupJoinExpr) *LookupJoinExpr {
 	in.hasher.HashBool(val.ChildOfLocalityOptimizedSearch)
 	in.hasher.HashFiltersExpr(val.ConstFilters)
 	in.hasher.HashLocking(val.Locking)
+	in.hasher.HashBool(val.RemoteOnlyLookups)
 	in.hasher.HashJoinFlags(val.Flags)
 	in.hasher.HashBool(val.SkipReorderJoins)
 
@@ -26706,6 +26712,7 @@ func (in *interner) InternLookupJoin(val *LookupJoinExpr) *LookupJoinExpr {
 				in.hasher.IsBoolEqual(val.ChildOfLocalityOptimizedSearch, existing.ChildOfLocalityOptimizedSearch) &&
 				in.hasher.IsFiltersExprEqual(val.ConstFilters, existing.ConstFilters) &&
 				in.hasher.IsLockingEqual(val.Locking, existing.Locking) &&
+				in.hasher.IsBoolEqual(val.RemoteOnlyLookups, existing.RemoteOnlyLookups) &&
 				in.hasher.IsJoinFlagsEqual(val.Flags, existing.Flags) &&
 				in.hasher.IsBoolEqual(val.SkipReorderJoins, existing.SkipReorderJoins) {
 				return existing

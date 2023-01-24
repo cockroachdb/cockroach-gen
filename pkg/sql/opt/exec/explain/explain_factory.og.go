@@ -523,14 +523,16 @@ func (f *Factory) ConstructUnionAll(
 	right exec.Node,
 	reqOrdering exec.OutputOrdering,
 	hardLimit uint64,
+	enforceHomeRegion bool,
 ) (exec.Node, error) {
 	leftNode := left.(*Node)
 	rightNode := right.(*Node)
 	args := &unionAllArgs{
-		Left:        leftNode,
-		Right:       rightNode,
-		ReqOrdering: reqOrdering,
-		HardLimit:   hardLimit,
+		Left:              leftNode,
+		Right:             rightNode,
+		ReqOrdering:       reqOrdering,
+		HardLimit:         hardLimit,
+		EnforceHomeRegion: enforceHomeRegion,
 	}
 	_n, err := newNode(unionAllOp, args, reqOrdering, leftNode, rightNode)
 	if err != nil {
@@ -542,6 +544,7 @@ func (f *Factory) ConstructUnionAll(
 		rightNode.WrappedNode(),
 		reqOrdering,
 		hardLimit,
+		enforceHomeRegion,
 	)
 	if err != nil {
 		return nil, err
@@ -659,6 +662,7 @@ func (f *Factory) ConstructLookupJoin(
 	reqOrdering exec.OutputOrdering,
 	locking opt.Locking,
 	limitHint int64,
+	remoteOnlyLookups bool,
 ) (exec.Node, error) {
 	inputNode := input.(*Node)
 	args := &lookupJoinArgs{
@@ -677,6 +681,7 @@ func (f *Factory) ConstructLookupJoin(
 		ReqOrdering:                reqOrdering,
 		Locking:                    locking,
 		LimitHint:                  limitHint,
+		RemoteOnlyLookups:          remoteOnlyLookups,
 	}
 	_n, err := newNode(lookupJoinOp, args, reqOrdering, inputNode)
 	if err != nil {
@@ -699,6 +704,7 @@ func (f *Factory) ConstructLookupJoin(
 		reqOrdering,
 		locking,
 		limitHint,
+		remoteOnlyLookups,
 	)
 	if err != nil {
 		return nil, err
@@ -2143,10 +2149,11 @@ type streamingSetOpArgs struct {
 }
 
 type unionAllArgs struct {
-	Left        *Node
-	Right       *Node
-	ReqOrdering exec.OutputOrdering
-	HardLimit   uint64
+	Left              *Node
+	Right             *Node
+	ReqOrdering       exec.OutputOrdering
+	HardLimit         uint64
+	EnforceHomeRegion bool
 }
 
 type sortArgs struct {
@@ -2186,6 +2193,7 @@ type lookupJoinArgs struct {
 	ReqOrdering                exec.OutputOrdering
 	Locking                    opt.Locking
 	LimitHint                  int64
+	RemoteOnlyLookups          bool
 }
 
 type invertedJoinArgs struct {

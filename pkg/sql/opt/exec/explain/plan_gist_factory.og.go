@@ -312,6 +312,7 @@ func (f *PlanGistFactory) ConstructUnionAll(
 	right exec.Node,
 	reqOrdering exec.OutputOrdering,
 	hardLimit uint64,
+	enforceHomeRegion bool,
 ) (exec.Node, error) {
 	f.encodeOperator(unionAllOp)
 	node, err := f.wrappedFactory.ConstructUnionAll(
@@ -319,6 +320,7 @@ func (f *PlanGistFactory) ConstructUnionAll(
 		right,
 		reqOrdering,
 		hardLimit,
+		enforceHomeRegion,
 	)
 	return node, err
 }
@@ -389,6 +391,7 @@ func (f *PlanGistFactory) ConstructLookupJoin(
 	reqOrdering exec.OutputOrdering,
 	locking opt.Locking,
 	limitHint int64,
+	remoteOnlyLookups bool,
 ) (exec.Node, error) {
 	f.encodeOperator(lookupJoinOp)
 	f.encodeByte(byte(joinType))
@@ -412,6 +415,7 @@ func (f *PlanGistFactory) ConstructLookupJoin(
 		reqOrdering,
 		locking,
 		limitHint,
+		remoteOnlyLookups,
 	)
 	return node, err
 }

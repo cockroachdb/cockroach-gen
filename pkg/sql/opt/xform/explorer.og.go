@@ -2594,7 +2594,7 @@ func (_e *explorer) exploreLookupJoin(
 								_e.funcs.CreateLocalityOptimizedLookupJoinPrivateIncludingCols(localExpr, _e.funcs.EmptyFiltersExpr(), private, _e.funcs.OutputCols(input)),
 							),
 							On:                on,
-							LookupJoinPrivate: *_e.funcs.CreateLocalityOptimizedLookupJoinPrivate(remoteExpr, _e.funcs.EmptyFiltersExpr(), private),
+							LookupJoinPrivate: *_e.funcs.CreateRemoteOnlyLookupJoinPrivate(remoteExpr, private),
 						}
 						_interned := _e.mem.AddLookupJoinToGroup(_expr, _root)
 						if _e.o.appliedRule != nil {
