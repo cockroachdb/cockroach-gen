@@ -27744,7 +27744,7 @@ sqldefault:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
 //line sql-gen.y:3943
 		{
-			return unimplementedWithIssueDetail(sqllex, 41608, "quote")
+			sqlVAL.union.val = &tree.CopyOptions{Quote: tree.NewStrVal(sqlDollar[2].str)}
 		}
 	case 418:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
