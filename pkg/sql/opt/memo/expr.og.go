@@ -3747,10 +3747,12 @@ type LookupJoinPrivate struct {
 	// this lookup join.
 	LocalityOptimized bool
 
-	// ConstFilters contains the constant filters that are represented as equality
-	// conditions on the KeyCols. These filters are needed by the statistics code to
-	// correctly estimate selectivity.
-	ConstFilters FiltersExpr
+	// AllLookupFilters synthesizes all the filters that are represented as
+	// equality conditions on the KeyCols, as well as the filters in LookupExpr
+	// and RemoteLookupExpr. These filters are needed by the statistics code to
+	// correctly estimate selectivity as well as by the logicalPropsBuilder for
+	// calculating logical properties.
+	AllLookupFilters FiltersExpr
 
 	// Locking represents the row-level locking mode of the LookupJoin in the
 	// lookup table. Most lookup joins leave this unset (Strength = ForNone),
@@ -26411,7 +26413,7 @@ func (in *interner) InternLookupJoin(val *LookupJoinExpr) *LookupJoinExpr {
 	in.hasher.HashBool(val.IsSecondJoinInPairedJoiner)
 	in.hasher.HashColumnID(val.ContinuationCol)
 	in.hasher.HashBool(val.LocalityOptimized)
-	in.hasher.HashFiltersExpr(val.ConstFilters)
+	in.hasher.HashFiltersExpr(val.AllLookupFilters)
 	in.hasher.HashLocking(val.Locking)
 	in.hasher.HashJoinFlags(val.Flags)
 	in.hasher.HashBool(val.SkipReorderJoins)
@@ -26434,7 +26436,7 @@ func (in *interner) InternLookupJoin(val *LookupJoinExpr) *LookupJoinExpr {
 				in.hasher.IsBoolEqual(val.IsSecondJoinInPairedJoiner, existing.IsSecondJoinInPairedJoiner) &&
 				in.hasher.IsColumnIDEqual(val.ContinuationCol, existing.ContinuationCol) &&
 				in.hasher.IsBoolEqual(val.LocalityOptimized, existing.LocalityOptimized) &&
-				in.hasher.IsFiltersExprEqual(val.ConstFilters, existing.ConstFilters) &&
+				in.hasher.IsFiltersExprEqual(val.AllLookupFilters, existing.AllLookupFilters) &&
 				in.hasher.IsLockingEqual(val.Locking, existing.Locking) &&
 				in.hasher.IsJoinFlagsEqual(val.Flags, existing.Flags) &&
 				in.hasher.IsBoolEqual(val.SkipReorderJoins, existing.SkipReorderJoins) {
