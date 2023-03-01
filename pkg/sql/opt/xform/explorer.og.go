@@ -590,7 +590,7 @@ func (_e *explorer) exploreInnerJoin(
 	{
 		if _rootOrd >= _rootState.start {
 			on := _root.On
-			firstJoin, secondJoin, newRelationCols, aggCols, groupingCols, ok := _e.funcs.SplitJoinWithEquijoinDisjuncts(_root, on)
+			firstJoin, secondJoin, newRelationCols, aggCols, groupingCols, ok := _e.funcs.SplitJoinWithDisjuncts(_root, on)
 			if ok {
 				if _e.o.matchedRule == nil || _e.o.matchedRule(opt.SplitDisjunctionOfJoinTerms) {
 					firstJoinCols := _e.funcs.OutputCols(firstJoin)
@@ -1744,7 +1744,7 @@ func (_e *explorer) exploreSemiJoin(
 	{
 		if _rootOrd >= _rootState.start {
 			on := _root.On
-			firstJoin, secondJoin, newRelationCols, aggCols, groupingCols, ok := _e.funcs.SplitJoinWithEquijoinDisjuncts(_root, on)
+			firstJoin, secondJoin, newRelationCols, aggCols, groupingCols, ok := _e.funcs.SplitJoinWithDisjuncts(_root, on)
 			if ok {
 				if _e.o.matchedRule == nil || _e.o.matchedRule(opt.SplitDisjunctionOfJoinTerms) {
 					firstJoinCols := _e.funcs.OutputCols(firstJoin)
@@ -2164,7 +2164,7 @@ func (_e *explorer) exploreAntiJoin(
 	{
 		if _rootOrd >= _rootState.start {
 			on := _root.On
-			firstJoin, secondJoin, newRelationCols, aggCols, groupingCols, ok := _e.funcs.SplitJoinWithEquijoinDisjuncts(_root, on)
+			firstJoin, secondJoin, newRelationCols, aggCols, groupingCols, ok := _e.funcs.SplitJoinWithDisjuncts(_root, on)
 			if ok {
 				if _e.o.matchedRule == nil || _e.o.matchedRule(opt.SplitDisjunctionOfAntiJoinTerms) {
 					firstJoinCols := _e.funcs.OutputCols(firstJoin)
