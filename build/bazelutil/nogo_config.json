@@ -78,11 +78,6 @@
             "cockroach/pkg/.*$": "first-party code"
         }
     },
-    "generics": {
-        "only_files": {
-            "cockroach/pkg/.*$": "first-party code"
-        }
-    },
     "grpcconnclose": {
         "exclude_files": {
             "cockroach/pkg/.*\\.eg\\.go$": "generated code",
@@ -742,7 +737,7 @@
             "pkg/security/securitytest/securitytest.go$": "excluded until all uses of io/ioutil are replaced",
             "pkg/server/dumpstore/dumpstore.go$": "excluded until all uses of io/ioutil are replaced",
             "pkg/server/dumpstore/dumpstore_test.go$": "excluded until all uses of io/ioutil are replaced",
-            "pkg/server/heapprofiler/profilestore_test.go$": "excluded until all uses of io/ioutil are replaced",
+            "pkg/server/profiler/profilestore_test.go$": "excluded until all uses of io/ioutil are replaced",
             "pkg/util/log/file_api.go$": "excluded until all uses of io/ioutil are replaced",
             "pkg/build/bazel/bazel\\.go$": "Runfile function deprecated"
         },
