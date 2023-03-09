@@ -13446,6 +13446,58 @@ func (e *ArrayAggExpr) DataType() *types.T {
 	return e.Typ
 }
 
+type ArrayCatAggExpr struct {
+	Input opt.ScalarExpr
+
+	Typ  *types.T
+	rank opt.ScalarRank
+}
+
+var _ opt.ScalarExpr = &ArrayCatAggExpr{}
+
+func (e *ArrayCatAggExpr) Rank() opt.ScalarRank {
+	return e.rank
+}
+
+func (e *ArrayCatAggExpr) Op() opt.Operator {
+	return opt.ArrayCatAggOp
+}
+
+func (e *ArrayCatAggExpr) ChildCount() int {
+	return 1
+}
+
+func (e *ArrayCatAggExpr) Child(nth int) opt.Expr {
+	switch nth {
+	case 0:
+		return e.Input
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *ArrayCatAggExpr) Private() interface{} {
+	return nil
+}
+
+func (e *ArrayCatAggExpr) String() string {
+	f := MakeExprFmtCtx(ExprFmtHideQualifications, nil, nil)
+	f.FormatExpr(e)
+	return f.Buffer.String()
+}
+
+func (e *ArrayCatAggExpr) SetChild(nth int, child opt.Expr) {
+	switch nth {
+	case 0:
+		e.Input = child.(opt.ScalarExpr)
+		return
+	}
+	panic(errors.AssertionFailedf("child index out of range"))
+}
+
+func (e *ArrayCatAggExpr) DataType() *types.T {
+	return e.Typ
+}
+
 type AvgExpr struct {
 	Input opt.ScalarExpr
 
@@ -22570,6 +22622,26 @@ func (m *Memo) MemoizeArrayAgg(
 	return interned
 }
 
+func (m *Memo) MemoizeArrayCatAgg(
+	input opt.ScalarExpr,
+) *ArrayCatAggExpr {
+	const size = int64(unsafe.Sizeof(ArrayCatAggExpr{}))
+	e := &ArrayCatAggExpr{
+		Input: input,
+		rank:  m.NextRank(),
+	}
+	e.Typ = InferType(m, e)
+	interned := m.interner.InternArrayCatAgg(e)
+	if interned == e {
+		if m.newGroupFn != nil {
+			m.newGroupFn(e)
+		}
+		m.memEstimate += size
+		m.CheckExpr(e)
+	}
+	return interned
+}
+
 func (m *Memo) MemoizeAvg(
 	input opt.ScalarExpr,
 ) *AvgExpr {
@@ -25504,6 +25576,8 @@ func (in *interner) InternExpr(e opt.Expr) opt.Expr {
 		return in.InternColumnAccess(t)
 	case *ArrayAggExpr:
 		return in.InternArrayAgg(t)
+	case *ArrayCatAggExpr:
+		return in.InternArrayCatAgg(t)
 	case *AvgExpr:
 		return in.InternAvg(t)
 	case *BitAndAggExpr:
@@ -29049,6 +29123,24 @@ func (in *interner) InternArrayAgg(val *ArrayAggExpr) *ArrayAggExpr {
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*ArrayAggExpr); ok {
+			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) {
+				return existing
+			}
+		}
+	}
+
+	in.cache.Add(val)
+	return val
+}
+
+func (in *interner) InternArrayCatAgg(val *ArrayCatAggExpr) *ArrayCatAggExpr {
+	in.hasher.Init()
+	in.hasher.HashOperator(opt.ArrayCatAggOp)
+	in.hasher.HashScalarExpr(val.Input)
+
+	in.cache.Start(in.hasher.hash)
+	for in.cache.Next() {
+		if existing, ok := in.cache.Item().(*ArrayCatAggExpr); ok {
 			if in.hasher.IsScalarExprEqual(val.Input, existing.Input) {
 				return existing
 			}

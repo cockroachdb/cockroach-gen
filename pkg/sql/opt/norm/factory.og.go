@@ -20138,6 +20138,25 @@ SKIP_RULES:
 	return expr
 }
 
+// ConstructArrayCatAgg constructs an expression for the ArrayCatAgg operator.
+func (_f *Factory) ConstructArrayCatAgg(
+	input opt.ScalarExpr,
+) opt.ScalarExpr {
+	_f.constructorStackDepth++
+	if _f.constructorStackDepth > maxConstructorStackDepth {
+		// If the constructor call stack depth exceeds the limit, call
+		// onMaxConstructorStackDepthExceeded and skip all rules.
+		_f.onMaxConstructorStackDepthExceeded()
+		goto SKIP_RULES
+	}
+
+SKIP_RULES:
+	e := _f.mem.MemoizeArrayCatAgg(input)
+	expr := _f.onConstructScalar(e)
+	_f.constructorStackDepth--
+	return expr
+}
+
 // ConstructAvg constructs an expression for the Avg operator.
 func (_f *Factory) ConstructAvg(
 	input opt.ScalarExpr,
@@ -22914,6 +22933,13 @@ func (f *Factory) Replace(e opt.Expr, replace ReplaceFunc) opt.Expr {
 		}
 		return t
 
+	case *memo.ArrayCatAggExpr:
+		input := replace(t.Input).(opt.ScalarExpr)
+		if input != t.Input {
+			return f.ConstructArrayCatAgg(input)
+		}
+		return t
+
 	case *memo.AvgExpr:
 		input := replace(t.Input).(opt.ScalarExpr)
 		if input != t.Input {
@@ -24502,6 +24528,11 @@ func (f *Factory) CopyAndReplaceDefault(src opt.Expr, replace ReplaceFunc) (dst 
 			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
 		)
 
+	case *memo.ArrayCatAggExpr:
+		return f.ConstructArrayCatAgg(
+			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
+		)
+
 	case *memo.AvgExpr:
 		return f.ConstructAvg(
 			f.invokeReplace(t.Input, replace).(opt.ScalarExpr),
@@ -25764,6 +25795,10 @@ func (f *Factory) DynamicConstruct(op opt.Operator, args ...interface{}) opt.Exp
 		)
 	case opt.ArrayAggOp:
 		return f.ConstructArrayAgg(
+			args[0].(opt.ScalarExpr),
+		)
+	case opt.ArrayCatAggOp:
+		return f.ConstructArrayCatAgg(
 			args[0].(opt.ScalarExpr),
 		)
 	case opt.AvgOp:

@@ -107,6 +107,8 @@ const (
 
 	ArrayAggOp
 
+	ArrayCatAggOp
+
 	// ArrayFlatten is an ARRAY(<subquery>) expression. ArrayFlatten takes as input
 	// a subquery which returns a single column and constructs a scalar array as the
 	// output. Any NULLs are included in the results, and if the subquery has an
@@ -1401,13 +1403,13 @@ const (
 	NumOperators
 )
 
-const opNames = "unknownagg-distinctagg-filteraggregationsaggregations-itemalter-range-relocatealter-range-relocate-privatealter-table-relocatealter-table-relocate-privatealter-table-splitalter-table-split-privatealter-table-unsplitalter-table-unsplit-allandanti-joinanti-join-applyanyany-not-null-aggany-scalararrayarray-aggarray-flattenassignment-castavgb-box-coversb-box-intersectsbit-and-aggbit-or-aggbitandbitorbitxorbool-andbool-orcancel-privatecancel-queriescancel-sessionscasecastcoalescecollatecolumn-accessconcatconcat-aggconstconst-aggconst-not-null-aggcontained-bycontainscontrol-jobscontrol-jobs-privatecontrol-schedulescontrol-schedules-privatecorrcountcount-rowscovar-popcovar-sampcreate-functioncreate-function-privatecreate-statisticscreate-statistics-privatecreate-tablecreate-table-privatecreate-viewcreate-view-privatecume-distdeletedense-rankdistinct-ondistributedivensure-distinct-onensure-upsert-distinct-oneqexceptexcept-allexistsexplainexplain-privateexportexport-privatef-k-checksf-k-checks-itemf-k-checks-item-privatefake-relfake-rel-privatefalsefetch-textfetch-text-pathfetch-valfetch-val-pathfiltersfilters-itemfirst-aggfirst-valuefloor-divfull-joinfunctionfunction-privategegroup-bygrouping-privategti-likeif-errinindex-joinindex-join-privateindirectioninner-joininner-join-applyinsertintersectintersect-allinverted-filterinverted-filter-privateinverted-joininverted-join-privateisis-notis-tuple-not-nullis-tuple-nulljoin-privatejson-aggjson-all-existsjson-existsjson-object-aggjson-some-existsjsonb-aggjsonb-object-aggk-v-optionsk-v-options-iteml-shiftlaglast-valueleleadleft-joinleft-join-applylikelimitliteral-valueslocality-optimized-searchlookup-joinlookup-join-privateltmaxmax1-rowmemo-cycle-test-relmerge-joinmerge-join-privateminminusmodmultmutation-privatenenorm-cycle-test-relnotnot-i-likenot-innot-likenot-reg-i-matchnot-reg-matchnot-similar-tonth-valuentilenulloffsetopaque-d-d-lopaque-mutationopaque-relopaque-rel-privateorordinalityordinality-privateoverlapspercent-rankpercentile-contpercentile-discplaceholderplaceholder-scanpluspowprojectproject-setprojectionsprojections-itemr-shiftrangerankrecursive-c-t-erecursive-c-t-e-privatereg-i-matchreg-matchregression-avg-xregression-avg-yregression-countregression-interceptregression-r2regression-s-x-xregression-s-x-yregression-s-y-yregression-sloperight-joinrow-numbers-t-collects-t-extents-t-make-lines-t-unionscalar-group-byscalar-listscanscan-privateselectsemi-joinsemi-join-applysequence-selectsequence-select-privateset-privateshow-trace-for-sessionshow-trace-privatesimilar-tosortsqr-diffstd-devstd-dev-popstring-aggsubquerysubquery-privatesumsum-inttop-ktop-k-privatetruetupleu-d-fu-d-f-privateunary-cbrtunary-complementunary-minusunary-plusunary-sqrtunionunion-allunique-checksunique-checks-itemunique-checks-item-privateupdateupsertupsert-distinct-onvaluesvalues-privatevar-popvariablevariancewhenwindowwindow-from-offsetwindow-privatewindow-to-offsetwindowswindows-itemwindows-item-privatewithwith-privatewith-scanwith-scan-privatexor-aggzigzag-joinzigzag-join-privatezipzip-item"
+const opNames = "unknownagg-distinctagg-filteraggregationsaggregations-itemalter-range-relocatealter-range-relocate-privatealter-table-relocatealter-table-relocate-privatealter-table-splitalter-table-split-privatealter-table-unsplitalter-table-unsplit-allandanti-joinanti-join-applyanyany-not-null-aggany-scalararrayarray-aggarray-cat-aggarray-flattenassignment-castavgb-box-coversb-box-intersectsbit-and-aggbit-or-aggbitandbitorbitxorbool-andbool-orcancel-privatecancel-queriescancel-sessionscasecastcoalescecollatecolumn-accessconcatconcat-aggconstconst-aggconst-not-null-aggcontained-bycontainscontrol-jobscontrol-jobs-privatecontrol-schedulescontrol-schedules-privatecorrcountcount-rowscovar-popcovar-sampcreate-functioncreate-function-privatecreate-statisticscreate-statistics-privatecreate-tablecreate-table-privatecreate-viewcreate-view-privatecume-distdeletedense-rankdistinct-ondistributedivensure-distinct-onensure-upsert-distinct-oneqexceptexcept-allexistsexplainexplain-privateexportexport-privatef-k-checksf-k-checks-itemf-k-checks-item-privatefake-relfake-rel-privatefalsefetch-textfetch-text-pathfetch-valfetch-val-pathfiltersfilters-itemfirst-aggfirst-valuefloor-divfull-joinfunctionfunction-privategegroup-bygrouping-privategti-likeif-errinindex-joinindex-join-privateindirectioninner-joininner-join-applyinsertintersectintersect-allinverted-filterinverted-filter-privateinverted-joininverted-join-privateisis-notis-tuple-not-nullis-tuple-nulljoin-privatejson-aggjson-all-existsjson-existsjson-object-aggjson-some-existsjsonb-aggjsonb-object-aggk-v-optionsk-v-options-iteml-shiftlaglast-valueleleadleft-joinleft-join-applylikelimitliteral-valueslocality-optimized-searchlookup-joinlookup-join-privateltmaxmax1-rowmemo-cycle-test-relmerge-joinmerge-join-privateminminusmodmultmutation-privatenenorm-cycle-test-relnotnot-i-likenot-innot-likenot-reg-i-matchnot-reg-matchnot-similar-tonth-valuentilenulloffsetopaque-d-d-lopaque-mutationopaque-relopaque-rel-privateorordinalityordinality-privateoverlapspercent-rankpercentile-contpercentile-discplaceholderplaceholder-scanpluspowprojectproject-setprojectionsprojections-itemr-shiftrangerankrecursive-c-t-erecursive-c-t-e-privatereg-i-matchreg-matchregression-avg-xregression-avg-yregression-countregression-interceptregression-r2regression-s-x-xregression-s-x-yregression-s-y-yregression-sloperight-joinrow-numbers-t-collects-t-extents-t-make-lines-t-unionscalar-group-byscalar-listscanscan-privateselectsemi-joinsemi-join-applysequence-selectsequence-select-privateset-privateshow-trace-for-sessionshow-trace-privatesimilar-tosortsqr-diffstd-devstd-dev-popstring-aggsubquerysubquery-privatesumsum-inttop-ktop-k-privatetruetupleu-d-fu-d-f-privateunary-cbrtunary-complementunary-minusunary-plusunary-sqrtunionunion-allunique-checksunique-checks-itemunique-checks-item-privateupdateupsertupsert-distinct-onvaluesvalues-privatevar-popvariablevariancewhenwindowwindow-from-offsetwindow-privatewindow-to-offsetwindowswindows-itemwindows-item-privatewithwith-privatewith-scanwith-scan-privatexor-aggzigzag-joinzigzag-join-privatezipzip-item"
 
-var opNameIndexes = [...]uint32{0, 7, 19, 29, 41, 58, 78, 106, 126, 154, 171, 196, 215, 238, 241, 250, 265, 268, 284, 294, 299, 308, 321, 336, 339, 351, 367, 378, 388, 394, 399, 405, 413, 420, 434, 448, 463, 467, 471, 479, 486, 499, 505, 515, 520, 529, 547, 559, 567, 579, 599, 616, 641, 645, 650, 660, 669, 679, 694, 717, 734, 759, 771, 791, 802, 821, 830, 836, 846, 857, 867, 870, 888, 913, 915, 921, 931, 937, 944, 959, 965, 979, 989, 1004, 1027, 1035, 1051, 1056, 1066, 1081, 1090, 1104, 1111, 1123, 1132, 1143, 1152, 1161, 1169, 1185, 1187, 1195, 1211, 1213, 1219, 1225, 1227, 1237, 1255, 1266, 1276, 1292, 1298, 1307, 1320, 1335, 1358, 1371, 1392, 1394, 1400, 1417, 1430, 1442, 1450, 1465, 1476, 1491, 1507, 1516, 1532, 1543, 1559, 1566, 1569, 1579, 1581, 1585, 1594, 1609, 1613, 1618, 1632, 1657, 1668, 1687, 1689, 1692, 1700, 1719, 1729, 1747, 1750, 1755, 1758, 1762, 1778, 1780, 1799, 1802, 1812, 1818, 1826, 1841, 1854, 1868, 1877, 1882, 1886, 1892, 1904, 1919, 1929, 1947, 1949, 1959, 1977, 1985, 1997, 2012, 2027, 2038, 2054, 2058, 2061, 2068, 2079, 2090, 2106, 2113, 2118, 2122, 2137, 2160, 2171, 2180, 2196, 2212, 2228, 2248, 2261, 2277, 2293, 2309, 2325, 2335, 2345, 2356, 2366, 2379, 2388, 2403, 2414, 2418, 2430, 2436, 2445, 2460, 2475, 2498, 2509, 2531, 2549, 2559, 2563, 2571, 2578, 2589, 2599, 2607, 2623, 2626, 2633, 2638, 2651, 2655, 2660, 2665, 2678, 2688, 2704, 2715, 2725, 2735, 2740, 2749, 2762, 2780, 2806, 2812, 2818, 2836, 2842, 2856, 2863, 2871, 2879, 2883, 2889, 2907, 2921, 2937, 2944, 2956, 2976, 2980, 2992, 3001, 3018, 3025, 3036, 3055, 3058, 3066}
+var opNameIndexes = [...]uint32{0, 7, 19, 29, 41, 58, 78, 106, 126, 154, 171, 196, 215, 238, 241, 250, 265, 268, 284, 294, 299, 308, 321, 334, 349, 352, 364, 380, 391, 401, 407, 412, 418, 426, 433, 447, 461, 476, 480, 484, 492, 499, 512, 518, 528, 533, 542, 560, 572, 580, 592, 612, 629, 654, 658, 663, 673, 682, 692, 707, 730, 747, 772, 784, 804, 815, 834, 843, 849, 859, 870, 880, 883, 901, 926, 928, 934, 944, 950, 957, 972, 978, 992, 1002, 1017, 1040, 1048, 1064, 1069, 1079, 1094, 1103, 1117, 1124, 1136, 1145, 1156, 1165, 1174, 1182, 1198, 1200, 1208, 1224, 1226, 1232, 1238, 1240, 1250, 1268, 1279, 1289, 1305, 1311, 1320, 1333, 1348, 1371, 1384, 1405, 1407, 1413, 1430, 1443, 1455, 1463, 1478, 1489, 1504, 1520, 1529, 1545, 1556, 1572, 1579, 1582, 1592, 1594, 1598, 1607, 1622, 1626, 1631, 1645, 1670, 1681, 1700, 1702, 1705, 1713, 1732, 1742, 1760, 1763, 1768, 1771, 1775, 1791, 1793, 1812, 1815, 1825, 1831, 1839, 1854, 1867, 1881, 1890, 1895, 1899, 1905, 1917, 1932, 1942, 1960, 1962, 1972, 1990, 1998, 2010, 2025, 2040, 2051, 2067, 2071, 2074, 2081, 2092, 2103, 2119, 2126, 2131, 2135, 2150, 2173, 2184, 2193, 2209, 2225, 2241, 2261, 2274, 2290, 2306, 2322, 2338, 2348, 2358, 2369, 2379, 2392, 2401, 2416, 2427, 2431, 2443, 2449, 2458, 2473, 2488, 2511, 2522, 2544, 2562, 2572, 2576, 2584, 2591, 2602, 2612, 2620, 2636, 2639, 2646, 2651, 2664, 2668, 2673, 2678, 2691, 2701, 2717, 2728, 2738, 2748, 2753, 2762, 2775, 2793, 2819, 2825, 2831, 2849, 2855, 2869, 2876, 2884, 2892, 2896, 2902, 2920, 2934, 2950, 2957, 2969, 2989, 2993, 3005, 3014, 3031, 3038, 3049, 3068, 3071, 3079}
 
-const opSyntaxTags = "UNKNOWNAGG DISTINCTAGG FILTERAGGREGATIONSAGGREGATIONS ITEMALTER RANGE RELOCATEALTER RANGE RELOCATE PRIVATEALTER TABLE RELOCATEALTER TABLE RELOCATE PRIVATEALTER TABLE SPLITALTER TABLE SPLIT PRIVATEALTER TABLE UNSPLITALTER TABLE UNSPLIT ALLANDANTI JOINANTI JOIN APPLYANYANY NOT NULL AGGANY SCALARARRAYARRAY AGGARRAY FLATTENASSIGNMENT CASTAVGB BOX COVERSB BOX INTERSECTSBIT AND AGGBIT OR AGGBITANDBITORBITXORBOOL ANDBOOL ORCANCEL PRIVATECANCEL QUERIESCANCEL SESSIONSCASECASTCOALESCECOLLATECOLUMN ACCESSCONCATCONCAT AGGCONSTCONST AGGCONST NOT NULL AGGCONTAINED BYCONTAINSCONTROL JOBSCONTROL JOBS PRIVATECONTROL SCHEDULESCONTROL SCHEDULES PRIVATECORRCOUNTCOUNT ROWSCOVAR POPCOVAR SAMPCREATE FUNCTIONCREATE FUNCTION PRIVATECREATE STATISTICSCREATE STATISTICS PRIVATECREATE TABLECREATE TABLE PRIVATECREATE VIEWCREATE VIEW PRIVATECUME DISTDELETEDENSE RANKDISTINCT ONDISTRIBUTEDIVENSURE DISTINCT ONENSURE UPSERT DISTINCT ONEQEXCEPTEXCEPT ALLEXISTSEXPLAINEXPLAIN PRIVATEEXPORTEXPORT PRIVATEF K CHECKSF K CHECKS ITEMF K CHECKS ITEM PRIVATEFAKE RELFAKE REL PRIVATEFALSEFETCH TEXTFETCH TEXT PATHFETCH VALFETCH VAL PATHFILTERSFILTERS ITEMFIRST AGGFIRST VALUEFLOOR DIVFULL JOINFUNCTIONFUNCTION PRIVATEGEGROUP BYGROUPING PRIVATEGTI LIKEIF ERRININDEX JOININDEX JOIN PRIVATEINDIRECTIONINNER JOININNER JOIN APPLYINSERTINTERSECTINTERSECT ALLINVERTED FILTERINVERTED FILTER PRIVATEINVERTED JOININVERTED JOIN PRIVATEISIS NOTIS TUPLE NOT NULLIS TUPLE NULLJOIN PRIVATEJSON AGGJSON ALL EXISTSJSON EXISTSJSON OBJECT AGGJSON SOME EXISTSJSONB AGGJSONB OBJECT AGGK V OPTIONSK V OPTIONS ITEML SHIFTLAGLAST VALUELELEADLEFT JOINLEFT JOIN APPLYLIKELIMITLITERAL VALUESLOCALITY OPTIMIZED SEARCHLOOKUP JOINLOOKUP JOIN PRIVATELTMAXMAX1 ROWMEMO CYCLE TEST RELMERGE JOINMERGE JOIN PRIVATEMINMINUSMODMULTMUTATION PRIVATENENORM CYCLE TEST RELNOTNOT I LIKENOT INNOT LIKENOT REG I MATCHNOT REG MATCHNOT SIMILAR TONTH VALUENTILENULLOFFSETOPAQUE D D LOPAQUE MUTATIONOPAQUE RELOPAQUE REL PRIVATEORORDINALITYORDINALITY PRIVATEOVERLAPSPERCENT RANKPERCENTILE CONTPERCENTILE DISCPLACEHOLDERPLACEHOLDER SCANPLUSPOWPROJECTPROJECT SETPROJECTIONSPROJECTIONS ITEMR SHIFTRANGERANKRECURSIVE C T ERECURSIVE C T E PRIVATEREG I MATCHREG MATCHREGRESSION AVG XREGRESSION AVG YREGRESSION COUNTREGRESSION INTERCEPTREGRESSION R2REGRESSION S X XREGRESSION S X YREGRESSION S Y YREGRESSION SLOPERIGHT JOINROW NUMBERS T COLLECTS T EXTENTS T MAKE LINES T UNIONSCALAR GROUP BYSCALAR LISTSCANSCAN PRIVATESELECTSEMI JOINSEMI JOIN APPLYSEQUENCE SELECTSEQUENCE SELECT PRIVATESET PRIVATESHOW TRACE FOR SESSIONSHOW TRACE PRIVATESIMILAR TOSORTSQR DIFFSTD DEVSTD DEV POPSTRING AGGSUBQUERYSUBQUERY PRIVATESUMSUM INTTOP KTOP K PRIVATETRUETUPLEU D FU D F PRIVATEUNARY CBRTUNARY COMPLEMENTUNARY MINUSUNARY PLUSUNARY SQRTUNIONUNION ALLUNIQUE CHECKSUNIQUE CHECKS ITEMUNIQUE CHECKS ITEM PRIVATEUPDATEUPSERTUPSERT DISTINCT ONVALUESVALUES PRIVATEVAR POPVARIABLEVARIANCEWHENWINDOWWINDOW FROM OFFSETWINDOW PRIVATEWINDOW TO OFFSETWINDOWSWINDOWS ITEMWINDOWS ITEM PRIVATEWITHWITH PRIVATEWITH SCANWITH SCAN PRIVATEXOR AGGZIGZAG JOINZIGZAG JOIN PRIVATEZIPZIP ITEM"
+const opSyntaxTags = "UNKNOWNAGG DISTINCTAGG FILTERAGGREGATIONSAGGREGATIONS ITEMALTER RANGE RELOCATEALTER RANGE RELOCATE PRIVATEALTER TABLE RELOCATEALTER TABLE RELOCATE PRIVATEALTER TABLE SPLITALTER TABLE SPLIT PRIVATEALTER TABLE UNSPLITALTER TABLE UNSPLIT ALLANDANTI JOINANTI JOIN APPLYANYANY NOT NULL AGGANY SCALARARRAYARRAY AGGARRAY CAT AGGARRAY FLATTENASSIGNMENT CASTAVGB BOX COVERSB BOX INTERSECTSBIT AND AGGBIT OR AGGBITANDBITORBITXORBOOL ANDBOOL ORCANCEL PRIVATECANCEL QUERIESCANCEL SESSIONSCASECASTCOALESCECOLLATECOLUMN ACCESSCONCATCONCAT AGGCONSTCONST AGGCONST NOT NULL AGGCONTAINED BYCONTAINSCONTROL JOBSCONTROL JOBS PRIVATECONTROL SCHEDULESCONTROL SCHEDULES PRIVATECORRCOUNTCOUNT ROWSCOVAR POPCOVAR SAMPCREATE FUNCTIONCREATE FUNCTION PRIVATECREATE STATISTICSCREATE STATISTICS PRIVATECREATE TABLECREATE TABLE PRIVATECREATE VIEWCREATE VIEW PRIVATECUME DISTDELETEDENSE RANKDISTINCT ONDISTRIBUTEDIVENSURE DISTINCT ONENSURE UPSERT DISTINCT ONEQEXCEPTEXCEPT ALLEXISTSEXPLAINEXPLAIN PRIVATEEXPORTEXPORT PRIVATEF K CHECKSF K CHECKS ITEMF K CHECKS ITEM PRIVATEFAKE RELFAKE REL PRIVATEFALSEFETCH TEXTFETCH TEXT PATHFETCH VALFETCH VAL PATHFILTERSFILTERS ITEMFIRST AGGFIRST VALUEFLOOR DIVFULL JOINFUNCTIONFUNCTION PRIVATEGEGROUP BYGROUPING PRIVATEGTI LIKEIF ERRININDEX JOININDEX JOIN PRIVATEINDIRECTIONINNER JOININNER JOIN APPLYINSERTINTERSECTINTERSECT ALLINVERTED FILTERINVERTED FILTER PRIVATEINVERTED JOININVERTED JOIN PRIVATEISIS NOTIS TUPLE NOT NULLIS TUPLE NULLJOIN PRIVATEJSON AGGJSON ALL EXISTSJSON EXISTSJSON OBJECT AGGJSON SOME EXISTSJSONB AGGJSONB OBJECT AGGK V OPTIONSK V OPTIONS ITEML SHIFTLAGLAST VALUELELEADLEFT JOINLEFT JOIN APPLYLIKELIMITLITERAL VALUESLOCALITY OPTIMIZED SEARCHLOOKUP JOINLOOKUP JOIN PRIVATELTMAXMAX1 ROWMEMO CYCLE TEST RELMERGE JOINMERGE JOIN PRIVATEMINMINUSMODMULTMUTATION PRIVATENENORM CYCLE TEST RELNOTNOT I LIKENOT INNOT LIKENOT REG I MATCHNOT REG MATCHNOT SIMILAR TONTH VALUENTILENULLOFFSETOPAQUE D D LOPAQUE MUTATIONOPAQUE RELOPAQUE REL PRIVATEORORDINALITYORDINALITY PRIVATEOVERLAPSPERCENT RANKPERCENTILE CONTPERCENTILE DISCPLACEHOLDERPLACEHOLDER SCANPLUSPOWPROJECTPROJECT SETPROJECTIONSPROJECTIONS ITEMR SHIFTRANGERANKRECURSIVE C T ERECURSIVE C T E PRIVATEREG I MATCHREG MATCHREGRESSION AVG XREGRESSION AVG YREGRESSION COUNTREGRESSION INTERCEPTREGRESSION R2REGRESSION S X XREGRESSION S X YREGRESSION S Y YREGRESSION SLOPERIGHT JOINROW NUMBERS T COLLECTS T EXTENTS T MAKE LINES T UNIONSCALAR GROUP BYSCALAR LISTSCANSCAN PRIVATESELECTSEMI JOINSEMI JOIN APPLYSEQUENCE SELECTSEQUENCE SELECT PRIVATESET PRIVATESHOW TRACE FOR SESSIONSHOW TRACE PRIVATESIMILAR TOSORTSQR DIFFSTD DEVSTD DEV POPSTRING AGGSUBQUERYSUBQUERY PRIVATESUMSUM INTTOP KTOP K PRIVATETRUETUPLEU D FU D F PRIVATEUNARY CBRTUNARY COMPLEMENTUNARY MINUSUNARY PLUSUNARY SQRTUNIONUNION ALLUNIQUE CHECKSUNIQUE CHECKS ITEMUNIQUE CHECKS ITEM PRIVATEUPDATEUPSERTUPSERT DISTINCT ONVALUESVALUES PRIVATEVAR POPVARIABLEVARIANCEWHENWINDOWWINDOW FROM OFFSETWINDOW PRIVATEWINDOW TO OFFSETWINDOWSWINDOWS ITEMWINDOWS ITEM PRIVATEWITHWITH PRIVATEWITH SCANWITH SCAN PRIVATEXOR AGGZIGZAG JOINZIGZAG JOIN PRIVATEZIPZIP ITEM"
 
-var opSyntaxTagIndexes = [...]uint32{0, 7, 19, 29, 41, 58, 78, 106, 126, 154, 171, 196, 215, 238, 241, 250, 265, 268, 284, 294, 299, 308, 321, 336, 339, 351, 367, 378, 388, 394, 399, 405, 413, 420, 434, 448, 463, 467, 471, 479, 486, 499, 505, 515, 520, 529, 547, 559, 567, 579, 599, 616, 641, 645, 650, 660, 669, 679, 694, 717, 734, 759, 771, 791, 802, 821, 830, 836, 846, 857, 867, 870, 888, 913, 915, 921, 931, 937, 944, 959, 965, 979, 989, 1004, 1027, 1035, 1051, 1056, 1066, 1081, 1090, 1104, 1111, 1123, 1132, 1143, 1152, 1161, 1169, 1185, 1187, 1195, 1211, 1213, 1219, 1225, 1227, 1237, 1255, 1266, 1276, 1292, 1298, 1307, 1320, 1335, 1358, 1371, 1392, 1394, 1400, 1417, 1430, 1442, 1450, 1465, 1476, 1491, 1507, 1516, 1532, 1543, 1559, 1566, 1569, 1579, 1581, 1585, 1594, 1609, 1613, 1618, 1632, 1657, 1668, 1687, 1689, 1692, 1700, 1719, 1729, 1747, 1750, 1755, 1758, 1762, 1778, 1780, 1799, 1802, 1812, 1818, 1826, 1841, 1854, 1868, 1877, 1882, 1886, 1892, 1904, 1919, 1929, 1947, 1949, 1959, 1977, 1985, 1997, 2012, 2027, 2038, 2054, 2058, 2061, 2068, 2079, 2090, 2106, 2113, 2118, 2122, 2137, 2160, 2171, 2180, 2196, 2212, 2228, 2248, 2261, 2277, 2293, 2309, 2325, 2335, 2345, 2356, 2366, 2379, 2388, 2403, 2414, 2418, 2430, 2436, 2445, 2460, 2475, 2498, 2509, 2531, 2549, 2559, 2563, 2571, 2578, 2589, 2599, 2607, 2623, 2626, 2633, 2638, 2651, 2655, 2660, 2665, 2678, 2688, 2704, 2715, 2725, 2735, 2740, 2749, 2762, 2780, 2806, 2812, 2818, 2836, 2842, 2856, 2863, 2871, 2879, 2883, 2889, 2907, 2921, 2937, 2944, 2956, 2976, 2980, 2992, 3001, 3018, 3025, 3036, 3055, 3058, 3066}
+var opSyntaxTagIndexes = [...]uint32{0, 7, 19, 29, 41, 58, 78, 106, 126, 154, 171, 196, 215, 238, 241, 250, 265, 268, 284, 294, 299, 308, 321, 334, 349, 352, 364, 380, 391, 401, 407, 412, 418, 426, 433, 447, 461, 476, 480, 484, 492, 499, 512, 518, 528, 533, 542, 560, 572, 580, 592, 612, 629, 654, 658, 663, 673, 682, 692, 707, 730, 747, 772, 784, 804, 815, 834, 843, 849, 859, 870, 880, 883, 901, 926, 928, 934, 944, 950, 957, 972, 978, 992, 1002, 1017, 1040, 1048, 1064, 1069, 1079, 1094, 1103, 1117, 1124, 1136, 1145, 1156, 1165, 1174, 1182, 1198, 1200, 1208, 1224, 1226, 1232, 1238, 1240, 1250, 1268, 1279, 1289, 1305, 1311, 1320, 1333, 1348, 1371, 1384, 1405, 1407, 1413, 1430, 1443, 1455, 1463, 1478, 1489, 1504, 1520, 1529, 1545, 1556, 1572, 1579, 1582, 1592, 1594, 1598, 1607, 1622, 1626, 1631, 1645, 1670, 1681, 1700, 1702, 1705, 1713, 1732, 1742, 1760, 1763, 1768, 1771, 1775, 1791, 1793, 1812, 1815, 1825, 1831, 1839, 1854, 1867, 1881, 1890, 1895, 1899, 1905, 1917, 1932, 1942, 1960, 1962, 1972, 1990, 1998, 2010, 2025, 2040, 2051, 2067, 2071, 2074, 2081, 2092, 2103, 2119, 2126, 2131, 2135, 2150, 2173, 2184, 2193, 2209, 2225, 2241, 2261, 2274, 2290, 2306, 2322, 2338, 2348, 2358, 2369, 2379, 2392, 2401, 2416, 2427, 2431, 2443, 2449, 2458, 2473, 2488, 2511, 2522, 2544, 2562, 2572, 2576, 2584, 2591, 2602, 2612, 2620, 2636, 2639, 2646, 2651, 2664, 2668, 2673, 2678, 2691, 2701, 2717, 2728, 2738, 2748, 2753, 2762, 2775, 2793, 2819, 2825, 2831, 2849, 2855, 2869, 2876, 2884, 2892, 2896, 2902, 2920, 2934, 2950, 2957, 2969, 2989, 2993, 3005, 3014, 3031, 3038, 3049, 3068, 3071, 3079}
 
 var RelationalOperators = [...]Operator{
 	AlterRangeRelocateOp,
@@ -1661,6 +1663,7 @@ var ScalarOperators = [...]Operator{
 	AnyScalarOp,
 	ArrayOp,
 	ArrayAggOp,
+	ArrayCatAggOp,
 	ArrayFlattenOp,
 	AssignmentCastOp,
 	AvgOp,
@@ -1815,36 +1818,36 @@ func IsScalarOp(e Expr) bool {
 	switch e.Op() {
 	case AggDistinctOp, AggFilterOp, AggregationsOp, AggregationsItemOp,
 		AndOp, AnyOp, AnyNotNullAggOp, AnyScalarOp, ArrayOp,
-		ArrayAggOp, ArrayFlattenOp, AssignmentCastOp, AvgOp, BBoxCoversOp,
-		BBoxIntersectsOp, BitAndAggOp, BitOrAggOp, BitandOp, BitorOp,
-		BitxorOp, BoolAndOp, BoolOrOp, CaseOp, CastOp,
-		CoalesceOp, CollateOp, ColumnAccessOp, ConcatOp, ConcatAggOp,
-		ConstOp, ConstAggOp, ConstNotNullAggOp, ContainedByOp, ContainsOp,
-		CorrOp, CountOp, CountRowsOp, CovarPopOp, CovarSampOp,
-		CumeDistOp, DenseRankOp, DivOp, EqOp, ExistsOp,
-		FKChecksOp, FKChecksItemOp, FalseOp, FetchTextOp, FetchTextPathOp,
-		FetchValOp, FetchValPathOp, FiltersOp, FiltersItemOp, FirstAggOp,
-		FirstValueOp, FloorDivOp, FunctionOp, GeOp, GtOp,
-		ILikeOp, IfErrOp, InOp, IndirectionOp, IsOp,
-		IsNotOp, IsTupleNotNullOp, IsTupleNullOp, JsonAggOp, JsonAllExistsOp,
-		JsonExistsOp, JsonObjectAggOp, JsonSomeExistsOp, JsonbAggOp, JsonbObjectAggOp,
-		KVOptionsOp, KVOptionsItemOp, LShiftOp, LagOp, LastValueOp,
-		LeOp, LeadOp, LikeOp, LtOp, MaxOp,
-		MinOp, MinusOp, ModOp, MultOp, NeOp,
-		NotOp, NotILikeOp, NotInOp, NotLikeOp, NotRegIMatchOp,
-		NotRegMatchOp, NotSimilarToOp, NthValueOp, NtileOp, NullOp,
-		OrOp, OverlapsOp, PercentRankOp, PercentileContOp, PercentileDiscOp,
-		PlaceholderOp, PlusOp, PowOp, ProjectionsOp, ProjectionsItemOp,
-		RShiftOp, RangeOp, RankOp, RegIMatchOp, RegMatchOp,
-		RegressionAvgXOp, RegressionAvgYOp, RegressionCountOp, RegressionInterceptOp, RegressionR2Op,
-		RegressionSXXOp, RegressionSXYOp, RegressionSYYOp, RegressionSlopeOp, RowNumberOp,
-		STCollectOp, STExtentOp, STMakeLineOp, STUnionOp, ScalarListOp,
-		SimilarToOp, SqrDiffOp, StdDevOp, StdDevPopOp, StringAggOp,
-		SubqueryOp, SumOp, SumIntOp, TrueOp, TupleOp,
-		UDFOp, UnaryCbrtOp, UnaryComplementOp, UnaryMinusOp, UnaryPlusOp,
-		UnarySqrtOp, UniqueChecksOp, UniqueChecksItemOp, VarPopOp, VariableOp,
-		VarianceOp, WhenOp, WindowFromOffsetOp, WindowToOffsetOp, WindowsOp,
-		WindowsItemOp, XorAggOp, ZipOp, ZipItemOp:
+		ArrayAggOp, ArrayCatAggOp, ArrayFlattenOp, AssignmentCastOp, AvgOp,
+		BBoxCoversOp, BBoxIntersectsOp, BitAndAggOp, BitOrAggOp, BitandOp,
+		BitorOp, BitxorOp, BoolAndOp, BoolOrOp, CaseOp,
+		CastOp, CoalesceOp, CollateOp, ColumnAccessOp, ConcatOp,
+		ConcatAggOp, ConstOp, ConstAggOp, ConstNotNullAggOp, ContainedByOp,
+		ContainsOp, CorrOp, CountOp, CountRowsOp, CovarPopOp,
+		CovarSampOp, CumeDistOp, DenseRankOp, DivOp, EqOp,
+		ExistsOp, FKChecksOp, FKChecksItemOp, FalseOp, FetchTextOp,
+		FetchTextPathOp, FetchValOp, FetchValPathOp, FiltersOp, FiltersItemOp,
+		FirstAggOp, FirstValueOp, FloorDivOp, FunctionOp, GeOp,
+		GtOp, ILikeOp, IfErrOp, InOp, IndirectionOp,
+		IsOp, IsNotOp, IsTupleNotNullOp, IsTupleNullOp, JsonAggOp,
+		JsonAllExistsOp, JsonExistsOp, JsonObjectAggOp, JsonSomeExistsOp, JsonbAggOp,
+		JsonbObjectAggOp, KVOptionsOp, KVOptionsItemOp, LShiftOp, LagOp,
+		LastValueOp, LeOp, LeadOp, LikeOp, LtOp,
+		MaxOp, MinOp, MinusOp, ModOp, MultOp,
+		NeOp, NotOp, NotILikeOp, NotInOp, NotLikeOp,
+		NotRegIMatchOp, NotRegMatchOp, NotSimilarToOp, NthValueOp, NtileOp,
+		NullOp, OrOp, OverlapsOp, PercentRankOp, PercentileContOp,
+		PercentileDiscOp, PlaceholderOp, PlusOp, PowOp, ProjectionsOp,
+		ProjectionsItemOp, RShiftOp, RangeOp, RankOp, RegIMatchOp,
+		RegMatchOp, RegressionAvgXOp, RegressionAvgYOp, RegressionCountOp, RegressionInterceptOp,
+		RegressionR2Op, RegressionSXXOp, RegressionSXYOp, RegressionSYYOp, RegressionSlopeOp,
+		RowNumberOp, STCollectOp, STExtentOp, STMakeLineOp, STUnionOp,
+		ScalarListOp, SimilarToOp, SqrDiffOp, StdDevOp, StdDevPopOp,
+		StringAggOp, SubqueryOp, SumOp, SumIntOp, TrueOp,
+		TupleOp, UDFOp, UnaryCbrtOp, UnaryComplementOp, UnaryMinusOp,
+		UnaryPlusOp, UnarySqrtOp, UniqueChecksOp, UniqueChecksItemOp, VarPopOp,
+		VariableOp, VarianceOp, WhenOp, WindowFromOffsetOp, WindowToOffsetOp,
+		WindowsOp, WindowsItemOp, XorAggOp, ZipOp, ZipItemOp:
 		return true
 	}
 	return false
@@ -2212,6 +2215,7 @@ func IsUnaryOp(e Expr) bool {
 var AggregateOperators = [...]Operator{
 	AnyNotNullAggOp,
 	ArrayAggOp,
+	ArrayCatAggOp,
 	AvgOp,
 	BitAndAggOp,
 	BitOrAggOp,
@@ -2260,16 +2264,16 @@ var AggregateOperators = [...]Operator{
 
 func IsAggregateOp(e Expr) bool {
 	switch e.Op() {
-	case AnyNotNullAggOp, ArrayAggOp, AvgOp, BitAndAggOp,
-		BitOrAggOp, BoolAndOp, BoolOrOp, ConcatAggOp, ConstAggOp,
-		ConstNotNullAggOp, CorrOp, CountOp, CountRowsOp, CovarPopOp,
-		CovarSampOp, FirstAggOp, JsonAggOp, JsonObjectAggOp, JsonbAggOp,
-		JsonbObjectAggOp, MaxOp, MinOp, PercentileContOp, PercentileDiscOp,
-		RegressionAvgXOp, RegressionAvgYOp, RegressionCountOp, RegressionInterceptOp, RegressionR2Op,
-		RegressionSXXOp, RegressionSXYOp, RegressionSYYOp, RegressionSlopeOp, STCollectOp,
-		STExtentOp, STMakeLineOp, STUnionOp, SqrDiffOp, StdDevOp,
-		StdDevPopOp, StringAggOp, SumOp, SumIntOp, VarPopOp,
-		VarianceOp, XorAggOp:
+	case AnyNotNullAggOp, ArrayAggOp, ArrayCatAggOp, AvgOp,
+		BitAndAggOp, BitOrAggOp, BoolAndOp, BoolOrOp, ConcatAggOp,
+		ConstAggOp, ConstNotNullAggOp, CorrOp, CountOp, CountRowsOp,
+		CovarPopOp, CovarSampOp, FirstAggOp, JsonAggOp, JsonObjectAggOp,
+		JsonbAggOp, JsonbObjectAggOp, MaxOp, MinOp, PercentileContOp,
+		PercentileDiscOp, RegressionAvgXOp, RegressionAvgYOp, RegressionCountOp, RegressionInterceptOp,
+		RegressionR2Op, RegressionSXXOp, RegressionSXYOp, RegressionSYYOp, RegressionSlopeOp,
+		STCollectOp, STExtentOp, STMakeLineOp, STUnionOp, SqrDiffOp,
+		StdDevOp, StdDevPopOp, StringAggOp, SumOp, SumIntOp,
+		VarPopOp, VarianceOp, XorAggOp:
 		return true
 	}
 	return false
