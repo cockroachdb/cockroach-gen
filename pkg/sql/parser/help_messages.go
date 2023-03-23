@@ -1957,47 +1957,48 @@ UPSERT INTO <tablename> [AS <name>] [( <colnames...> )]
 		Text: `
 UPDATE <tablename> [[AS] <name>]
        SET ...
+       [FROM <source>]
        [WHERE <expr>]
        [ORDER BY <exprs...>]
        [LIMIT <expr>]
        [RETURNING <exprs...>]
 `,
-		//line sql.y: 9873
+		//line sql.y: 9874
 		SeeAlso: `INSERT, UPSERT, DELETE, WEBDOCS/update.html
 `,
 	},
-	//line sql.y: 9929
+	//line sql.y: 9930
 	`REASSIGN OWNED BY`: {
 		ShortDescription: `change ownership of all objects`,
-		//line sql.y: 9930
-		Category: hPriv,
 		//line sql.y: 9931
+		Category: hPriv,
+		//line sql.y: 9932
 		Text: `REASSIGN OWNED BY {<name> | CURRENT_USER | SESSION_USER}[,...]
 TO {<name> | CURRENT_USER | SESSION_USER}
 `,
-		//line sql.y: 9933
+		//line sql.y: 9934
 		SeeAlso: `DROP OWNED BY
 `,
 	},
-	//line sql.y: 9944
+	//line sql.y: 9945
 	`DROP OWNED BY`: {
 		ShortDescription: `remove database objects owned by role(s).`,
-		//line sql.y: 9945
-		Category: hPriv,
 		//line sql.y: 9946
+		Category: hPriv,
+		//line sql.y: 9947
 		Text: `DROP OWNED BY {<name> | CURRENT_USER | SESSION_USER}[,...]
 [RESTRICT | CASCADE]
 `,
-		//line sql.y: 9948
+		//line sql.y: 9949
 		SeeAlso: `REASSIGN OWNED BY
 `,
 	},
-	//line sql.y: 10128
+	//line sql.y: 10129
 	`<SELECTCLAUSE>`: {
 		ShortDescription: `access tabular data`,
-		//line sql.y: 10129
-		Category: hDML,
 		//line sql.y: 10130
+		Category: hDML,
+		//line sql.y: 10131
 		Text: `
 Select clause:
   TABLE <tablename>
@@ -2005,12 +2006,12 @@ Select clause:
   SELECT ... [ { INTERSECT | UNION | EXCEPT } [ ALL | DISTINCT ] <selectclause> ]
 `,
 	},
-	//line sql.y: 10141
+	//line sql.y: 10142
 	`SELECT`: {
 		ShortDescription: `retrieve rows from a data source and compute a result`,
-		//line sql.y: 10142
-		Category: hDML,
 		//line sql.y: 10143
+		Category: hDML,
+		//line sql.y: 10144
 		Text: `
 SELECT [DISTINCT [ ON ( <expr> [ , ... ] ) ] ]
        { <expr> [[AS] <name>] | [ [<dbname>.] <tablename>. ] * } [, ...]
@@ -2024,40 +2025,40 @@ SELECT [DISTINCT [ ON ( <expr> [ , ... ] ) ] ]
        [ LIMIT { <expr> | ALL } ]
        [ OFFSET <expr> [ ROW | ROWS ] ]
 `,
-		//line sql.y: 10155
+		//line sql.y: 10156
 		SeeAlso: `WEBDOCS/select-clause.html
 `,
 	},
-	//line sql.y: 10230
+	//line sql.y: 10231
 	`TABLE`: {
 		ShortDescription: `select an entire table`,
-		//line sql.y: 10231
-		Category: hDML,
 		//line sql.y: 10232
+		Category: hDML,
+		//line sql.y: 10233
 		Text: `TABLE <tablename>
 `,
-		//line sql.y: 10233
+		//line sql.y: 10234
 		SeeAlso: `SELECT, VALUES, WEBDOCS/table-expressions.html
 `,
 	},
-	//line sql.y: 10595
+	//line sql.y: 10596
 	`VALUES`: {
 		ShortDescription: `select a given set of values`,
-		//line sql.y: 10596
-		Category: hDML,
 		//line sql.y: 10597
+		Category: hDML,
+		//line sql.y: 10598
 		Text: `VALUES ( <exprs...> ) [, ...]
 `,
-		//line sql.y: 10598
+		//line sql.y: 10599
 		SeeAlso: `SELECT, TABLE, WEBDOCS/table-expressions.html
 `,
 	},
-	//line sql.y: 10733
+	//line sql.y: 10734
 	`<SOURCE>`: {
 		ShortDescription: `define a data source for SELECT`,
-		//line sql.y: 10734
-		Category: hDML,
 		//line sql.y: 10735
+		Category: hDML,
+		//line sql.y: 10736
 		Text: `
 Data sources:
   <tablename> [ @ { <idxname> | <indexflags> } ]
@@ -2084,7 +2085,7 @@ Join types:
   { INNER | { LEFT | RIGHT | FULL } [OUTER] } [ { HASH | MERGE | LOOKUP | INVERTED } ]
 
 `,
-		//line sql.y: 10760
+		//line sql.y: 10761
 		SeeAlso: `WEBDOCS/table-expressions.html
 `,
 	},
