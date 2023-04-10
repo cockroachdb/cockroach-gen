@@ -2819,6 +2819,7 @@ parallelize_multi_key_lookup_joins_enabled            off                 NULL  
 password_encryption                                   scram-sha-256       NULL      NULL        NULL        string
 pg_trgm.similarity_threshold                          0.3                 NULL      NULL        NULL        string
 prefer_lookup_joins_for_fks                           off                 NULL      NULL        NULL        string
+prepared_statements_cache_size                        0 B                 NULL      NULL        NULL        string
 propagate_input_ordering                              off                 NULL      NULL        NULL        string
 reorder_joins_limit                                   8                   NULL      NULL        NULL        string
 require_explicit_primary_keys                         off                 NULL      NULL        NULL        string
@@ -2835,6 +2836,7 @@ show_primary_key_constraint_on_not_visible_columns    on                  NULL  
 sql_safe_updates                                      off                 NULL      NULL        NULL        string
 standard_conforming_strings                           on                  NULL      NULL        NULL        string
 statement_timeout                                     0                   NULL      NULL        NULL        string
+streamer_enabled                                      on                  NULL      NULL        NULL        string
 stub_catalog_tables                                   on                  NULL      NULL        NULL        string
 synchronize_seqscans                                  on                  NULL      NULL        NULL        string
 synchronous_commit                                    on                  NULL      NULL        NULL        string
@@ -2961,6 +2963,7 @@ parallelize_multi_key_lookup_joins_enabled            off                 NULL  
 password_encryption                                   scram-sha-256       NULL  user     NULL      scram-sha-256       scram-sha-256
 pg_trgm.similarity_threshold                          0.3                 NULL  user     NULL      0.3                 0.3
 prefer_lookup_joins_for_fks                           off                 NULL  user     NULL      off                 off
+prepared_statements_cache_size                        0 B                 NULL  user     NULL      0 B                 0 B
 propagate_input_ordering                              off                 NULL  user     NULL      off                 off
 reorder_joins_limit                                   8                   NULL  user     NULL      8                   8
 require_explicit_primary_keys                         off                 NULL  user     NULL      off                 off
@@ -2977,6 +2980,7 @@ show_primary_key_constraint_on_not_visible_columns    on                  NULL  
 sql_safe_updates                                      off                 NULL  user     NULL      off                 off
 standard_conforming_strings                           on                  NULL  user     NULL      on                  on
 statement_timeout                                     0                   NULL  user     NULL      0s                  0s
+streamer_enabled                                      on                  NULL  user     NULL      on                  on
 stub_catalog_tables                                   on                  NULL  user     NULL      on                  on
 synchronize_seqscans                                  on                  NULL  user     NULL      on                  on
 synchronous_commit                                    on                  NULL  user     NULL      on                  on
@@ -3101,6 +3105,7 @@ parallelize_multi_key_lookup_joins_enabled            NULL    NULL     NULL     
 password_encryption                                   NULL    NULL     NULL     NULL        NULL
 pg_trgm.similarity_threshold                          NULL    NULL     NULL     NULL        NULL
 prefer_lookup_joins_for_fks                           NULL    NULL     NULL     NULL        NULL
+prepared_statements_cache_size                        NULL    NULL     NULL     NULL        NULL
 propagate_input_ordering                              NULL    NULL     NULL     NULL        NULL
 reorder_joins_limit                                   NULL    NULL     NULL     NULL        NULL
 require_explicit_primary_keys                         NULL    NULL     NULL     NULL        NULL
@@ -3118,6 +3123,7 @@ show_primary_key_constraint_on_not_visible_columns    NULL    NULL     NULL     
 sql_safe_updates                                      NULL    NULL     NULL     NULL        NULL
 standard_conforming_strings                           NULL    NULL     NULL     NULL        NULL
 statement_timeout                                     NULL    NULL     NULL     NULL        NULL
+streamer_enabled                                      NULL    NULL     NULL     NULL        NULL
 stub_catalog_tables                                   NULL    NULL     NULL     NULL        NULL
 synchronize_seqscans                                  NULL    NULL     NULL     NULL        NULL
 synchronous_commit                                    NULL    NULL     NULL     NULL        NULL
@@ -4787,3 +4793,8 @@ WHERE
     AND t.typname LIKE 'myt%';
 ----
 0
+
+# Regression test for a panic after physical planning combined rendering steps
+# (#95633).
+statement ok
+SELECT d.datname, pg_catalog.pg_get_userbyid(d.datdba) FROM pg_catalog.pg_database d;

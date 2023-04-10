@@ -848,23 +848,27 @@ func (p *Provider) runInstance(
 		vm.TagRoachprod: "Roachprod",
 	}
 
-	var sb strings.Builder
-	sb.WriteString("ResourceType=instance,Tags=[")
+	var labelPairs []string
+	addLabel := func(key, value string) {
+		labelPairs = append(labelPairs, fmt.Sprintf("{Key=%s,Value=%s}", key, value))
+	}
+
 	for key, value := range opts.CustomLabels {
 		_, ok := m[strings.ToLower(key)]
 		if ok {
 			return fmt.Errorf("duplicate label name defined: %s", key)
 		}
-		fmt.Fprintf(&sb, "{Key=%s,Value=%s},", key, value)
+		addLabel(key, value)
 	}
 	for key, value := range m {
 		if n, ok := awsLabelsNameMap[key]; ok {
 			key = n
 		}
-		fmt.Fprintf(&sb, "{Key=%s,Value=%s},", key, value)
+		addLabel(key, value)
 	}
-	s := sb.String()
-	tagSpecs := fmt.Sprintf("%s]", s[:len(s)-1])
+	labels := strings.Join(labelPairs, ",")
+	vmTagSpecs := fmt.Sprintf("ResourceType=instance,Tags=[%s]", labels)
+	volumeTagSpecs := fmt.Sprintf("ResourceType=volume,Tags=[%s]", labels)
 
 	var data struct {
 		Instances []struct {
@@ -909,7 +913,7 @@ func (p *Provider) runInstance(
 		"--region", az.region.Name,
 		"--security-group-ids", az.region.SecurityGroup,
 		"--subnet-id", az.subnetID,
-		"--tag-specifications", tagSpecs,
+		"--tag-specifications", vmTagSpecs, volumeTagSpecs,
 		"--user-data", "file://" + filename,
 	}
 

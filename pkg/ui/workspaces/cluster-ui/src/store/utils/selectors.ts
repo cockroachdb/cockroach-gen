@@ -9,6 +9,7 @@
 // licenses/APL.txt.
 
 import { createSelector } from "reselect";
+import { LocalStorageKeys } from "../localStorage";
 import { AppState } from "../reducers";
 
 export const adminUISelector = createSelector(
@@ -19,4 +20,29 @@ export const adminUISelector = createSelector(
 export const localStorageSelector = createSelector(
   adminUISelector,
   adminUiState => adminUiState?.localStorage,
+);
+
+export const selectTimeScale = createSelector(
+  localStorageSelector,
+  localStorage => localStorage[LocalStorageKeys.GLOBAL_TIME_SCALE],
+);
+
+export const selectStmtsPageLimit = createSelector(
+  localStorageSelector,
+  localStorage => localStorage[LocalStorageKeys.STMT_FINGERPRINTS_LIMIT],
+);
+
+export const selectStmtsPageReqSort = createSelector(
+  localStorageSelector,
+  localStorage => localStorage[LocalStorageKeys.STMT_FINGERPRINTS_SORT],
+);
+
+export const selectTxnsPageLimit = createSelector(
+  localStorageSelector,
+  localStorage => localStorage[LocalStorageKeys.TXN_FINGERPRINTS_LIMIT],
+);
+
+export const selectTxnsPageReqSort = createSelector(
+  localStorageSelector,
+  localStorage => localStorage[LocalStorageKeys.TXN_FINGERPRINTS_SORT],
 );

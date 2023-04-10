@@ -46,6 +46,7 @@ import {
   ActiveStatementsViewDispatchProps,
   StatementsPageDispatchProps,
   StatementsPageRootProps,
+  api,
 } from "@cockroachlabs/cluster-ui";
 import {
   cancelStatementDiagnosticsReportAction,
@@ -69,6 +70,7 @@ import { selectTimeScale } from "src/redux/timeScale";
 import {
   selectStatementsLastUpdated,
   selectStatementsDataValid,
+  selectStatementsDataInFlight,
 } from "src/selectors/executionFingerprintsSelectors";
 
 type ICollectedStatementStatistics =
@@ -110,7 +112,7 @@ export const selectStatements = createSelector(
     props: RouteComponentProps<any>,
     diagnosticsReportsPerStatement,
   ): AggregateStatistics[] => {
-    if (!state.data || !state.valid) {
+    if (!state?.data || !state?.valid) {
       return null;
     }
     let statements = flattenStatementStats(state.data.statements);
@@ -190,7 +192,7 @@ export const selectStatements = createSelector(
 export const selectApps = createSelector(
   (state: AdminUIState) => state.cachedData.statements,
   (state: CachedDataReducerState<StatementsResponseMessage>) => {
-    if (!state.data) {
+    if (!state?.data) {
       return [];
     }
 
@@ -226,7 +228,7 @@ export const selectApps = createSelector(
 export const selectDatabases = createSelector(
   (state: AdminUIState) => state.cachedData.statements,
   (state: CachedDataReducerState<StatementsResponseMessage>) => {
-    if (!state.data) {
+    if (!state?.data) {
       return [];
     }
     return Array.from(
@@ -246,7 +248,7 @@ export const selectDatabases = createSelector(
 export const selectTotalFingerprints = createSelector(
   (state: AdminUIState) => state.cachedData.statements,
   (state: CachedDataReducerState<StatementsResponseMessage>) => {
-    if (!state.data) {
+    if (!state?.data) {
       return 0;
     }
     const aggregated = aggregateStatementStats(state.data.statements);
@@ -259,7 +261,7 @@ export const selectTotalFingerprints = createSelector(
 export const selectLastReset = createSelector(
   (state: AdminUIState) => state.cachedData.statements,
   (state: CachedDataReducerState<StatementsResponseMessage>) => {
-    if (!state.data) {
+    if (!state?.data) {
       return "unknown";
     }
     return PrintTime(util.TimestampToMoment(state.data.last_reset));
@@ -273,7 +275,7 @@ export const statementColumnsLocalSetting = new LocalSetting(
 );
 
 export const sortSettingLocalSetting = new LocalSetting(
-  "sortSetting/StatementsPage",
+  "tableSortSetting/StatementsPage",
   (state: AdminUIState) => state.localSettings,
   { ascending: false, columnTitle: "executionCount" },
 );
@@ -288,6 +290,18 @@ export const searchLocalSetting = new LocalSetting(
   "search/StatementsPage",
   (state: AdminUIState) => state.localSettings,
   null,
+);
+
+export const reqSortSetting = new LocalSetting(
+  "reqSortSetting/StatementsPage",
+  (state: AdminUIState) => state.localSettings,
+  api.DEFAULT_STATS_REQ_OPTIONS.sort,
+);
+
+export const limitSetting = new LocalSetting(
+  "reqLimitSetting/StatementsPage",
+  (state: AdminUIState) => state.localSettings,
+  api.DEFAULT_STATS_REQ_OPTIONS.limit,
 );
 
 const fingerprintsPageActions = {
@@ -343,6 +357,8 @@ const fingerprintsPageActions = {
     statementColumnsLocalSetting.set(
       value.length === 0 ? " " : value.join(","),
     ),
+  onChangeLimit: (newLimit: number) => limitSetting.set(newLimit),
+  onChangeReqSort: (sort: api.SqlStatsSortType) => reqSortSetting.set(sort),
 };
 
 type StateProps = {
@@ -376,11 +392,16 @@ export default withRouter(
         sortSetting: sortSettingLocalSetting.selector(state),
         statements: selectStatements(state, props),
         isDataValid: selectStatementsDataValid(state),
+        isReqInFlight: selectStatementsDataInFlight(state),
         lastUpdated: selectStatementsLastUpdated(state),
         statementsError: state.cachedData.statements.lastError,
         totalFingerprints: selectTotalFingerprints(state),
         hasViewActivityRedactedRole: selectHasViewActivityRedactedRole(state),
         hasAdminRole: selectHasAdminRole(state),
+        limit: limitSetting.selector(state),
+        reqSortSetting: reqSortSetting.selector(state),
+        stmtsTotalRuntimeSecs:
+          state.cachedData?.statements?.data?.stmts_total_runtime_secs ?? 0,
       },
       activePageProps: mapStateToActiveStatementViewProps(state),
     }),

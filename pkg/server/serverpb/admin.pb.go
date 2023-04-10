@@ -3041,6 +3041,8 @@ func (m *ListTracingSnapshotsResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_ListTracingSnapshotsResponse proto.InternalMessageInfo
 
 type SnapshotInfo struct {
+	// SnapshotID identifies a specific snapshot which can be requested via a
+	// GetTracingSnapshotRequest. Negative IDs are used for "automatic" snapshots.
 	SnapshotID int64      `protobuf:"varint,1,opt,name=snapshot_id,json=snapshotId,proto3" json:"snapshot_id,omitempty"`
 	CapturedAt *time.Time `protobuf:"bytes,2,opt,name=captured_at,json=capturedAt,proto3,stdtime" json:"captured_at,omitempty"`
 }
@@ -3140,6 +3142,8 @@ func (m *TakeTracingSnapshotResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_TakeTracingSnapshotResponse proto.InternalMessageInfo
 
 type GetTracingSnapshotRequest struct {
+	// SnapshotId indicates which snapshot is requested. ID may be negative when
+	// requesting an "automatic" snapshot; see ListTracingSnapshotsResponse.
 	SnapshotId int64 `protobuf:"varint,1,opt,name=snapshot_id,json=snapshotId,proto3" json:"snapshot_id,omitempty"`
 }
 

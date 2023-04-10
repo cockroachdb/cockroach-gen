@@ -13,7 +13,7 @@ import { createSelector } from "reselect";
 import { RouteComponentProps, withRouter } from "react-router-dom";
 import {
   refreshNodes,
-  refreshStatements,
+  refreshTxns,
   refreshUserSQLRoles,
 } from "src/redux/apiReducers";
 import { AdminUIState } from "src/redux/state";
@@ -21,8 +21,10 @@ import { txnFingerprintIdAttr } from "src/util/constants";
 import { getMatchParamByName } from "src/util/query";
 import { nodeRegionsByIDSelector } from "src/redux/nodes";
 import {
+  reqSortSetting,
   selectData,
   selectLastError,
+  limitSetting,
 } from "src/views/transactions/transactionsPage";
 import {
   TransactionDetailsStateProps,
@@ -34,15 +36,16 @@ import { setGlobalTimeScaleAction } from "src/redux/statements";
 import { selectTimeScale } from "src/redux/timeScale";
 
 export const selectTransaction = createSelector(
-  (state: AdminUIState) => state.cachedData.statements,
+  (state: AdminUIState) => state.cachedData.transactions,
   (_state: AdminUIState, props: RouteComponentProps) => props,
   (transactionState, props) => {
     const transactions = transactionState.data?.transactions;
     if (!transactions) {
       return {
-        isLoading: true,
+        isLoading: transactionState.inFlight,
         transaction: null,
         lastUpdated: null,
+        isValid: transactionState.valid,
       };
     }
     const txnFingerprintId = getMatchParamByName(
@@ -56,9 +59,10 @@ export const selectTransaction = createSelector(
         txnFingerprintId,
     )[0];
     return {
-      isLoading: false,
+      isLoading: transactionState.inFlight,
       transaction: transaction,
       lastUpdated: transactionState?.setAt?.utc(),
+      isValid: transactionState.valid,
     };
   },
 );
@@ -69,10 +73,8 @@ export default withRouter(
       state: AdminUIState,
       props: TransactionDetailsProps,
     ): TransactionDetailsStateProps => {
-      const { isLoading, transaction, lastUpdated } = selectTransaction(
-        state,
-        props,
-      );
+      const { isLoading, transaction, lastUpdated, isValid } =
+        selectTransaction(state, props);
       return {
         timeScale: selectTimeScale(state),
         error: selectLastError(state),
@@ -86,10 +88,13 @@ export default withRouter(
         ),
         isLoading: isLoading,
         lastUpdated: lastUpdated,
+        isDataValid: isValid,
+        limit: limitSetting.selector(state),
+        reqSortSetting: reqSortSetting.selector(state),
       };
     },
     {
-      refreshData: refreshStatements,
+      refreshData: refreshTxns,
       refreshNodes,
       refreshUserSQLRoles,
       onTimeScaleChange: setGlobalTimeScaleAction,

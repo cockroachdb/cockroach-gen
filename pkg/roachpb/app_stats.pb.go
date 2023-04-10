@@ -319,9 +319,8 @@ var xxx_messageInfo_StatementStatisticsKey proto.InternalMessageInfo
 
 type AggregatedStatementMetadata struct {
 	Query string `protobuf:"bytes,1,opt,name=query" json:"query"`
-	// Formatted query is the return of the key_data.query after prettify_statement.
-	// The query above cannot be replaced by the formatted value, because is used as is for
-	// diagnostic bundle.
+	// Formatted query is the same value of query. It used to be formatted with prettify_statement,
+	// but until that function is improved (#91197), it should not be used.
 	FormattedQuery string   `protobuf:"bytes,2,opt,name=formatted_query,json=formattedQuery" json:"formatted_query"`
 	QuerySummary   string   `protobuf:"bytes,3,opt,name=query_summary,json=querySummary" json:"query_summary"`
 	StmtType       string   `protobuf:"bytes,4,opt,name=stmt_type,json=stmtType" json:"stmt_type"`

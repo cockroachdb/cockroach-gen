@@ -112,6 +112,10 @@ type Builder struct {
 	// are referenced multiple times in the same query.
 	views map[cat.View]*tree.Select
 
+	// sourceViews contains a map with all the views in the current data source
+	// chain. It is used to detect circular dependencies.
+	sourceViews map[string]struct{}
+
 	// subquery contains a pointer to the subquery which is currently being built
 	// (if any).
 	subquery *subquery
@@ -501,7 +505,7 @@ func (o *optTrackingTypeResolver) ResolveType(
 	if err != nil {
 		return nil, err
 	}
-	o.metadata.AddUserDefinedType(typ)
+	o.metadata.AddUserDefinedType(typ, name)
 	return typ, nil
 }
 
@@ -513,6 +517,6 @@ func (o *optTrackingTypeResolver) ResolveTypeByOID(
 	if err != nil {
 		return nil, err
 	}
-	o.metadata.AddUserDefinedType(typ)
+	o.metadata.AddUserDefinedType(typ, nil /* name */)
 	return typ, nil
 }

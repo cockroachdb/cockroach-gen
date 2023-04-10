@@ -45,12 +45,17 @@ func registerDiskStalledDetection(r registry.Registry) {
 			return &cgroupDiskStaller{t: t, c: c, readOrWrite: []string{"write"}, logsToo: true}
 		},
 	}
+	makeSpec := func() spec.ClusterSpec {
+		s := r.MakeClusterSpec(4, spec.ReuseNone())
+		s.PreferLocalSSD = false
+		return s
+	}
 	for name, makeStaller := range stallers {
 		name, makeStaller := name, makeStaller
 		r.Add(registry.TestSpec{
 			Name:    fmt.Sprintf("disk-stalled/%s", name),
 			Owner:   registry.OwnerStorage,
-			Cluster: r.MakeClusterSpec(4, spec.ReuseNone()),
+			Cluster: makeSpec(),
 			Timeout: 30 * time.Minute,
 			Run: func(ctx context.Context, t test.Test, c cluster.Cluster) {
 				runDiskStalledDetection(ctx, t, c, makeStaller(t, c), true /* doStall */)
@@ -76,7 +81,7 @@ func registerDiskStalledDetection(r registry.Registry) {
 					stallLogDir, stallDataDir,
 				),
 				Owner:   registry.OwnerStorage,
-				Cluster: r.MakeClusterSpec(4, spec.ReuseNone()),
+				Cluster: makeSpec(),
 				Timeout: 30 * time.Minute,
 				Run: func(ctx context.Context, t test.Test, c cluster.Cluster) {
 					runDiskStalledDetection(ctx, t, c, &fuseDiskStaller{
@@ -201,14 +206,12 @@ func runDiskStalledDetection(
 	}
 
 	// Let the workload continue after the stall.
-	{
-		workloadPauseDur := 10*time.Minute - timeutil.Since(workloadStartAt)
-		t.Status("letting workload continue for ", workloadPauseDur, " with n1 stalled")
-		select {
-		case <-ctx.Done():
-			t.Fatal(ctx.Err())
-		case <-time.After(workloadPauseDur):
-		}
+	workloadAfterDur := 10*time.Minute - timeutil.Since(workloadStartAt)
+	t.Status("letting workload continue for ", workloadAfterDur, " with n1 stalled")
+	select {
+	case <-ctx.Done():
+		t.Fatal(ctx.Err())
+	case <-time.After(workloadAfterDur):
 	}
 
 	{
@@ -219,7 +222,7 @@ func runDiskStalledDetection(
 		cum := response.Results[0].Datapoints
 		totalTxnsPostStall := cum[len(cum)-1].Value - totalTxnsPreStall
 		preStallTPS := totalTxnsPreStall / stallAt.Sub(workloadStartAt).Seconds()
-		postStallTPS := totalTxnsPostStall / now.Sub(stallAt).Seconds()
+		postStallTPS := totalTxnsPostStall / workloadAfterDur.Seconds()
 		t.L().PrintfCtx(ctx, "%.2f total transactions committed after stall\n", totalTxnsPostStall)
 		t.L().PrintfCtx(ctx, "pre-stall tps: %.2f, post-stall tps: %.2f\n", preStallTPS, postStallTPS)
 		if postStallTPS < preStallTPS/2 {
@@ -376,9 +379,9 @@ func (s *cgroupDiskStaller) device() (major, minor int) {
 	//    `cat /proc/partitions` and find `deviceName`
 	switch s.c.Spec().Cloud {
 	case spec.GCE:
-		// ls -l /dev/nvme0n1
-		// brw-rw---- 1 root disk 259, 0 Jan 26 20:05 /dev/nvme0n1
-		return 259, 0
+		// ls -l /dev/sdb
+		// brw-rw---- 1 root disk 8, 16 Mar 27 22:08 /dev/sdb
+		return 8, 16
 	default:
 		s.t.Fatalf("unsupported cloud %q", s.c.Spec().Cloud)
 		return 0, 0
@@ -455,7 +458,7 @@ func (s *fuseDiskStaller) Unstall(ctx context.Context, nodes option.NodeListOpti
 func getDevice(t test.Test, s spec.ClusterSpec) string {
 	switch s.Cloud {
 	case spec.GCE:
-		return "/dev/nvme0n1"
+		return "/dev/sdb"
 	case spec.AWS:
 		return "/dev/nvme1n1"
 	default:
