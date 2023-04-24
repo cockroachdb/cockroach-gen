@@ -28266,13 +28266,13 @@ sqldefault:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
 //line sql-gen.y:4177
 		{
-			sqlVAL.union.val = &tree.CreateExtension{IfNotExists: true, Name: sqlDollar[6].str}
+			sqlVAL.union.val = &tree.CreateExtension{IfNotExists: true, Name: tree.Name(sqlDollar[6].str)}
 		}
 	case 480:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
 //line sql-gen.y:4180
 		{
-			sqlVAL.union.val = &tree.CreateExtension{Name: sqlDollar[3].str}
+			sqlVAL.union.val = &tree.CreateExtension{Name: tree.Name(sqlDollar[3].str)}
 		}
 	case 481:
 		sqlDollar = sqlS[sqlpt-8 : sqlpt+1]
