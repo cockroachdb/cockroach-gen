@@ -835,8 +835,8 @@ func (_f *Factory) ConstructSelect(
 				passthrough := _project.Passthrough
 				rejectNullCols := _f.funcs.RejectNullCols(_project)
 				if !_f.funcs.ColsAreEmpty(rejectNullCols) {
-					nullRejectedCols := _f.funcs.IntersectionCols(projectionCols, rejectNullCols)
-					if _f.funcs.HasNullRejectingFilter(filters, nullRejectedCols) {
+					nullRejectedCols := _f.funcs.IntersectionCols(_f.funcs.IntersectionCols(projectionCols, rejectNullCols), _f.funcs.GetNullRejectedCols(filters))
+					if !_f.funcs.ColsAreEmpty(nullRejectedCols) {
 						if _f.matchedRule == nil || _f.matchedRule(opt.RejectNullsProject) {
 							_expr := _f.ConstructSelect(
 								_f.ConstructProject(
