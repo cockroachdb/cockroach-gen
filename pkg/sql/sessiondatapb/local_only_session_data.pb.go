@@ -208,6 +208,9 @@ type LocalOnlySessionData struct {
 	// InjectRetryErrorsEnabled causes statements inside an explicit
 	// transaction to return a transaction retry error. It is intended for
 	// developers to test their app's retry logic.
+	//
+	// Note that this session variable is **not** propagated to the internal
+	// executors - use InternalExecutorOverride for that.
 	InjectRetryErrorsEnabled bool `protobuf:"varint,54,opt,name=inject_retry_errors_enabled,json=injectRetryErrorsEnabled,proto3" json:"inject_retry_errors_enabled,omitempty"`
 	// NullOrderedLast controls whether NULL is ordered last. We default to
 	// NULLS FIRST for ascending order by default, whereas postgres defaults
