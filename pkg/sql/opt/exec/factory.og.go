@@ -717,17 +717,12 @@ type Factory interface {
 	//
 	// CreateView implements a CREATE VIEW statement.
 	ConstructCreateView(
+		createView *tree.CreateView,
 		schema cat.Schema,
-		viewName *cat.DataSourceName,
-		ifNotExists bool,
-		replace bool,
-		persistence tree.Persistence,
-		materialized bool,
 		viewQuery string,
 		columns colinfo.ResultColumns,
 		deps opt.SchemaDeps,
 		typeDeps opt.SchemaTypeDeps,
-		withData bool,
 	) (Node, error)
 
 	// ConstructSequenceSelect creates a node for a SequenceSelect operation.
@@ -1319,17 +1314,12 @@ func (StubFactory) ConstructCreateTableAs(
 }
 
 func (StubFactory) ConstructCreateView(
+	createView *tree.CreateView,
 	schema cat.Schema,
-	viewName *cat.DataSourceName,
-	ifNotExists bool,
-	replace bool,
-	persistence tree.Persistence,
-	materialized bool,
 	viewQuery string,
 	columns colinfo.ResultColumns,
 	deps opt.SchemaDeps,
 	typeDeps opt.SchemaTypeDeps,
-	withData bool,
 ) (Node, error) {
 	return struct{}{}, nil
 }

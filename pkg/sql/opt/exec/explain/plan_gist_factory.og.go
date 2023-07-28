@@ -812,33 +812,23 @@ func (f *PlanGistFactory) ConstructCreateTableAs(
 }
 
 func (f *PlanGistFactory) ConstructCreateView(
+	createView *tree.CreateView,
 	schema cat.Schema,
-	viewName *cat.DataSourceName,
-	ifNotExists bool,
-	replace bool,
-	persistence tree.Persistence,
-	materialized bool,
 	viewQuery string,
 	columns colinfo.ResultColumns,
 	deps opt.SchemaDeps,
 	typeDeps opt.SchemaTypeDeps,
-	withData bool,
 ) (exec.Node, error) {
 	f.encodeOperator(createViewOp)
 	f.encodeID(schema.ID())
 	f.encodeResultColumns(columns)
 	node, err := f.wrappedFactory.ConstructCreateView(
+		createView,
 		schema,
-		viewName,
-		ifNotExists,
-		replace,
-		persistence,
-		materialized,
 		viewQuery,
 		columns,
 		deps,
 		typeDeps,
-		withData,
 	)
 	return node, err
 }

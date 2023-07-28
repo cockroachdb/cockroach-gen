@@ -17370,13 +17370,11 @@ func (g *createViewGroup) bestProps() *bestProps {
 }
 
 type CreateViewPrivate struct {
+	// Syntax is the CREATE VIEW AST node.
+	Syntax *tree.CreateView
+
 	// Schema is the ID of the catalog schema into which the new table goes.
-	Schema       opt.SchemaID
-	ViewName     *tree.TableName
-	Persistence  tree.Persistence
-	IfNotExists  bool
-	Replace      bool
-	Materialized bool
+	Schema opt.SchemaID
 
 	// ViewQuery contains the query for the view; data sources are always fully
 	// qualified.
@@ -30416,12 +30414,8 @@ func (in *interner) InternCreateTable(val *CreateTableExpr) *CreateTableExpr {
 func (in *interner) InternCreateView(val *CreateViewExpr) *CreateViewExpr {
 	in.hasher.Init()
 	in.hasher.HashOperator(opt.CreateViewOp)
+	in.hasher.HashPointer(unsafe.Pointer(val.Syntax))
 	in.hasher.HashSchemaID(val.Schema)
-	in.hasher.HashPointer(unsafe.Pointer(val.ViewName))
-	in.hasher.HashPersistence(val.Persistence)
-	in.hasher.HashBool(val.IfNotExists)
-	in.hasher.HashBool(val.Replace)
-	in.hasher.HashBool(val.Materialized)
 	in.hasher.HashString(val.ViewQuery)
 	in.hasher.HashPresentation(val.Columns)
 	in.hasher.HashSchemaDeps(val.Deps)
@@ -30431,12 +30425,8 @@ func (in *interner) InternCreateView(val *CreateViewExpr) *CreateViewExpr {
 	in.cache.Start(in.hasher.hash)
 	for in.cache.Next() {
 		if existing, ok := in.cache.Item().(*CreateViewExpr); ok {
-			if in.hasher.IsSchemaIDEqual(val.Schema, existing.Schema) &&
-				in.hasher.IsPointerEqual(unsafe.Pointer(val.ViewName), unsafe.Pointer(existing.ViewName)) &&
-				in.hasher.IsPersistenceEqual(val.Persistence, existing.Persistence) &&
-				in.hasher.IsBoolEqual(val.IfNotExists, existing.IfNotExists) &&
-				in.hasher.IsBoolEqual(val.Replace, existing.Replace) &&
-				in.hasher.IsBoolEqual(val.Materialized, existing.Materialized) &&
+			if in.hasher.IsPointerEqual(unsafe.Pointer(val.Syntax), unsafe.Pointer(existing.Syntax)) &&
+				in.hasher.IsSchemaIDEqual(val.Schema, existing.Schema) &&
 				in.hasher.IsStringEqual(val.ViewQuery, existing.ViewQuery) &&
 				in.hasher.IsPresentationEqual(val.Columns, existing.Columns) &&
 				in.hasher.IsSchemaDepsEqual(val.Deps, existing.Deps) &&

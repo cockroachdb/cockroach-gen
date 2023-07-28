@@ -1364,30 +1364,20 @@ func (f *Factory) ConstructCreateTableAs(
 }
 
 func (f *Factory) ConstructCreateView(
+	createView *tree.CreateView,
 	schema cat.Schema,
-	viewName *cat.DataSourceName,
-	ifNotExists bool,
-	replace bool,
-	persistence tree.Persistence,
-	materialized bool,
 	viewQuery string,
 	columns colinfo.ResultColumns,
 	deps opt.SchemaDeps,
 	typeDeps opt.SchemaTypeDeps,
-	withData bool,
 ) (exec.Node, error) {
 	args := &createViewArgs{
-		Schema:       schema,
-		ViewName:     viewName,
-		IfNotExists:  ifNotExists,
-		Replace:      replace,
-		Persistence:  persistence,
-		Materialized: materialized,
-		ViewQuery:    viewQuery,
-		Columns:      columns,
-		deps:         deps,
-		typeDeps:     typeDeps,
-		withData:     withData,
+		CreateView: createView,
+		Schema:     schema,
+		ViewQuery:  viewQuery,
+		Columns:    columns,
+		deps:       deps,
+		typeDeps:   typeDeps,
 	}
 	_n, err := newNode(createViewOp, args, nil /* ordering */)
 	if err != nil {
@@ -1395,17 +1385,12 @@ func (f *Factory) ConstructCreateView(
 	}
 	// Build the "real" node.
 	wrapped, err := f.wrappedFactory.ConstructCreateView(
+		createView,
 		schema,
-		viewName,
-		ifNotExists,
-		replace,
-		persistence,
-		materialized,
 		viewQuery,
 		columns,
 		deps,
 		typeDeps,
-		withData,
 	)
 	if err != nil {
 		return nil, err
@@ -2313,17 +2298,12 @@ type createTableAsArgs struct {
 }
 
 type createViewArgs struct {
-	Schema       cat.Schema
-	ViewName     *cat.DataSourceName
-	IfNotExists  bool
-	Replace      bool
-	Persistence  tree.Persistence
-	Materialized bool
-	ViewQuery    string
-	Columns      colinfo.ResultColumns
-	deps         opt.SchemaDeps
-	typeDeps     opt.SchemaTypeDeps
-	withData     bool
+	CreateView *tree.CreateView
+	Schema     cat.Schema
+	ViewQuery  string
+	Columns    colinfo.ResultColumns
+	deps       opt.SchemaDeps
+	typeDeps   opt.SchemaTypeDeps
 }
 
 type sequenceSelectArgs struct {
