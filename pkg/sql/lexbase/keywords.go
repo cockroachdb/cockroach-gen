@@ -189,6 +189,7 @@ var KeywordsCategories = map[string]string{
 	"global":                        "U",
 	"goal":                          "U",
 	"grant":                         "R",
+	"grantee":                       "U",
 	"grants":                        "U",
 	"greatest":                      "C",
 	"group":                         "R",
@@ -768,6 +769,7 @@ var KeywordNames = []string{
 	"global",
 	"goal",
 	"grant",
+	"grantee",
 	"grants",
 	"greatest",
 	"group",
@@ -1538,6 +1540,8 @@ func GetKeywordID(k string) int32 {
 		return GOAL
 	case "grant":
 		return GRANT
+	case "grantee":
+		return GRANTEE
 	case "grants":
 		return GRANTS
 	case "greatest":
