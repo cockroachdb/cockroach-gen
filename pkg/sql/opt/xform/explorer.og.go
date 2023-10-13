@@ -2651,7 +2651,8 @@ func (_e *explorer) exploreGroupBy(
 							if _e.funcs.OtherAggsAreConst(aggregations, item) {
 								groupingPrivate := &_root.GroupingPrivate
 								if _e.funcs.IsCanonicalGroupBy(groupingPrivate) {
-									if _e.funcs.ColsAreConst(_e.funcs.GroupingCols(groupingPrivate), input) {
+									groupingCols := _e.funcs.GroupingCols(groupingPrivate)
+									if _e.funcs.ColsAreConst(groupingCols, input) {
 										if _e.o.matchedRule == nil || _e.o.matchedRule(opt.ReplaceMinWithLimit) {
 											var _last memo.RelExpr
 											if _e.o.appliedRule != nil {
@@ -2661,7 +2662,7 @@ func (_e *explorer) exploreGroupBy(
 												input,
 												_e.funcs.IntConst(tree.NewDInt(1)),
 												_e.funcs.MakeOrderingChoiceFromColumn(opt.MinOp, col),
-											), aggregations)
+											), aggregations, groupingCols)
 											if _e.o.appliedRule != nil {
 												_e.o.appliedRule(opt.ReplaceMinWithLimit, _root, _last.NextExpr())
 											}
@@ -2692,7 +2693,8 @@ func (_e *explorer) exploreGroupBy(
 						if _e.funcs.OtherAggsAreConst(aggregations, item) {
 							groupingPrivate := &_root.GroupingPrivate
 							if _e.funcs.IsCanonicalGroupBy(groupingPrivate) {
-								if _e.funcs.ColsAreConst(_e.funcs.GroupingCols(groupingPrivate), input) {
+								groupingCols := _e.funcs.GroupingCols(groupingPrivate)
+								if _e.funcs.ColsAreConst(groupingCols, input) {
 									if _e.o.matchedRule == nil || _e.o.matchedRule(opt.ReplaceMaxWithLimit) {
 										var _last memo.RelExpr
 										if _e.o.appliedRule != nil {
@@ -2702,7 +2704,7 @@ func (_e *explorer) exploreGroupBy(
 											input,
 											_e.funcs.IntConst(tree.NewDInt(1)),
 											_e.funcs.MakeOrderingChoiceFromColumn(opt.MaxOp, col),
-										), aggregations)
+										), aggregations, groupingCols)
 										if _e.o.appliedRule != nil {
 											_e.o.appliedRule(opt.ReplaceMaxWithLimit, _root, _last.NextExpr())
 										}
